@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NBB.Payments.Api": {
+      "commandName": "Project",
+      "launchUrl": "api/payables",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:2046"
+    }
+  }
+}

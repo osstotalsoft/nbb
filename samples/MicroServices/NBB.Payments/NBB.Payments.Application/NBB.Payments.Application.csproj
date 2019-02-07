@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1705;NU1701</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="NBB.Payments.Application.csproj.vspscc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\..\NBB.Invoices\NBB.Invoices.PublishedLanguage\NBB.Invoices.PublishedLanguage.csproj" />
+    <ProjectReference Include="..\NBB.Payments.Application.Commands\NBB.Payments.Application.Commands.csproj" />
+    <ProjectReference Include="..\NBB.Payments.Data\NBB.Payments.Data.csproj" />
+    <ProjectReference Include="..\NBB.Payments.Domain\NBB.Payments.Domain.csproj" />
+    <ProjectReference Include="..\NBB.Payments.PublishedLanguage\NBB.Payments.PublishedLanguage.csproj" />
+  </ItemGroup>
+
+</Project>

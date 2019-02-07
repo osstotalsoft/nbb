@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>NBB_Mono_04f3de64-51a9-466b-a489-ed331aba59c8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+    <None Remove="NBB.Mono.Migrations.csproj.vspscc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Migrations\NBB.EventStore.AdoNet.Migrations.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Contracts\NBB.Contracts.Migrations\NBB.Contracts.Migrations.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Invoices\NBB.Invoices.Migrations\NBB.Invoices.Migrations.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Migrations\NBB.Payments.Migrations.csproj" />
+  </ItemGroup>
+
+</Project>

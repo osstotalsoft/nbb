@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NBB.Mono": {
+      "commandName": "Project",
+      "launchUrl": "api/values",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:2047/"
+    }
+  }
+}

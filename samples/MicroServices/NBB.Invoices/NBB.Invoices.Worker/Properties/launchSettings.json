@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "NBB.Invoices.Worker": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "NETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

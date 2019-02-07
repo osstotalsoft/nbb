@@ -1,0 +1,7 @@
+**/obj/**
+**/bin/**
+**/dockerfile
+**/DROP/
+**/TEMP/
+**/packages/
+**/kube/**

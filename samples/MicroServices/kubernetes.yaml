@@ -1,0 +1,381 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "nbb-samples"
+  labels:
+    name: "nbb-samples"
+---
+apiVersion: v1
+data:
+  .dockerconfigjson: #{DOCKER_CONFIG_JSON}#
+kind: Secret
+metadata:
+  name: registrykey
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nbb-contracts-api
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: nbb-contracts-api
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: nbb-contracts-api
+        version: 1.0.0
+    spec:
+      containers:
+      - name: nbb-contracts-api
+        image: #{DOCKER_REPO}#/nbb.contracts.api:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Contracts;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}#
+        - name: Messaging__topic_prefix
+          value: UAT.
+        - name: Messaging__Kafka__bootstrap_servers
+          value: #{KAFKA_URL}#
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nbb-contracts-api
+  labels:
+    app: nbb-contracts-api
+spec:
+  ports:
+  - port: 80
+    name: http
+    protocol: TCP
+  selector:
+    app: nbb-contracts-api
+    version: 1.0.0
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nbb-contracts-api
+  labels:
+    app: nbb-contracts-api
+spec:
+  rules:
+  - host: nbb-contracts-api.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: nbb-contracts-api
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nbb-contracts-worker
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: nbb-contracts-worker
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: nbb-contracts-worker
+        version: 1.0.0
+    spec:
+      containers:
+      - name: nbb-contracts-worker
+        image: #{DOCKER_REPO}#/nbb.contracts.worker:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Contracts;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: ConnectionStrings__Logs
+          value: Server=#{DB_SERVER}#;Database=NBB_Logs;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: Messaging__topic_prefix
+          value: UAT.
+        - name: Messaging__Kafka__bootstrap_servers
+          value: #{KAFKA_URL}#
+        - name: Messaging__Kafka__group_id
+          value: NBB.Contracts.Worker
+        - name: EventStore__NBB__ConnectionString
+          value: Server=#{DB_SERVER}#;Database=NBB_Contracts;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nbb-contracts-migrations
+spec:
+  template:
+    spec:
+      containers:
+      - name: nbb-contracts-migrations
+        image: #{DOCKER_REPO}#/nbb.contracts.migrations:1.0.0
+        imagePullPolicy: Always
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Contracts;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: EventStore__NBB__ConnectionString
+          value: Server=#{DB_SERVER}#;Database=NBB_Contracts;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+      restartPolicy: Never
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nbb-invoices-api
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: nbb-invoices-api
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: nbb-invoices-api
+        version: 1.0.0
+    spec:
+      containers:
+      - name: nbb-invoices-api
+        image: #{DOCKER_REPO}#/nbb.invoices.api:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Invoices;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: Messaging__topic_prefix
+          value: UAT.
+        - name: Messaging__Kafka__bootstrap_servers
+          value: #{KAFKA_URL}#
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nbb-invoices-api
+  labels:
+    app: nbb-invoices-api
+spec:
+  ports:
+  - port: 80
+    name: http
+    protocol: TCP
+  selector:
+    app: nbb-invoices-api
+    version: 1.0.0
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nbb-invoices-api
+  labels:
+    app: nbb-invoices-api
+spec:
+  rules:
+  - host: nbb-invoices-api.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: nbb-invoices-api
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nbb-invoices-worker
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: nbb-invoices-worker
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: nbb-invoices-worker
+        version: 1.0.0
+    spec:
+      containers:
+      - name: nbb-invoices-worker
+        image: #{DOCKER_REPO}#/nbb.invoices.worker:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Invoices;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: ConnectionStrings__Logs
+          value: Server=#{DB_SERVER}#;Database=NBB_Logs;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: Messaging__topic_prefix
+          value: UAT.
+        - name: Messaging__Kafka__bootstrap_servers
+          value: #{KAFKA_URL}#
+        - name: Messaging__Kafka__group_id
+          value: NBB.Invoices.Worker
+        - name: EventStore__NBB__ConnectionString
+          value: Server=#{DB_SERVER}#;Database=NBB_Invoices;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nbb-invoices-migrations
+spec:
+  template:
+    spec:
+      containers:
+      - name: nbb-invoices-migrations
+        image: #{DOCKER_REPO}#/nbb.invoices.migrations:1.0.0
+        imagePullPolicy: Always
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Invoices;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: EventStore__NBB__ConnectionString
+          value: Server=#{DB_SERVER}#;Database=NBB_Invoices;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+      restartPolicy: Never
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nbb-payments-api
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: nbb-payments-api
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: nbb-payments-api
+        version: 1.0.0
+    spec:
+      containers:
+      - name: nbb-payments-api
+        image: #{DOCKER_REPO}#/nbb.payments.api:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Payments;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: Messaging__topic_prefix
+          value: UAT.
+        - name: Messaging__Kafka__bootstrap_servers
+          value: #{KAFKA_URL}#
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nbb-payments-api
+  labels:
+    app: nbb-payments-api
+spec:
+  ports:
+  - port: 80
+    name: http
+    protocol: TCP
+  selector:
+    app: nbb-payments-api
+    version: 1.0.0
+  type: NodePort
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nbb-payments-api
+  labels:
+    app: nbb-payments-api
+spec:
+  rules:
+  - host: nbb-payments-api.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: nbb-payments-api
+          servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nbb-payments-worker
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: nbb-payments-worker
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: nbb-payments-worker
+        version: 1.0.0
+    spec:
+      containers:
+      - name: nbb-payments-worker
+        image: #{DOCKER_REPO}#/nbb.payments.worker:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Payments;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: ConnectionStrings__Logs
+          value: Server=#{DB_SERVER}#;Database=NBB_Logs;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: Messaging__topic_prefix
+          value: UAT.
+        - name: Messaging__Kafka__bootstrap_servers
+          value: #{KAFKA_URL}#
+        - name: Messaging__Kafka__group_id
+          value: NBB.Payments.Worker
+        - name: EventStore__NBB__ConnectionString
+          value: Server=#{DB_SERVER}#;Database=NBB_Payments;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+      imagePullSecrets:
+      - name: registrykey
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nbb-payments-migrations
+spec:
+  template:
+    spec:
+      containers:
+      - name: nbb-payments-migrations
+        image: #{DOCKER_REPO}#/nbb.payments.migrations:1.0.0
+        imagePullPolicy: Always
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          value: Server=#{DB_SERVER}#;Database=NBB_Payments;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+        - name: EventStore__NBB__ConnectionString
+          value: Server=#{DB_SERVER}#;Database=NBB_Payments;User Id=#{DB_USER}#;Password=#{DB_PASSWORD}##;MultipleActiveResultSets=true
+      restartPolicy: Never
+      imagePullSecrets:
+      - name: registrykey
+---

@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NBB.Contracts.Api": {
+      "commandName": "Project",
+      "launchUrl": "api/contracts",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:2047/"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <DockerComposeProjectPath>..\..\MicroServices\docker-compose.dcproj</DockerComposeProjectPath>
+    <UserSecretsId>NBB_Mono_04f3de64-51a9-466b-a489-ed331aba59c8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="NBB.Mono.csproj.vspscc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="$(MediatRPackageVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="$(MicrosoftAspNetCoreAppPackageVersion)" />
+    <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
+    <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Core\NBB.Core.DependencyInjection\NBB.Core.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
+    <ProjectReference Include="..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />
+    <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
+    <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore\NBB.EventStore.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.InProcessMessaging\NBB.Messaging.InProcessMessaging.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Contracts\NBB.Contracts.Api\NBB.Contracts.Api.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Contracts\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Contracts\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Contracts\NBB.Contracts.WriteModel.Data\NBB.Contracts.WriteModel.Data.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Invoices\NBB.Invoices.Api\NBB.Invoices.Api.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Invoices\NBB.Invoices.Application\NBB.Invoices.Application.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Api\NBB.Payments.Api.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Application\NBB.Payments.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

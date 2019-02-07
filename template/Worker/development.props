@@ -1,0 +1,36 @@
+﻿<Project>
+  <PropertyGroup Label="PackageVersionOverrides">
+    <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
+    <MicrosoftEntityFrameworkPackagesVersion>2.2.0</MicrosoftEntityFrameworkPackagesVersion>
+    <MicrosoftAspNetCoreAppPackageVersion>2.2.0</MicrosoftAspNetCoreAppPackageVersion>
+  </PropertyGroup>
+  <PropertyGroup Label="Development">
+    <Develop>true</Develop>
+
+    <LocalNBB>true</LocalNBB>
+    <NBBPackagesVersion>3.4.31</NBBPackagesVersion>
+
+    <NatsMessagingTransport>true</NatsMessagingTransport>
+    <KafkaMessagingTransport>false</KafkaMessagingTransport>
+    <SqlLogging>false</SqlLogging>
+    <HealthCheck>false</HealthCheck>
+    <Resiliency>true</Resiliency>
+    <FluentValidation>true</FluentValidation>
+    <AutoMapper>true</AutoMapper>
+    <MediatR>true</MediatR>
+    <AddSamples>true</AddSamples>
+
+    <AspNetApp>$(HealthCheck)</AspNetApp>   
+
+    <ConditionalCompilationSymbols Condition="$(HealthCheck)">$(ConditionalCompilationSymbols);HealthCheck</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(NatsMessagingTransport)">$(ConditionalCompilationSymbols);NatsMessagingTransport</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(KafkaMessagingTransport)">$(ConditionalCompilationSymbols);KafkaMessagingTransport</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(AspNetApp)">$(ConditionalCompilationSymbols);AspNetApp</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(SqlLogging)">$(ConditionalCompilationSymbols);SqlLogging</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(Resiliency)">$(ConditionalCompilationSymbols);Resiliency</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(FluentValidation)">$(ConditionalCompilationSymbols);FluentValidation</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(AutoMapper)">$(ConditionalCompilationSymbols);AutoMapper</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(MediatR)">$(ConditionalCompilationSymbols);MediatR</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(AddSamples)">$(ConditionalCompilationSymbols);AddSamples</ConditionalCompilationSymbols>
+  </PropertyGroup>
+</Project>

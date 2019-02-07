@@ -1,0 +1,1 @@
+﻿dotnet run TheBenchmarks -c Release

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TheBenchmarks": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "NETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

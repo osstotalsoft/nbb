@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Serverless.Functions.Root": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "NETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

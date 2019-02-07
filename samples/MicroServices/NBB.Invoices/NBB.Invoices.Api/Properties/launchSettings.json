@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NBB.Invoices.Api": {
+      "commandName": "Project",
+      "launchUrl": "api/invoices",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:2048/"
+    }
+  }
+}
