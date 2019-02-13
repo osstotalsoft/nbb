@@ -16,5 +16,6 @@
     <SerilogExtensionsLoggingPackageVersion>2.0.2</SerilogExtensionsLoggingPackageVersion>
     <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
     <SerilogAspNetCorePackageVersion>2.1.1</SerilogAspNetCorePackageVersion>
+    <AutoMapperPackageVersion>8.0.0</AutoMapperPackageVersion>
   </PropertyGroup>
 </Project>
