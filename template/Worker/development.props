@@ -18,6 +18,7 @@
     <FluentValidation>true</FluentValidation>
     <AutoMapper>true</AutoMapper>
     <MediatR>true</MediatR>
+    <OpenTracing>true</OpenTracing>
     <AddSamples>true</AddSamples>
 
     <AspNetApp>$(HealthCheck)</AspNetApp>   
@@ -31,6 +32,7 @@
     <ConditionalCompilationSymbols Condition="$(FluentValidation)">$(ConditionalCompilationSymbols);FluentValidation</ConditionalCompilationSymbols>
     <ConditionalCompilationSymbols Condition="$(AutoMapper)">$(ConditionalCompilationSymbols);AutoMapper</ConditionalCompilationSymbols>
     <ConditionalCompilationSymbols Condition="$(MediatR)">$(ConditionalCompilationSymbols);MediatR</ConditionalCompilationSymbols>
+    <ConditionalCompilationSymbols Condition="$(OpenTracing)">$(ConditionalCompilationSymbols);OpenTracing</ConditionalCompilationSymbols>
     <ConditionalCompilationSymbols Condition="$(AddSamples)">$(ConditionalCompilationSymbols);AddSamples</ConditionalCompilationSymbols>
   </PropertyGroup>
 </Project>

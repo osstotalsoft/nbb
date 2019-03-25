@@ -13,6 +13,9 @@ using Serilog.Events;
 #if SqlLogging
 using Serilog.Sinks.MSSqlServer;
 #endif
+#if OpenTracing
+using NBB.Tools.Serilog.OpenTracingSink;
+#endif
 
 namespace NBB.Worker
 {
@@ -98,6 +101,9 @@ namespace NBB.Worker
                 .Enrich.FromLogContext()
                 .Enrich.With<CorrelationLogEventEnricher>()
                 .WriteTo.Console()
+#if OpenTracing
+                .WriteTo.OpenTracing()
+#endif
 #if SqlLogging
                 .WriteTo.MSSqlServer(connectionString, "__Logs", autoCreateSqlTable: true, columnOptions: columnOptions)
 #endif

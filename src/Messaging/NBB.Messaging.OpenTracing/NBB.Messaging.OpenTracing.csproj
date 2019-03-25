@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTracing" Version="$(OpenTracingPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\NBB.Core.Pipeline\NBB.Core.Pipeline.csproj" />
+    <ProjectReference Include="..\..\Correlation\NBB.Correlation\NBB.Correlation.csproj" />
+    <ProjectReference Include="..\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>
