@@ -21,6 +21,19 @@ using NBB.Worker.Messaging;
 using NBB.Messaging.Abstractions;
 #if NatsMessagingTransport
 using NBB.Messaging.Nats;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
+#if OpenTracing
+using NBB.Messaging.OpenTracing.Subscriber;
+using NBB.Messaging.OpenTracing.Publisher;
+using OpenTracing;
+using OpenTracing.Noop;
+using Jaeger;
+using Jaeger.Samplers;
+using Jaeger.Reporters;
+using Jaeger.Senders;
+using OpenTracing.Util;
+#endif
 #elif KafkaMessagingTransport
 using NBB.Messaging.Kafka;
 #endif
@@ -66,6 +79,9 @@ namespace NBB.Worker
 #if AddSamples
             services.Decorate<IMessageBusPublisher, SamplePublisherDecorator>();
 #endif
+#if OpenTracing
+            services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+#endif
             services.AddMessagingHost()
                 .AddSubscriberServices(selector =>
                 {
@@ -83,6 +99,9 @@ namespace NBB.Worker
                 .UsePipeline(builder => builder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
+#if OpenTracing
+                    .UseMiddleware<OpenTracingMiddleware>()
+#endif
 #if Resiliency
                     .UseDefaultResiliencyMiddleware()
 #endif
@@ -106,6 +125,37 @@ namespace NBB.Worker
 #if AutoMapper
             // AutoMapper
             services.AddAutoMapper(typeof(__AMappingProfile__).Assembly);
+#endif
+
+#if OpenTracing
+            // OpenTracing
+            services.AddOpenTracing();
+
+            services.AddSingleton<ITracer>(serviceProvider =>
+            {
+                if (!configuration.GetValue<bool>("OpenTracing:Jeager:IsEnabled"))
+                {
+                    return NoopTracerFactory.Create();
+                }
+
+                string serviceName = Assembly.GetEntryAssembly().GetName().Name;
+
+                ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+
+                ITracer tracer = new Tracer.Builder(serviceName)
+                    .WithLoggerFactory(loggerFactory)
+                    .WithSampler(new ConstSampler(true))
+                    .WithReporter(new RemoteReporter.Builder()
+                        .WithSender(new UdpSender(
+                            configuration.GetValue<string>("OpenTracing:Jeager:AgentHost"),
+                            configuration.GetValue<int>("OpenTracing:Jeager:AgentPort"), 0))
+                        .Build())
+                    .Build();
+
+                GlobalTracer.Register(tracer);
+
+                return tracer;
+            });
 #endif
         }
     }

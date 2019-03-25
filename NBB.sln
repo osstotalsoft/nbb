@@ -277,9 +277,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Worker", "template\Work
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{FF63A085-1882-4B60-8EF0-F416990EDCEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Tools.AutoMapperExtensions.Tests", "test\UnitTests\Tools\NBB.Tools.AutoMapperExtensions.Tests\NBB.Tools.AutoMapperExtensions.Tests.csproj", "{A0D92D4E-A1FD-48A6-A59D-21082695ECAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Tools.AutoMapperExtensions.Tests", "test\UnitTests\Tools\NBB.Tools.AutoMapperExtensions.Tests\NBB.Tools.AutoMapperExtensions.Tests.csproj", "{A0D92D4E-A1FD-48A6-A59D-21082695ECAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Tools.AutoMapperExtensions", "src\Tools\NBB.Tools.AutomapperExtensions\NBB.Tools.AutoMapperExtensions.csproj", "{9B8B7158-4194-442F-83D7-346FDFF51DB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Messaging.OpenTracing", "src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj", "{B5C4D462-E7AF-4146-9618-75FF242E148C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serilog", "Serilog", "{48E5BC6A-5846-4AD7-BFFB-C1D04C5C1BC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Tools.Serilog.OpenTracingSink", "src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj", "{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -645,6 +651,14 @@ Global
 		{9B8B7158-4194-442F-83D7-346FDFF51DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B8B7158-4194-442F-83D7-346FDFF51DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B8B7158-4194-442F-83D7-346FDFF51DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5C4D462-E7AF-4146-9618-75FF242E148C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5C4D462-E7AF-4146-9618-75FF242E148C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5C4D462-E7AF-4146-9618-75FF242E148C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5C4D462-E7AF-4146-9618-75FF242E148C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -773,6 +787,9 @@ Global
 		{FF63A085-1882-4B60-8EF0-F416990EDCEB} = {90E022FB-CA1B-49DD-9BEA-CE7F8E74E8BB}
 		{A0D92D4E-A1FD-48A6-A59D-21082695ECAC} = {FF63A085-1882-4B60-8EF0-F416990EDCEB}
 		{9B8B7158-4194-442F-83D7-346FDFF51DB1} = {70EA3420-74E3-4C9D-9858-57EC01AD31B3}
+		{B5C4D462-E7AF-4146-9618-75FF242E148C} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
+		{48E5BC6A-5846-4AD7-BFFB-C1D04C5C1BC2} = {70EA3420-74E3-4C9D-9858-57EC01AD31B3}
+		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59} = {48E5BC6A-5846-4AD7-BFFB-C1D04C5C1BC2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

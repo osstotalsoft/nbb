@@ -17,5 +17,8 @@
     <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
     <SerilogAspNetCorePackageVersion>2.1.1</SerilogAspNetCorePackageVersion>
     <AutoMapperPackageVersion>8.0.0</AutoMapperPackageVersion>
+    <OpenTracingPackageVersion>0.12.0</OpenTracingPackageVersion>
+    <OpenTracingContribPackageVersion>0.5.0</OpenTracingContribPackageVersion>
+    <JaegerPackageVersion>0.2.2</JaegerPackageVersion>
   </PropertyGroup>
 </Project>
