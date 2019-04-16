@@ -1,6 +1,8 @@
 FROM mono:5.14 AS docfx-image
 ENV DOCFX_VER 2.37.2
-RUN apt-get update && apt-get install unzip wget git -y && \
+#fix https://github.com/mono/docker/issues/73
+RUN apt-get update -y; exit 0
+RUN apt-get install unzip wget git -y && \
     wget -q -P /tmp https://github.com/dotnet/docfx/releases/download/v${DOCFX_VER}/docfx.zip && \
     mkdir -p /opt/docfx && \
     unzip /tmp/docfx.zip -d /opt/docfx && \
