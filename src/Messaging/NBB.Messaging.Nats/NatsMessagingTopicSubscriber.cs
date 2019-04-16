@@ -58,7 +58,8 @@ namespace NBB.Messaging.Nats
             opts.ManualAcks = _subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
             
             //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
-            opts.MaxInflight = 10;
+            opts.MaxInflight = 5;
+            opts.AckWait = 40000;
             
             void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
