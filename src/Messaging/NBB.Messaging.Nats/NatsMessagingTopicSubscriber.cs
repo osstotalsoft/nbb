@@ -56,7 +56,10 @@ namespace NBB.Messaging.Nats
             var qGroup = _configuration.GetSection("Messaging").GetSection("Nats")["qGroup"];
             var _subscriberOptions = options ?? new MessagingSubscriberOptions();
             opts.ManualAcks = _subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
-
+            
+            //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
+            opts.MaxInflight = 10;
+            
             void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
                 _logger.LogDebug("Nats subscriber {QGroup} received message from subject {Subject}", qGroup,
