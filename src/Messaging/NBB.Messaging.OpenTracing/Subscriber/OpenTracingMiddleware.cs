@@ -4,7 +4,6 @@ using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Tag;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Abstractions;
@@ -25,14 +24,17 @@ namespace NBB.Messaging.OpenTracing.Subscriber
         public async Task Invoke(MessagingEnvelope data, CancellationToken cancellationToken, Func<Task> next)
         {
             var extractedSpanContext = _tracer.Extract(BuiltinFormats.TextMap, new TextMapExtractAdapter(data.Headers));
-            string operationName =  $"Subscriber {data.Payload.GetType().GetPrettyName()}"; 
+            string operationName = $"Subscriber {data.Payload.GetType().GetPrettyName()}";
 
-            using(var scope = _tracer.BuildSpan(operationName)
-                .AsChildOf(extractedSpanContext)
-                .WithTag(Tags.Component, "NBB.Messaging.Subscriber")
-                .WithTag(Tags.SpanKind, Tags.SpanKindServer)
+            using (var scope = _tracer.BuildSpan(operationName)
+                .AddReference(References.FollowsFrom, extractedSpanContext)
+                .WithTag(Tags.Component, "NBB.Messaging")
+                .WithTag(Tags.SpanKind, Tags.SpanKindConsumer)
+                .WithTag(Tags.PeerService,
+                    data.Headers.TryGetValue(MessagingHeaders.Source, out var value) ? value : default)
                 .WithTag("correlationId", CorrelationManager.GetCorrelationId()?.ToString())
-                .StartActive(finishSpanOnDispose: true)) {
+                .StartActive(true))
+            {
 
                 try
                 {
@@ -40,19 +42,10 @@ namespace NBB.Messaging.OpenTracing.Subscriber
                 }
                 catch (Exception exception)
                 {
-                    scope.Span.Log(new Dictionary<string, object>(3)
-                    {
-                        { LogFields.Event, Tags.Error.Key },
-                        { LogFields.ErrorKind, exception.GetType().Name },
-                        { LogFields.ErrorObject, exception }
-                    });
-                
-                    scope.Span.SetTag(Tags.Error, true);
-
+                    scope.Span.SetException(exception);
                     throw;
                 }
             }
-            return;
         }
     }
 }
