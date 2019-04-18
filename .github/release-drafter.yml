@@ -5,7 +5,7 @@ categories:
     label: feature
   - title: 🐛 Bug Fixes
     label: fix
-  - title: 🧰 Maintenance
+  - title: 🛠️ Maintenance
     label: chore
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 template: |
