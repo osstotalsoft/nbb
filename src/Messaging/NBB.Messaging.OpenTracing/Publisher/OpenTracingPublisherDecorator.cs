@@ -6,7 +6,6 @@ using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Tag;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,11 +15,13 @@ namespace NBB.Messaging.OpenTracing.Publisher
     {
         private readonly IMessageBusPublisher _inner;
         private readonly ITracer _tracer;
+        private readonly ITopicRegistry _topicRegistry;
 
-        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITracer tracer)
+        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITracer tracer,ITopicRegistry topicRegistry)
         {
             _inner = inner;
             _tracer = tracer;
+            _topicRegistry = topicRegistry;
         }
 
         public Task PublishAsync<T>(T message, CancellationToken cancellationToken, Action<MessagingEnvelope> customizer = null, string topicName = null)
@@ -36,28 +37,24 @@ namespace NBB.Messaging.OpenTracing.Publisher
                 customizer?.Invoke(outgoingEnvelope);
             }
 
-            string operationName = $"Publisher {message.GetType().GetPrettyName()}";
+            var formattedTopicName = _topicRegistry.GetTopicForName(topicName) ??
+                               _topicRegistry.GetTopicForMessageType(message.GetType());
+            var operationName = $"Publisher {message.GetType().GetPrettyName()}";
+
             using (var scope = _tracer.BuildSpan(operationName)
-                .WithTag(Tags.Component, "NBB.Messaging.Publisher")
-                .WithTag(Tags.SpanKind, Tags.SpanKindServer)
-                .WithTag("correlationId", CorrelationManager.GetCorrelationId()?.ToString())
-                .StartActive(finishSpanOnDispose: true))
+                .WithTag(Tags.Component, MessagingTags.ComponentMessaging)
+                .WithTag(Tags.SpanKind, Tags.SpanKindProducer)
+                .WithTag(Tags.MessageBusDestination, formattedTopicName)
+                .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
+                .StartActive(true))
             {
                 try
                 {
-                    return _inner.PublishAsync(message, cancellationToken, NewCustomizer);
+                    return _inner.PublishAsync(message, cancellationToken, NewCustomizer, topicName);
                 }
                 catch (Exception exception)
                 {
-                    scope.Span.Log(new Dictionary<string, object>(3)
-                    {
-                        { LogFields.Event, Tags.Error.Key },
-                        { LogFields.ErrorKind, exception.GetType().Name },
-                        { LogFields.ErrorObject, exception }
-                    });
-                
-                    scope.Span.SetTag(Tags.Error, true);
-
+                    scope.Span.SetException(exception);
                     throw;
                 }
             }
