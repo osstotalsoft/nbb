@@ -9,19 +9,18 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.Nats
 {
-    public class NatsMessagingTopicSubscriber : IMessagingTopicSubscriber, IDisposable
+    public class NatsMessagingTopicSubscriber : IMessagingTopicSubscriber
     {
-        private readonly StanConnectionProvider _stanConnectionProvider;
+        private readonly StanConnectionProvider _stanConnectionManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<NatsMessagingTopicSubscriber> _logger;
 
-        private IStanConnection _stanConnection;
         private bool _subscribedToTopic;
 
-        public NatsMessagingTopicSubscriber(StanConnectionProvider stanConnectionProvider, IConfiguration configuration, 
+        public NatsMessagingTopicSubscriber(StanConnectionProvider stanConnectionManager, IConfiguration configuration, 
             ILogger<NatsMessagingTopicSubscriber> logger)
         {
-            _stanConnectionProvider = stanConnectionProvider;
+            _stanConnectionManager = stanConnectionManager;
             _configuration = configuration;
             _logger = logger;
         }
@@ -52,10 +51,9 @@ namespace NBB.Messaging.Nats
         {
             var opts = StanSubscriptionOptions.GetDefaultOptions();
             opts.DurableName = _configuration.GetSection("Messaging").GetSection("Nats")["durableName"];
-            _stanConnection = _stanConnectionProvider.GetConnection();
             var qGroup = _configuration.GetSection("Messaging").GetSection("Nats")["qGroup"];
-            var _subscriberOptions = options ?? new MessagingSubscriberOptions();
-            opts.ManualAcks = _subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
+            var subscriberOptions = options ?? new MessagingSubscriberOptions();
+            opts.ManualAcks = subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
             
             //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
             opts.MaxInflight = 1;
@@ -70,7 +68,7 @@ namespace NBB.Messaging.Nats
 
                 try
                 {
-                    if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial)
+                    if (subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial)
                     {
                         handler(json).Wait(token);
                     }
@@ -83,22 +81,21 @@ namespace NBB.Messaging.Nats
                     //TODO: push to DLQ
                 }
 
-                if (_subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Serial)
+                if (subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Serial)
                 {
                     args.Message.Ack();
                 }
             }
 
-            var s = _subscriberOptions.ConsumerType == MessagingConsumerType.CollaborativeConsumer 
-                    ? _stanConnection.Subscribe(subject, opts, StanMsgHandler)
-                    : _stanConnection.Subscribe(subject, qGroup, opts, StanMsgHandler);
+            _stanConnectionManager.Execute(stanConnection =>
+            {
+                var _ = subscriberOptions.ConsumerType == MessagingConsumerType.CollaborativeConsumer
+                    ? stanConnection.Subscribe(subject, opts, StanMsgHandler)
+                    : stanConnection.Subscribe(subject, qGroup, opts, StanMsgHandler);
+            });
+            
 
             return Task.CompletedTask;
-        }
-
-        public void Dispose()
-        {
-            _stanConnection.Dispose();
         }
     }
 }
