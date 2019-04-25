@@ -45,7 +45,6 @@ namespace NBB.Messaging.Nats.Internal
         public void Execute(Action<IStanConnection> action)
         {
             var connection = GetAndCheckConnection();
-
             try
             {
                 action(connection);
