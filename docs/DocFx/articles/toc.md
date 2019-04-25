@@ -11,3 +11,4 @@
 #[Expression evaluator](expression_evaluator.md)
 #[Excel exporter](excel_exporter.md)
 #[CSV exporter](csv_exporter.md)
+#[Debugging](debugging.md)
