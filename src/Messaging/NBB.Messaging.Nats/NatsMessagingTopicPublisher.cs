@@ -1,34 +1,35 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using NBB.Messaging.Nats.Internal;
 
 namespace NBB.Messaging.Nats
 {
     public class NatsMessagingTopicPublisher : IMessagingTopicPublisher
     {
-        private readonly StanConnectionProvider _stanConnectionProvider;
+        private readonly StanConnectionProvider _stanConnectionManager;
         private readonly ILogger<NatsMessagingTopicPublisher> _logger;
 
-        public NatsMessagingTopicPublisher(StanConnectionProvider stanConnectionProvider, ILogger<NatsMessagingTopicPublisher> logger)
+        public NatsMessagingTopicPublisher(StanConnectionProvider stanConnectionManager,
+            ILogger<NatsMessagingTopicPublisher> logger)
         {
-            _stanConnectionProvider = stanConnectionProvider;
+            _stanConnectionManager = stanConnectionManager;
             _logger = logger;
         }
 
-        public async Task PublishAsync(string topic, string key, string message, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task PublishAsync(string topic, string key, string message,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
-            var connection = _stanConnectionProvider.GetConnection();
-            var result = await connection.PublishAsync(topic, System.Text.Encoding.UTF8.GetBytes(message));
+            await _stanConnectionManager.ExecuteAsync(async connection =>
+                await connection.PublishAsync(topic, System.Text.Encoding.UTF8.GetBytes(message)));
             stopWatch.Stop();
 
-            _logger.LogDebug("Nats message published to subject {Subject} in {ElapsedMilliseconds} ms", topic, stopWatch.ElapsedMilliseconds);
+            _logger.LogDebug("Nats message published to subject {Subject} in {ElapsedMilliseconds} ms", topic,
+                stopWatch.ElapsedMilliseconds);
         }
     }
 }
