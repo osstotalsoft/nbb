@@ -144,7 +144,7 @@ namespace NBB.Contracts.Functions.CreateContract
             var loggerFactory = new LoggerFactory();
             loggerFactory.AddSerilog();
 
-            var stanConnectionProvider = new StanConnectionProvider(configuration);
+            var stanConnectionProvider = new StanConnectionProvider(configuration, new Logger<StanConnectionProvider>(loggerFactory), null);
             var topicRegistry = new DefaultTopicRegistry(configuration);
             var messageTypeRegistry = new DefaultMessageTypeRegistry();
             var messageSerdes = new NewtonsoftJsonMessageSerDes(messageTypeRegistry);
