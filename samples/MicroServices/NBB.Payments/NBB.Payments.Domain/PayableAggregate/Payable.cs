@@ -28,7 +28,7 @@ namespace NBB.Payments.Domain.PayableAggregate
         public void Pay()
         {
             if (this.IsPayed)
-                throw new Exception("payment allready payed");
+                throw new Exception("payment already payed");
 
             Emit(new PaymentReceived(Guid.NewGuid(), this.PayableId, this.InvoiceId, DateTime.Now));
         }

@@ -26,16 +26,16 @@ namespace NBB.Messaging.Host.MessagingPipeline
             _logger = logger;
         }
 
-        public async Task Invoke(MessagingEnvelope messageContext, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
             var outOfOrderPolicy = _resiliencyPolicyProvider.GetOutOfOrderPolicy(retryCount => _logger.LogWarning(
                   "Message of type {MessageType} could not be processed due to OutOfOrderMessageException. Retry count is {RetryCount}.",
-                  messageContext.Payload.GetType().GetPrettyName(), retryCount));
+                  message.Payload.GetType().GetPrettyName(), retryCount));
 
             var concurrencyException = _resiliencyPolicyProvider.GetConcurencyExceptionPolicy(ex =>
                 _logger.LogWarning(
                     "Message of type {MessageType} could not be processed due to concurrency exception. The system will automatically retry it.",
-                    messageContext.Payload.GetType().GetPrettyName()));
+                    message.Payload.GetType().GetPrettyName()));
 
             var policies = Policy.WrapAsync(outOfOrderPolicy, concurrencyException);
 

@@ -1,24 +1,18 @@
-﻿using NBB.Core.Abstractions;
+﻿using System;
+using NBB.Core.Abstractions;
 using NBB.Domain.Abstractions;
-using System;
-using System.Collections.Generic;
 
 namespace NBB.Domain
 {
     public abstract class DomainEvent : IDomainEvent, IMetadataProvider<DomainEventMetadata>
     {
-        public Guid EventId { get; }
         public DomainEventMetadata Metadata { get; }
-        int IDomainEvent.SequenceNumber
+
+        protected DomainEvent(DomainEventMetadata metadata)
         {
-            get => Metadata.SequenceNumber;
-            set => Metadata.SequenceNumber = value;
+            Metadata = metadata ?? DomainEventMetadata.Default();
         }
 
-        protected DomainEvent(Guid eventId, DomainEventMetadata metadata)
-        {
-            EventId = eventId;
-            Metadata = metadata ?? new DomainEventMetadata();
-        }
+        Guid IEvent.EventId => Metadata.EventId;
     }
 }

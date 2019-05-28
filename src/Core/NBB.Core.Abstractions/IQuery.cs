@@ -5,8 +5,6 @@ namespace NBB.Core.Abstractions
 {
     public interface IQuery
     {
-        Guid QueryId { get; }
- 
         Type GetResponseType();
     }
 

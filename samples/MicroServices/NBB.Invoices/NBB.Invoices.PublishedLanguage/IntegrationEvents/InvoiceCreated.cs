@@ -1,35 +1,22 @@
 ﻿using NBB.Application.DataContracts;
-using NBB.Core.Abstractions;
-using NBB.Messaging.DataContracts;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace NBB.Invoices.PublishedLanguage.IntegrationEvents
 {
     public class InvoiceCreated : Event
     {
-        public Guid InvoiceId { get; private set; }
-        public decimal Amount { get; private set; }
-        public Guid ClientId { get; private set; }
-        public Guid? ContractId { get; private set; }
+        public Guid InvoiceId { get; }
+        public decimal Amount { get; }
+        public Guid ClientId { get; }
+        public Guid? ContractId { get; }
 
-
-        [JsonConstructor]
-        private InvoiceCreated(Guid eventId, ApplicationMetadata metadata,
-            Guid invoiceId, decimal amount, Guid clientId, Guid? contractId)
-            : base(eventId, metadata)
+        public InvoiceCreated(Guid invoiceId, decimal amount, Guid clientId, Guid? contractId, EventMetadata metadata = null)
+            : base(metadata)
         {
             InvoiceId = invoiceId;
             Amount = amount;
             ClientId = clientId;
             ContractId = contractId;
-        }
-
-        public InvoiceCreated(Guid invoiceId, decimal amount, Guid clientId, Guid? contractId)
-            : this(Guid.NewGuid(), new ApplicationMetadata { CreationDate = DateTime.UtcNow }, 
-                invoiceId, amount, clientId, contractId)
-        {
         }
     }
 }

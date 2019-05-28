@@ -16,7 +16,7 @@ using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Kafka;
+using NBB.Messaging.Nats;
 using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
@@ -68,7 +68,8 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
-                    services.AddKafkaMessaging();
+                    //services.AddKafkaMessaging();
+                    services.AddNatsMessaging();
 
                     services.AddContractsWriteModelDataAccess();
                     services.AddContractsReadModelDataAccess();

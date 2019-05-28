@@ -14,9 +14,9 @@ namespace NBB.Messaging.Host.MessagingPipeline
     /// <seealso cref="NBB.Core.Pipeline.IPipelineMiddleware{NBB.Messaging.DataContracts.MessagingEnvelope}" />
     public class CorrelationMiddleware : IPipelineMiddleware<MessagingEnvelope>
     {
-        public async Task Invoke(MessagingEnvelope messageContext, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
-            using (CorrelationManager.NewCorrelationId(messageContext.GetCorrelationId()))
+            using (CorrelationManager.NewCorrelationId(message.GetCorrelationId()))
             {
                 await next();
             }

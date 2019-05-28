@@ -32,18 +32,18 @@ namespace NBB.Application.DataContracts.Schema
             return GetSchema(baseType, topicResolver);
         }
 
-        public SchemaDefinitionUpdated GetSchemaAsEvent(Type baseType, Guid? correlationId, string applicationName, Func<Type, string> topicResolver = null)
+        public SchemaDefinitionUpdated GetSchemaAsEvent(Type baseType, string applicationName, Func<Type, string> topicResolver = null)
         {
             var list = GetSchema(baseType, topicResolver);
-            var @event = new SchemaDefinitionUpdated(list, correlationId, Guid.NewGuid(), applicationName);
+            var @event = new SchemaDefinitionUpdated(list, applicationName);
             return @event;
         }
 
-        public SchemaDefinitionUpdated GetSchemaAsEvent<T>(Guid? correlationId, string applicationName, Func<Type, string> topicResolver = null)
+        public SchemaDefinitionUpdated GetSchemaAsEvent<T>(string applicationName, Func<Type, string> topicResolver = null)
         {
             var baseType = typeof(T);
             var list = GetSchema(baseType, topicResolver);
-            var @event = new SchemaDefinitionUpdated(list, correlationId, Guid.NewGuid(), applicationName);
+            var @event = new SchemaDefinitionUpdated(list, applicationName);
             return @event;
         }
     }

@@ -11,9 +11,8 @@ namespace NBB.Contracts.Application.Commands
 
         string IKeyProvider.Key => ContractId.ToString();
 
-        [JsonConstructor]
-        private ValidateContract(Guid contractId, Guid commandId, ApplicationMetadata metadata)
-            : base(commandId, metadata)
+        public ValidateContract(Guid contractId, CommandMetadata metadata = null)
+            : base(metadata)
         {
             ContractId = contractId;
         }

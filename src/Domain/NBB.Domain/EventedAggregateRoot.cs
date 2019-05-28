@@ -13,7 +13,6 @@ namespace NBB.Domain
         protected void AddEvent(IDomainEvent @event)
         {
             _changes.Add(@event);
-            @event.SequenceNumber = Version + _changes.Count;
         }
 
 

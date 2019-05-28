@@ -16,7 +16,7 @@ using NBB.EventStore.AdoNet;
 using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Kafka;
+using NBB.Messaging.Nats;
 using NBB.Payments.Application.CommandHandlers;
 using NBB.Payments.Data;
 using NBB.Resiliency;
@@ -69,7 +69,8 @@ namespace NBB.Payments.Worker
                 .ConfigureServices((hostingContext, services) =>
                 {
                     services.AddMediatR(typeof(PayableCommandHandlers).Assembly);
-                    services.AddKafkaMessaging();
+                    //services.AddKafkaMessaging();
+                    services.AddNatsMessaging();
 
                     services.AddPaymentsWriteDataAccess();
 

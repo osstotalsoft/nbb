@@ -1,7 +1,4 @@
 using FluentAssertions;
-using Newtonsoft.Json;
-using System;
-using System.Text.RegularExpressions;
 using Xunit;
 
 namespace NBB.Application.DataContracts.Tests
@@ -10,8 +7,8 @@ namespace NBB.Application.DataContracts.Tests
     {
         private class TestEvent : Event
         {
-            public TestEvent(ApplicationMetadata metadata = null)
-                : base(Guid.NewGuid(), metadata)
+            public TestEvent(EventMetadata metadata)
+                : base(metadata)
             {
             }
         }
@@ -20,10 +17,9 @@ namespace NBB.Application.DataContracts.Tests
         public void Should_create_empty_metadata()
         {
             //Arrange
-            ApplicationMetadata metadata = null;
 
             //Act
-            var integrationEvent = new TestEvent(metadata);
+            var integrationEvent = new TestEvent(null);
 
             //Assert
             integrationEvent.Metadata.Should().NotBeNull();

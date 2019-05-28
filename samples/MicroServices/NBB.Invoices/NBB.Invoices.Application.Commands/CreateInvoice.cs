@@ -1,6 +1,5 @@
 ﻿using NBB.Application.DataContracts;
 using NBB.Core.Abstractions;
-using Newtonsoft.Json;
 using System;
 
 namespace NBB.Invoices.Application.Commands
@@ -15,20 +14,12 @@ namespace NBB.Invoices.Application.Commands
 
         string IKeyProvider.Key => ContractId.ToString();
 
-        [JsonConstructor]
-        private CreateInvoice(Guid commandId, ApplicationMetadata metadata, decimal amount, Guid clientId, Guid? contractId)
-            : base(commandId, metadata)
+        public CreateInvoice(decimal amount, Guid clientId, Guid? contractId, CommandMetadata metadata = null)
+            : base(metadata)
         {
             Amount = amount;
             ClientId = clientId;
             ContractId = contractId;
-        }
-
-        public CreateInvoice(decimal amount, Guid clientId, Guid? contractId, Guid? correlationId)
-            : this(Guid.NewGuid(),
-                new ApplicationMetadata { CreationDate = DateTime.UtcNow },
-                amount, clientId, contractId)
-        {
         }
     }
 }

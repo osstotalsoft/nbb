@@ -13,7 +13,6 @@ using System.Linq;
 using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing;
 using NBB.Domain;
-using Newtonsoft.Json;
 using MediatR;
 using BenchmarkDotNet.Attributes.Exporters;
 using BenchmarkDotNet.Attributes.Columns;
@@ -269,15 +268,8 @@ namespace TheBenchmarks
         {
             public string Prop { get; }
 
-            [JsonConstructor]
-            private TestEvent(string prop, Guid eventId, DomainEventMetadata metadata)
-                : base(eventId, metadata)
-            {
-                Prop = prop;
-            }
-
-            public TestEvent(string prop)
-                : this(prop, Guid.NewGuid(), new DomainEventMetadata() {CreationDate = DateTime.Now})
+            public TestEvent(string prop, DomainEventMetadata metadata = null)
+                : base(metadata)
             {
                 Prop = prop;
             }

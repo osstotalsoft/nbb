@@ -13,10 +13,5 @@ namespace NBB.Messaging.Host
 
             return new MessagingHostBuilder(serviceCollection);
         }
-
-        public static void AddMessageBusMediator(this IServiceCollection serviceCollection)
-        {
-            serviceCollection.AddScoped<IMessageBusMediator, MessageBusMediator>();
-        }
     }
 }

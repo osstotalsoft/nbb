@@ -1,6 +1,5 @@
 ﻿using System;
 using FluentAssertions;
-using NBB.Core.Abstractions;
 using NBB.Domain.Abstractions;
 using Newtonsoft.Json;
 using Xunit;
@@ -12,14 +11,13 @@ namespace NBB.Domain.Tests
         private class TestDomainEvent : DomainEvent
         {
             public TestDomainEvent()
-                : base(Guid.NewGuid(), null)
+                : base(null)
             {
             }
         }
         private class TestSnapshotAggregateRoot : EventSourcedAggregateRoot<Guid, TestSnapshot>
         {
             public Guid Id { get; private set; }
-
             public string Prop { get; private set; }
 
             public TestSnapshotAggregateRoot()

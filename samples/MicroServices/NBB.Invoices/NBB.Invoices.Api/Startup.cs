@@ -2,16 +2,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NBB.Correlation.AspNet;
 using NBB.Invoices.Data;
-using NBB.Invoices.PublishedLanguage.IntegrationQueries;
-using NBB.Messaging.DataContracts;
-using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Kafka;
-using NBB.Resiliency;
+using NBB.Messaging.Nats;
 
 namespace NBB.Invoices.Api
 {
@@ -29,22 +22,9 @@ namespace NBB.Invoices.Api
         {
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddKafkaMessaging();
-
+            //services.AddKafkaMessaging();
+            services.AddNatsMessaging();
             services.AddInvoicesReadDataAccess();
-            services.AddMessagingHost()
-                .UsePipeline(config => config
-                    .UseCorrelationMiddleware()
-                    .UseExceptionHandlingMiddleware())
-                .AddSubscriberServices(config => config
-                    .FromMediatRHandledQueries().AddAllClasses())
-                .WithDefaultOptions();
-
-                
-            services.AddMessageBusMediator();
-
-            services.AddResiliency();
-            services.AddSingleton<IHostedService, MessageBusSubscriberService<MessagingResponse<GetInvoice.Model>>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

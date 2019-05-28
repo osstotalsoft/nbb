@@ -1,4 +1,3 @@
-using System;
 using FluentAssertions;
 using Xunit;
 
@@ -9,8 +8,8 @@ namespace NBB.Domain.Tests
     {
         private class TestDomainEvent : DomainEvent
         {
-            public TestDomainEvent(DomainEventMetadata metadata = null)
-                : base(Guid.NewGuid(), metadata)
+            public TestDomainEvent(DomainEventMetadata metadata)
+                : base(metadata)
             {
             }
         }
@@ -19,10 +18,9 @@ namespace NBB.Domain.Tests
         public void Should_create_empty_metadata()
         {
             //Arrange
-            DomainEventMetadata metadata = null;
 
             //Act
-            var domainEvent = new TestDomainEvent(metadata);
+            var domainEvent = new TestDomainEvent(null);
 
             //Assert
             domainEvent.Metadata.Should().NotBeNull();

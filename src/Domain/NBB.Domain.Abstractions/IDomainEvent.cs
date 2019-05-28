@@ -5,6 +5,5 @@ namespace NBB.Domain.Abstractions
 {
     public interface IDomainEvent : IEvent
     {
-        int SequenceNumber { get; set; }
     }
 }

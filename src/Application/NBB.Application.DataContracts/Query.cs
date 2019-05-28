@@ -3,15 +3,13 @@ using NBB.Core.Abstractions;
 
 namespace NBB.Application.DataContracts
 {
-    public abstract class Query<TResponse> : IQuery<TResponse>, IMetadataProvider<ApplicationMetadata>
+    public abstract class Query<TResponse> : IQuery<TResponse>, IMetadataProvider<QueryMetadata>
     {
-        public Guid QueryId { get; }  
-        public ApplicationMetadata Metadata { get; }
+        public QueryMetadata Metadata { get; }
 
-        protected Query(Guid queryId, ApplicationMetadata metadata)
+        protected Query(QueryMetadata metadata)
         {
-            QueryId = queryId;
-            Metadata = metadata ?? new ApplicationMetadata();
+            Metadata = metadata ?? QueryMetadata.Default();
         }
 
         Type IQuery.GetResponseType() => typeof(TResponse);

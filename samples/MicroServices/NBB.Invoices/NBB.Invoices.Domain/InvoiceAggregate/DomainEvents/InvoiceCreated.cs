@@ -1,8 +1,5 @@
 ﻿using NBB.Domain;
-using NBB.Domain.Abstractions;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace NBB.Invoices.Domain.InvoiceAggregate.DomainEvents
 {
@@ -16,21 +13,13 @@ namespace NBB.Invoices.Domain.InvoiceAggregate.DomainEvents
 
         public Guid? ContractId { get; }
 
-
-        [JsonConstructor]
-        private InvoiceCreated(Guid eventId, DomainEventMetadata metadata, Guid invoiceId, decimal amount, Guid clientId, Guid? contractId) 
-            : base(eventId, metadata)
+        public InvoiceCreated(Guid invoiceId, decimal amount, Guid clientId, Guid? contractId, DomainEventMetadata metadata = null) 
+            : base(metadata)
         {
             InvoiceId = invoiceId;
             Amount = amount;
             ClientId = clientId;
             ContractId = contractId;
-        }
-
-        public InvoiceCreated(Guid invoiceId, decimal amount, Guid clientId, Guid? contractId)
-            : this(Guid.NewGuid(), new DomainEventMetadata {CreationDate = DateTime.UtcNow, SequenceNumber = 0 }, 
-            invoiceId, amount, clientId, contractId)
-        {
         }
 
     }
