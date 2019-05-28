@@ -8,7 +8,7 @@ namespace NBB.Worker
     {
         public __AValidator__()
         {
-            RuleFor(x => x.CommandId).NotEmpty();
+            RuleFor(x => x.Metadata.CommandId).NotEmpty();
         }
     }
 }

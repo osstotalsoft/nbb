@@ -1,6 +1,5 @@
 ﻿using NBB.Application.DataContracts;
 using NBB.Core.Abstractions;
-using Newtonsoft.Json;
 using System;
 
 namespace NBB.Payments.Application.Commands
@@ -11,17 +10,8 @@ namespace NBB.Payments.Application.Commands
 
         string IKeyProvider.Key => PayableId.ToString();
 
-        [JsonConstructor]
-        private PayPayable(Guid commandId, ApplicationMetadata metadata, Guid payableId)
-            : base(commandId, metadata)
-        {
-            PayableId = payableId;
-       }
-
-        public PayPayable(Guid payableId, Guid? correlationId)
-            : this(Guid.NewGuid(),
-                new ApplicationMetadata { CreationDate = DateTime.UtcNow },
-                payableId)
+        public PayPayable(Guid payableId, CommandMetadata metadata = null)
+            : base(metadata)
         {
             PayableId = payableId;
         }

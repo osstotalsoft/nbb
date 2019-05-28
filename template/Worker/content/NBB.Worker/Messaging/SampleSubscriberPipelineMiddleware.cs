@@ -17,9 +17,9 @@ namespace NBB.Worker.Messaging
             _logger = logger;
         }
 
-        public async Task Invoke(MessagingEnvelope messageEnvelope, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
-            _logger.LogDebug("Message {@Message} was received.", messageEnvelope.Payload);
+            _logger.LogDebug("Message {@Message} was received.", message.Payload);
             await next();
         }
     }

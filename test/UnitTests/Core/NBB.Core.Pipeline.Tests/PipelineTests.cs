@@ -218,21 +218,21 @@ namespace NBB.Core.Pipeline.Tests
 
         private class FirstMiddleware : IPipelineMiddleware<IData>
         {
-            public async Task Invoke(IData data, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
             {
-                (data as TestData)?.Log.Add("FirstBefore");
+                (message as TestData)?.Log.Add("FirstBefore");
                 await next();
-                (data as TestData)?.Log.Add("FirstAfter");
+                (message as TestData)?.Log.Add("FirstAfter");
             }
         }
 
         private class SecondMiddleware : IPipelineMiddleware<IData>
         {
-            public async Task Invoke(IData data, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
             {
-                (data as TestData)?.Log.Add("SecondBefore");
+                (message as TestData)?.Log.Add("SecondBefore");
                 await next();
-                (data as TestData)?.Log.Add("SecondAfter");
+                (message as TestData)?.Log.Add("SecondAfter");
             }
         }
 
@@ -245,9 +245,9 @@ namespace NBB.Core.Pipeline.Tests
                 this._logger = logger;
             }
 
-            public async Task Invoke(IData data, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
             {
-                if (data is TestData dataAsTestData)
+                if (message is TestData dataAsTestData)
                     dataAsTestData.Data = _logger;
 
                 _logger.LogDebug("MiddlewareWithDI:Before");
@@ -270,7 +270,7 @@ namespace NBB.Core.Pipeline.Tests
                 this.dependency = dependency;
             }
 
-            public async Task Invoke(IData data, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
             {
                 await next();
             }
@@ -285,11 +285,11 @@ namespace NBB.Core.Pipeline.Tests
                 ResolvedObject = resolvedObject;
             }
 
-            public async Task Invoke(IData data, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
             {
-                (data as TestData)?.Log.Add("FirstBefore");
+                (message as TestData)?.Log.Add("FirstBefore");
                 await next();
-                (data as TestData)?.Log.Add("FirstBefore");
+                (message as TestData)?.Log.Add("FirstBefore");
             }
         }
 

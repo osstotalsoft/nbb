@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.Kafka;
+using NBB.Messaging.Nats;
 using NBB.Payments.Data;
 
 namespace NBB.Payments.Api
@@ -22,7 +22,8 @@ namespace NBB.Payments.Api
         {
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddKafkaMessaging();
+            //services.AddKafkaMessaging();
+            services.AddNatsMessaging();
             services.AddPaymentsReadDataAccess();
         }
 

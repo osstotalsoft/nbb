@@ -11,8 +11,8 @@ namespace NBB.Application.DataContracts.Tests
     {
         private class TestQuery : Query<string>
         {
-            public TestQuery(ApplicationMetadata metadata = null)
-                : base(Guid.NewGuid(), metadata)
+            public TestQuery(QueryMetadata metadata)
+                : base(metadata)
             {
             }
         }
@@ -21,10 +21,9 @@ namespace NBB.Application.DataContracts.Tests
         public void Should_create_empty_metadata()
         {
             //Arrange
-            ApplicationMetadata metadata = null;
 
             //Act
-            var query = new TestQuery(metadata);
+            var query = new TestQuery(null);
 
             //Assert
             query.Metadata.Should().NotBeNull();

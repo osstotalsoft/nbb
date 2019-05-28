@@ -24,7 +24,6 @@ namespace NBB.Messaging.Abstractions
         public Type ResolveType(string messageTypeId, IEnumerable<Assembly> scannedAssemblies)
         {
             var scannedAssembliesList = scannedAssemblies?.ToList() ?? new List<Assembly>();
-            scannedAssembliesList.Add(typeof(MessagingResponse<>).Assembly);
 
             return _typeCache.GetOrAdd(messageTypeId, key =>
                 GetTypeByAttribute(key, scannedAssembliesList) ??

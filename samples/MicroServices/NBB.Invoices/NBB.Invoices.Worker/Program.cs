@@ -19,6 +19,7 @@ using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Kafka;
+using NBB.Messaging.Nats;
 using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
@@ -69,7 +70,8 @@ namespace NBB.Invoices.Worker
                 .ConfigureServices((hostingContext, services) =>
                 {
                 services.AddMediatR(typeof(InvoiceCommandHandlers).Assembly);
-                    services.AddKafkaMessaging();
+                //services.AddKafkaMessaging();
+                services.AddNatsMessaging();
                 services.AddInvoicesWriteDataAccess();
                 services.AddEventStore()
                     .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
@@ -81,7 +83,6 @@ namespace NBB.Invoices.Worker
                     .AddSubscriberServices(config => config
                         .FromMediatRHandledCommands().AddClassesAssignableTo<Command>()
                         .FromMediatRHandledEvents().AddClassesAssignableTo<Event>()
-                        .FromMediatRHandledQueries().AddClassesAssignableTo<IQuery>()
                     )
                     .WithDefaultOptions()
                     .UsePipeline(pipelineBuilder => pipelineBuilder

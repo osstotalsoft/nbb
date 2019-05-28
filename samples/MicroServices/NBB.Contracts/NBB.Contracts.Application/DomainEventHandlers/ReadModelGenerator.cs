@@ -27,7 +27,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             var c = await _contractReadModelRepository.GetByIdAsync(@event.ContractId);
             if (c == null)
             {
-                await _contractReadModelRepository.AddAsync(new ContractReadModel(@event.ContractId, @event.ClientId, @event.Metadata?.SequenceNumber ?? default(int)));
+                await _contractReadModelRepository.AddAsync(new ContractReadModel(@event.ContractId, @event.ClientId, 0));
                 await _contractReadModelRepository.SaveChangesAsync();
             }
         }
@@ -42,7 +42,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             if (e != null)
             {
                 e.Amount = @event.NewAmount;
-                e.Version = @event.Metadata?.SequenceNumber ?? default(int);
+                e.Version = e.Version + 1;
 
                 await _contractReadModelRepository.SaveChangesAsync();
 
@@ -59,7 +59,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
                 {
                     var contractLine = new ContractLineReadModel(@event.ContractLineId, @event.Product, @event.Price, @event.Quantity, @event.ContractId);
                     e.ContractLines.Add(contractLine);
-                    e.Version = @event.Metadata?.SequenceNumber ?? default(int);
+                    e.Version = e.Version + 1;
 
                     await _contractReadModelRepository.SaveChangesAsync();
                 }
@@ -76,7 +76,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             if (contract != null)
             {
                 contract.IsValidated = true;
-                contract.Version = @event.Metadata?.SequenceNumber ?? default(int);
+                contract.Version = contract.Version + 1;
                 await _contractReadModelRepository.SaveChangesAsync();
             }
         }

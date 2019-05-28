@@ -23,7 +23,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
             _logger = logger;
         }
 
-        public async Task Invoke(MessagingEnvelope messageContext, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -34,14 +34,14 @@ namespace NBB.Messaging.Host.MessagingPipeline
 
                 _logger.LogInformation(
                     "Message of type {EventType} processed in {ElapsedMilliseconds} ms.",
-                    messageContext.Payload.GetType().GetPrettyName(),
+                    message.Payload.GetType().GetPrettyName(),
                     stopWatch.ElapsedMilliseconds);
             }
             catch(Exception ex)
             {
                 _logger.LogError(
                     "Message of type {MessageType} could not be processed due to the following exception {Exception}.",
-                    messageContext.Payload.GetType().GetPrettyName(), ex);
+                    message.Payload.GetType().GetPrettyName(), ex);
             }
             finally
             {

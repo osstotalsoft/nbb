@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NBB.Contracts.Domain.ContractAggregate.DomainEvents;
-using NBB.Domain;
 
 namespace NBB.Contracts.Domain.ContractAggregate.Snapshots
 {

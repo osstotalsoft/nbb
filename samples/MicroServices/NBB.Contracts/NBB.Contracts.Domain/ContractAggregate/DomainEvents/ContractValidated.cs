@@ -12,20 +12,12 @@ namespace NBB.Contracts.Domain.ContractAggregate.DomainEvents
         public Guid ClientId { get; }
         public decimal Amount { get; }
 
-        [JsonConstructor]
-        private ContractValidated(Guid eventId, DomainEventMetadata metadata,
-            Guid contractId, Guid clientId, decimal amount)
-            : base(eventId, metadata)
+        public ContractValidated(Guid contractId, Guid clientId, decimal amount, DomainEventMetadata metadata = null)
+            : base(metadata)
         {
             ContractId = contractId;
             ClientId = clientId;
             Amount = amount;
         }
-
-        public ContractValidated(Guid contractId, Guid clientId, decimal amount)
-            : this(Guid.NewGuid(), new DomainEventMetadata { CreationDate = DateTime.UtcNow }, contractId, clientId, amount)
-        {
-        }
-
     }
 }

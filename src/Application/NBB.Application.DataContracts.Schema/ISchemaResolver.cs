@@ -9,11 +9,10 @@ namespace NBB.Application.DataContracts.Schema
 
         List<SchemaDefinition> GetSchema<T>(Func<Type, string> topicResolver = null);
 
-        SchemaDefinitionUpdated GetSchemaAsEvent(Type baseType, Guid? correlationId, string applicationName,
+        SchemaDefinitionUpdated GetSchemaAsEvent(Type baseType, string applicationName,
            Func<Type, string> topicResolver = null);
 
 
-        SchemaDefinitionUpdated GetSchemaAsEvent<T>(Guid? correlationId, string applicationName,
-           Func<Type, string> topicResolver = null);
+        SchemaDefinitionUpdated GetSchemaAsEvent<T>(string applicationName, Func<Type, string> topicResolver = null);
     }
 }

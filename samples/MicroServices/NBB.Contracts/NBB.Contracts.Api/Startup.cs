@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.Kafka;
+using NBB.Messaging.Nats;
 
 namespace NBB.Contracts.Api
 {
@@ -23,7 +23,8 @@ namespace NBB.Contracts.Api
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
 
-            services.AddKafkaMessaging();
+            //services.AddKafkaMessaging();
+            services.AddNatsMessaging();
 
             services.AddContractsReadModelDataAccess();
         }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NBB.Application.DataContracts;
 using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
@@ -21,11 +20,9 @@ using NBB.Payments.Application.CommandHandlers;
 using NBB.Payments.Data;
 using NBB.Core.DependencyInjection;
 using NBB.Domain;
-using NBB.Invoices.PublishedLanguage.IntegrationQueries;
 using NBB.Messaging.Host;
 using NBB.Resiliency;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
-using NBB.Messaging.DataContracts;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
 
@@ -46,8 +43,8 @@ namespace NBB.Mono
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddMediatR(
-                typeof(ContractCommandHandlers).Assembly, 
-                typeof(InvoiceCommandHandlers).Assembly, 
+                typeof(ContractCommandHandlers).Assembly,
+                typeof(InvoiceCommandHandlers).Assembly,
                 typeof(PayableCommandHandlers).Assembly);
 
             services.AddInProcessMessaging();
@@ -61,14 +58,12 @@ namespace NBB.Mono
                 .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                 .WithAdoNetEventRepository();
 
-            services.AddMessageBusMediator();
             services.AddResiliency();
 
             services.AddMessagingHost()
                 .AddSubscriberServices(config => config
                     .FromMediatRHandledCommands().AddClassesAssignableTo<Command>()
                     .FromMediatRHandledEvents().AddClassesAssignableTo<Event>()
-                    .FromMediatRHandledQueries().AddClassesAssignableTo<IQuery>()
                 )
                 .WithDefaultOptions()
                 .UsePipeline(pipelineBuilder => pipelineBuilder
@@ -77,8 +72,6 @@ namespace NBB.Mono
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );
-
-            services.AddSingleton<IHostedService, MessageBusSubscriberService<MessagingResponse<GetInvoice.Model>>>();
 
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>), 
                 serviceType => typeof(IEventedAggregateRoot).IsAssignableFrom(serviceType.GetGenericArguments()[0]));

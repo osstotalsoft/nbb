@@ -1,21 +1,17 @@
-﻿using NBB.Core.Abstractions;
-using NBB.Messaging.DataContracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using NBB.Core.Abstractions;
 
 namespace NBB.Application.DataContracts
 {
-    public abstract class Event : IEvent, IMetadataProvider<ApplicationMetadata>
+    public abstract class Event : IEvent, IMetadataProvider<EventMetadata>
     {
-        public Guid EventId { get; }
-        public ApplicationMetadata Metadata { get; }
+        public EventMetadata Metadata { get; }
 
-
-        protected Event(Guid eventId, ApplicationMetadata metadata)
+        protected Event(EventMetadata metadata)
         {
-            EventId = eventId;
-            Metadata = metadata ?? new ApplicationMetadata();
+            Metadata = metadata ?? EventMetadata.Default();
         }
+
+        Guid IEvent.EventId => Metadata.EventId;
     }
 }

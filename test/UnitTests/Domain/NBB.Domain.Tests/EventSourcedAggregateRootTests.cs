@@ -10,7 +10,7 @@ namespace NBB.Domain.Tests
         private class TestDomainEvent : DomainEvent
         {
             public TestDomainEvent()
-                : base(Guid.NewGuid(), null)
+                : base(null)
             {
             }
         }

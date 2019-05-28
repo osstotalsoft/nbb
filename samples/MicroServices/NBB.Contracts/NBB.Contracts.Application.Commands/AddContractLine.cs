@@ -1,8 +1,5 @@
 ﻿using NBB.Application.DataContracts;
-using NBB.Messaging.DataContracts;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace NBB.Contracts.Application.Commands
 {
@@ -17,9 +14,8 @@ namespace NBB.Contracts.Application.Commands
         public Guid ContractId { get; }
 
 
-        [JsonConstructor]
-        private AddContractLine(string product, decimal price, int quantity, Guid contractId, Guid commandId, ApplicationMetadata metadata)
-            : base(commandId, metadata)
+        public AddContractLine(string product, decimal price, int quantity, Guid contractId, CommandMetadata metadata = null)
+            : base(metadata)
         {
             Product = product;
             Price = price;
