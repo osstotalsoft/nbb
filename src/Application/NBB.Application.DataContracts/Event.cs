@@ -7,7 +7,7 @@ namespace NBB.Application.DataContracts
     {
         public EventMetadata Metadata { get; }
 
-        protected Event(EventMetadata metadata)
+        protected Event(EventMetadata metadata = null)
         {
             Metadata = metadata ?? EventMetadata.Default();
         }

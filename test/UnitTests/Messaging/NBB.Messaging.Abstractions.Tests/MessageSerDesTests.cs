@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentAssertions;
 using Moq;
+using NBB.Application.DataContracts;
 using NBB.Core.Abstractions;
 using NBB.Messaging.DataContracts;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ namespace NBB.Messaging.Abstractions.Tests
 {
     public class MessageSerDesTests
     {
-        public class TestMessage : IEvent
+        public class TestMessage : Event
         {
             public Guid EventId { get; private set; }
             public DateTime CreationDate { get; private set; }
@@ -24,26 +25,16 @@ namespace NBB.Messaging.Abstractions.Tests
             private readonly bool _constructedWithPrivateConstructor;
             public bool ConstructedWithPrivateConstructor() => _constructedWithPrivateConstructor;
 
-            [JsonConstructor]
-            private TestMessage(Guid eventId, DateTime creationDate, long contractId, long partnerId, string details)
+            public TestMessage(long partnerId, long contractId, string details, EventMetadata metadata = null) : base(metadata)
             {
-                EventId = eventId;
-                CreationDate = creationDate;
-                ContractId = contractId;
                 PartnerId = partnerId;
+                ContractId = contractId;
                 Details = details;
-
-                _constructedWithPrivateConstructor = true;
-            }
-
-            public TestMessage(long contractId, long partnerId, string details)
-                :this(Guid.NewGuid(), DateTime.Now, contractId, partnerId, details)
-            {
             }
         }
 
         [Fact]
-        public void Should_deserialize_messages_using_the_attributed_private_constructor()
+        public void Should_deserialize_messages_using_constructor_with_optional_params()
         {
             //Arrange
             var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x => x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
@@ -56,7 +47,8 @@ namespace NBB.Messaging.Abstractions.Tests
 
             //Assert
             deserialized.Should().NotBeNull();
-            deserialized.Payload.ConstructedWithPrivateConstructor().Should().BeTrue();
+            deserialized.Payload.Should().NotBeNull();
+            deserialized.Payload.Should().BeEquivalentTo(@event);
         }
 
         [Fact]
