@@ -7,7 +7,7 @@ namespace NBB.Application.DataContracts
     {
         public QueryMetadata Metadata { get; }
 
-        protected Query(QueryMetadata metadata)
+        protected Query(QueryMetadata metadata = null)
         {
             Metadata = metadata ?? QueryMetadata.Default();
         }

@@ -8,7 +8,7 @@ namespace NBB.Application.DataContracts
     {
         public CommandMetadata Metadata { get; }
 
-        protected Command(CommandMetadata metadata)
+        protected Command(CommandMetadata metadata = null)
         {
             Metadata = metadata ?? CommandMetadata.Default();
         }
@@ -16,7 +16,7 @@ namespace NBB.Application.DataContracts
 
     public abstract class Command<TResponse> : Command, IRequest<TResponse>
     {
-        protected Command(CommandMetadata metadata)
+        protected Command(CommandMetadata metadata = null)
             : base(metadata)
         {
         }

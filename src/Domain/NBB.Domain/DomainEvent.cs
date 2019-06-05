@@ -8,7 +8,7 @@ namespace NBB.Domain
     {
         public DomainEventMetadata Metadata { get; }
 
-        protected DomainEvent(DomainEventMetadata metadata)
+        protected DomainEvent(DomainEventMetadata metadata = null)
         {
             Metadata = metadata ?? DomainEventMetadata.Default();
         }
