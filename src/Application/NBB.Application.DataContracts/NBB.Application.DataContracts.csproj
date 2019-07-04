@@ -15,6 +15,10 @@
   <ItemGroup>
     <None Remove="NBB.Application.csproj.vspscc" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />

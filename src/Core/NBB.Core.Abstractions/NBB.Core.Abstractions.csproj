@@ -16,8 +16,4 @@
     <None Remove="NBB.Core.Abstractions.csproj.vspscc" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
-  </ItemGroup>
-
 </Project>

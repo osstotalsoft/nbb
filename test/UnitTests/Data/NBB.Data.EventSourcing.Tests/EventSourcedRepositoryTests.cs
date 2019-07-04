@@ -279,7 +279,7 @@ namespace NBB.Data.EventSourcing.Tests
         }
     }
 
-    public class TestDomainEvent : IDomainEvent
+    public class TestDomainEvent : IDomainEvent, INotification
     {
         public DateTime CreationDate => DateTime.Now;
         

@@ -1,8 +1,6 @@
-﻿using MediatR;
-
-namespace NBB.Core.Abstractions
+﻿namespace NBB.Core.Abstractions
 {
-    public interface ICommand : IRequest
+    public interface ICommand
     {
     }
 }
