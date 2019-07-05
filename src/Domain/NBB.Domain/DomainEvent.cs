@@ -1,10 +1,11 @@
 ﻿using System;
+using MediatR;
 using NBB.Core.Abstractions;
 using NBB.Domain.Abstractions;
 
 namespace NBB.Domain
 {
-    public abstract class DomainEvent : IDomainEvent, IMetadataProvider<DomainEventMetadata>
+    public abstract class DomainEvent : IDomainEvent, INotification, IMetadataProvider<DomainEventMetadata>
     {
         public DomainEventMetadata Metadata { get; }
 

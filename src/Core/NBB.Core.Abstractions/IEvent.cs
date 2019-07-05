@@ -1,9 +1,8 @@
 ﻿using System;
-using MediatR;
 
 namespace NBB.Core.Abstractions
 {
-    public interface IEvent : INotification
+    public interface IEvent
     {
         Guid EventId { get; }
     }

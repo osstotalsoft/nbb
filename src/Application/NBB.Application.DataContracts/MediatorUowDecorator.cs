@@ -32,7 +32,7 @@ namespace NBB.Application.DataContracts
 
         private async Task OnAfterSave(List<IEvent> events)
         {
-            foreach (var @event in events)
+            foreach (var @event in events.OfType<INotification>())
             {
                 await _mediator.Publish(@event);
             }

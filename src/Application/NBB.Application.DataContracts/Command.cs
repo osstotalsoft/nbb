@@ -1,10 +1,9 @@
 ﻿using MediatR;
 using NBB.Core.Abstractions;
-using System;
 
 namespace NBB.Application.DataContracts
 {
-    public abstract class Command : ICommand, IMetadataProvider<CommandMetadata>
+    public abstract class Command : ICommand, IRequest, IMetadataProvider<CommandMetadata>
     {
         public CommandMetadata Metadata { get; }
 
@@ -14,11 +13,13 @@ namespace NBB.Application.DataContracts
         }
     }
 
-    public abstract class Command<TResponse> : Command, IRequest<TResponse>
+    public abstract class Command<TResponse> : ICommand, IRequest<TResponse>, IMetadataProvider<CommandMetadata>
     {
+        public CommandMetadata Metadata { get; }
+
         protected Command(CommandMetadata metadata = null)
-            : base(metadata)
         {
+            Metadata = metadata ?? CommandMetadata.Default();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using MediatR;
 
 namespace NBB.Core.Abstractions
 {
@@ -8,7 +7,7 @@ namespace NBB.Core.Abstractions
         Type GetResponseType();
     }
 
-    public interface IQuery<out TResponse> : IQuery, IRequest<TResponse>
+    public interface IQuery<out TResponse> : IQuery
     {
         
     }

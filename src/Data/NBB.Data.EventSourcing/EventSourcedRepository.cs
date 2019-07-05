@@ -101,7 +101,7 @@ namespace NBB.Data.EventSourcing
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            foreach (var @event in events)
+            foreach (var @event in events.OfType<INotification>())
             {
                 await _mediator.Publish(@event, cancellationToken);
             }

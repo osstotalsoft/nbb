@@ -149,21 +149,21 @@ namespace NBB.Messaging.Host.Tests
             registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
         }
 
-        public class CommandMessage : ICommand
+        public class CommandMessage : ICommand, IRequest
         {
             public Guid MessageId => throw new NotImplementedException();
 
             public Guid CommandId => throw new NotImplementedException();
         }
 
-        public class EventMessage :  IEvent
+        public class EventMessage :  IEvent, INotification
         {
             public Guid MessageId => throw new NotImplementedException();
 
             public Guid EventId => throw new NotImplementedException();
         }
 
-        public class QueryMessage :  IQuery<string>
+        public class QueryMessage :  IQuery<string>, IRequest<string>
         {
             public Guid MessageId => throw new NotImplementedException();
 
