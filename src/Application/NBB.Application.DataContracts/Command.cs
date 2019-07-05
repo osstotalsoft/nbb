@@ -13,11 +13,13 @@ namespace NBB.Application.DataContracts
         }
     }
 
-    public abstract class Command<TResponse> : Command, IRequest<TResponse>
+    public abstract class Command<TResponse> : ICommand, IRequest<TResponse>, IMetadataProvider<CommandMetadata>
     {
+        public CommandMetadata Metadata { get; }
+
         protected Command(CommandMetadata metadata = null)
-            : base(metadata)
         {
+            Metadata = metadata ?? CommandMetadata.Default();
         }
     }
 }
