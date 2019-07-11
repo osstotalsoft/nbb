@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Extensions.Internal;
 
 namespace NBB.Data.EntityFramework
 {
-    public class EfQuery<TEntity, TContext> : IQueryable<TEntity>, IAsyncEnumerable<TEntity>
+    public class EfQuery<TEntity, TContext> : IQueryable<TEntity>
         where TContext : DbContext where TEntity : class
     {
         private readonly TContext _c;
@@ -31,7 +31,5 @@ namespace NBB.Data.EntityFramework
         public IEnumerator<TEntity> GetEnumerator() => _q.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => _q.GetEnumerator();
-
-        IAsyncEnumerator<TEntity> IAsyncEnumerable<TEntity>.GetEnumerator() => _q.AsAsyncEnumerable().GetEnumerator();
     }
 }
