@@ -11,7 +11,7 @@ namespace NBB.Core.Pipeline
     /// A middleware for a pipeline that processes data/context of type <typeparamref name="T"/>
     /// </summary>
     /// <typeparam name="T">The type of data/context processed in the pipeline</typeparam>
-    public interface IPipelineMiddleware<T>
+    public interface IPipelineMiddleware<in T>
     {
         /// <summary>
         /// Perform processing for the current <paramref name="data"/> next middleware data.
