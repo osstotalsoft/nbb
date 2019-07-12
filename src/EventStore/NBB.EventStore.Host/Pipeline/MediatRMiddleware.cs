@@ -18,7 +18,10 @@ namespace NBB.EventStore.Host.Pipeline
 
         public async Task Invoke(IEvent @event, CancellationToken cancellationToken, Func<Task> next)
         {
-            await _mediator.Publish(@event, cancellationToken);
+            if (@event is INotification notification)
+            {
+                await _mediator.Publish(notification, cancellationToken);
+            }
 
             await next();
         }

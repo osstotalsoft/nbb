@@ -1,13 +1,14 @@
 ﻿using System;
+using MediatR;
 using NBB.Core.Abstractions;
 
 namespace NBB.Application.DataContracts
 {
-    public abstract class Event : IEvent, IMetadataProvider<EventMetadata>
+    public abstract class Event : IEvent, INotification, IMetadataProvider<EventMetadata>
     {
         public EventMetadata Metadata { get; }
 
-        protected Event(EventMetadata metadata)
+        protected Event(EventMetadata metadata = null)
         {
             Metadata = metadata ?? EventMetadata.Default();
         }
