@@ -3,10 +3,12 @@
 ################################################################################
 
 /.vs
+/.ionide
 */**/bin
 */**/obj
 **/packages
 */**/*.csproj.user
+*/**/*.fsproj.user
 TestResults
 */**/BenchmarkDotNet.Artifacts
 **/*.DotSettings.user

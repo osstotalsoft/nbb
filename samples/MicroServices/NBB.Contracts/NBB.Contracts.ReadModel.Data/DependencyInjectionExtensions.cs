@@ -13,6 +13,7 @@ namespace NBB.Contracts.ReadModel.Data
 
             services.AddEfCrudRepository<ContractReadModel, ContractsReadDbContext>();
             services.AddEfQuery<ContractReadModel, ContractsReadDbContext>();
+            services.AddEfQuery<ContractLineReadModel, ContractsReadDbContext>();
 
             services.AddEntityFrameworkSqlServer().AddDbContext<ContractsReadDbContext>(
                 (serviceProvider, options) =>

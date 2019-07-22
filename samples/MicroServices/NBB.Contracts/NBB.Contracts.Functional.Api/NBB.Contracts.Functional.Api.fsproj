@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <DebugType>portable</DebugType>
+    <AssemblyName>NBB.Contracts.Functional.Api</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Giraffe" Version="3.4.*" />
+    <PackageReference Include="TaskBuilder.fs" Version="2.1.*" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
+    <ProjectReference Include="..\NBB.Contracts.Application.Commands\NBB.Contracts.Application.Commands.csproj" />
+    <ProjectReference Include="..\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
+    <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.Development.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+ 
+    <Compile Include="SerializationExtensions.fs" />
+    <None Include="_oldProgram.fs" />
+	<Compile Include="ServiceCollectionExtensions.fs" />
+	<Compile Include="HandlerUtils.fs" />
+    <Compile Include="Handlers\Contracts.fs" />
+    <Compile Include="Handlers\ContractsAlternative.fs" />
+	
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+   
+  </ItemGroup>
+  <ItemGroup>
+     <Compile Include="AssemblyInfo.fs" />
+     <Compile Include="Program.fs" />
+  </ItemGroup>
+</Project>

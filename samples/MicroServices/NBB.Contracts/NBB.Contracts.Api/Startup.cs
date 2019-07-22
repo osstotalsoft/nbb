@@ -1,7 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.Application.DataContracts;
+using NBB.Contracts.Application.CommandHandlers;
+using NBB.Contracts.Application.Commands;
+using NBB.Contracts.Application.Queries;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
 using NBB.Messaging.Nats;
@@ -22,6 +27,10 @@ namespace NBB.Contracts.Api
         {
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
+
+            services.AddMediatR(typeof(GetContracts));
+            services.AddScopedContravariant<IRequestHandler<Command>, MessageBusPublisherCommandHandler>(typeof(CreateContract).Assembly);
+
 
             //services.AddKafkaMessaging();
             services.AddNatsMessaging();
