@@ -11,38 +11,36 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Primitives
 open NBB.Application.DataContracts
 open NBB.Correlation
+open NBB.Core.Abstractions
 
 // ---------------------------------
 // Utils
 // ---------------------------------
-let toOption value =
-    opt {
-        if not (isNull value) then return value
-    }
-
 let inject<'T> (f : 'T -> HttpHandler) : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
         let resolved = ctx.RequestServices.GetService<'T>()
         f resolved next ctx
 
+let bindQuery<'T> = bindQuery<'T> None
+
 // ---------------------------------
 // Command & Query processing
 // ---------------------------------
-let sendCommand (command : 'T :> IRequest) (mediator : IMediator) : HttpHandler =
+let sendCommand (command : IRequest) (mediator : IMediator) : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
         task {
             do! mediator.Send(command)
             return! next ctx
         }
 
-let sendQuery<'TQuery, 'TResponse when 'TQuery :> IRequest<'TResponse> and 'TResponse : null> 
-        (query : 'TQuery) (f : 'TResponse option -> HttpHandler) (mediator : IMediator) : HttpHandler =
+let sendQuery (query : IRequest<'TResponse>) (f : 'TResponse -> HttpHandler) (mediator : IMediator) : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
-        task { let! result = mediator.Send(query)
-               return! f (toOption result) next ctx 
+        task { 
+            let! result = mediator.Send(query)
+            return! f result next ctx 
         }
 
-let commandResult (command : 'T :> Command) =
+let commandResult (command : IMetadataProvider<CommandMetadata>) =
     fun (next : HttpFunc) (ctx : HttpContext) ->
         let result = {| 
             CommandId = command.Metadata.CommandId 
@@ -51,26 +49,19 @@ let commandResult (command : 'T :> Command) =
 
         Successful.OK result next ctx
 
-let queryResult (result : 'T option) =
-    fun (next : HttpFunc) (ctx : HttpContext) ->
-        match result with
-        | Some x -> Successful.OK x next ctx
-        | None -> RequestErrors.NOT_FOUND "Item not found" next ctx
+let queryResult  =
+    Successful.OK 
 
 // ---------------------------------
 // Handler compositions
 // ---------------------------------
-let handleCommand command = 
-    inject<IMediator> (sendCommand command) >=> commandResult command
+let mediator = inject<IMediator>
 
-let handleQuery query = 
-    inject<IMediator> (sendQuery query queryResult)
+let mediatorSendCommand command = 
+    mediator (sendCommand command) >=> commandResult command
 
-let handleCommandFromRequest<'T when 'T :> Command> = 
-    bindJson<'T> handleCommand
-
-let handleQueryFromRequest<'TQuery, 'TResponse when 'TQuery :> Query<'TResponse> and 'TResponse : null> =
-    bindQuery<'TQuery> None handleQuery
+let mediatorSendQuery query : HttpHandler = 
+    mediator (sendQuery query queryResult)
 
 // ---------------------------------
 // Model binding hacks

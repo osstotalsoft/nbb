@@ -29,9 +29,8 @@
     </Content>
  
     <Compile Include="SerializationExtensions.fs" />
-    <None Include="_oldProgram.fs" />
-	<Compile Include="ServiceCollectionExtensions.fs" />
-	<Compile Include="HandlerUtils.fs" />
+  	<Compile Include="ServiceCollectionExtensions.fs" />
+	  <Compile Include="HandlerUtils.fs" />
     <Compile Include="Handlers\Contracts.fs" />
     <Compile Include="Handlers\ContractsAlternative.fs" />
 	
