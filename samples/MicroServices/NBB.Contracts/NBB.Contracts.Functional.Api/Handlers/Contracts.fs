@@ -11,7 +11,7 @@ let contractsHandler : HttpHandler =
     subRoute "/contracts" (
         choose [
             GET >=> route "" >=> bindQuery<GetContracts.Query> mediatorSendQuery
-            GET >=> route "/(.*)" >=> bindQuery<GetContractById.Query> mediatorSendQuery 
+            GET >=> routex "/(.*)" >=> bindQuery<GetContractById.Query> mediatorSendQuery 
             POST >=> route "" >=> bindJson<CreateContract> mediatorSendCommand
             POST >=> routex "/(.*)/lines" >=> bindJson<CreateContract> mediatorSendCommand
             POST >=> routex "/(.*)/validate" >=> bindJson<CreateContract> mediatorSendCommand
