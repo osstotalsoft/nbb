@@ -1,0 +1,14 @@
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "NBB.Contracts.FSharpMvc.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/contracts",
+      "applicationUrl": "http://localhost:2057",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
