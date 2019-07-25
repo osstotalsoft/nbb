@@ -30,8 +30,8 @@ let webApp =
         route "/" >=> redirectTo false "/api/contracts"
         subRoute "/api"
             (choose [
-                contractsHandler
-                contractsAlternativeHandler
+                Contracts.handler
+                ContractsAlternative.handler
             ])
         setStatusCode 401 >=> text "Not Found" ]
 

@@ -1,10 +1,8 @@
-﻿[<AutoOpen>]
-module NBB.HandlerUtils
+﻿module NBB.HandlerUtils
 
 open System.Text.RegularExpressions
 open FSharp.Control.Tasks.V2
 open Giraffe
-open Giraffe.ComputationExpressions
 open MediatR
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
@@ -40,7 +38,7 @@ let sendQuery (query : IRequest<'TResponse>) (f : 'TResponse -> HttpHandler) (me
             return! f result next ctx 
         }
 
-let commandResult (command : IMetadataProvider<CommandMetadata>) =
+let commandResult (command : IMetadataProvider<CommandMetadata>) : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
         let result = {| 
             CommandId = command.Metadata.CommandId 
@@ -49,7 +47,7 @@ let commandResult (command : IMetadataProvider<CommandMetadata>) =
 
         Successful.OK result next ctx
 
-let queryResult  =
+let queryResult =
     Successful.OK 
 
 // ---------------------------------
