@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.156
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}"
 EndProject
@@ -291,6 +291,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F577
 	ProjectSection(SolutionItems) = preProject
 		.github\release-drafter.yml = .github\release-drafter.yml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Correlation.Serilog.SqlServer", "src\Correlation\NBB.Correlation.Serilog.SqlServer\NBB.Correlation.Serilog.SqlServer.csproj", "{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -664,6 +666,10 @@ Global
 		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -796,6 +802,7 @@ Global
 		{48E5BC6A-5846-4AD7-BFFB-C1D04C5C1BC2} = {70EA3420-74E3-4C9D-9858-57EC01AD31B3}
 		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59} = {48E5BC6A-5846-4AD7-BFFB-C1D04C5C1BC2}
 		{F57779EB-9107-427D-A65C-5AA262C348E1} = {EB7B0468-DE25-4350-80AD-50E7C4D09120}
+		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168} = {307E1650-6128-4A36-9C98-297F2BF71C83}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
