@@ -27,12 +27,10 @@ namespace NBB.Correlation.Serilog.SqlServer
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="autoCreateSqlTable">Create log table with the provided name on destination sql server.</param>
         /// <param name="columnOptions"></param>
-        /// <param name="additionalColumns">Additional columns to be added. If nothing is added, only CorrelationId of type System.Guid is added</param>
-        /// <param name="correlationId">CorrelationId parameter name. Default 'CorrelationId'</param>
-        /// <param name="correlationIdType">Type of the correlationId parameter. Default is System.Guid</param>
+        /// <param name="additionalColumns">Additional columns to be added</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         /// <exception cref="T:System.ArgumentNullException">A required parameter is null.</exception>
-        public static LoggerConfiguration MsSqlServerWithAdditionalColumnsAndCorrelation(
+        public static LoggerConfiguration MsSqlServerWithAdditionalColumns(
           this LoggerSinkConfiguration loggerConfiguration,
           string connectionString,
           string tableName,
@@ -43,9 +41,7 @@ namespace NBB.Correlation.Serilog.SqlServer
           bool autoCreateSqlTable = false,
           ColumnOptions columnOptions = null,
           string schemaName = "dbo",
-          Dictionary<string, Type> additionalColumns = null,
-          string correlationId = "CorrelationId",
-          Type correlationIdType = null
+          Dictionary<string, Type> additionalColumns = null
           )
         {
             if (columnOptions == null)
@@ -57,7 +53,6 @@ namespace NBB.Correlation.Serilog.SqlServer
             {
                 columnOptions.AdditionalDataColumns = new List<System.Data.DataColumn>();
             }
-
 
             if (additionalColumns != null)
             {
@@ -74,17 +69,7 @@ namespace NBB.Correlation.Serilog.SqlServer
                             DataType = additionalColumns[columnName]
                         });
                 }
-            }
-
-            if (additionalColumns == null || additionalColumns.Count == 0 || !additionalColumns.ContainsKey(correlationId))
-            {
-                columnOptions.AdditionalDataColumns.Add(
-                    new System.Data.DataColumn
-                    {
-                        ColumnName = correlationId,
-                        DataType = correlationIdType ?? typeof(Guid)
-                    });
-            }
+            }           
 
             return loggerConfiguration.MSSqlServer(connectionString,
                 tableName,
@@ -114,7 +99,6 @@ namespace NBB.Correlation.Serilog.SqlServer
         /// <param name="formatProvider">Supplies culture-specific formatting information, or null.</param>
         /// <param name="autoCreateSqlTable">Create log table with the provided name on destination sql server.</param>
         /// <param name="columnOptions"></param>
-        /// <param name="additionalColumns">Additional columns to be added. If nothing is added, only CorrelationId of type System.Guid is added</param>
         /// <param name="correlationId">CorrelationId parameter name. Default 'CorrelationId'</param>
         /// <param name="correlationIdType">Type of the correlationId parameter. Default is System.Guid</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
@@ -142,8 +126,7 @@ namespace NBB.Correlation.Serilog.SqlServer
             if (columnOptions.AdditionalDataColumns == null)
             {
                 columnOptions.AdditionalDataColumns = new List<System.Data.DataColumn>();
-            }
-            
+            }            
 
             if (!columnOptions.AdditionalDataColumns.Any(x => x.ColumnName.Equals(correlationId)))
             {
@@ -166,6 +149,4 @@ namespace NBB.Correlation.Serilog.SqlServer
                 schemaName);
         }
     }
-
 }
-
