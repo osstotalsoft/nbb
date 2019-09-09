@@ -19,7 +19,7 @@ namespace NBB.Correlation.AspNet
                 }
 
                 var correlationId = 
-                    ExtractGuid(context.Request.Headers["x-correlation-id"]) ??
+                    ExtractGuid(context.Request.Headers[HttpRequestHeaders.CorrelationId]) ??
                     ExtractGuid(context.Request.Query["correlationId"]);
 
                 using (CorrelationManager.NewCorrelationId(correlationId))

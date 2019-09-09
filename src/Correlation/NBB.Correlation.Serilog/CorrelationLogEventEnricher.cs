@@ -8,7 +8,7 @@ namespace NBB.Correlation.Serilog
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("CorrelationId", CorrelationManager.GetCorrelationId()));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("CorrelationId", CorrelationManager.GetCorrelationId()));
         }
     }
 }
