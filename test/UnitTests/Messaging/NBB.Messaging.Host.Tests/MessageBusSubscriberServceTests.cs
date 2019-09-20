@@ -32,8 +32,8 @@ namespace NBB.Messaging.Host.Tests
                 {
                     messageBusSubscriberCallback = handler;
                     cancellationToken = token;
-                })
-                .Returns(Task.CompletedTask);
+                });
+                //.Returns();
 
             var mockedServiceProvider = Mock.Of<IServiceProvider>(sp =>
                 sp.GetService(typeof(IServiceScopeFactory)) == Mock.Of<IServiceScopeFactory>(ssf =>
