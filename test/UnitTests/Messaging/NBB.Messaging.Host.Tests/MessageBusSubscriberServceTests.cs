@@ -24,7 +24,7 @@ namespace NBB.Messaging.Host.Tests
             Func<MessagingEnvelope<TestMessage>, Task> messageBusSubscriberCallback = null;
             var cancellationToken = new CancellationToken();
 
-            var mockedMessageBusSubscriber = Mock.Of<IMessageBusSubscriber<TestMessage>>();
+            var mockedMessageBusSubscriber = Mock.Of<IMessageBusSubscriber>();
             Mock.Get(mockedMessageBusSubscriber)
                 .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<TestMessage>, Task>>(), It.IsAny<CancellationToken>(), It.IsAny<string>(), It.IsAny<MessagingSubscriberOptions>()))
                 .Callback((Func<MessagingEnvelope<TestMessage>, Task> handler, CancellationToken token, string topicName, MessagingSubscriberOptions options) => {
@@ -39,11 +39,11 @@ namespace NBB.Messaging.Host.Tests
                             ss.ServiceProvider == Mock.Of<IServiceProvider>(ssp =>
                                 (PipelineDelegate<MessagingEnvelope>) ssp.GetService(typeof(PipelineDelegate<MessagingEnvelope>)) == pipeline))));
 
-            var messageBusSubscriberService = new MessageBusSubscriberService<TestMessage>(
+            var messageBusSubscriberService = new MessageBusSubscriberService(
                     mockedMessageBusSubscriber,
                     mockedServiceProvider,
                     Mock.Of<MessagingContextAccessor>(),
-                    Mock.Of<ILogger<MessageBusSubscriberService<TestMessage>>>(),
+                    Mock.Of<ILogger<MessageBusSubscriberService>>(),
                     new MessagingSubscriberOptions()
                 );
 

@@ -44,8 +44,8 @@ namespace NBB.Messaging.Host.Builder
         {
             foreach (var messageType in _messageTypeProvider.GetTypes())
             {
-                RegisterHostedService(typeof(MessageBusSubscriberService<>).MakeGenericType(messageType),
-                    subscriberOptionsBuilder);
+                //TODO
+                RegisterHostedService(typeof(MessageBusSubscriberService), subscriberOptionsBuilder);
             }
 
             foreach (var topic in _topicProvider.GetTopics())

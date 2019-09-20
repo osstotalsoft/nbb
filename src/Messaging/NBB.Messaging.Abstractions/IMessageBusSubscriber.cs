@@ -5,16 +5,16 @@ using NBB.Messaging.DataContracts;
 
 namespace NBB.Messaging.Abstractions
 {
-    public interface IMessageBusSubscriber<TMessage>
+    public interface IMessageBusSubscriber
     {
-        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token, string topicName = null, MessagingSubscriberOptions options = null);
-        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token);
+        Task SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token, string topicName = null, MessagingSubscriberOptions options = null);
+        Task UnSubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token);
     }
 
 
     public static class MessageBusSubscriberExtensions
     {
-        public static async Task<MessagingEnvelope<TMessage>> WaitForMessage<TMessage>(this IMessageBusSubscriber<TMessage> subscriber, Func<MessagingEnvelope<TMessage>, bool> predicate, CancellationToken token)
+        public static async Task<MessagingEnvelope<TMessage>> WaitForMessage<TMessage>(this IMessageBusSubscriber subscriber, Func<MessagingEnvelope<TMessage>, bool> predicate, CancellationToken token)
         {
             var tcs = new TaskCompletionSource<MessagingEnvelope<TMessage>>();
 
@@ -23,11 +23,11 @@ namespace NBB.Messaging.Abstractions
                 if (predicate(msg))
                 {
                     tcs.SetResult(msg);
-                    await subscriber.UnSubscribeAsync(HandleMessage, token);
+                    await subscriber.UnSubscribeAsync<TMessage>(HandleMessage, token);
                 }
             }
 
-            await subscriber.SubscribeAsync(HandleMessage, token);
+            await subscriber.SubscribeAsync<TMessage>(HandleMessage, token);
 
             return await tcs.Task;
         }

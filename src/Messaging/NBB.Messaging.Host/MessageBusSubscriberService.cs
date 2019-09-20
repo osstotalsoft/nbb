@@ -11,19 +11,19 @@ using NBB.Messaging.DataContracts;
 
 namespace NBB.Messaging.Host
 {
-    public class MessageBusSubscriberService<TMessage> : BackgroundService
+    public class MessageBusSubscriberService : BackgroundService
     {
         private readonly MessagingSubscriberOptions _subscriberOptions;
-        private readonly IMessageBusSubscriber<TMessage> _messageBusSubscriber;
+        private readonly IMessageBusSubscriber _messageBusSubscriber;
         private readonly IServiceProvider _serviceProvider;
         private readonly MessagingContextAccessor _messagingContextAccessor;
-        private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
+        private readonly ILogger<MessageBusSubscriberService> _logger;
 
         public MessageBusSubscriberService(
-            IMessageBusSubscriber<TMessage> messageBusSubscriber, 
+            IMessageBusSubscriber messageBusSubscriber, 
             IServiceProvider serviceProvider,
             MessagingContextAccessor messagingContextAccessor,
-            ILogger<MessageBusSubscriberService<TMessage>> logger,
+            ILogger<MessageBusSubscriberService> logger,
             MessagingSubscriberOptions subscriberOptions = null
             )
         {
@@ -36,19 +36,22 @@ namespace NBB.Messaging.Host
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            /*TODO discover events and subscribe
+
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is starting", typeof(TMessage).GetPrettyName());
 
-            Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, stoppingToken);
+            Task HandleMsg(MessagingEnvelope msg) => Handle(msg, stoppingToken);
 
             await _messageBusSubscriber.SubscribeAsync(HandleMsg, stoppingToken, null, _subscriberOptions);
             await stoppingToken.WhenCanceled();
             await _messageBusSubscriber.UnSubscribeAsync(HandleMsg, CancellationToken.None);
 
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is stopping", typeof(TMessage).GetPrettyName());
+            */
         }
 
 
-        private async Task Handle(MessagingEnvelope<TMessage> message, CancellationToken cancellationToken)
+        private async Task Handle(MessagingEnvelope message, CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
