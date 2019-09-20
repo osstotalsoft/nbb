@@ -13,7 +13,7 @@ namespace NBB.Messaging.InProcessMessaging.Extensions
         {
             services.AddSingleton<IStorage, Storage>();
             services.AddSingleton<IMessageBusPublisher, MessageBusPublisher>();
-            services.AddSingleton(typeof(IMessageBusSubscriber<>), typeof(MessageBusSubscriber<>));
+            services.AddSingleton(typeof(IMessageBusSubscriber), typeof(MessageBusSubscriber));
             services.AddTransient<IMessagingTopicSubscriber, InProcessMessagingTopicSubscriber>();
             services.AddTransient<IMessagingTopicPublisher, InProcessMessagingTopicPublisher>();
             services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();

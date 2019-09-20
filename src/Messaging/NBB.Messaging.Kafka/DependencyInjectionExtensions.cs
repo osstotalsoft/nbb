@@ -10,7 +10,7 @@ namespace NBB.Messaging.Kafka
         public static IServiceCollection AddKafkaMessaging(this IServiceCollection services, Action<IServiceProvider,  KafkaMessagingOptionsBuilder> optionsAction = null)
         {
             services.AddSingleton(typeof(IMessageBusPublisher), typeof(MessageBusPublisher));
-            services.AddSingleton(typeof(IMessageBusSubscriber<>), typeof(MessageBusSubscriber<>));
+            services.AddSingleton(typeof(IMessageBusSubscriber), typeof(MessageBusSubscriber));
             services.AddTransient<IMessagingTopicSubscriber, KafkaMessagingTopicSubscriber>();
             services.AddTransient<IMessagingTopicPublisher, KafkaMessagingTopicPublisher>();
             services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();

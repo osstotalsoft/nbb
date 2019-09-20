@@ -100,11 +100,11 @@ namespace MessagingBenchmarks
             {
                 var cnt = 0;
                 var cts = new CancellationTokenSource();
-                var sub = scope.ServiceProvider.GetService<IMessageBusSubscriber<IntegrationMessage>>();
+                var sub = scope.ServiceProvider.GetService<IMessageBusSubscriber>();
 
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
-                await sub.SubscribeAsync(async e =>
+                await sub.SubscribeAsync<IntegrationMessage>(async e =>
                 {
                     stopWatch.Stop();
                     var ms = stopWatch.ElapsedMilliseconds;

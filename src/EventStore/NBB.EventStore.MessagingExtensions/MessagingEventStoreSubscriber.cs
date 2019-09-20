@@ -14,11 +14,11 @@ namespace NBB.EventStore.MessagingExtensions
     public class MessagingEventStoreSubscriber : IEventStoreSubscriber
     {
         private readonly IEventStoreSerDes _eventStoreSerDes;
-        private readonly IMessageBusSubscriber<IEvent> _messageBusSubscriber;
+        private readonly IMessageBusSubscriber _messageBusSubscriber;
         private readonly MessagingTopicResolver _messagingTopicResolver;
         private readonly MessagingSubscriberOptions _subscriberOptions;
 
-        public MessagingEventStoreSubscriber(IEventStoreSerDes eventStoreSerDes, IMessageBusSubscriber<IEvent> messageBusSubscriber, MessagingTopicResolver messagingTopicResolver, MessagingSubscriberOptions subscriberOptions)
+        public MessagingEventStoreSubscriber(IEventStoreSerDes eventStoreSerDes, IMessageBusSubscriber messageBusSubscriber, MessagingTopicResolver messagingTopicResolver, MessagingSubscriberOptions subscriberOptions)
         {
             _eventStoreSerDes = eventStoreSerDes;
             _messageBusSubscriber = messageBusSubscriber;
@@ -29,7 +29,7 @@ namespace NBB.EventStore.MessagingExtensions
 
         public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken token)
         {
-            return _messageBusSubscriber.SubscribeAsync(async envelope =>
+            return _messageBusSubscriber.SubscribeAsync<IEvent>(async envelope =>
             {
                 using (CorrelationManager.NewCorrelationId(envelope.GetCorrelationId()))
                 {

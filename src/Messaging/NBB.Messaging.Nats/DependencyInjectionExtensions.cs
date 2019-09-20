@@ -13,7 +13,7 @@ namespace NBB.Messaging.Nats
         {
             services.AddSingleton<StanConnectionProvider>();
             services.AddSingleton<IMessageBusPublisher, MessageBusPublisher>();
-            services.AddSingleton(typeof(IMessageBusSubscriber<>), typeof(MessageBusSubscriber<>));
+            services.AddSingleton(typeof(IMessageBusSubscriber), typeof(MessageBusSubscriber));
             services.AddTransient<IMessagingTopicSubscriber, NatsMessagingTopicSubscriber>();
             services.AddTransient<IMessagingTopicPublisher, NatsMessagingTopicPublisher>();
             services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();

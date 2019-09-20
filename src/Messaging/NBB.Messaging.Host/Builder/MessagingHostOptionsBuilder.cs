@@ -15,7 +15,7 @@ namespace NBB.Messaging.Host.Builder
         private readonly IServiceCollection _serviceCollection;
         private readonly IMessageTopicProvider _topicProvider;
         private readonly IMessageTypeProvider _messageTypeProvider;
-        
+
         public MessagingHostOptionsBuilder(MessagingHostBuilder hostBuilder, IServiceCollection serviceCollection,
             IMessageTypeProvider messageTypeProvider, IMessageTopicProvider topicProvider)
         {
@@ -44,8 +44,8 @@ namespace NBB.Messaging.Host.Builder
         {
             foreach (var messageType in _messageTypeProvider.GetTypes())
             {
-                //TODO
-                RegisterHostedService(typeof(MessageBusSubscriberService), subscriberOptionsBuilder);
+                RegisterHostedService(typeof(MessageBusSubscriberService<>).MakeGenericType(messageType),
+                    subscriberOptionsBuilder);
             }
 
             foreach (var topic in _topicProvider.GetTopics())
@@ -65,8 +65,8 @@ namespace NBB.Messaging.Host.Builder
                 subscriberOptionsConfigurator?.Invoke(builder);
 
                 return topicName == null
-                    ? (IHostedService) ActivatorUtilities.CreateInstance(sp, serviceType, builder.Options)
-                    : (IHostedService) ActivatorUtilities.CreateInstance(sp, serviceType, builder.Options, topicName);
+                    ? (IHostedService)ActivatorUtilities.CreateInstance(sp, serviceType, builder.Options)
+                    : (IHostedService)ActivatorUtilities.CreateInstance(sp, serviceType, builder.Options, topicName);
             });
         }
     }
