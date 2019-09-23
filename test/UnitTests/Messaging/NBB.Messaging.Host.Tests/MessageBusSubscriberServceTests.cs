@@ -27,10 +27,10 @@ namespace NBB.Messaging.Host.Tests
 
             var mockedMessageBusSubscriber = Mock.Of<IMessageBusSubscriber>();
             Mock.Get(mockedMessageBusSubscriber)
-                .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<TestMessage>, Task>>(), It.IsAny<CancellationToken>(), It.IsAny<string>(),
-                    It.IsAny<MessagingSubscriberOptions>())
+                .Setup(x => x.SubscribeAsync(typeof(TestMessage), It.IsAny<Func<MessagingEnvelope, Task>>(), It.IsAny<CancellationToken>(), 
+                    It.IsAny<string>(), It.IsAny<MessagingSubscriberOptions>())
                 )
-                .Callback((Func<MessagingEnvelope<TestMessage>, Task> handler, CancellationToken token, string topicName, MessagingSubscriberOptions options) =>
+                .Callback((Type messageType, Func<MessagingEnvelope, Task> handler, CancellationToken token, string topicName, MessagingSubscriberOptions options) =>
                 {
                     messageBusSubscriberCallback = handler;
                     cancellationToken = token;

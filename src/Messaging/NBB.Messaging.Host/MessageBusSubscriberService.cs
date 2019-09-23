@@ -40,9 +40,9 @@ namespace NBB.Messaging.Host
 
             Task HandleMsg(MessagingEnvelope msg) => Handle(msg, stoppingToken);
 
-            await _messageBusSubscriber.SubscribeAsync<TMessage>(HandleMsg, stoppingToken, null, _subscriberOptions);
+            var subs = await _messageBusSubscriber.SubscribeAsync<TMessage>(HandleMsg, stoppingToken, null, _subscriberOptions);
             await stoppingToken.WhenCanceled();
-            await _messageBusSubscriber.UnSubscribeAsync<TMessage>(HandleMsg, CancellationToken.None);
+            subs.Dispose();
 
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is stopping", typeof(TMessage).GetPrettyName());
         }

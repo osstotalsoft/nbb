@@ -32,18 +32,18 @@ namespace NBB.Messaging.Abstractions
             _handlers = new ConcurrentDictionary<string, (IMessagingTopicSubscriber, List<InvocationHandler>)>();
         }
 
-        public async Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token, string topicName = null,
+        public async Task<IDisposable> SubscribeAsync(Type messageType, Func<MessagingEnvelope, Task> handler, CancellationToken token, string topicName = null,
             MessagingSubscriberOptions options = null)
         {
-            var _topicName = _topicRegistry.GetTopicForName(topicName) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage));
-            var invocationHandler = new InvocationHandler(envelope => handler(envelope as MessagingEnvelope<TMessage>));
+            var _topicName = _topicRegistry.GetTopicForName(topicName) ?? _topicRegistry.GetTopicForMessageType(messageType);
+            var invocationHandler = new InvocationHandler(handler);
             Task subscribeAsync = null;
 
             var (_, handlersList) = _handlers.AddOrUpdate(_topicName,
                 _ =>
                 {
                     var topicSubscriber = ActivatorUtilities.CreateInstance<IMessagingTopicSubscriber>(_serviceProvider);
-                    subscribeAsync = topicSubscriber.SubscribeAsync(_topicName, HandleMessage<TMessage>(options, _topicName), token, options);
+                    subscribeAsync = topicSubscriber.SubscribeAsync(_topicName, HandleMessage(messageType, options, _topicName), token, options);
                     return (topicSubscriber, new List<InvocationHandler> {invocationHandler});
                 },
                 (topic, listTuple) =>
@@ -63,14 +63,14 @@ namespace NBB.Messaging.Abstractions
             return new Subscription(invocationHandler, handlersList);
         }
 
-        Func<string, Task> HandleMessage<TMessage>(MessagingSubscriberOptions options, string topicName)
+        Func<string, Task> HandleMessage(Type messageType, MessagingSubscriberOptions options, string topicName)
         {
             return async msg =>
             {
-                MessagingEnvelope<TMessage> deserializedMessage = null;
+                MessagingEnvelope deserializedMessage = null;
                 try
                 {
-                    deserializedMessage = _messageSerDes.DeserializeMessageEnvelope<TMessage>(msg, options?.SerDes);
+                    deserializedMessage = _messageSerDes.DeserializeMessageEnvelope(messageType, msg, options?.SerDes);
                 }
                 catch (Exception ex)
                 {
@@ -92,18 +92,18 @@ namespace NBB.Messaging.Abstractions
             };
         }
 
-        public async Task UnSubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token)
-        {
-            var _topicName = _topicRegistry.GetTopicForMessageType(typeof(TMessage));
-            var (messagingTopicSubscriber, handlersList) = _handlers[_topicName];
+        //public async Task UnSubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token)
+        //{
+        //    var _topicName = _topicRegistry.GetTopicForMessageType(typeof(TMessage));
+        //    var (messagingTopicSubscriber, handlersList) = _handlers[_topicName];
 
-            handlersList.RemoveAll(x => x.Handler == handler);
-            if (handlersList.Count == 0)
-            {
-                await messagingTopicSubscriber.UnSubscribeAsync(token);
-                _handlers.TryRemove(_topicName, out _);
-            }
-        }
+        //    handlersList.RemoveAll(x => x.Handler == handler);
+        //    if (handlersList.Count == 0)
+        //    {
+        //        await messagingTopicSubscriber.UnSubscribeAsync(token);
+        //        _handlers.TryRemove(_topicName, out _);
+        //    }
+        //}
     }
 
     internal struct InvocationHandler
