@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ProcessManager": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "environment": "Development"
+      }
+    }
+  }
+}
