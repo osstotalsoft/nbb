@@ -2,16 +2,16 @@
   <PropertyGroup Label="Package Versions">
     <NewtonsoftJsonPackageVersion>11.0.2</NewtonsoftJsonPackageVersion>
     <MediatRPackageVersion>4.1.0</MediatRPackageVersion>
-    <ScrutorPackageVersion>3.0.1</ScrutorPackageVersion>
+    <ScrutorPackageVersion>3.1.0</ScrutorPackageVersion>
     <BenchmarkDotNetPackageVersion>0.10.14</BenchmarkDotNetPackageVersion>
     <MoqPackageVersion>4.8.2</MoqPackageVersion>
     <XunitPackageVersion>2.3.1</XunitPackageVersion>
     <XunitRunnerVisualStudioPackageVersion>2.4.0-beta.1.build3958</XunitRunnerVisualStudioPackageVersion>
     <FluentAssertionsPackageVersion>5.3.2</FluentAssertionsPackageVersion>
-    <MicrosoftExtensionsPackagesVersion>2.1.1</MicrosoftExtensionsPackagesVersion>
+    <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>2.1.4</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftAspNetCoreAppPackageVersion>2.1.5</MicrosoftAspNetCoreAppPackageVersion>
-    <MicrosoftCSharpPackageVersion>4.5.0</MicrosoftCSharpPackageVersion>
+    <MicrosoftCSharpPackageVersion>4.6.0</MicrosoftCSharpPackageVersion>
     <SerilogPackageVersion>2.7.1</SerilogPackageVersion>
     <SerilogExtensionsLoggingPackageVersion>2.0.2</SerilogExtensionsLoggingPackageVersion>
     <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
