@@ -292,7 +292,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F577
 		.github\release-drafter.yml = .github\release-drafter.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Correlation.Serilog.SqlServer", "src\Correlation\NBB.Correlation.Serilog.SqlServer\NBB.Correlation.Serilog.SqlServer.csproj", "{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Correlation.Serilog.SqlServer", "src\Correlation\NBB.Correlation.Serilog.SqlServer\NBB.Correlation.Serilog.SqlServer.csproj", "{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orchestration", "Orchestration", "{7D20C931-B59B-4227-A916-3DE892F7A78A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProcessManager.Definition", "src\Orchestration\NBB.ProcessManager.Definition\NBB.ProcessManager.Definition.csproj", "{501EF886-EF0C-4067-BBF8-1768F2747E67}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProcessManager.Runtime", "src\Orchestration\NBB.ProcessManager.Runtime\NBB.ProcessManager.Runtime.csproj", "{D11FE59A-F3FE-4A7D-85B3-252294B6447C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orchestration", "Orchestration", "{FE39B11B-26E0-4EDA-AA33-18E1D5EB63D8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProcessManager.Tests", "test\UnitTests\Orchestration\NBB.ProcessManager.Tests\NBB.ProcessManager.Tests.csproj", "{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -670,6 +680,18 @@ Global
 		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}.Release|Any CPU.Build.0 = Release|Any CPU
+		{501EF886-EF0C-4067-BBF8-1768F2747E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{501EF886-EF0C-4067-BBF8-1768F2747E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{501EF886-EF0C-4067-BBF8-1768F2747E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{501EF886-EF0C-4067-BBF8-1768F2747E67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D11FE59A-F3FE-4A7D-85B3-252294B6447C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D11FE59A-F3FE-4A7D-85B3-252294B6447C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D11FE59A-F3FE-4A7D-85B3-252294B6447C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D11FE59A-F3FE-4A7D-85B3-252294B6447C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -803,6 +825,11 @@ Global
 		{9DDF53B1-7728-4CF3-BEBE-2057A6956F59} = {48E5BC6A-5846-4AD7-BFFB-C1D04C5C1BC2}
 		{F57779EB-9107-427D-A65C-5AA262C348E1} = {EB7B0468-DE25-4350-80AD-50E7C4D09120}
 		{F442DC3C-D2E9-468F-A6E3-D639E6F5D168} = {307E1650-6128-4A36-9C98-297F2BF71C83}
+		{7D20C931-B59B-4227-A916-3DE892F7A78A} = {7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}
+		{501EF886-EF0C-4067-BBF8-1768F2747E67} = {7D20C931-B59B-4227-A916-3DE892F7A78A}
+		{D11FE59A-F3FE-4A7D-85B3-252294B6447C} = {7D20C931-B59B-4227-A916-3DE892F7A78A}
+		{FE39B11B-26E0-4EDA-AA33-18E1D5EB63D8} = {83E383BB-C9D9-4F5F-BAAF-FF1ADFF0B151}
+		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472} = {FE39B11B-26E0-4EDA-AA33-18E1D5EB63D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

@@ -4,13 +4,13 @@
     <Version>$(GitVersion_NuGetVersion)</Version>
     <Authors>Totalsoft</Authors>
     <Company>Totalsoft</Company>
-    <PackageTags>totalsoft charisma</PackageTags>
+    <PackageTags>totalsoft nbb</PackageTags>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All"/>
   </ItemGroup>
 </Project>
