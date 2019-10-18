@@ -7,6 +7,7 @@ using NBB.ProcessManager.Tests.Events;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NBB.ProcessManager.Definition;
 using Xunit;
 
 namespace NBB.ProcessManager.Tests
@@ -27,7 +28,7 @@ namespace NBB.ProcessManager.Tests
             var definition = new OrderProcessManager3();
 
             var instance = new Instance<OrderProcessManagerData>(definition);
-            var identitySelector = definition.GetCorrelationFilter<OrderCreated>();
+            var identitySelector = ((IDefinition<OrderProcessManagerData>)definition).GetCorrelationFilter<OrderCreated>();
             if (identitySelector != null)
                 instance = await _fixture.Repository.Get(definition, identitySelector(@event), CancellationToken.None);
 
