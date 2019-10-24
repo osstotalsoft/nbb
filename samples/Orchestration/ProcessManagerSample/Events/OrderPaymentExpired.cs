@@ -1,7 +1,7 @@
-﻿using System;
-using NBB.Application.DataContracts;
+﻿using NBB.Application.DataContracts;
+using System;
 
-namespace NBB.ProcessManager.Tests.Events
+namespace ProcessManagerSample.Events
 {
     public class OrderPaymentExpired : Event
     {

@@ -38,7 +38,7 @@ namespace NBB.ProcessManager.Definition.Builder
             _eventCorrelations.Add(typeof(TEvent), new EventCorrelation<IEvent, TData>(@event => correl.CorrelationFilter((TEvent) @event)));
         }
 
-        public Func<TEvent, object> GetCorrelationFilter<TEvent>() where TEvent : IEvent
+        Func<TEvent, object> IDefinition<TData>.GetCorrelationFilter<TEvent>()
         {
             if (_eventCorrelations.ContainsKey(typeof(TEvent)))
             {
@@ -49,23 +49,23 @@ namespace NBB.ProcessManager.Definition.Builder
             return null;
         }
 
-        public IEnumerable<Type> GetEventTypes() => _eventActivities.Select(x => x.EventType).Distinct();
+        IEnumerable<Type> IDefinition.GetEventTypes() => _eventActivities.Select(x => x.EventType).Distinct();
 
-        public IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, IEnumerable<EffectHandler<IEvent, TData>>>> GetEffectHandlers(Type eventType)
+        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, IEnumerable<EffectHandler<IEvent, TData>>>> IDefinition<TData>.GetEffectHandlers(Type eventType)
         {
             return _eventActivities
                 .Where(x => x.EventType == eventType)
                 .Select(x => (x.WhenPredicate, x.GetEffectHandlers()));
         }
 
-        public IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, IEnumerable<StateHandler<IEvent, TData>>>> GetStateHandlers(Type eventType)
+        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, IEnumerable<StateHandler<IEvent, TData>>>> IDefinition<TData>.GetStateHandlers(Type eventType)
         {
             return _eventActivities
                 .Where(x => x.EventType == eventType)
                 .Select(x => (x.WhenPredicate, x.GetStateHandlers()));
         }
 
-        public EventPredicate<TEvent, TData> GetStarterPredicate<TEvent>() where TEvent : IEvent
+        EventPredicate<TEvent, TData> IDefinition<TData>.GetStarterPredicate<TEvent>()
         {
             var act = _eventActivities
                 .SingleOrDefault(x => x.EventType == typeof(TEvent) && x.StartsProcess);
@@ -77,7 +77,7 @@ namespace NBB.ProcessManager.Definition.Builder
             };
         }
 
-        public IEnumerable<EventPredicate<TEvent, TData>> GetCompletionPredicates<TEvent>() where TEvent : IEvent
+        IEnumerable<EventPredicate<TEvent, TData>> IDefinition<TData>.GetCompletionPredicates<TEvent>()
         {
             foreach (var x in _eventActivities)
             {

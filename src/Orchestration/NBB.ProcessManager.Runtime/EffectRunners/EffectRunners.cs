@@ -57,6 +57,23 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             };
         }
 
+        public static Func<IServiceProvider, EffectRunner> CancelTimeoutsEffectRunner()
+        {
+            return serviceProvider =>
+            {
+                var timeoutsRepository = serviceProvider.GetRequiredService<ITimeoutsRepository>();
+
+                return async effect =>
+                {
+                    if (effect is CancelTimeouts cancelTimeouts)
+                    {
+                        await timeoutsRepository.RemoveTimeoutBy(cancelTimeouts.InstanceId?.ToString());
+                    }
+                };
+            };
+        }
+
+
         public static Func<IServiceProvider, EffectRunner> NoOpEffect()
         {
             return serviceProvider => { return effect => Task.CompletedTask; };

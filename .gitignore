@@ -3,6 +3,7 @@
 ################################################################################
 
 /.vs
+/.idea
 */**/bin
 */**/obj
 **/packages
@@ -10,3 +11,6 @@
 TestResults
 */**/BenchmarkDotNet.Artifacts
 **/*.DotSettings.user
+*/**/appsettings.Development.json
+*.user
+*.suo
