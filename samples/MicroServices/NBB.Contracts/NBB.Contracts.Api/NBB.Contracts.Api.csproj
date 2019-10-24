@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>NBB_Contracts_6a73f87d-2175-4be0-9a42-31cb73bc8e10</UserSecretsId>
   </PropertyGroup>
