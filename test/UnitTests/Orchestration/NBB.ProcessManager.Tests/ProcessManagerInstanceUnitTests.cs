@@ -28,7 +28,7 @@ namespace NBB.ProcessManager.Tests
             var definition = new OrderProcessManager3();
 
             var instance = new Instance<OrderProcessManagerData>(definition);
-            var identitySelector = ((IDefinition<OrderProcessManagerData>)definition).GetCorrelationFilter<OrderCreated>();
+            var identitySelector = ((IDefinition<OrderProcessManagerData>) definition).GetCorrelationFilter<OrderCreated>();
             if (identitySelector != null)
                 instance = await _fixture.Repository.Get(definition, identitySelector(@event), CancellationToken.None);
 

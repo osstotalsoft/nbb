@@ -32,7 +32,7 @@ namespace ProcessManagerSample
                     newState.OrderId = Guid.NewGuid();
                     return newState;
                 })
-                .RequestTimeout(TimeSpan.FromSeconds(10), new OrderPaymentExpired(Guid.Empty, 0, 0));
+                .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
 
             When<OrderPaymentExpired>()
                 .Complete();

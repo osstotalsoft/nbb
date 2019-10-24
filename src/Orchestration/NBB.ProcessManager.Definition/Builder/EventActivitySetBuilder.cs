@@ -48,17 +48,11 @@ namespace NBB.ProcessManager.Definition.Builder
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, EventPredicate<TEvent, TData> predicate = null)
-            where T : IEvent, new()
-        {
-            RequestTimeout(timeSpan, new T(), predicate);
-            return this;
-        }
-
-        public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, T message, EventPredicate<TEvent, TData> predicate = null)
+        public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, Func<TEvent, InstanceData<TData>, T> messageFactory, 
+            EventPredicate<TEvent, TData> predicate = null)
             where T : IEvent
         {
-            Then((whenEvent, state) => new RequestTimeout(state.CorrelationId.ToString(), timeSpan, message, typeof(T)), predicate);
+            Then((whenEvent, state) => new RequestTimeout(state.CorrelationId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
             return this;
         }
 
