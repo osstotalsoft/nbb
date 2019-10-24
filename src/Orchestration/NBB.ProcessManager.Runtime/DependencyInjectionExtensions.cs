@@ -18,6 +18,7 @@ namespace NBB.ProcessManager.Runtime
             services.AddSingleton(typeof(IEffectRunnerMarker<SendCommand>), EffectRunners.EffectRunners.SendCommandEffectRunner());
             services.AddSingleton(typeof(IEffectRunnerMarker<NoEffect>), EffectRunners.EffectRunners.NoOpEffect());
             services.AddSingleton(typeof(IEffectRunnerMarker<RequestTimeout>), EffectRunners.EffectRunners.RequestTimeoutEffectRunner());
+            services.AddSingleton(typeof(IEffectRunnerMarker<CancelTimeouts>), EffectRunners.EffectRunners.CancelTimeoutsEffectRunner());
 
             services.AddTimeoutManager();
         }

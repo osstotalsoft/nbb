@@ -5,12 +5,12 @@ namespace NBB.ProcessManager.Runtime.Events
 {
     public class ProcessStarted: IEvent
     {
-        public object CorrelationId { get; }
+        public object InstanceId { get; }
         public Guid EventId { get; }
 
-        public ProcessStarted(object correlationId, Guid? eventId = null)
+        public ProcessStarted(object instanceId, Guid? eventId = null)
         {
-            CorrelationId = correlationId;
+            InstanceId = instanceId;
             EventId = eventId ?? Guid.NewGuid();
         }
     }

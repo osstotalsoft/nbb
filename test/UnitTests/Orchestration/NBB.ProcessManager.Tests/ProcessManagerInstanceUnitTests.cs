@@ -71,7 +71,7 @@ namespace NBB.ProcessManager.Tests
 
             var instance = new Instance<OrderProcessManagerData>(definition);
             instance.ProcessEvent(@event);
-            instance.InstanceData.Data.Amount.Should().Be(200);
+            instance.Data.Amount.Should().Be(200);
         }
 
         class OrderProcessManager2 : AbstractDefinition<OrderProcessManagerData>
@@ -106,12 +106,12 @@ namespace NBB.ProcessManager.Tests
 
             var instance = new Instance<OrderProcessManagerData>(definition);
             instance.ProcessEvent(orderCreated);
-            instance.InstanceData.Data.Amount.Should().Be(200);
+            instance.Data.Amount.Should().Be(200);
 
             var orderPaymentCreated = new OrderPaymentCreated(100, orderId, 0, 0);
             instance.ProcessEvent(orderPaymentCreated);
-            instance.InstanceData.Data.Amount.Should().Be(200);
-            instance.InstanceData.Data.IsPaid.Should().BeTrue();
+            instance.Data.Amount.Should().Be(200);
+            instance.Data.IsPaid.Should().BeTrue();
         }
 
         class OrderProcessManager3 : AbstractDefinition<OrderProcessManagerData>
@@ -185,11 +185,11 @@ namespace NBB.ProcessManager.Tests
             var instance = new Instance<OrderProcessManagerData>(definition);
             instance.ProcessEvent(orderCreated);
             instance.State.Should().Be(InstanceStates.Started);
-            instance.InstanceData.Data.IsPaid.Should().Be(true);
+            instance.Data.IsPaid.Should().Be(true);
             instance.ProcessEvent(orderPaymentCreated);
             instance.State.Should().Be(InstanceStates.Started);
-            instance.InstanceData.Data.IsPaid.Should().Be(false);
-            instance.InstanceData.Data.Amount.Should().Be(110);
+            instance.Data.IsPaid.Should().Be(false);
+            instance.Data.Amount.Should().Be(110);
         }
 
 

@@ -2,11 +2,16 @@
 
 namespace NBB.ProcessManager.Definition
 {
-    public class InstanceData<TData>
+    public struct InstanceData<TData>
         where TData : struct
     {
-        //TO REMOVE CorrelationId setter
-        public object CorrelationId { get; set; }
-        public TData Data { get; set; }
+        public object InstanceId { get; }
+        public TData Data { get; }
+
+        public InstanceData(object instanceId, TData data)
+        {
+            InstanceId = instanceId;
+            Data = data;
+        }
     }
 }

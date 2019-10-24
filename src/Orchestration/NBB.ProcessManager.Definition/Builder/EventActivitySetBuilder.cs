@@ -48,11 +48,11 @@ namespace NBB.ProcessManager.Definition.Builder
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, Func<TEvent, InstanceData<TData>, T> messageFactory, 
+        public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, Func<TEvent, InstanceData<TData>, T> messageFactory,
             EventPredicate<TEvent, TData> predicate = null)
             where T : IEvent
         {
-            Then((whenEvent, state) => new RequestTimeout(state.CorrelationId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
+            Then((whenEvent, state) => new RequestTimeout(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
             return this;
         }
 
@@ -70,6 +70,7 @@ namespace NBB.ProcessManager.Definition.Builder
         public void Complete(EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.UseForCompletion(predicate);
+            Then((whenEvent, state) => new CancelTimeouts(state.InstanceId), predicate);
         }
     }
 }
