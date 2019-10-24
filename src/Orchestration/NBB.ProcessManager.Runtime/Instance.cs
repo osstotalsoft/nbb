@@ -63,17 +63,17 @@ namespace NBB.ProcessManager.Runtime
                     throw new Exception($"Cannot accept a new event. Instance is {State}");
             }
 
-            var effectHandlers = _definition.GetEffectHandlers(eventType);
-            foreach (var (pred, handlers) in effectHandlers)
+            var effectHandlers = _definition.GetEffectFuncs(eventType);
+            foreach (var (pred, handler) in effectHandlers)
             {
                 if (pred != null && !pred(@event, GetInstanceData()))
                     continue;
 
-                foreach (var handler in handlers)
-                {
-                    var effect = handler(@event, GetInstanceData());
-                    _effects.Add(effect);
-                }
+                if (handler == null)
+                    continue;
+
+                var effect = handler(@event, GetInstanceData());
+                _effects.Add(effect);
             }
 
             Emit(new EventReceived<TEvent>(@event));
@@ -84,14 +84,16 @@ namespace NBB.ProcessManager.Runtime
 
         private void Apply<TEvent>(EventReceived<TEvent> @event)
         {
-            var stateHandlers = _definition.GetStateHandlers(@event.ReceivedEvent.GetType());
-            foreach (var (pred, handlers) in stateHandlers)
+            var stateHandlers = _definition.GetSetStateFuncs(@event.ReceivedEvent.GetType());
+            foreach (var (pred, handler) in stateHandlers)
             {
                 if (pred != null && !pred((IEvent) @event.ReceivedEvent, GetInstanceData()))
                     continue;
 
-                foreach (var handler in handlers)
-                    Data = handler((IEvent) @event.ReceivedEvent, GetInstanceData());
+                if (handler == null)
+                    continue;
+
+                Data = handler((IEvent) @event.ReceivedEvent, GetInstanceData());
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace NBB.ProcessManager.Definition.Effects
 {
-    public class SendCommand : IEffect
+    public class SendCommand : Effect
     {
         public object Command { get; }
 

@@ -1,6 +1,6 @@
 ﻿namespace NBB.ProcessManager.Definition.Effects
 {
-    public class PublishEvent : IEffect
+    public class PublishEvent : Effect
     {
         public object Event { get; }
 

@@ -2,7 +2,7 @@
 
 namespace NBB.ProcessManager.Definition.Effects
 {
-    public class RequestTimeout : IEffect
+    public class RequestTimeout : Effect
     {
         public Type MessageType { get; }
         public object Message { get; }

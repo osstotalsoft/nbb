@@ -51,18 +51,18 @@ namespace NBB.ProcessManager.Definition.Builder
 
         IEnumerable<Type> IDefinition.GetEventTypes() => _eventActivities.Select(x => x.EventType).Distinct();
 
-        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, IEnumerable<EffectHandler<IEvent, TData>>>> IDefinition<TData>.GetEffectHandlers(Type eventType)
+        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, EffectFunc<IEvent, TData>>> IDefinition<TData>.GetEffectFuncs(Type eventType)
         {
             return _eventActivities
                 .Where(x => x.EventType == eventType)
-                .Select(x => (x.WhenPredicate, x.GetEffectHandlers()));
+                .Select(x => (x.WhenPredicate, x.EffectFunc));
         }
 
-        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, IEnumerable<StateHandler<IEvent, TData>>>> IDefinition<TData>.GetStateHandlers(Type eventType)
+        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, SetStateFunc<IEvent, TData>>> IDefinition<TData>.GetSetStateFuncs(Type eventType)
         {
             return _eventActivities
                 .Where(x => x.EventType == eventType)
-                .Select(x => (x.WhenPredicate, x.GetStateHandlers()));
+                .Select(x => (x.WhenPredicate, x.SetStateFunc));
         }
 
         EventPredicate<TEvent, TData> IDefinition<TData>.GetStarterPredicate<TEvent>()

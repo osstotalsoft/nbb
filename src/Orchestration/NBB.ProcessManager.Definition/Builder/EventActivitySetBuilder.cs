@@ -15,24 +15,24 @@ namespace NBB.ProcessManager.Definition.Builder
             _eventActivitySet = eventActivitySet;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> Then(EffectHandler<TEvent, TData> handler, EventPredicate<TEvent, TData> predicate = null)
+        public EventActivitySetBuilder<TEvent, TData> Then(EffectFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.AddEffectHandler((whenEvent, data) =>
             {
                 if (predicate != null && !predicate(whenEvent, data))
                     return NoEffect.Instance;
-                return handler(whenEvent, data);
+                return func(whenEvent, data);
             });
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> SetState(StateHandler<TEvent, TData> handler, EventPredicate<TEvent, TData> predicate = null)
+        public EventActivitySetBuilder<TEvent, TData> SetState(SetStateFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.AddSetStateHandler((whenEvent, data) =>
             {
                 if (predicate != null && !predicate(whenEvent, data))
                     return data.Data;
-                return handler(whenEvent, data);
+                return func(whenEvent, data);
             });
             return this;
         }

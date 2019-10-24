@@ -71,7 +71,7 @@ namespace NBB.ProcessManager.Tests
 
             var instance = new Instance<OrderProcessManagerData>(definition);
             instance.ProcessEvent(@event);
-            instance.Data.Amount.Should().Be(200);
+            instance.Data.Amount.Should().Be(100);
         }
 
         class OrderProcessManager2 : AbstractDefinition<OrderProcessManagerData>
@@ -81,12 +81,6 @@ namespace NBB.ProcessManager.Tests
                 Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => Guid.NewGuid()));
 
                 StartWith<OrderCreated>()
-                    .SetState((orderCreated, state) =>
-                    {
-                        var newState = state.Data;
-                        newState.Amount = 100;
-                        return newState;
-                    })
                     .PublishEvent((orderCreated, state) => new OrderCompleted(100, orderCreated.OrderId, 0, 0))
                     .SetState((orderCreated, state) =>
                     {
@@ -106,11 +100,11 @@ namespace NBB.ProcessManager.Tests
 
             var instance = new Instance<OrderProcessManagerData>(definition);
             instance.ProcessEvent(orderCreated);
-            instance.Data.Amount.Should().Be(200);
+            instance.Data.Amount.Should().Be(100);
 
             var orderPaymentCreated = new OrderPaymentCreated(100, orderId, 0, 0);
             instance.ProcessEvent(orderPaymentCreated);
-            instance.Data.Amount.Should().Be(200);
+            instance.Data.Amount.Should().Be(100);
             instance.Data.IsPaid.Should().BeTrue();
         }
 
@@ -129,13 +123,7 @@ namespace NBB.ProcessManager.Tests
                         newState.OrderId = orderCreated.OrderId;
                         return newState;
                     })
-                    .PublishEvent((orderCreated, state) => new OrderCompleted(100, orderCreated.OrderId, 0, 0))
-                    .SetState((orderCreated, state) =>
-                    {
-                        var newState = state.Data;
-                        newState.Amount = state.Data.Amount + 100;
-                        return newState;
-                    });
+                    .PublishEvent((orderCreated, state) => new OrderCompleted(100, orderCreated.OrderId, 0, 0));
 
                 When<OrderPaymentCreated>()
                     .SetState((@event, data) =>

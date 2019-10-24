@@ -1,6 +1,8 @@
 ﻿using NBB.Core.Abstractions;
 using System;
 using System.Collections.Generic;
+using MediatR;
+using NBB.ProcessManager.Definition.Effects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -9,8 +11,9 @@ namespace NBB.ProcessManager.Definition.Builder
         where TEvent : IEvent
         where TData : struct
     {
-        private readonly List<EffectHandler<IEvent, TData>> _handlers = new List<EffectHandler<IEvent, TData>>();
-        private readonly List<StateHandler<IEvent, TData>> _setStateHandlers = new List<StateHandler<IEvent, TData>>();
+        public EffectFunc<IEvent, TData> EffectFunc { get; set; }
+        public SetStateFunc<IEvent, TData> SetStateFunc { get; set; }
+
         private readonly EventPredicate<TEvent, TData> _whenPredicate;
         private EventPredicate<TEvent, TData> _completionPredicate;
         public bool StartsProcess { get; set; }
@@ -24,24 +27,23 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public Type EventType => typeof(TEvent);
 
-        public IEnumerable<EffectHandler<IEvent, TData>> GetEffectHandlers()
+        public void AddEffectHandler(EffectFunc<TEvent, TData> func)
         {
-            return _handlers;
+            if (EffectFunc == null)
+                EffectFunc = (@event, data) => func((TEvent) @event, data);
+            else
+                EffectFunc = (@event, data) =>
+                {
+                    var ef1 = EffectFunc(@event, data);
+                    var ef2 = func((TEvent) @event, data);
+
+                    return new CombinedEffect(ef1, ef2);
+                };
         }
 
-        public IEnumerable<StateHandler<IEvent, TData>> GetStateHandlers()
+        public void AddSetStateHandler(SetStateFunc<TEvent, TData> func)
         {
-            return _setStateHandlers;
-        }
-
-        public void AddEffectHandler(EffectHandler<TEvent, TData> handler)
-        {
-            _handlers.Add((@event, data) => handler((TEvent) @event, data));
-        }
-
-        public void AddSetStateHandler(StateHandler<TEvent, TData> handler)
-        {
-            _setStateHandlers.Add((@event, data) => handler((TEvent) @event, data));
+            SetStateFunc = (@event, data) => func((TEvent) @event, data);
         }
 
         public EventPredicate<IEvent, TData> WhenPredicate
@@ -79,7 +81,7 @@ namespace NBB.ProcessManager.Definition.Builder
         bool StartsProcess { get; }
         EventPredicate<IEvent, TData> WhenPredicate { get; }
         EventPredicate<IEvent, TData> CompletionPredicate { get; }
-        IEnumerable<EffectHandler<IEvent, TData>> GetEffectHandlers();
-        IEnumerable<StateHandler<IEvent, TData>> GetStateHandlers();
+        EffectFunc<IEvent, TData> EffectFunc { get; }
+        SetStateFunc<IEvent, TData> SetStateFunc { get; }
     }
 }
