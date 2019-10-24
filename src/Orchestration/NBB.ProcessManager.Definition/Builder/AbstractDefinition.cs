@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NBB.ProcessManager.Definition.Effects.Handlers;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -51,11 +52,12 @@ namespace NBB.ProcessManager.Definition.Builder
 
         IEnumerable<Type> IDefinition.GetEventTypes() => _eventActivities.Select(x => x.EventType).Distinct();
 
-        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, EffectFunc<IEvent, TData>>> IDefinition<TData>.GetEffectFuncs(Type eventType)
+        IEnumerable<IEffectHandler<IEvent, TData>> IDefinition<TData>.GetEffectHandlers(Type eventType)
         {
             return _eventActivities
                 .Where(x => x.EventType == eventType)
-                .Select(x => (x.WhenPredicate, x.EffectFunc));
+                .Select(x => x.EffectHandler)
+                .Where(x => x != null);
         }
 
         IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, SetStateFunc<IEvent, TData>>> IDefinition<TData>.GetSetStateFuncs(Type eventType)

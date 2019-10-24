@@ -11,9 +11,16 @@ namespace NBB.ProcessManager.Definition.Effects.Handlers
 
     public class EffectHandler<TEvent, TData> : IEffectHandler<TEvent, TData> where TData : struct
     {
+        private readonly EffectFunc<TEvent, TData> _effectFunc;
+
+        public EffectHandler(EffectFunc<TEvent, TData> effectFunc)
+        {
+            _effectFunc = effectFunc;
+        }
+
         public IEffect GetEffect(TEvent @event, InstanceData<TData> data)
         {
-            throw new NotImplementedException();
+            return _effectFunc(@event, data);
         }
     }
 }

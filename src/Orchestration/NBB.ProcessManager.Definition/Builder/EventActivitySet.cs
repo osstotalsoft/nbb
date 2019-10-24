@@ -1,8 +1,7 @@
 ﻿using NBB.Core.Abstractions;
-using System;
-using System.Collections.Generic;
-using MediatR;
 using NBB.ProcessManager.Definition.Effects;
+using NBB.ProcessManager.Definition.Effects.Handlers;
+using System;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -11,7 +10,7 @@ namespace NBB.ProcessManager.Definition.Builder
         where TEvent : IEvent
         where TData : struct
     {
-        public EffectFunc<IEvent, TData> EffectFunc { get; set; }
+        public IEffectHandler<IEvent, TData> EffectHandler { get; set; }
         public SetStateFunc<IEvent, TData> SetStateFunc { get; set; }
 
         private readonly EventPredicate<TEvent, TData> _whenPredicate;
@@ -29,16 +28,24 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public void AddEffectHandler(EffectFunc<TEvent, TData> func)
         {
-            if (EffectFunc == null)
-                EffectFunc = (@event, data) => func((TEvent) @event, data);
+            if (EffectHandler == null)
+                EffectHandler = CreateEffectHandler((@event, data) => func((TEvent) @event, data));
             else
-                EffectFunc = (@event, data) =>
+                EffectHandler = CreateEffectHandler((@event, data) =>
                 {
-                    var ef1 = EffectFunc(@event, data);
+                    var ef1 = EffectHandler.GetEffect(@event, data);
                     var ef2 = func((TEvent) @event, data);
 
                     return new CombinedEffect(ef1, ef2);
-                };
+                });
+        }
+
+        private IEffectHandler<IEvent, TData> CreateEffectHandler(EffectFunc<IEvent, TData> func)
+        {
+            var handler = new EffectHandler<IEvent, TData>(func);
+            if (WhenPredicate != null)
+                return new ConditionalEffectHandler<IEvent, TData>(WhenPredicate, handler);
+            return handler;
         }
 
         public void AddSetStateHandler(SetStateFunc<TEvent, TData> func)
@@ -81,7 +88,7 @@ namespace NBB.ProcessManager.Definition.Builder
         bool StartsProcess { get; }
         EventPredicate<IEvent, TData> WhenPredicate { get; }
         EventPredicate<IEvent, TData> CompletionPredicate { get; }
-        EffectFunc<IEvent, TData> EffectFunc { get; }
+        IEffectHandler<IEvent, TData> EffectHandler { get; }
         SetStateFunc<IEvent, TData> SetStateFunc { get; }
     }
 }

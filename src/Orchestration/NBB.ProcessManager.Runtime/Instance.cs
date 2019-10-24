@@ -63,16 +63,10 @@ namespace NBB.ProcessManager.Runtime
                     throw new Exception($"Cannot accept a new event. Instance is {State}");
             }
 
-            var effectHandlers = _definition.GetEffectFuncs(eventType);
-            foreach (var (pred, handler) in effectHandlers)
+            var effectHandlers = _definition.GetEffectHandlers(eventType);
+            foreach (var handler in effectHandlers)
             {
-                if (pred != null && !pred(@event, GetInstanceData()))
-                    continue;
-
-                if (handler == null)
-                    continue;
-
-                var effect = handler(@event, GetInstanceData());
+                var effect = handler.GetEffect(@event, GetInstanceData());
                 _effects.Add(effect);
             }
 
