@@ -15,24 +15,24 @@ namespace NBB.ProcessManager.Definition.Builder
             _eventActivitySet = eventActivitySet;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> Then(EffectHandler<TEvent, TData> handler, EventPredicate<TEvent, TData> predicate = null)
+        public EventActivitySetBuilder<TEvent, TData> Then(EffectFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.AddEffectHandler((whenEvent, data) =>
             {
                 if (predicate != null && !predicate(whenEvent, data))
                     return NoEffect.Instance;
-                return handler(whenEvent, data);
+                return func(whenEvent, data);
             });
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> SetState(StateHandler<TEvent, TData> handler, EventPredicate<TEvent, TData> predicate = null)
+        public EventActivitySetBuilder<TEvent, TData> SetState(SetStateFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.AddSetStateHandler((whenEvent, data) =>
             {
                 if (predicate != null && !predicate(whenEvent, data))
                     return data.Data;
-                return handler(whenEvent, data);
+                return func(whenEvent, data);
             });
             return this;
         }
@@ -43,7 +43,7 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var command = handler(whenEvent, state);
-                return new SendCommand(command);
+                return new PublishMessageEffect(command);
             }, predicate);
             return this;
         }
@@ -52,7 +52,7 @@ namespace NBB.ProcessManager.Definition.Builder
             EventPredicate<TEvent, TData> predicate = null)
             where T : IEvent
         {
-            Then((whenEvent, state) => new RequestTimeout(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
+            Then((whenEvent, state) => new RequestTimeoutEffect(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
             return this;
         }
 
@@ -62,7 +62,7 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var @event = handler(whenEvent, state);
-                return new PublishEvent(@event);
+                return new PublishMessageEffect(@event);
             }, predicate);
             return this;
         }
@@ -70,7 +70,7 @@ namespace NBB.ProcessManager.Definition.Builder
         public void Complete(EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.UseForCompletion(predicate);
-            Then((whenEvent, state) => new CancelTimeouts(state.InstanceId), predicate);
+            Then((whenEvent, state) => new CancelTimeoutsEffect(state.InstanceId), predicate);
         }
     }
 }

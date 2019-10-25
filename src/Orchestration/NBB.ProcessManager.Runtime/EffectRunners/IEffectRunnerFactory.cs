@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.ProcessManager.Definition;
 
@@ -16,16 +17,15 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
     {
         public static Func<IServiceProvider, EffectRunnerFactory> EffectRunnerFactory()
         {
-            return serviceProvider =>
-            {
-                return effectType => (EffectRunner) serviceProvider.GetRequiredService(typeof(IEffectRunnerMarker<>).MakeGenericType(effectType));
-
-            };
+            return serviceProvider => effectType => (EffectRunner) serviceProvider.GetRequiredService(typeof(IEffectRunnerMarker<>).MakeGenericType(effectType));
         }
     }
 
-    public delegate Task EffectRunner(IEffect effect);
+    public delegate Task<TResult> EffectRunner<TResult>(IEffect<TResult> effect);
+
+    public delegate Task EffectRunner(IEffect<Unit> effect);
 
     public delegate EffectRunner EffectRunnerFactory(Type effectType);
 
+    public delegate EffectRunner<TResult> EffectRunnerFactory<TResult>(Type effectType);
 }

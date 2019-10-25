@@ -37,16 +37,15 @@ namespace ProcessManagerSample
             When<OrderPaymentExpired>()
                 .Complete();
 
-            When<OrderShipped>((@event, data) => data.Data.IsPaid)
+            When<OrderShipped>((@event, data) => !data.Data.IsPaid)
                 .SendCommand(OrderShippedHandler)
                 .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
                 .Complete();
-
         }
 
         private static IEffect OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
-            var effect = new SendCommand(new DoPayment());
+            var effect = new PublishMessageEffect(new DoPayment());
             return effect;
         }
 
@@ -59,5 +58,11 @@ namespace ProcessManagerSample
         {
             return new DoPayment();
         }
+    }
+
+    public class Partner
+    {
+        public string PartnerName { get; set; }
+        public string PartnerCode { get; set; }
     }
 }

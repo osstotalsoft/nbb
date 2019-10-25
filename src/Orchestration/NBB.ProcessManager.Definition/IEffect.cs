@@ -1,11 +1,19 @@
-﻿namespace NBB.ProcessManager.Definition
-{
-    public delegate IEffect EffectHandler<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
-    public delegate TData StateHandler<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
-    public delegate bool EventPredicate<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
-    public delegate T EventPredicate<in TEvent, TData, out T>(TEvent @event, InstanceData<TData> data) where TData : struct;
+﻿using System.Threading.Tasks;
+using MediatR;
 
-    public interface IEffect
+namespace NBB.ProcessManager.Definition
+{
+    public delegate IEffect<Unit> EffectFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
+
+    public delegate TData SetStateFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
+
+    public delegate bool EventPredicate<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
+
+    public interface IEffect<out T>
+    {
+    }
+
+    public interface IEffect : IEffect<Unit>
     {
     }
 }

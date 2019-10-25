@@ -4,6 +4,7 @@ using NBB.ProcessManager.Runtime.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MediatR;
 using NBB.ProcessManager.Definition.Effects;
 
 namespace NBB.ProcessManager.Runtime
@@ -18,7 +19,7 @@ namespace NBB.ProcessManager.Runtime
 
 
         private readonly List<IEvent> _changes = new List<IEvent>();
-        private readonly List<IEffect> _effects = new List<IEffect>();
+        private readonly List<IEffect<Unit>> _effects = new List<IEffect<Unit>>();
         public int Version { get; internal set; }
 
         public Instance(IDefinition<TData> definition)
@@ -48,7 +49,6 @@ namespace NBB.ProcessManager.Runtime
         public void ProcessEvent<TEvent>(TEvent @event)
             where TEvent : IEvent
         {
-            var eventType = typeof(TEvent);
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
 
             if (State == InstanceStates.NotStarted && starter)
@@ -63,36 +63,18 @@ namespace NBB.ProcessManager.Runtime
                     throw new Exception($"Cannot accept a new event. Instance is {State}");
             }
 
-            var effectHandlers = _definition.GetEffectHandlers(eventType);
-            foreach (var (pred, handlers) in effectHandlers)
-            {
-                if (pred != null && !pred(@event, GetInstanceData()))
-                    continue;
-
-                foreach (var handler in handlers)
-                {
-                    var effect = handler(@event, GetInstanceData());
-                    _effects.Add(effect);
-                }
-            }
+            var effect = _definition.GetEffectFunc<TEvent>()(@event, GetInstanceData());
+            _effects.Add(effect);
 
             Emit(new EventReceived<TEvent>(@event));
 
-            if (_definition.GetCompletionPredicates<TEvent>().Any(x => x(@event, GetInstanceData())))
+            if (_definition.GetCompletionPredicate<TEvent>()(@event, GetInstanceData()))
                 Emit(new ProcessCompleted<TEvent>(@event));
         }
 
         private void Apply<TEvent>(EventReceived<TEvent> @event)
         {
-            var stateHandlers = _definition.GetStateHandlers(@event.ReceivedEvent.GetType());
-            foreach (var (pred, handlers) in stateHandlers)
-            {
-                if (pred != null && !pred((IEvent) @event.ReceivedEvent, GetInstanceData()))
-                    continue;
-
-                foreach (var handler in handlers)
-                    Data = handler((IEvent) @event.ReceivedEvent, GetInstanceData());
-            }
+            Data = _definition.GetSetStateFunc<TEvent>()(@event.ReceivedEvent, GetInstanceData());
         }
 
         private InstanceData<TData> GetInstanceData()
@@ -147,7 +129,7 @@ namespace NBB.ProcessManager.Runtime
         }
 
         public IEnumerable<object> GetUncommittedChanges() => _changes;
-        public IEnumerable<IEffect> GetUncommittedEffects() => _effects;
+        public IEnumerable<IEffect<Unit>> GetUncommittedEffects() => _effects;
 
         public void MarkChangesAsCommitted()
         {
