@@ -68,7 +68,7 @@ namespace ProcessManagerSample
 
     public class Partner
     {
-        public string  PartnerName { get; set; }   
-        public string PartnerCode { get; set; }   
+        public string PartnerName { get; set; }
+        public string PartnerCode { get; set; }
     }
 }

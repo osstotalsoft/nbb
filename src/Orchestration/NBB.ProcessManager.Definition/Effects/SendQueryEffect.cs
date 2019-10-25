@@ -1,12 +1,13 @@
 ﻿using System;
+using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
     public class SendQueryEffect<TResult> : IEffect<TResult>
     {
-        public object Query { get; }
+        public IRequest<TResult> Query { get; }
 
-        public SendQueryEffect(object query)
+        public SendQueryEffect(IRequest<TResult> query)
         {
             Query = query;
         }

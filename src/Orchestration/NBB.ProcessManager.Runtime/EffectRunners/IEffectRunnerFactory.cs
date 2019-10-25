@@ -17,10 +17,7 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
     {
         public static Func<IServiceProvider, EffectRunnerFactory> EffectRunnerFactory()
         {
-            return serviceProvider =>
-            {
-                return effectType => (EffectRunner) serviceProvider.GetRequiredService(typeof(IEffectRunnerMarker<>).MakeGenericType(effectType));
-            };
+            return serviceProvider => effectType => (EffectRunner) serviceProvider.GetRequiredService(typeof(IEffectRunnerMarker<>).MakeGenericType(effectType));
         }
     }
 
@@ -29,4 +26,6 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
     public delegate Task EffectRunner(IEffect<Unit> effect);
 
     public delegate EffectRunner EffectRunnerFactory(Type effectType);
+
+    public delegate EffectRunner<TResult> EffectRunnerFactory<TResult>(Type effectType);
 }

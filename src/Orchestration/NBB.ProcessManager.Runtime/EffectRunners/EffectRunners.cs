@@ -4,6 +4,7 @@ using NBB.ProcessManager.Definition.Effects;
 using NBB.ProcessManager.Runtime.Timeouts;
 using System;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace NBB.ProcessManager.Runtime.EffectRunners
 {
@@ -48,7 +49,6 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             return serviceProvider =>
             {
                 var timeoutsRepository = serviceProvider.GetRequiredService<ITimeoutsRepository>();
-
                 return async effect =>
                 {
                     if (effect is CancelTimeoutsEffect cancelTimeouts)
@@ -64,7 +64,6 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             return serviceProvider =>
             {
                 var effectRunnerFactory = serviceProvider.GetRequiredService<EffectRunnerFactory>();
-
                 return async effect =>
                 {
                     if (effect is SequentialEffect sequentialEffect)
@@ -72,6 +71,41 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
                         await effectRunnerFactory(sequentialEffect.Effect1.GetType())(sequentialEffect.Effect1);
                         await effectRunnerFactory(sequentialEffect.Effect2.GetType())(sequentialEffect.Effect2);
                     }
+                };
+            };
+        }
+
+        public static Func<IServiceProvider, EffectRunner> BoundedEffectRunner<TEffectResult1, TEffectResult2>()
+        {
+            return serviceProvider =>
+            {
+                var effectRunnerFactory1 = serviceProvider.GetRequiredService<EffectRunnerFactory<TEffectResult1>>();
+                var effectRunnerFactory2 = serviceProvider.GetRequiredService<EffectRunnerFactory<TEffectResult2>>();
+                return async effect =>
+                {
+                    if (effect is BoundedEffect<TEffectResult1, TEffectResult2> boundedEffect)
+                    {
+                        var result = await effectRunnerFactory1(boundedEffect.Effect.GetType())(boundedEffect.Effect);
+                        var effect2 = boundedEffect.Continuation(result);
+                        await effectRunnerFactory2(effect2.GetType())(effect2);
+                    }
+                };
+            };
+        }
+
+        public static Func<IServiceProvider, EffectRunner<TResult>> SendQueryEffectRunner<TResult>()
+        {
+            return serviceProvider =>
+            {
+                var mediator = serviceProvider.GetRequiredService<IMediator>();
+                return async effect =>
+                {
+                    if (effect is SendQueryEffect<TResult> sendQueryEffect)
+                    {
+                        return await mediator.Send(sendQueryEffect.Query);
+                    }
+
+                    return default(TResult);
                 };
             };
         }
