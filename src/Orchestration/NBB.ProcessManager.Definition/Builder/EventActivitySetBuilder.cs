@@ -52,7 +52,7 @@ namespace NBB.ProcessManager.Definition.Builder
             EventPredicate<TEvent, TData> predicate = null)
             where T : IEvent
         {
-            Then((whenEvent, state) => new RequestTimeout(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
+            Then((whenEvent, state) => new RequestTimeoutEffect(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
             return this;
         }
 
@@ -70,7 +70,7 @@ namespace NBB.ProcessManager.Definition.Builder
         public void Complete(EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.UseForCompletion(predicate);
-            Then((whenEvent, state) => new CancelTimeouts(state.InstanceId), predicate);
+            Then((whenEvent, state) => new CancelTimeoutsEffect(state.InstanceId), predicate);
         }
     }
 }

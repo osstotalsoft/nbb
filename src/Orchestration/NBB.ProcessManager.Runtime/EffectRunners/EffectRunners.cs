@@ -33,7 +33,7 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
 
                 return async effect =>
                 {
-                    if (effect is RequestTimeout requestTimeout)
+                    if (effect is RequestTimeoutEffect requestTimeout)
                     {
                         var dueDate = currentTimeProvider().Add(requestTimeout.TimeSpan);
                         await timeoutsRepository.Add(new TimeoutRecord(requestTimeout.InstanceId, dueDate, requestTimeout.Message, requestTimeout.MessageType));
@@ -51,7 +51,7 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
 
                 return async effect =>
                 {
-                    if (effect is CancelTimeouts cancelTimeouts)
+                    if (effect is CancelTimeoutsEffect cancelTimeouts)
                     {
                         await timeoutsRepository.RemoveTimeoutBy(cancelTimeouts.InstanceId?.ToString());
                     }

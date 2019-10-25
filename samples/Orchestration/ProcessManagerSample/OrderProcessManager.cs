@@ -37,7 +37,7 @@ namespace ProcessManagerSample
             When<OrderPaymentExpired>()
                 .Complete();
 
-            When<OrderShipped>((@event, data) => data.Data.IsPaid)
+            When<OrderShipped>((@event, data) => !data.Data.IsPaid)
                 .SendCommand(OrderShippedHandler)
                 .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
                 .Complete();

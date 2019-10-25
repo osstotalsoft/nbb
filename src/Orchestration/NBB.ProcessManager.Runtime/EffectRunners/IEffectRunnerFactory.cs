@@ -19,13 +19,13 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             return serviceProvider =>
             {
                 return effectType => (EffectRunner) serviceProvider.GetRequiredService(typeof(IEffectRunnerMarker<>).MakeGenericType(effectType));
-
             };
         }
     }
 
+    public delegate Task<TResult> EffectRunner<TResult>(IEffect<TResult> effect);
+
     public delegate Task EffectRunner(IEffect effect);
 
     public delegate EffectRunner EffectRunnerFactory(Type effectType);
-
 }
