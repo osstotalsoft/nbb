@@ -43,7 +43,7 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var command = handler(whenEvent, state);
-                return new SendCommand(command);
+                return new PublishMessageEffect(command);
             }, predicate);
             return this;
         }
@@ -62,7 +62,7 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var @event = handler(whenEvent, state);
-                return new PublishEvent(@event);
+                return new PublishMessageEffect(@event);
             }, predicate);
             return this;
         }

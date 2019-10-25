@@ -46,7 +46,7 @@ namespace ProcessManagerSample
 
         private static IEffect OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
-            var effect = new SendCommand(new DoPayment());
+            var effect = new PublishMessageEffect(new DoPayment());
             return effect;
         }
 

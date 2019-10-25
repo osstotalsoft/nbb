@@ -1,9 +1,9 @@
 ﻿namespace NBB.ProcessManager.Definition.Effects
 {
     
-    public class NoEffect : Effect
+    public class NoEffect : IEffect
     {
-        public static readonly Effect Instance = new NoEffect();
+        public static readonly IEffect Instance = new NoEffect();
 
     }
 }

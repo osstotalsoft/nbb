@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NBB.ProcessManager.Definition.Effects.Handlers;
+using NBB.ProcessManager.Definition.Effects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -44,7 +44,7 @@ namespace NBB.ProcessManager.Definition.Builder
             if (_eventCorrelations.ContainsKey(typeof(TEvent)))
             {
                 var func = _eventCorrelations[typeof(TEvent)];
-                return @event => func.CorrelationFilter(@event);
+                return @event => func.CorrelationFilter((IEvent) @event);
             }
 
             return null;
@@ -52,50 +52,56 @@ namespace NBB.ProcessManager.Definition.Builder
 
         IEnumerable<Type> IDefinition.GetEventTypes() => _eventActivities.Select(x => x.EventType).Distinct();
 
-        IEnumerable<IEffectHandler<IEvent, TData>> IDefinition<TData>.GetEffectHandlers(Type eventType)
+        EffectFunc<TEvent, TData> IDefinition<TData>.GetEffectFunc<TEvent>()
         {
-            return _eventActivities
-                .Where(x => x.EventType == eventType)
-                .Select(x => x.EffectHandler)
-                .Where(x => x != null);
+            var func = _eventActivities
+                .Where(x => x.EventType == typeof(TEvent))
+                .Select(x => x.EffectFunc)
+                .DefaultIfEmpty()
+                .Aggregate(EffectHelpers.Sequential);
+
+            return (@event, data) => func?.Invoke((IEvent) @event, data) ?? NoEffect.Instance;
         }
 
-        IEnumerable<ValueTuple<EventPredicate<IEvent, TData>, SetStateFunc<IEvent, TData>>> IDefinition<TData>.GetSetStateFuncs(Type eventType)
+        SetStateFunc<TEvent, TData> IDefinition<TData>.GetSetStateFunc<TEvent>()
         {
-            return _eventActivities
-                .Where(x => x.EventType == eventType)
-                .Select(x => (x.WhenPredicate, x.SetStateFunc));
+            var func = _eventActivities
+                .Where(x => x.EventType == typeof(TEvent))
+                .Select(x => x.SetStateFunc)
+                .DefaultIfEmpty()
+                .Aggregate((func1, func2) => (@event, data) =>
+                    {
+                        var newData = func1(@event, data);
+                        return func2(@event, new InstanceData<TData>(data.InstanceId, newData));
+                    }
+                );
+
+            return (@event, data) => func?.Invoke((IEvent) @event, data) ?? data.Data;
         }
 
         EventPredicate<TEvent, TData> IDefinition<TData>.GetStarterPredicate<TEvent>()
         {
-            var act = _eventActivities
-                .SingleOrDefault(x => x.EventType == typeof(TEvent) && x.StartsProcess);
-            return (@event, data) =>
-            {
-                if (act == null)
-                    return false;
-                return act.WhenPredicate?.Invoke(@event, data) ?? true;
-            };
+            var act = _eventActivities.SingleOrDefault(x => x.EventType == typeof(TEvent) && x.StartsProcess);
+            if (act == null)
+                return (@event, data) => false;
+
+            return (@event, data) => act.StarterPredicate?.Invoke((IEvent) @event, data) ?? true;
         }
 
-        IEnumerable<EventPredicate<TEvent, TData>> IDefinition<TData>.GetCompletionPredicates<TEvent>()
+        EventPredicate<TEvent, TData> IDefinition<TData>.GetCompletionPredicate<TEvent>()
         {
-            foreach (var x in _eventActivities)
-            {
-                if (x.EventType == typeof(TEvent) && x.CompletesProcess)
-                    yield return (@event, data) =>
-                    {
-                        if (x.CompletionPredicate != null && x.WhenPredicate != null)
-                            return x.CompletionPredicate(@event, data) && x.WhenPredicate(@event, data);
-                        if (x.CompletionPredicate == null && x.WhenPredicate != null)
-                            return x.WhenPredicate(@event, data);
-                        if (x.CompletionPredicate != null && x.WhenPredicate == null)
-                            return x.CompletionPredicate(@event, data);
+            var acts = _eventActivities
+                .Where(x => x.EventType == typeof(TEvent) && x.CompletesProcess)
+                .ToList();
 
-                        return true;
-                    };
-            }
+            if (acts.Count == 0)
+                return (@event, data) => false;
+
+            var func = acts.Select(x => x.CompletionPredicate)
+                .DefaultIfEmpty()
+                .Aggregate((func1, func2) => (@event, data) => func2(@event, data) && func2(@event, data));
+
+            return (@event, data) => func?.Invoke((IEvent) @event, data) ?? true;
         }
     }
 }

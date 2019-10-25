@@ -134,7 +134,7 @@ namespace NBB.ProcessManager.Tests
                     })
                     .Then((ev, state) =>
                     {
-                        var effect = new SendCommand(new DoPayment());
+                        var effect = new PublishMessageEffect(new DoPayment());
                         return effect;
                     });
             }

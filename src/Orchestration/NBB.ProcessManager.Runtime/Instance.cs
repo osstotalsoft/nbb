@@ -48,7 +48,6 @@ namespace NBB.ProcessManager.Runtime
         public void ProcessEvent<TEvent>(TEvent @event)
             where TEvent : IEvent
         {
-            var eventType = typeof(TEvent);
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
 
             if (State == InstanceStates.NotStarted && starter)
@@ -63,32 +62,18 @@ namespace NBB.ProcessManager.Runtime
                     throw new Exception($"Cannot accept a new event. Instance is {State}");
             }
 
-            var effectHandlers = _definition.GetEffectHandlers(eventType);
-            foreach (var handler in effectHandlers)
-            {
-                var effect = handler.GetEffect(@event, GetInstanceData());
-                _effects.Add(effect);
-            }
+            var effect = _definition.GetEffectFunc<TEvent>()(@event, GetInstanceData());
+            _effects.Add(effect);
 
             Emit(new EventReceived<TEvent>(@event));
 
-            if (_definition.GetCompletionPredicates<TEvent>().Any(x => x(@event, GetInstanceData())))
+            if (_definition.GetCompletionPredicate<TEvent>()(@event, GetInstanceData()))
                 Emit(new ProcessCompleted<TEvent>(@event));
         }
 
         private void Apply<TEvent>(EventReceived<TEvent> @event)
         {
-            var stateHandlers = _definition.GetSetStateFuncs(@event.ReceivedEvent.GetType());
-            foreach (var (pred, handler) in stateHandlers)
-            {
-                if (pred != null && !pred((IEvent) @event.ReceivedEvent, GetInstanceData()))
-                    continue;
-
-                if (handler == null)
-                    continue;
-
-                Data = handler((IEvent) @event.ReceivedEvent, GetInstanceData());
-            }
+            Data = _definition.GetSetStateFunc<TEvent>()(@event.ReceivedEvent, GetInstanceData());
         }
 
         private InstanceData<TData> GetInstanceData()

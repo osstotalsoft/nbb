@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System.Threading.Tasks;
+using MediatR;
 
 namespace NBB.ProcessManager.Definition
 {
@@ -10,15 +11,9 @@ namespace NBB.ProcessManager.Definition
 
     public interface IEffect<out T>
     {
-        T Value { get; }
     }
 
     public interface IEffect : IEffect<Unit>
     {
-    }
-
-    public abstract class Effect : IEffect
-    {
-        public Unit Value { get; }
     }
 }
