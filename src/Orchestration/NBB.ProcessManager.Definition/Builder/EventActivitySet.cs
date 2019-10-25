@@ -1,6 +1,7 @@
 ﻿using NBB.Core.Abstractions;
 using NBB.ProcessManager.Definition.Effects;
 using System;
+using MediatR;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -33,7 +34,7 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public void AddEffectHandler(EffectFunc<TEvent, TData> func)
         {
-            IEffect newFunc(IEvent @event, InstanceData<TData> data)
+            IEffect<Unit> newFunc(IEvent @event, InstanceData<TData> data)
             {
                 if (_starterPredicate != null && !_starterPredicate((TEvent) @event, data))
                     return NoEffect.Instance;
@@ -94,7 +95,7 @@ namespace NBB.ProcessManager.Definition.Builder
     public static class EffectHelpers
     {
         public static EffectFunc<TEvent, TData> Aggregate<TEvent, TData>(EffectFunc<TEvent, TData> func1, EffectFunc<TEvent, TData> func2,
-            Func<IEffect, IEffect, IEffect> accumulator)
+            Func<IEffect<Unit>, IEffect<Unit>, IEffect<Unit>> accumulator)
             where TData : struct
         {
             return (@event, data) =>
@@ -105,7 +106,6 @@ namespace NBB.ProcessManager.Definition.Builder
                 return accumulator(ef1, ef2);
             };
         }
-
         public static EffectFunc<TEvent, TData> Sequential<TEvent, TData>(EffectFunc<TEvent, TData> func1, EffectFunc<TEvent, TData> func2)
             where TData : struct
         {

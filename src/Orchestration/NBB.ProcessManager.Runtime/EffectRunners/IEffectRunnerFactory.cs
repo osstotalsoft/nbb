@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.ProcessManager.Definition;
 
@@ -25,7 +26,7 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
 
     public delegate Task<TResult> EffectRunner<TResult>(IEffect<TResult> effect);
 
-    public delegate Task EffectRunner(IEffect effect);
+    public delegate Task EffectRunner(IEffect<Unit> effect);
 
     public delegate EffectRunner EffectRunnerFactory(Type effectType);
 }

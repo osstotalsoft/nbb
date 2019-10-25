@@ -3,7 +3,7 @@ using MediatR;
 
 namespace NBB.ProcessManager.Definition
 {
-    public delegate IEffect EffectFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
+    public delegate IEffect<Unit> EffectFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
 
     public delegate TData SetStateFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
 

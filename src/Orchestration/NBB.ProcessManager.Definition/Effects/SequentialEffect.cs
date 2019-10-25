@@ -1,13 +1,15 @@
 ﻿using System;
+using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
-    public class SequentialEffect : IEffect
+ 
+    public class SequentialEffect : IEffect<Unit>
     {
-        public IEffect Effect1 { get; }
-        public IEffect Effect2 { get; }
+        public IEffect<Unit> Effect1 { get; }
+        public IEffect<Unit> Effect2 { get; }
 
-        public SequentialEffect(IEffect effect1, IEffect effect2)
+        public SequentialEffect(IEffect<Unit> effect1, IEffect<Unit> effect2)
         {
             Effect1 = effect1;
             Effect2 = effect2;

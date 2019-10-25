@@ -2,15 +2,13 @@
 
 namespace NBB.ProcessManager.Definition.Effects
 {
-    public class BoundedEffect : IEffect
+    public class BoundedEffect<TEffectResult1, TEffectResult2> : IEffect<TEffectResult2>
     {
-        public IEffect Effect1 { get; }
-        public IEffect Effect2 { get; }
+        private readonly Func<TEffectResult1, IEffect<TEffectResult2>> _continuation;
 
-        public BoundedEffect(IEffect effect1, IEffect effect2)
+        public BoundedEffect(IEffect<TEffectResult1> effect, Func<TEffectResult1, IEffect<TEffectResult2>> continuation)
         {
-            Effect1 = effect1;
-            Effect2 = effect2;
+            _continuation = continuation;
         }
     }
 }

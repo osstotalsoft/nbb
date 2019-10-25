@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MediatR;
 using NBB.ProcessManager.Definition.Effects;
 
 namespace NBB.ProcessManager.Definition.Builder
