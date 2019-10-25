@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NBB.ProcessManager.Runtime.Timeouts
 {
@@ -18,11 +19,11 @@ namespace NBB.ProcessManager.Runtime.Timeouts
         public DateTime NextRetrieval { get; private set; }
         DateTime _startSlice;
 
-        public TimeoutsManager(ITimeoutsRepository timeoutsRepository, ILogger<TimeoutsManager> logger, IMediator mediator, Func<DateTime> currentTimeProvider)
+        public TimeoutsManager(ITimeoutsRepository timeoutsRepository, ILogger<TimeoutsManager> logger, IServiceScopeFactory scopeFactory, Func<DateTime> currentTimeProvider)
         {
             _timeoutsRepository = timeoutsRepository;
             _logger = logger;
-            _mediator = mediator;
+            _mediator = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IMediator>();
             _currentTimeProvider = currentTimeProvider;
 
             var now = _currentTimeProvider();

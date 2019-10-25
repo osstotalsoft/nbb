@@ -38,6 +38,12 @@ namespace ProcessManagerSample
                 .Complete();
 
             When<OrderShipped>((@event, data) => !data.Data.IsPaid)
+                .Then((orderShipped, data) =>
+                {
+                    var query1 = new SendQueryEffect<Partner>(null);
+                    return query1
+                        .ContinueWith(partnerTuple => new PublishMessageEffect(partnerTuple));
+                })
                 .SendCommand(OrderShippedHandler)
                 .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
                 .Complete();
