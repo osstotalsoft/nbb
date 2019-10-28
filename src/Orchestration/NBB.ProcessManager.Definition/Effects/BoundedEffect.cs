@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
@@ -11,6 +12,11 @@ namespace NBB.ProcessManager.Definition.Effects
         {
             Effect = effect;
             Continuation = continuation;
+        }
+
+        public Task<TEffectResult2> Accept(IEffectVisitor visitor)
+        {
+            return visitor.Visit(this);
         }
     }
 }

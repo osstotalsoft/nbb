@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
@@ -13,6 +14,11 @@ namespace NBB.ProcessManager.Definition.Effects
         {
             Effect1 = effect1;
             Effect2 = effect2;
+        }
+
+        public Task<Unit> Accept(IEffectVisitor visitor)
+        {
+            return visitor.Visit(this);
         }
     }
 }

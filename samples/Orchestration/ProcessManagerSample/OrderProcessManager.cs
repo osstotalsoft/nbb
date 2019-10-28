@@ -4,6 +4,7 @@ using NBB.ProcessManager.Definition.Builder;
 using NBB.ProcessManager.Definition.Effects;
 using ProcessManagerSample.Commands;
 using ProcessManagerSample.Events;
+using ProcessManagerSample.Queries;
 using System;
 
 namespace ProcessManagerSample
@@ -31,6 +32,11 @@ namespace ProcessManagerSample
                     var newState = state.Data;
                     newState.OrderId = Guid.NewGuid();
                     return newState;
+                })
+                .Then((orderCreated, data) =>
+                {
+                    return new SendQueryEffect<Partner>(new GetPartnerQuery())
+                        .ContinueWith(partner => new PublishMessageEffect(new DoPayment()));
                 })
                 .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
 
@@ -60,9 +66,5 @@ namespace ProcessManagerSample
         }
     }
 
-    public class Partner
-    {
-        public string PartnerName { get; set; }
-        public string PartnerCode { get; set; }
-    }
+   
 }

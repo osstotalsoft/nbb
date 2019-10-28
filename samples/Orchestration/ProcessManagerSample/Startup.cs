@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +15,8 @@ using NBB.ProcessManager.Runtime;
 using NBB.ProcessManager.Runtime.Timeouts;
 using NBB.Resiliency;
 using ProcessManagerSample.MessageMiddlewares;
+using ProcessManagerSample.Queries;
+using System.Reflection;
 
 namespace ProcessManagerSample
 {
@@ -28,11 +28,11 @@ namespace ProcessManagerSample
             //services.AddNatsMessaging();
             services.AddInProcessMessaging();
 
-            services.AddMediatR(Enumerable.Empty<Assembly>());
+            services.AddMediatR(typeof(GetPartnerQuery).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
-            services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
+            //services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
 
-            services.AddProcessManagerDefinition();
+            services.AddProcessManagerDefinition(Assembly.GetEntryAssembly());
             services.AddProcessManagerRuntime();
             services.AddNotificationHandlers(typeof(ProcessManagerNotificationHandler<,,>));
 

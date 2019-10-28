@@ -4,16 +4,17 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NBB.ProcessManager.Definition
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddProcessManagerDefinition(this IServiceCollection services)
+        public static void AddProcessManagerDefinition(this IServiceCollection services, params Assembly[] assemblies)
         {
             //scan for pm definitions 
             services.Scan(scan => scan
-                .FromEntryAssembly()
+                .FromAssemblies(assemblies)
                 .AddClasses(classes => classes.AssignableTo(typeof(IDefinition<>)))
                 .AsImplementedInterfaces()
                 .WithSingletonLifetime()
@@ -25,6 +26,8 @@ namespace NBB.ProcessManager.Definition
             if (!processManagerNotificationHandlerImplementationType.IsGenericType
                 || processManagerNotificationHandlerImplementationType.GetGenericTypeDefinition().GetGenericArguments().Length != 3)
                 throw new Exception("Invalid definition handler");
+
+            services.Remove(services.FirstOrDefault(x => x.ImplementationType == processManagerNotificationHandlerImplementationType));
 
             var tempServiceCollection = new ServiceCollection();
             foreach (var serviceDesc in services)
