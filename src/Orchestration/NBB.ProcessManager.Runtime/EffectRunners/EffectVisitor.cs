@@ -51,7 +51,7 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             var t1 = effect.Effect1.Accept(this);
             var t2 = effect.Effect2.Accept(this);
 
-            await Task.WhenAll(new[] {t1, t2});
+            await Task.WhenAll(new[] { t1, t2 });
             return Unit.Value;
         }
 
