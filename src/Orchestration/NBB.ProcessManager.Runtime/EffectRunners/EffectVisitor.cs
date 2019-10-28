@@ -24,6 +24,7 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             throw new NotImplementedException();
         }
 
+
         public async Task<Unit> Visit(RequestTimeoutEffect effect)
         {
             var timeoutsManager = _serviceProvider.GetRequiredService<TimeoutsManager>();
