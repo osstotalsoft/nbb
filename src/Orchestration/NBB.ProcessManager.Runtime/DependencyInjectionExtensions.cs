@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.ProcessManager.Definition.Effects;
 using NBB.ProcessManager.Runtime.EffectRunners;
 using NBB.ProcessManager.Runtime.Persistence;
 using NBB.ProcessManager.Runtime.Timeouts;
 using System;
+using NBB.ProcessManager.Definition;
 
 namespace NBB.ProcessManager.Runtime
 {
@@ -13,13 +13,7 @@ namespace NBB.ProcessManager.Runtime
         {
             services.AddSingleton<ProcessExecutionCoordinator>();
             services.AddSingleton<IInstanceDataRepository, InstanceDataRepository>();
-            services.AddSingleton(Functions.EffectRunnerFactory());
-            services.AddSingleton(typeof(IEffectRunnerMarker<PublishMessageEffect>), EffectRunners.EffectRunners.PublishMessageEffectRunner());
-            services.AddSingleton(typeof(IEffectRunnerMarker<NoEffect>), EffectRunners.EffectRunners.NoOpEffect());
-            services.AddSingleton(typeof(IEffectRunnerMarker<RequestTimeoutEffect>), EffectRunners.EffectRunners.RequestTimeoutEffectRunner());
-            services.AddSingleton(typeof(IEffectRunnerMarker<CancelTimeoutsEffect>), EffectRunners.EffectRunners.CancelTimeoutsEffectRunner());
-            services.AddSingleton(typeof(IEffectRunnerMarker<SequentialEffect>), EffectRunners.EffectRunners.SequentialEffectRunner());
-
+            services.AddTransient<IEffectVisitor, EffectVisitor>();
             services.AddTimeoutManager();
         }
 

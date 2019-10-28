@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
@@ -15,6 +17,11 @@ namespace NBB.ProcessManager.Definition.Effects
             TimeSpan = timeSpan;
             Message = message;
             MessageType = messageType;
+        }
+
+        public Task<Unit> Accept(IEffectVisitor visitor)
+        {
+            return visitor.Visit(this);
         }
     }
 }
