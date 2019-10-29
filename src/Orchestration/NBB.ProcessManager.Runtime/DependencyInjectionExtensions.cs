@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.ProcessManager.Runtime.EffectRunners;
+using NBB.ProcessManager.Definition.Effects;
 using NBB.ProcessManager.Runtime.Persistence;
 using NBB.ProcessManager.Runtime.Timeouts;
 using System;
-using NBB.ProcessManager.Definition;
+using NBB.ProcessManager.Runtime.EffectRunners;
 
 namespace NBB.ProcessManager.Runtime
 {
@@ -13,7 +13,7 @@ namespace NBB.ProcessManager.Runtime
         {
             services.AddSingleton<ProcessExecutionCoordinator>();
             services.AddSingleton<IInstanceDataRepository, InstanceDataRepository>();
-            services.AddTransient<IEffectVisitor, EffectVisitor>();
+            services.AddTransient<IEffectRunner, EffectsVisitor>();
             services.AddTimeoutManager();
         }
 

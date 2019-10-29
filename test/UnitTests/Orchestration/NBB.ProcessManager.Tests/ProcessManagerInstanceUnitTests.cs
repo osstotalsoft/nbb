@@ -134,7 +134,7 @@ namespace NBB.ProcessManager.Tests
                     })
                     .Then((ev, state) =>
                     {
-                        var effect = new PublishMessageEffect(new DoPayment());
+                        var effect = EffectHelpers.PublishMessage(new DoPayment());
                         return effect;
                     });
             }

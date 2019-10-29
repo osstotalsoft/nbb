@@ -6,6 +6,8 @@ using ProcessManagerSample.Commands;
 using ProcessManagerSample.Events;
 using ProcessManagerSample.Queries;
 using System;
+using System.Net.Http;
+using MediatR;
 
 namespace ProcessManagerSample
 {
@@ -35,13 +37,19 @@ namespace ProcessManagerSample
                 })
                 .Then((orderCreated, data) =>
                 {
-                    var q1 = new SendQueryEffect<Partner>(new GetPartnerQuery());
-                    var q2 = new SendQueryEffect<Partner>(new GetPartnerQuery());
+                    var a = EffectHelpers.Http<Partner>(new HttpRequestMessage());
+                    var q1 = EffectHelpers.Query(new GetPartnerQuery());
+                    var q2 = EffectHelpers.Query(new GetPartnerQuery());
 
                     var q3 = EffectHelpers.WhenAll(q1, q2);
 
-                    return q3.ContinueWith(partners => new PublishMessageEffect(new DoPayment()))
-                        .ContinueWith(partner => new PublishMessageEffect(new DoPayment()));
+                    var ab = from x in q1
+                        from y in q2
+                        select x.PartnerCode + x.PartnerName;
+
+
+                    return q3.ContinueWith(partners => EffectHelpers.PublishMessage(new DoPayment()))
+                        .ContinueWith(partner => EffectHelpers.PublishMessage(new DoPayment()));
                 })
                 .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
 
@@ -54,10 +62,9 @@ namespace ProcessManagerSample
                 .Complete();
         }
 
-        private static IEffect OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
+        private static IEffect<Unit> OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
-            var effect = new PublishMessageEffect(new DoPayment());
-            return effect;
+            return EffectHelpers.PublishMessage(new DoPayment());
         }
 
         private static DoPayment OrderPaymentCreatedHandler(OrderPaymentCreated orderPaymentReceived, InstanceData<OrderProcessManagerData> state)

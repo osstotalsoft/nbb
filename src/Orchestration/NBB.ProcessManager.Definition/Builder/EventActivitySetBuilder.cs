@@ -1,6 +1,7 @@
 ﻿using NBB.Core.Abstractions;
 using NBB.ProcessManager.Definition.Effects;
 using System;
+using MediatR;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -43,7 +44,11 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var command = handler(whenEvent, state);
-                return new PublishMessageEffect(command);
+                return new Effect<Unit>(async runner =>
+                {
+                    await runner.PublishMessage(command);
+                    return Unit.Value;
+                });
             }, predicate);
             return this;
         }
@@ -52,7 +57,12 @@ namespace NBB.ProcessManager.Definition.Builder
             EventPredicate<TEvent, TData> predicate = null)
             where T : IEvent
         {
-            Then((whenEvent, state) => new RequestTimeoutEffect(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
+            Then((whenEvent, state) =>
+                new Effect<Unit>(async runner =>
+                {
+                    await runner.RequestTimeout(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T));
+                    return Unit.Value;
+                }), predicate);
             return this;
         }
 
@@ -62,7 +72,11 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var @event = handler(whenEvent, state);
-                return new PublishMessageEffect(@event);
+                return new Effect<Unit>(async runner =>
+                {
+                    await runner.PublishMessage(@event);
+                    return Unit.Value;
+                });
             }, predicate);
             return this;
         }
@@ -70,7 +84,12 @@ namespace NBB.ProcessManager.Definition.Builder
         public void Complete(EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.UseForCompletion(predicate);
-            Then((whenEvent, state) => new CancelTimeoutsEffect(state.InstanceId), predicate);
+            Then((whenEvent, state) => new Effect<Unit>(async runner =>
+                {
+                    await runner.CancelTimeouts(state.InstanceId);
+                    return Unit.Value;
+                }
+            ), predicate);
         }
     }
 }
