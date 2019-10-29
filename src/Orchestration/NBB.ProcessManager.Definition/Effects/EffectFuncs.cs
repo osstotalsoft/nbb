@@ -1,23 +1,11 @@
 ﻿using MediatR;
 using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
 
-    public static class EffectHelpers
+    public static class EffectFuncs
     {
-        public static IEffect<TResult[]> WhenAll<TResult>(params IEffect<TResult>[] effects)
-        {
-            return new Effect<TResult[]>(runner =>
-            {
-                var list = effects.Select(effect => effect.Computation(runner));
-                return Task.WhenAll(list);
-            });
-        }
-
         public static EffectFunc<TEvent, TData> Aggregate<TEvent, TData>(EffectFunc<TEvent, TData> func1, EffectFunc<TEvent, TData> func2,
             Func<IEffect<Unit>, IEffect<Unit>, IEffect<Unit>> accumulator)
             where TData : struct
@@ -40,25 +28,6 @@ namespace NBB.ProcessManager.Definition.Effects
                 await effect2.Computation(runner);
                 return Unit.Value;
             }));
-        }
-
-        public static IEffect<TResult> Http<TResult>(HttpRequestMessage message)
-        {
-            return new Effect<TResult>(runner => runner.Http<TResult>(message));
-        }
-
-        public static IEffect<TResult> Query<TResult>(IRequest<TResult> query)
-        {
-            return new Effect<TResult>(runner => runner.SendQuery(query));
-        }
-
-        public static IEffect<Unit> PublishMessage(object message)
-        {
-            return new Effect<Unit>(async runner =>
-            {
-                await runner.PublishMessage(message);
-                return Unit.Value;
-            });
         }
     }
 

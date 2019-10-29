@@ -41,7 +41,7 @@ namespace NBB.ProcessManager.Definition.Builder
                 return func((TEvent) @event, data);
             }
 
-            EffectFunc = EffectHelpers.Sequential(EffectFunc, newFunc);
+            EffectFunc = EffectFuncs.Sequential(EffectFunc, newFunc);
         }
 
         public void AddSetStateHandler(SetStateFunc<TEvent, TData> func)

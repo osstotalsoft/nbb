@@ -59,7 +59,7 @@ namespace NBB.ProcessManager.Definition.Builder
                 .Where(x => x.EventType == typeof(TEvent))
                 .Select(x => x.EffectFunc)
                 .DefaultIfEmpty()
-                .Aggregate(EffectHelpers.Sequential);
+                .Aggregate(EffectFuncs.Sequential);
 
             return (@event, data) => func?.Invoke((IEvent) @event, data) ?? NoEffect.Instance;
         }
