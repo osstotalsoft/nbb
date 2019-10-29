@@ -4,18 +4,16 @@ using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
-    public class ParallelEffect : IEffect
+    public class ParallelEffect<TResult>: IEffect<TResult[]>
     {
-        public IEffect Effect1 { get; }
-        public IEffect Effect2 { get; }
+        public IEffect<TResult>[] Effects { get; }
 
-        public ParallelEffect(IEffect effect1, IEffect effect2)
+        public ParallelEffect(params IEffect<TResult>[] effects)
         {
-            Effect1 = effect1;
-            Effect2 = effect2;
+            Effects = effects;
         }
 
-        public Task<Unit> Accept(IEffectVisitor visitor)
+        public Task<TResult[]> Accept(IEffectVisitor visitor)
         {
             return visitor.Visit(this);
         }

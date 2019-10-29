@@ -1,6 +1,8 @@
 ﻿using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.Effects;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,12 +48,17 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             return Unit.Value;
         }
 
-        public async Task<Unit> Visit(ParallelEffect effect)
+        public Task<TResult[]> Visit<TResult>(ParallelEffect<TResult> effect)
         {
-            var t1 = effect.Effect1.Accept(this);
-            var t2 = effect.Effect2.Accept(this);
+            var list = effect.Effects.Select(ef => ef.Accept(this)).ToList();
+            return Task.WhenAll(list);
+        }
 
-            await Task.WhenAll(new[] { t1, t2 });
+        public async Task<Unit> Visit(SequentialEffect effect)
+        {
+            await effect.Effect1.Accept(this);
+            await effect.Effect2.Accept(this);
+
             return Unit.Value;
         }
 
@@ -71,15 +78,6 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
         {
             var mediator = _serviceProvider.GetRequiredService<IMediator>();
             return mediator.Send(effect.Query);
-        }
-
-
-        public async Task<Unit> Visit(SequentialEffect effect)
-        {
-            await effect.Effect1.Accept(this);
-            await effect.Effect2.Accept(this);
-
-            return Unit.Value;
         }
 
         public async Task<TEffectResult2> Visit<TEffectResult1, TEffectResult2>(BoundedEffect<TEffectResult1, TEffectResult2> effect)

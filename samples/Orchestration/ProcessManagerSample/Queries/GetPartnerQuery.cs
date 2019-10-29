@@ -14,12 +14,18 @@ namespace ProcessManagerSample.Queries
     {
         public async Task<Partner> Handle(GetPartnerQuery request, CancellationToken cancellationToken)
         {
-            return new Partner();
+            return new Partner("ion","vasile");
         }
     }
 
     public class Partner
     {
+        public Partner(string partnerName, string partnerCode)
+        {
+            PartnerName = partnerName;
+            PartnerCode = partnerCode;
+        }
+
         public string PartnerName { get; set; }
         public string PartnerCode { get; set; }
     }

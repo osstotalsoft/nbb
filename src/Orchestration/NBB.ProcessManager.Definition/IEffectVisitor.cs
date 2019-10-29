@@ -11,7 +11,7 @@ namespace NBB.ProcessManager.Definition
     {
         Task<TResult> Visit<TResult>(HttpEffect<TResult> effect);
         Task<Unit> Visit(CancelTimeoutsEffect effect);
-        Task<Unit> Visit(ParallelEffect effect);
+        Task<TResult[]> Visit<TResult>(ParallelEffect<TResult> effect);
         Task<Unit> Visit(NoEffect effect);
         Task<Unit> Visit(PublishMessageEffect effect);
         Task<TResult> Visit<TResult>(SendQueryEffect<TResult> effect);

@@ -35,7 +35,12 @@ namespace ProcessManagerSample
                 })
                 .Then((orderCreated, data) =>
                 {
-                    return new SendQueryEffect<Partner>(new GetPartnerQuery())
+                    var q1 = new SendQueryEffect<Partner>(new GetPartnerQuery());
+                    var q2 = new SendQueryEffect<Partner>(new GetPartnerQuery());
+
+                    var q3 = EffectHelpers.WhenAll(q1, q2);
+
+                    return q3.ContinueWith(partners => new PublishMessageEffect(new DoPayment()))
                         .ContinueWith(partner => new PublishMessageEffect(new DoPayment()));
                 })
                 .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
@@ -65,6 +70,4 @@ namespace ProcessManagerSample
             return new DoPayment();
         }
     }
-
-   
 }

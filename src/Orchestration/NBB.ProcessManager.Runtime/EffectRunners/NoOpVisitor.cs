@@ -18,9 +18,9 @@ namespace NBB.ProcessManager.Runtime.EffectRunners
             return Unit.Task;
         }
 
-        public Task<Unit> Visit(ParallelEffect effect)
+        public Task<TResult[]> Visit<TResult>(ParallelEffect<TResult> effect)
         {
-            return Unit.Task;
+            return Task.FromResult(default(TResult[]));
         }
 
         public Task<Unit> Visit(NoEffect effect)
