@@ -20,8 +20,4 @@ namespace NBB.ProcessManager.Definition.Effects
         //bool IsCompleted { get; }
         //Task<T> Accept(IEffectVisitor visitor);
     }
-
-    public interface IEffect : IEffect<Unit>
-    {
-    }
 }

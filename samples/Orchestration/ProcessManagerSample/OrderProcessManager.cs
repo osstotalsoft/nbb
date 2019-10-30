@@ -40,7 +40,7 @@ namespace ProcessManagerSample
                 .Then((orderCreated, data) =>
                 {
                     var q1 = Query(new GetClientQuery());
-                    var q2 = Effect.WhenAll(Query(new GetPartnerQuery()), Query(new GetPartnerQuery()));
+                    var q2 = Effect.Parallel(Query(new GetPartnerQuery()), Query(new GetPartnerQuery()));
 
                     var queries =
                         from x in q1

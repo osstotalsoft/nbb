@@ -22,14 +22,7 @@ namespace NBB.ProcessManager.Definition.Effects
         public static EffectFunc<TEvent, TData> Sequential<TEvent, TData>(EffectFunc<TEvent, TData> func1, EffectFunc<TEvent, TData> func2)
             where TData : struct
         {
-            return Aggregate(func1, func2, (effect1, effect2) => new Effect<Unit>(async runner =>
-            {
-                await effect1.Computation(runner);
-                await effect2.Computation(runner);
-                return Unit.Value;
-            }));
+            return Aggregate(func1, func2, (effect1, effect2) => Effect.Sequential(effect1, effect2));
         }
     }
-
-   
 }

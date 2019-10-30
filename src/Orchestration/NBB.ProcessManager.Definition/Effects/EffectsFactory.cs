@@ -27,12 +27,25 @@ namespace NBB.ProcessManager.Definition.Effects
             });
         }
 
-        public static IEffect<TResult[]> WhenAll<TResult>(params IEffect<TResult>[] effects)
+        public static IEffect<TResult[]> Parallel<TResult>(params IEffect<TResult>[] effects)
         {
             return new Effect<TResult[]>(runner =>
             {
                 var list = effects.Select(effect => effect.Computation(runner));
                 return Task.WhenAll(list);
+            });
+        }
+
+        public static IEffect<Unit> Sequential<TResult>(params IEffect<TResult>[] effects)
+        {
+            return new Effect<Unit>(async runner =>
+            {
+                foreach (var ef in effects)
+                {
+                    await ef.Computation(runner);
+                }
+
+                return Unit.Value;
             });
         }
 
