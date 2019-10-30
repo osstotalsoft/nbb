@@ -1,56 +1,37 @@
 ﻿using MediatR;
-using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.Effects;
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NBB.ProcessManager.Runtime.EffectRunners
 {
 
-    public class NoOpVisitor : IEffectVisitor
+    public class NoOpVisitor : IEffectRunner
     {
-        public Task<TResult> Visit<TResult>(HttpEffect<TResult> effect)
+        public Task<TResult> Http<TResult>(HttpRequestMessage request)
         {
             return Task.FromResult(default(TResult));
         }
 
-        public Task<Unit> Visit(CancelTimeoutsEffect effect)
-        {
-            return Unit.Task;
-        }
-
-        public Task<Unit> Visit(ParallelEffect effect)
-        {
-            return Unit.Task;
-        }
-
-        public Task<Unit> Visit(NoEffect effect)
-        {
-            return Unit.Task;
-        }
-
-        public Task<Unit> Visit(PublishMessageEffect effect)
-        {
-            return Unit.Task;
-        }
-
-        public Task<TResult> Visit<TResult>(SendQueryEffect<TResult> effect)
+        public Task<TResult> SendQuery<TResult>(IRequest<TResult> query)
         {
             return Task.FromResult(default(TResult));
         }
 
-        public Task<Unit> Visit(RequestTimeoutEffect effect)
+        public Task PublishMessage(object message)
         {
             return Unit.Task;
         }
 
-        public Task<Unit> Visit(SequentialEffect effect)
+        public Task RequestTimeout(string instanceId, TimeSpan timeSpan, object message, Type messageType)
         {
             return Unit.Task;
         }
 
-        public Task<TEffectResult2> Visit<TEffectResult1, TEffectResult2>(BoundedEffect<TEffectResult1, TEffectResult2> effect)
+        public Task CancelTimeouts(object instanceId)
         {
-            return Task.FromResult(default(TEffectResult2));
+            return Unit.Task;
         }
     }
 }

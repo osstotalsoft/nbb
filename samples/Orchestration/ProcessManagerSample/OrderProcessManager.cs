@@ -6,6 +6,10 @@ using ProcessManagerSample.Commands;
 using ProcessManagerSample.Events;
 using ProcessManagerSample.Queries;
 using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using MediatR;
 
 namespace ProcessManagerSample
 {
@@ -35,8 +39,16 @@ namespace ProcessManagerSample
                 })
                 .Then((orderCreated, data) =>
                 {
-                    return new SendQueryEffect<Partner>(new GetPartnerQuery())
-                        .ContinueWith(partner => new PublishMessageEffect(new DoPayment()));
+                    var q1 = Query(new GetClientQuery());
+                    var q2 = Effect.Parallel(Query(new GetPartnerQuery()), Query(new GetPartnerQuery()));
+
+                    var queries =
+                        from x in q1
+                        from y in q2
+                        select x.ClientCode + string.Join("; ", y.Select(z => z.PartnerName));
+
+                    return queries.ContinueWith(partners => PublishMessage(new DoPayment()))
+                        .ContinueWith(partner => PublishMessage(new DoPayment()));
                 })
                 .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
 
@@ -49,10 +61,9 @@ namespace ProcessManagerSample
                 .Complete();
         }
 
-        private static IEffect OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
+        private static IEffect<Unit> OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
-            var effect = new PublishMessageEffect(new DoPayment());
-            return effect;
+            return PublishMessage(new DoPayment());
         }
 
         private static DoPayment OrderPaymentCreatedHandler(OrderPaymentCreated orderPaymentReceived, InstanceData<OrderProcessManagerData> state)
@@ -65,6 +76,4 @@ namespace ProcessManagerSample
             return new DoPayment();
         }
     }
-
-   
 }

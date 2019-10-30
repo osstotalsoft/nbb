@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using MediatR;
 using NBB.ProcessManager.Definition.Effects;
 
@@ -59,7 +60,7 @@ namespace NBB.ProcessManager.Definition.Builder
                 .Where(x => x.EventType == typeof(TEvent))
                 .Select(x => x.EffectFunc)
                 .DefaultIfEmpty()
-                .Aggregate(EffectHelpers.Sequential);
+                .Aggregate(EffectFuncs.Sequential);
 
             return (@event, data) => func?.Invoke((IEvent) @event, data) ?? NoEffect.Instance;
         }
@@ -104,5 +105,18 @@ namespace NBB.ProcessManager.Definition.Builder
 
             return (@event, data) => func?.Invoke((IEvent) @event, data) ?? true;
         }
+
+
+        public static IEffect<TResult> Http<TResult>(HttpRequestMessage message) => Effect.Http<TResult>(message);
+
+        public static IEffect<TResult> Query<TResult>(IRequest<TResult> query) => Effect.Query(query);
+
+        public static IEffect<Unit> PublishMessage(object message) => Effect.PublishMessage(message);
+
+        public static IEffect<Unit> RequestTimeout(string instanceId, TimeSpan timeSpan, object message, Type messageType)
+            => Effect.RequestTimeout(instanceId, timeSpan, message, messageType);
+
+        public static IEffect<Unit> CancelTimeout(object instanceId) => Effect.CancelTimeout(instanceId);
+
     }
 }
