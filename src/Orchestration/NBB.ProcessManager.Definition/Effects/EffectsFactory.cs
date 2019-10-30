@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MediatR;
+using System;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
 {
-   public class EffectsFactory
+    public static class Effect
     {
         public static IEffect<TResult> Http<TResult>(HttpRequestMessage message)
         {

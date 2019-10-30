@@ -6,6 +6,7 @@ using ProcessManagerSample.Commands;
 using ProcessManagerSample.Events;
 using ProcessManagerSample.Queries;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using MediatR;
@@ -38,21 +39,16 @@ namespace ProcessManagerSample
                 })
                 .Then((orderCreated, data) =>
                 {
-                    var a = EffectsFactory.Http<Partner>(new HttpRequestMessage());
-                    var q1 = EffectsFactory.Query(new GetPartnerQuery());
-                    var q2 = EffectsFactory.Query(new GetPartnerQuery());
+                    var q1 = Query(new GetClientQuery());
+                    var q2 = Effect.WhenAll(Query(new GetPartnerQuery()), Query(new GetPartnerQuery()));
 
-                    var q3 = EffectsFactory.WhenAll(q1, q2);
-
-                    var ab = 
+                    var queries =
                         from x in q1
                         from y in q2
-                        select x.PartnerCode + x.PartnerName;
+                        select x.ClientCode + string.Join("; ", y.Select(z => z.PartnerName));
 
-
-
-                    return q3.ContinueWith(partners => EffectsFactory.PublishMessage(new DoPayment()))
-                        .ContinueWith(partner => EffectsFactory.PublishMessage(new DoPayment()));
+                    return queries.ContinueWith(partners => PublishMessage(new DoPayment()))
+                        .ContinueWith(partner => PublishMessage(new DoPayment()));
                 })
                 .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
 
@@ -67,7 +63,7 @@ namespace ProcessManagerSample
 
         private static IEffect<Unit> OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
-            return EffectsFactory.PublishMessage(new DoPayment());
+            return PublishMessage(new DoPayment());
         }
 
         private static DoPayment OrderPaymentCreatedHandler(OrderPaymentCreated orderPaymentReceived, InstanceData<OrderProcessManagerData> state)
