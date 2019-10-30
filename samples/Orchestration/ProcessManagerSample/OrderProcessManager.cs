@@ -7,6 +7,7 @@ using ProcessManagerSample.Events;
 using ProcessManagerSample.Queries;
 using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using MediatR;
 
 namespace ProcessManagerSample
@@ -43,9 +44,11 @@ namespace ProcessManagerSample
 
                     var q3 = EffectsFactory.WhenAll(q1, q2);
 
-                    var ab = from x in q1
+                    var ab = 
+                        from x in q1
                         from y in q2
                         select x.PartnerCode + x.PartnerName;
+
 
 
                     return q3.ContinueWith(partners => EffectsFactory.PublishMessage(new DoPayment()))
