@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using NBB.EventStore.AdoNet.Internal;
+using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using NBB.EventStore.AdoNet.Internal;
 
 namespace NBB.EventStore.AdoNet.Migrations
 {
@@ -33,39 +34,39 @@ namespace NBB.EventStore.AdoNet.Migrations
             _scripts = new Scripts();
         }
 
-        public async Task ReCreateDatabaseObjects(string[] args)
+        public async Task ReCreateDatabaseObjects(string[] args, CancellationToken cancellationToken = default)
         {
             try
             {
-                await DropDatabaseObjects();
+                await DropDatabaseObjectsAsync(cancellationToken);
             }
             catch
             {
                 // ignored
             }
 
-            await CreateDatabaseObjects();
+            await CreateDatabaseObjectsAsync(cancellationToken);
         }
 
-        private async Task CreateDatabaseObjects()
+        private async Task CreateDatabaseObjectsAsync(CancellationToken cancellationToken)
         {
             using (var cnx = new SqlConnection(_connectionString))
             {
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.CreateDatabaseObjects, cnx);
-                await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
         }
 
-        private async Task DropDatabaseObjects()
+        private async Task DropDatabaseObjectsAsync(CancellationToken cancellationToken)
         {
             using (var cnx = new SqlConnection(_connectionString))
             {
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.DropDatabaseObjects, cnx);
-                await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
         }
     }

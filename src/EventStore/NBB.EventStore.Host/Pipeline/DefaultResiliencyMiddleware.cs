@@ -34,10 +34,10 @@ namespace NBB.EventStore.Host.Pipeline
 
             var policies = Policy.WrapAsync(outOfOrderPolicy, concurencyException);
 
-            var result = await policies.ExecuteAndCaptureAsync(async () =>
+            var result = await policies.ExecuteAndCaptureAsync(async (CancellationToken) =>
             {
                 await next();
-            });
+            }, cancellationToken);
 
             if (result.Outcome == OutcomeType.Failure)
             {

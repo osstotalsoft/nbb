@@ -1,10 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using NBB.Contracts.Application.Commands;
 using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Data.Abstractions;
-using NBB.Messaging.Abstractions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Contracts.Application.CommandHandlers
 {
@@ -14,12 +13,10 @@ namespace NBB.Contracts.Application.CommandHandlers
         IRequestHandler<ValidateContract>
     {
         private readonly IEventSourcedRepository<Contract> _repository;
-        private readonly IMessageBusPublisher _messageBusPublisher;
 
-        public ContractCommandHandlers(IEventSourcedRepository<Contract> repository, IMessageBusPublisher messageBusPublisher)
+        public ContractCommandHandlers(IEventSourcedRepository<Contract> repository)
         {
             this._repository = repository;
-            this._messageBusPublisher = messageBusPublisher;
         }
 
         public async Task Handle(CreateContract command, CancellationToken cancellationToken)

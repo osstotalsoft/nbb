@@ -39,10 +39,10 @@ namespace NBB.Messaging.Host.MessagingPipeline
 
             var policies = Policy.WrapAsync(outOfOrderPolicy, concurrencyException);
 
-            var result = await policies.ExecuteAndCaptureAsync(async () =>
+            var result = await policies.ExecuteAndCaptureAsync(async (CancellationToken) =>
             {
                 await next();
-            });
+            }, cancellationToken);
 
             if (result.Outcome == OutcomeType.Failure)
             {

@@ -1,9 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using NBB.Data.Abstractions;
 using NBB.Payments.Application.Commands;
 using NBB.Payments.Domain.PayableAggregate;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Payments.Application.CommandHandlers
 {
@@ -19,11 +19,11 @@ namespace NBB.Payments.Application.CommandHandlers
 
         public async Task Handle(PayPayable command, CancellationToken cancellationToken)
         {
-            var payable = await _repository.GetByIdAsync(command.PayableId);
+            var payable = await _repository.GetByIdAsync(command.PayableId, cancellationToken);
             if (payable != null)
             {
                 payable.Pay();
-                await _repository.SaveChangesAsync();
+                await _repository.SaveChangesAsync(cancellationToken);
             }
         }
     }

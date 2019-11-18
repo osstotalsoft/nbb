@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NBB.Core.Pipeline
@@ -9,7 +8,7 @@ namespace NBB.Core.Pipeline
     public class PipelineBuilder<T> : IPipelineBuilder<T>
     {
         private readonly IList<Func<PipelineDelegate<T>, PipelineDelegate<T>>> _components = new List<Func<PipelineDelegate<T>, PipelineDelegate<T>>>();
-        private PipelineDelegate<T> _builtPipeline = null;
+        private PipelineDelegate<T> _builtPipeline;
 
         public PipelineBuilder(IServiceProvider serviceProvider)
         {
@@ -21,17 +20,7 @@ namespace NBB.Core.Pipeline
             get;
         }
 
-        public PipelineDelegate<T> Pipeline {
-            get
-            {
-                if (_builtPipeline == null)
-                {
-                    _builtPipeline = Build();
-                }
-
-                return _builtPipeline;
-            }
-        }
+        public PipelineDelegate<T> Pipeline => _builtPipeline ?? (_builtPipeline = Build());
 
         public IPipelineBuilder<T> Use(Func<PipelineDelegate<T>, PipelineDelegate<T>> middleware)
         {
@@ -48,12 +37,7 @@ namespace NBB.Core.Pipeline
         {
             var pipeline = GetPipelineTerminator();
 
-            foreach (var component in _components.Reverse())
-            {
-                pipeline = component(pipeline);
-            }
-
-            return pipeline;
+            return _components.Reverse().Aggregate(pipeline, (current, component) => component(current));
         }
     }
 }

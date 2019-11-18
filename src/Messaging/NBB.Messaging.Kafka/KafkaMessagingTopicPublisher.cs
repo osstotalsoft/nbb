@@ -2,9 +2,7 @@
 using Confluent.Kafka.Serialization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,7 +29,7 @@ namespace NBB.Messaging.Kafka
             _logger = logger;
         }
 
-        public async Task PublishAsync(string topicName, string key, string message, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task PublishAsync(string topicName, string key, string message, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

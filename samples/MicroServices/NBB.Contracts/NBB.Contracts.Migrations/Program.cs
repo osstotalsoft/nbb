@@ -1,11 +1,11 @@
-﻿using System;
-using NBB.EventStore.AdoNet.Migrations;
+﻿using NBB.EventStore.AdoNet.Migrations;
+using System;
 
 namespace NBB.Contracts.Migrations
 {
     class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var contractsMigrator = new ContractsReadDatabaseMigrator();
             contractsMigrator.EnsureDatabaseDeleted(args).Wait();

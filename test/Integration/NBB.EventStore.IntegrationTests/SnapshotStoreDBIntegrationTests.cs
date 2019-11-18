@@ -33,21 +33,21 @@ namespace NBB.EventStore.IntegrationTests
                 var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
 
                 // Act
-                Parallel.For(0, threadCount,  _ =>
-                {
-                    try
-                    {
-                        snapshotStore.StoreSnapshotAsync(
-                            new SnapshotEnvelope(
-                                new TestSnapshot {Prop1 = "aaa", Prop2 = "bbb"}, streamVersion, stream),
-                            CancellationToken.None
-                        ).GetAwaiter().GetResult();
-                    }
-                    catch (ConcurrencyUnrecoverableException)
-                    {
-                        Interlocked.Increment(ref concurrencyExceptionCount);
-                    }
-                });
+                Parallel.For(0, threadCount, _ =>
+               {
+                   try
+                   {
+                       snapshotStore.StoreSnapshotAsync(
+                           new SnapshotEnvelope(
+                               new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" }, streamVersion, stream),
+                           CancellationToken.None
+                       ).GetAwaiter().GetResult();
+                   }
+                   catch (ConcurrencyUnrecoverableException)
+                   {
+                       Interlocked.Increment(ref concurrencyExceptionCount);
+                   }
+               });
                 var snapshot = snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None).Result;
 
                 // Assert
@@ -70,15 +70,15 @@ namespace NBB.EventStore.IntegrationTests
                 var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
 
                 // Act
-                Parallel.For(0, threadCount,  index =>
-                {
-                        snapshotStore.StoreSnapshotAsync(
-                            new SnapshotEnvelope(
-                                new TestSnapshot {Prop1 = "aaa", Prop2 = "bbb"}, index, stream),
-                            CancellationToken.None
-                        ).GetAwaiter().GetResult();
-                  
-                });
+                Parallel.For(0, threadCount, index =>
+               {
+                   snapshotStore.StoreSnapshotAsync(
+                        new SnapshotEnvelope(
+                            new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" }, index, stream),
+                        CancellationToken.None
+                    ).GetAwaiter().GetResult();
+
+               });
                 var snapshot = snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None).Result;
 
                 // Assert
@@ -94,7 +94,7 @@ namespace NBB.EventStore.IntegrationTests
             PrepareDb();
             var container = BuildAdoRepoServiceProvider();
             var stream = Guid.NewGuid().ToString();
-            var snapshot = new TestSnapshot {Prop1 = "aaa", Prop2 = "bbb"};
+            var snapshot = new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" };
             var snapshotEnvelope = new SnapshotEnvelope(snapshot, 1, stream);
 
             using (var scope = container.CreateScope())
@@ -111,7 +111,7 @@ namespace NBB.EventStore.IntegrationTests
                 loadedSnapshotEnvelope.Should().BeEquivalentTo(snapshotEnvelope);
             }
         }
-        
+
         [Fact]
         public async Task Should_return_null_for_not_found_snapshot()
         {
@@ -169,6 +169,6 @@ namespace NBB.EventStore.IntegrationTests
     public class TestSnapshot
     {
         public string Prop1 { get; set; }
-        public string Prop2 { get; set; }      
+        public string Prop2 { get; set; }
     }
 }

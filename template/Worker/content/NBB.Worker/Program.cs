@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using NBB.Correlation.Serilog;
 using Serilog;
 using Serilog.Events;
+using System.Threading;
 #if SqlLogging
 using Serilog.Sinks.MSSqlServer;
 #endif
@@ -35,7 +36,7 @@ namespace NBB.Worker
                 Log.Information("Starting NBB.Worker");
                 Log.Information("Messaging.TopicPrefix=" + Configuration.GetSection("Messaging")["TopicPrefix"]);
 
-                await host.RunAsync();
+                await host.RunAsync(CancellationToken.None);
 
                 return 0;
             }

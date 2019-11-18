@@ -1,20 +1,21 @@
-﻿using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Payments.Migrations
 {
     public class PaymentsDatabaseMigrator
     {
-        public async Task MigrateDatabaseToLatestVersion(string[] args)
+        public async Task MigrateDatabaseToLatestVersion(string[] args, CancellationToken cancellationToken = default)
         {
             var dbContext = new PaymentsDbContextFactory().CreateDbContext(args);
-            await dbContext.Database.MigrateAsync();
+            await dbContext.Database.MigrateAsync(cancellationToken);
         }
 
-        public async Task EnsureDatabaseDeleted(string[] args)
+        public async Task EnsureDatabaseDeleted(string[] args, CancellationToken cancellationToken = default)
         {
             var dbContext = new PaymentsDbContextFactory().CreateDbContext(args);
-            await dbContext.Database.EnsureDeletedAsync();
+            await dbContext.Database.EnsureDeletedAsync(cancellationToken);
         }
     }
 }

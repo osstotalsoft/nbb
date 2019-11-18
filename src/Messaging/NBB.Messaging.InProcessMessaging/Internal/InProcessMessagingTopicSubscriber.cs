@@ -35,7 +35,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             return Task.CompletedTask;
         }
 
-        private async Task InternalSubscribeAsync(string topic, Func<string, Task> handler, CancellationToken token)
+        private async Task InternalSubscribeAsync(string topic, Func<string, Task> handler, CancellationToken cancellationToken)
         {
             await _storage.AddSubscription(topic, async msg =>
             {
@@ -50,7 +50,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                         topic, ex);
                     //TODO: push to DLQ
                 }
-            }, token);
+            }, cancellationToken);
 
             //_logger.LogInformation("InProcessMessagingTopicSubscriber has subscribed to topic {Topic}", topic);
         }

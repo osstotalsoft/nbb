@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Data.Abstractions.Linq
 {
-    public static class QueryableExtensions
+    public static class QueryableAsyncExtensions
     {
         public static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source,
             CancellationToken cancellationToken = default)

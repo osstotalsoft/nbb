@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NBB.Contracts.Application.Commands;
 using NBB.Contracts.ReadModel;
 using NBB.Messaging.Abstractions;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Contracts.Api.Controllers
 {
@@ -27,7 +27,7 @@ namespace NBB.Contracts.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var query = await _contractReadModelQuery.ToListAsync();
+            var query = await _contractReadModelQuery.ToListAsync(CancellationToken.None);
             return Ok(query.ToList());
         }
 
@@ -38,7 +38,7 @@ namespace NBB.Contracts.Api.Controllers
             //var contract = await _contractReadModelRepository.GetFirstOrDefaultAsync(x=> x.ContractId == id, "ContractLines");
             var contract = await _contractReadModelQuery
                 .Include(x=> x.ContractLines)
-                .SingleOrDefaultAsync(x => x.ContractId == id);
+                .SingleOrDefaultAsync(x => x.ContractId == id, CancellationToken.None);
 
             if (contract != null)
                 return Ok(contract);

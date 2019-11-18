@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Data.Abstractions
@@ -6,8 +7,8 @@ namespace NBB.Data.Abstractions
     public interface ICrudRepository<TEntity> : IReadOnlyRepository<TEntity>, IUowRepository<TEntity>
         where TEntity : class
     {
-        Task AddAsync(TEntity entity);
-        Task Update(TEntity entity);
-        Task Remove(object id);
+        Task AddAsync(TEntity entity, CancellationToken cancellationToken);
+        Task Update(TEntity entity, CancellationToken cancellationToken);
+        Task Remove(object id, CancellationToken cancellationToken);
     }
 }

@@ -24,20 +24,19 @@ namespace NBB.Messaging.InProcessMessaging.Tests
             var topic = "x";
             var sut = new Storage();
             var msg = "ala bala ";
-            var tokenSource = new CancellationTokenSource();
-
-
-            //Act
-
-            sut.Enqueue(msg, topic);
-            await sut.AddSubscription(topic, message =>
+            using (var tokenSource = new CancellationTokenSource())
             {
+                //Act
+                sut.Enqueue(msg, topic);
+                await sut.AddSubscription(topic, message =>
+                {
                 //Assert
                 message.Should().Be(msg);
 
-                tokenSource.Cancel();
-                return Task.CompletedTask;
-            }, tokenSource.Token);
+                    tokenSource.Cancel();
+                    return Task.CompletedTask;
+                }, tokenSource.Token);
+            }
         }
     }
 }

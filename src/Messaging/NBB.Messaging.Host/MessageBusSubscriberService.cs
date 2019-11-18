@@ -1,13 +1,13 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.DataContracts;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Messaging.Host
 {
@@ -34,14 +34,14 @@ namespace NBB.Messaging.Host
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is starting", typeof(TMessage).GetPrettyName());
 
-            Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, stoppingToken);
+            Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, cancellationToken);
 
-            await _messageBusSubscriber.SubscribeAsync(HandleMsg, stoppingToken, null, _subscriberOptions);
-            await stoppingToken.WhenCanceled();
+            await _messageBusSubscriber.SubscribeAsync(HandleMsg, cancellationToken, null, _subscriberOptions);
+            await cancellationToken.WhenCanceled();
             await _messageBusSubscriber.UnSubscribeAsync(HandleMsg, CancellationToken.None);
 
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is stopping", typeof(TMessage).GetPrettyName());

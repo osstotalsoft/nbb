@@ -153,7 +153,7 @@ namespace TheBenchmarks
         private void SeedEventRepository(string stream)
         {
             var events = Enumerable.Range(0, 100)
-                .Select(r=>GetATestEvent());
+                .Select(r => GetATestEvent());
 
             using (var scope = _container.CreateScope())
             {
@@ -166,14 +166,14 @@ namespace TheBenchmarks
 
         private static void MigrateNBBEventStore()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(null).Wait();
+            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(default, default).Wait();
         }
 
         private static void MigrateSqlStreamStore()
         {
             var migrator = new SqlStreamStoreMigrator();
-            migrator.EnsureDatabaseDeleted(null).Wait();
-            migrator.MigrateDatabaseToLatestVersion(null).Wait();
+            migrator.EnsureDatabaseDeleted(default, null).Wait();
+            migrator.MigrateDatabaseToLatestVersion(default, null).Wait();
         }
 
         private static TestEvent GetATestEvent()

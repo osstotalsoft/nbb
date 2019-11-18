@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using NBB.Core.Abstractions;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using NBB.Core.Abstractions;
 
 namespace NBB.EventStore.Abstractions
 {
@@ -22,20 +23,20 @@ namespace NBB.EventStore.Abstractions
             return _inner.GetChanges();
         }
 
-        public async Task SaveChangesAsync()
+        public async Task SaveChangesAsync(CancellationToken cancellationToken)
         {
             var streams = this.GetChanges()
                 .Select(e => new {Stream = e.GetStream(), Events = e.GetUncommittedChanges().ToList()}).ToList();
             
-            await _inner.SaveChangesAsync();
-            await OnAfterSave(streams);
+            await _inner.SaveChangesAsync(cancellationToken);
+            await OnAfterSave(cancellationToken, streams);
         }
 
-        private async Task OnAfterSave(IEnumerable<dynamic> changes)
+        private async Task OnAfterSave(CancellationToken cancellationToken, IEnumerable<dynamic> changes)
         {
             foreach (var @entity in changes)
             {
-                await _eventStore.AppendEventsToStreamAsync(@entity.Stream, @entity.Events, null);
+                await _eventStore.AppendEventsToStreamAsync(@entity.Stream, @entity.Events, null, cancellationToken);
             }
         }
     }

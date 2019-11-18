@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using NBB.Core.Abstractions;
+﻿using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.MessagingExtensions.Internal;
 using NBB.Messaging.Abstractions;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.EventStore.MessagingExtensions
 {
@@ -23,7 +23,7 @@ namespace NBB.EventStore.MessagingExtensions
         }
 
         public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var eventList = events.ToList();
             await _innerEventStore.AppendEventsToStreamAsync(stream, eventList, expectedVersion, cancellationToken);

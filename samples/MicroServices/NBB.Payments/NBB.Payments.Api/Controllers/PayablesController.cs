@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NBB.Messaging.Abstractions;
 using NBB.Payments.Application.Commands;
 using NBB.Payments.Domain.PayableAggregate;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Payments.Api.Controllers
 {
@@ -26,7 +26,7 @@ namespace NBB.Payments.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var payables = await _payableQuery.ToListAsync();
+            var payables = await _payableQuery.ToListAsync(CancellationToken.None);
             return Ok(payables);
         }
 
@@ -34,7 +34,7 @@ namespace NBB.Payments.Api.Controllers
         [HttpGet("{id}")]
         public Task<Payable> Get(Guid id)
         {
-            return _payableQuery.FirstOrDefaultAsync(x=> x.PayableId == id);
+            return _payableQuery.FirstOrDefaultAsync(x=> x.PayableId == id, CancellationToken.None);
         }
 
         // POSt api/payables/6AF6F8C8-117C-45C0-BB88-F49C13B8DE8D/pay

@@ -43,15 +43,15 @@ namespace NBB.Messaging.Host
             _topic = _topicRegistry.GetTopicForName(topic);
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation($"MessagingTopicSubscriberService for topic {_topic} is starting");
 
-            Task HandleMsg(string msg) => Handle(msg, stoppingToken);
+            Task HandleMsg(string msg) => Handle(msg, cancellationToken);
 
-            await _messagingTopicSubscriber.SubscribeAsync(_topic, HandleMsg, stoppingToken, _subscriberOptions);
-            await stoppingToken.WhenCanceled();
-            await _messagingTopicSubscriber.UnSubscribeAsync(CancellationToken.None);
+            await _messagingTopicSubscriber.SubscribeAsync(_topic, HandleMsg, cancellationToken, _subscriberOptions);
+            await cancellationToken.WhenCanceled();
+            await _messagingTopicSubscriber.UnSubscribeAsync(cancellationToken);
 
             _logger.LogInformation($"MessagingTopicSubscriberService for topic {_topic} is stopping");
         }

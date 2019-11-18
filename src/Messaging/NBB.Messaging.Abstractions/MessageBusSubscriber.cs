@@ -77,11 +77,11 @@ namespace NBB.Messaging.Abstractions
             }
         }
 
-        public async Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token)
+        public async Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken)
         {
             _handlers.Remove(handler);
             if (_handlers.Count == 0)
-                await _topicSubscriber.UnSubscribeAsync(token);
+                await _topicSubscriber.UnSubscribeAsync(cancellationToken);
         }
     }
 }

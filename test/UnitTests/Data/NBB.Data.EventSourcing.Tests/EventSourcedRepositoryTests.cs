@@ -3,13 +3,13 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Core.Abstractions;
+using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.Data.EventSourcing.Infrastructure;
 using Xunit;
 
 namespace NBB.Data.EventSourcing.Tests
@@ -110,7 +110,7 @@ namespace NBB.Data.EventSourcing.Tests
             var testAggregate = new TestEventSourcedAggregateRoot(Guid.NewGuid(), 5, domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate);
+            await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
             //eventStoreMock.Verify(es => es.AppendEventsToStreamAsync(It.IsAny<string>(), It.Is<IEnumerable<IDomainEvent>>(de=> de.Single() == domainEvent), null, It.IsAny<CancellationToken>()));
@@ -129,7 +129,7 @@ namespace NBB.Data.EventSourcing.Tests
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 1000, 1, 10, domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate);
+            await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
             Mock.Get(snapshotStore)
@@ -151,7 +151,7 @@ namespace NBB.Data.EventSourcing.Tests
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 2, 1, null, domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate);
+            await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
             Mock.Get(snapshotStore)
@@ -173,7 +173,7 @@ namespace NBB.Data.EventSourcing.Tests
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 3, 1, null, domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate);
+            await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
             Mock.Get(snapshotStore)
@@ -195,7 +195,7 @@ namespace NBB.Data.EventSourcing.Tests
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 2, 1, 2, domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate);
+            await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
             Mock.Get(snapshotStore)
@@ -217,7 +217,7 @@ namespace NBB.Data.EventSourcing.Tests
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 3, 1, 2, domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate);
+            await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
             Mock.Get(snapshotStore)
@@ -238,7 +238,7 @@ namespace NBB.Data.EventSourcing.Tests
             testAggregate.Setup(a => a.GetUncommittedChanges()).Returns(domainEvents);
 
             //Act
-            await sut.SaveAsync(testAggregate.Object);
+            await sut.SaveAsync(testAggregate.Object, CancellationToken.None);
 
             //Assert
             testAggregate.Verify(a => a.MarkChangesAsCommitted(), Times.Once);
@@ -269,7 +269,7 @@ namespace NBB.Data.EventSourcing.Tests
             var domainEvents = new List<IDomainEvent> { domainEvent };
             testAggregate.Setup(a => a.GetUncommittedChanges()).Returns(domainEvents);
             //Act
-            await sut.SaveAsync(testAggregate.Object);
+            await sut.SaveAsync(testAggregate.Object, CancellationToken.None);
 
             //Assert
             //mediatorMock.Verify(m => m.Publish(domainEvent, It.IsAny<CancellationToken>()), Times.Once());

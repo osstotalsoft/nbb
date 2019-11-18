@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using NBB.Core.Abstractions;
+﻿using NBB.Core.Abstractions;
 using NBB.Correlation;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.Internal;
 using NBB.EventStore.MessagingExtensions.Internal;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.EventStore.MessagingExtensions
 {
@@ -27,7 +26,7 @@ namespace NBB.EventStore.MessagingExtensions
         }
 
 
-        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken token)
+        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken)
         {
             return _messageBusSubscriber.SubscribeAsync(async envelope =>
             {
@@ -35,7 +34,7 @@ namespace NBB.EventStore.MessagingExtensions
                 {
                     await handler(envelope.Payload);
                 }
-            }, token, _messagingTopicResolver.ResolveTopicName(), _subscriberOptions);
+            }, cancellationToken, _messagingTopicResolver.ResolveTopicName(), _subscriberOptions);
         }
     }
 }

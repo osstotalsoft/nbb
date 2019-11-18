@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.EventStore.Abstractions;
-using NBB.Resiliency;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.EventStore.Host
 {
@@ -25,11 +24,11 @@ namespace NBB.EventStore.Host
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("EventStoreSubscriberService is starting");
 
-            await _eventStoreSubscriber.SubscribeToAllAsync(@event => Handle(@event, stoppingToken), stoppingToken);
+            await _eventStoreSubscriber.SubscribeToAllAsync(@event => Handle(@event, cancellationToken), cancellationToken);
 
             _logger.LogInformation("EventStoreSubscriberService is stopping");
         }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using NBB.Core.Abstractions;
@@ -23,18 +24,18 @@ namespace NBB.Application.DataContracts
             return _inner.GetChanges();
         }
 
-        public async Task SaveChangesAsync()
+        public async Task SaveChangesAsync(CancellationToken cancellationToken)
         {
             var events = this.GetChanges().SelectMany(e => e.GetUncommittedChanges().ToList()).ToList();
-            await _inner.SaveChangesAsync();
-            await OnAfterSave(events);
+            await _inner.SaveChangesAsync(cancellationToken);
+            await OnAfterSave(events, cancellationToken);
         }
 
-        private async Task OnAfterSave(List<IEvent> events)
+        private async Task OnAfterSave(List<IEvent> events, CancellationToken cancellationToken)
         {
             foreach (var @event in events.OfType<INotification>())
             {
-                await _mediator.Publish(@event);
+                await _mediator.Publish(@event, cancellationToken);
             }
         }
     }

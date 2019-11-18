@@ -27,7 +27,7 @@ namespace TheBenchmarks
     public class EventSourcedRepositoryBenchmark
     {
         private IServiceProvider _container;
-        private TestAggregate _loadedAggregate;        
+        private TestAggregate _loadedAggregate;
         private readonly Guid _loadTestAggregateId = Guid.NewGuid();
 
         private const int _snapshotFrequency = 10;
@@ -86,7 +86,7 @@ namespace TheBenchmarks
             //LoadAggregate<TestSnapshotAggregate>();
             //TryLoadRandomAggregate<TestSnapshotAggregate>();
         }
-        
+
         [GlobalSetup(Target = nameof(LoadAndSaveAggregateWithSnapshot))]
         public void GlobalSetupLoadAndSaveAggregateWithSnapshot()
         {
@@ -99,7 +99,7 @@ namespace TheBenchmarks
         {
             GlobalSetup(true);
         }
-        
+
         //[Benchmark]
         public void LoadAggregateWithoutSnapshot()
         {
@@ -143,8 +143,8 @@ namespace TheBenchmarks
             using (var scope = _container.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
-                var aggregate = repository.GetByIdAsync(_loadTestAggregateId).GetAwaiter().GetResult();
-                
+                var aggregate = repository.GetByIdAsync(_loadTestAggregateId, default).GetAwaiter().GetResult();
+
                 if (aggregate?.AggregateId == default(Guid))
                     aggregate.AggregateId = _loadTestAggregateId;
 
@@ -157,7 +157,7 @@ namespace TheBenchmarks
             using (var scope = _container.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
-                var aggregate = repository.GetByIdAsync(Guid.NewGuid()).GetAwaiter().GetResult();
+                var aggregate = repository.GetByIdAsync(Guid.NewGuid(), default).GetAwaiter().GetResult();
             }
         }
 
@@ -173,7 +173,7 @@ namespace TheBenchmarks
             }
         }
 
-        private void SeedEventRepository<TAggregateRoot>(bool useJunkData = false) where TAggregateRoot: TestAggregate, new()
+        private void SeedEventRepository<TAggregateRoot>(bool useJunkData = false) where TAggregateRoot : TestAggregate, new()
         {
             if (useJunkData)
             {
@@ -198,12 +198,12 @@ namespace TheBenchmarks
 
                 foreach (var aggregateId in aggregateIds)
                 {
-                    var aggregate = new TAggregateRoot() {AggregateId = aggregateId};
+                    var aggregate = new TAggregateRoot() { AggregateId = aggregateId };
                     for (int i = 0; i < eventNo; i++)
                     {
                         aggregate.DoAction($"Value {i + 1}");
 
-                        if ((i+1) % _snapshotFrequency == 0)
+                        if ((i + 1) % _snapshotFrequency == 0)
                             repository.SaveAsync(aggregate).GetAwaiter().GetResult();
                     }
 
@@ -223,7 +223,7 @@ namespace TheBenchmarks
 
         private static void MigrateNBBEventStore()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(null).Wait();
+            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(default, default).Wait();
         }
 
         private static TestEvent GetATestEvent()
@@ -277,7 +277,7 @@ namespace TheBenchmarks
 
         public class TestAggregate : EventSourcedAggregateRoot<Guid>
         {
-            public Guid AggregateId { get;  set; }
+            public Guid AggregateId { get; set; }
 
             protected List<string> State { get; set; } = new List<string>();
 
@@ -315,15 +315,15 @@ namespace TheBenchmarks
                 return new TestSnapshot(AggregateId, State.ToList());
             }
 
-            void IMementoProvider.SetMemento(object memento) => SetMemento((TestSnapshot)memento) ;
+            void IMementoProvider.SetMemento(object memento) => SetMemento((TestSnapshot)memento);
             object IMementoProvider.CreateMemento() => CreateMemento();
         }
-        
+
 
         public class TestSnapshot
         {
             public Guid AggregateId { get; }
-            public IEnumerable<string> State { get;}
+            public IEnumerable<string> State { get; }
 
             public TestSnapshot(Guid aggregateId, IEnumerable<string> state)
             {

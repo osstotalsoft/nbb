@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -20,6 +18,9 @@ using NBB.Messaging.Nats;
 using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Contracts.Worker
 {
@@ -93,7 +94,7 @@ namespace NBB.Contracts.Worker
                         );
                 });
 
-            await builder.RunConsoleAsync();
+            await builder.RunConsoleAsync(default);
         }
     }
 }

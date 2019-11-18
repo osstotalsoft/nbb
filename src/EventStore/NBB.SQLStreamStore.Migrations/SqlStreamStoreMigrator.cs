@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SqlStreamStore;
@@ -9,18 +10,18 @@ namespace NBB.SQLStreamStore.Migrations
 {
     public class SqlStreamStoreMigrator
     {
-        public async Task MigrateDatabaseToLatestVersion(string[] args)
+        public async Task MigrateDatabaseToLatestVersion(CancellationToken cancellationToken,string[] args)
         {
             var store = GetStore();
-            await store.CreateSchema();
+            await store.CreateSchema(cancellationToken);
         }
 
-        public async Task EnsureDatabaseDeleted(string[] args)
+        public async Task EnsureDatabaseDeleted(CancellationToken cancellationToken, string[] args)
         {
             var store = GetStore();
             try
             {
-                await store.DropAll();
+                await store.DropAll(cancellationToken);
             }
             catch
             {

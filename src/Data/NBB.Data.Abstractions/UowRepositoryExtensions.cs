@@ -1,13 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Data.Abstractions
 {
     public static class UowRepositoryExtensions
     {
-        public static Task SaveChangesAsync<TEntity>(this IUowRepository<TEntity> repository)
+        public static Task SaveChangesAsync<TEntity>(this IUowRepository<TEntity> repository, CancellationToken cancellationToken)
             where TEntity : class
         {
-            return repository.Uow.SaveChangesAsync();
+            return repository.Uow.SaveChangesAsync(cancellationToken);
         }
     }
 }

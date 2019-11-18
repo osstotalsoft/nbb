@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.Messaging.DataContracts;
 
 namespace NBB.Messaging.InProcessMessaging.Internal
 {
@@ -28,7 +27,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             }
         }
 
-        public async Task AddSubscription(string topic, Func<string, Task> handler, CancellationToken token) 
+        public async Task AddSubscription(string topic, Func<string, Task> handler, CancellationToken cancellationToken) 
         {
             lock (_subscriptions)
             {
@@ -39,15 +38,15 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             }
 
             await Task.Yield();
-            var startBrokerTask = Task.Run(async () => { await StartBroker(topic, handler, token); }, token);
+            var startBrokerTask = Task.Run(async () => { await StartBroker(topic, handler, cancellationToken); }, cancellationToken);
         }
 
-        private async Task StartBroker(string topic, Func<string, Task> handler, CancellationToken token)
+        private async Task StartBroker(string topic, Func<string, Task> handler, CancellationToken cancellationToken)
         {
             var ev = _brokersAutoReset.GetOrAdd(topic, new AutoResetEvent(false));
 
             var q = _queues.GetOrAdd(topic, new ConcurrentQueue<string>());
-            while (!token.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 if (q.IsEmpty)
                     ev.WaitOne();

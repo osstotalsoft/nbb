@@ -1,10 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using NBB.Data.Abstractions;
-using NBB.Domain.Abstractions;
 using NBB.Invoices.Domain.InvoiceAggregate;
 using NBB.Payments.PublishedLanguage.IntegrationEvents;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Invoices.Application.IntegrationEventHandlers
 {
@@ -21,12 +20,12 @@ namespace NBB.Invoices.Application.IntegrationEventHandlers
             if (e.InvoiceId == null)
                 return;
 
-            var invoice = await _invoiceRepository.GetByIdAsync(e.InvoiceId.Value);
+            var invoice = await _invoiceRepository.GetByIdAsync(e.InvoiceId.Value, cancellationToken);
             if (invoice != null)
             {
                 invoice.MarkAsPayed(e.PaymentId);
 
-                await _invoiceRepository.SaveChangesAsync();
+                await _invoiceRepository.SaveChangesAsync(cancellationToken);
             }
         }
     }
