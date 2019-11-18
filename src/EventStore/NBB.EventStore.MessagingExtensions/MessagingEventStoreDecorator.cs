@@ -34,7 +34,7 @@ namespace NBB.EventStore.MessagingExtensions
             }
         }
 
-        public Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             return _innerEventStore.GetEventsFromStreamAsync(stream, startFromVersion, cancellationToken);
         }

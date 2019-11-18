@@ -96,7 +96,7 @@ namespace NBB.Data.EventSourcing
         }
 
 
-        private async Task PublishEventsAsync(List<IEvent> events, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task PublishEventsAsync(List<IEvent> events, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

@@ -10,13 +10,13 @@ namespace NBB.SQLStreamStore.Migrations
 {
     public class SqlStreamStoreMigrator
     {
-        public async Task MigrateDatabaseToLatestVersion(CancellationToken cancellationToken,string[] args)
+        public async Task MigrateDatabaseToLatestVersion(string[] args, CancellationToken cancellationToken = default)
         {
             var store = GetStore();
             await store.CreateSchema(cancellationToken);
         }
 
-        public async Task EnsureDatabaseDeleted(CancellationToken cancellationToken, string[] args)
+        public async Task EnsureDatabaseDeleted(string[] args, CancellationToken cancellationToken = default)
         {
             var store = GetStore();
             try

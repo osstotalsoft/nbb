@@ -27,7 +27,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() { correlationId = CorrelationManager.GetCorrelationId(); return Task.CompletedTask; }
 
             //Act
-            await correlationMiddleWare.Invoke(envelope, default(CancellationToken), Next);
+            await correlationMiddleWare.Invoke(envelope, default, Next);
 
             //Assert
             correlationId.Should().NotBeNull();
@@ -47,7 +47,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() { correlationId = CorrelationManager.GetCorrelationId(); return Task.CompletedTask; }
 
             //Act
-            await correlationMiddleWare.Invoke(envelope, default(CancellationToken), Next);
+            await correlationMiddleWare.Invoke(envelope, default, Next);
 
             //Assert
             correlationId.Should().Be(messageCorrelationId);
@@ -66,7 +66,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
             //Act
-            await correlationMiddleWare.Invoke(envelope, default(CancellationToken), Next);
+            await correlationMiddleWare.Invoke(envelope, default, Next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();

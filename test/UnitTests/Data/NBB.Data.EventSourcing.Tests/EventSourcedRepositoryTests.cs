@@ -314,13 +314,13 @@ namespace NBB.Data.EventSourcing.Tests
     {
         public int AppendEventsToStreamAsyncCallsCount { get; private set; }
 
-        public Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             AppendEventsToStreamAsyncCallsCount++;
             return Task.CompletedTask;
         }
 
-        public Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

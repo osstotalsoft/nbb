@@ -34,7 +34,7 @@ namespace NBB.EventStore.Host.Pipeline
 
             var policies = Policy.WrapAsync(outOfOrderPolicy, concurencyException);
 
-            var result = await policies.ExecuteAndCaptureAsync(async (CancellationToken) =>
+            var result = await policies.ExecuteAndCaptureAsync(async (_) =>
             {
                 await next();
             }, cancellationToken);

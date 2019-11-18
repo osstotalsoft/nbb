@@ -34,7 +34,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
             //Act
-            await resiliencyMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            await resiliencyMiddleware.Invoke(envelope, default, Next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();
@@ -65,7 +65,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => throw new OutOfOrderMessageException();
 
             //Act
-            await resiliencyMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            await resiliencyMiddleware.Invoke(envelope, default, Next);
             //Assert
             outOfOrderPoliyCalled.Should().BeTrue();
         }
@@ -95,7 +95,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => throw new ConcurrencyException("message");
 
             //Act
-            await resiliencyMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            await resiliencyMiddleware.Invoke(envelope, default, Next);
             //Assert
             concurrencyPoliyCalled.Should().BeTrue();
         }
@@ -120,7 +120,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Act
             async Task Action()
             {
-                await resiliencyMiddleware.Invoke(envelope, default(CancellationToken), Next);
+                await resiliencyMiddleware.Invoke(envelope, default, Next);
             }
 
             //Assert
@@ -147,7 +147,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Act
             async Task Action()
             {
-                await resiliencyMiddleware.Invoke(envelope, default(CancellationToken), Next);
+                await resiliencyMiddleware.Invoke(envelope, default, Next);
             }
 
             //Assert

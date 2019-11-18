@@ -25,7 +25,7 @@ namespace NBB.Core.Pipeline.Tests
             var sentData = new TestData();
 
             //Act
-            await executePipeline(sentData, default(CancellationToken));
+            await executePipeline(sentData, default);
 
             //Assert
             sentData.Log.Should().Equal(new[] { "FirstBefore", "SecondBefore", "SecondAfter", "FirstAfter" });
@@ -55,7 +55,7 @@ namespace NBB.Core.Pipeline.Tests
 
 
             //Act
-            await pipeline(sentData, default(CancellationToken));
+            await pipeline(sentData, default);
 
             //Assert
             sentData.Log.Should().Equal(new[] { "FirstBefore", "SecondBefore", "SecondAfter", "FirstAfter" });
@@ -77,7 +77,7 @@ namespace NBB.Core.Pipeline.Tests
             var sentData = new TestData();
 
             //Act
-            await pipeline(sentData, default(CancellationToken));
+            await pipeline(sentData, default);
 
             //Assert
             Mock.Get(mockedServiceProvider).Verify(x => x.GetService(typeof(ILogger<MiddlewareWithDI>)));
@@ -146,7 +146,7 @@ namespace NBB.Core.Pipeline.Tests
             var sentData = Mock.Of<IData>();
 
             //Act
-            async Task Action() => await pipeline(sentData, default(CancellationToken));
+            async Task Action() => await pipeline(sentData, default);
 
             //Assert
             ((Func<Task>)Action).Should().Throw<ApplicationException>();
@@ -174,7 +174,7 @@ namespace NBB.Core.Pipeline.Tests
             var sentData = Mock.Of<IData>();
 
             //Act
-            void Action() => pipeline(sentData, default(CancellationToken)).Wait();
+            void Action() => pipeline(sentData, default).Wait();
 
             //Assert
             
@@ -204,7 +204,7 @@ namespace NBB.Core.Pipeline.Tests
             using (var scope = container.CreateScope())
             {
                 var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<IData>>();
-                await pipeline(sentData, default(CancellationToken));
+                await pipeline(sentData, default);
                 scopedDependency = scope.ServiceProvider.GetService<ILogger<MiddlewareWithDI>>();
             }
 

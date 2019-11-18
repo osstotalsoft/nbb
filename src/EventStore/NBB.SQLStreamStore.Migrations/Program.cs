@@ -7,8 +7,7 @@ namespace NBB.SQLStreamStore.Migrations
         static void Main(string[] args)
         {
             var migrator = new SqlStreamStoreMigrator();
-            migrator.MigrateDatabaseToLatestVersion(default, args).Wait();
-
+            migrator.MigrateDatabaseToLatestVersion(args).Wait();
         }
     }
 }

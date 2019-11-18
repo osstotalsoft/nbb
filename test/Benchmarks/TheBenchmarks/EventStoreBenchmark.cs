@@ -172,8 +172,8 @@ namespace TheBenchmarks
         private static void MigrateSqlStreamStore()
         {
             var migrator = new SqlStreamStoreMigrator();
-            migrator.EnsureDatabaseDeleted(default, null).Wait();
-            migrator.MigrateDatabaseToLatestVersion(default, null).Wait();
+            migrator.EnsureDatabaseDeleted(null).Wait();
+            migrator.MigrateDatabaseToLatestVersion(null).Wait();
         }
 
         private static TestEvent GetATestEvent()
