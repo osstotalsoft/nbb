@@ -27,7 +27,7 @@ namespace NBB.Contracts.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var query = await _contractReadModelQuery.ToListAsync(CancellationToken.None);
+            var query = await _contractReadModelQuery.ToListAsync();
             return Ok(query.ToList());
         }
 

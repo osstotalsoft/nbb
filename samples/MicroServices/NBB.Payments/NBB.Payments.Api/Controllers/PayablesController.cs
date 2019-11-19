@@ -26,7 +26,7 @@ namespace NBB.Payments.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var payables = await _payableQuery.ToListAsync(default);
+            var payables = await _payableQuery.ToListAsync();
             return Ok(payables);
         }
 
