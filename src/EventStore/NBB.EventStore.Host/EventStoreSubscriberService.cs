@@ -24,7 +24,7 @@ namespace NBB.EventStore.Host
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation("EventStoreSubscriberService is starting");
 

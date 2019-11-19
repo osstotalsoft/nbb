@@ -20,7 +20,7 @@ namespace NBB.ProcessManager.Runtime
             _definitions = definitions;
         }
 
-        public async Task Invoke<TDefinition, TData, TEvent>(TEvent @event, CancellationToken cancellationToken)
+        public async Task Invoke<TDefinition, TData, TEvent>(TEvent @event, CancellationToken cancellationToken = default)
             where TDefinition : IDefinition<TData>
             where TData : struct
             where TEvent : IEvent

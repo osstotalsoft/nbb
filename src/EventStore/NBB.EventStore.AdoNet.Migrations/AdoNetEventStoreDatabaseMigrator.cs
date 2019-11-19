@@ -48,7 +48,7 @@ namespace NBB.EventStore.AdoNet.Migrations
             await CreateDatabaseObjectsAsync(cancellationToken);
         }
 
-        private async Task CreateDatabaseObjectsAsync(CancellationToken cancellationToken)
+        private async Task CreateDatabaseObjectsAsync(CancellationToken cancellationToken = default)
         {
             using (var cnx = new SqlConnection(_connectionString))
             {
@@ -59,7 +59,7 @@ namespace NBB.EventStore.AdoNet.Migrations
             }
         }
 
-        private async Task DropDatabaseObjectsAsync(CancellationToken cancellationToken)
+        private async Task DropDatabaseObjectsAsync(CancellationToken cancellationToken = default)
         {
             using (var cnx = new SqlConnection(_connectionString))
             {

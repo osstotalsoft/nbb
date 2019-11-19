@@ -27,7 +27,7 @@ namespace NBB.Messaging.Kafka
             _kafkaServers = configuration.GetSection("Messaging").GetSection("Kafka")["bootstrap_servers"];
         }
 
-        public Task SubscribeAsync(string topicName, Func<string, Task> handler, CancellationToken token, MessagingSubscriberOptions options = null)
+        public Task SubscribeAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
             if (!_subscribedToTopic)
             {
@@ -38,7 +38,7 @@ namespace NBB.Messaging.Kafka
                         _subscribedToTopic = true;
                         _subscriberOptions = options ?? new MessagingSubscriberOptions();
                         _consumer = GetConsumer();
-                        return SubscribeToTopicAsync(topicName, handler, token);
+                        return SubscribeToTopicAsync(topicName, handler, cancellationToken);
                     }
                 }
             }
@@ -46,7 +46,7 @@ namespace NBB.Messaging.Kafka
             throw new Exception("Already subscribed to this topic: " + topicName);
         }
 
-        private async Task SubscribeToTopicAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken)
+        private async Task SubscribeToTopicAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken = default)
         {
             
 
@@ -71,7 +71,7 @@ namespace NBB.Messaging.Kafka
 
         }
 
-        public Task UnSubscribeAsync(CancellationToken token)
+        public Task UnSubscribeAsync(CancellationToken cancellationToken = default)
         {
             //_consumer.Unsubscribe();
             return Task.CompletedTask;
@@ -83,9 +83,9 @@ namespace NBB.Messaging.Kafka
         }
 
 
-        private async Task Poll(string topicName, Func<string, Task> handler,Consumer<string, string> consumer, CancellationToken token)
+        private async Task Poll(string topicName, Func<string, Task> handler,Consumer<string, string> consumer, CancellationToken cancellationToken = default)
         {
-            while (!token.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 if (consumer.Consume(out Message<string, string> message, TimeSpan.FromMilliseconds(100)))
                 {

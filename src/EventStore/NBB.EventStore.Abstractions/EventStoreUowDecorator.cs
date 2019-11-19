@@ -23,16 +23,16 @@ namespace NBB.EventStore.Abstractions
             return _inner.GetChanges();
         }
 
-        public async Task SaveChangesAsync(CancellationToken cancellationToken)
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var streams = this.GetChanges()
                 .Select(e => new {Stream = e.GetStream(), Events = e.GetUncommittedChanges().ToList()}).ToList();
             
             await _inner.SaveChangesAsync(cancellationToken);
-            await OnAfterSave(cancellationToken, streams);
+            await OnAfterSave(streams, cancellationToken);
         }
 
-        private async Task OnAfterSave(CancellationToken cancellationToken, IEnumerable<dynamic> changes)
+        private async Task OnAfterSave(IEnumerable<dynamic> changes, CancellationToken cancellationToken = default)
         {
             foreach (var @entity in changes)
             {

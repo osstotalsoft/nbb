@@ -21,7 +21,7 @@ namespace NBB.GetEventStore
             _logger = logger;
         }
 
-        public async Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken)
+        public async Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default)
         {
             using (var connection = await GetConnectionAsync())
             {

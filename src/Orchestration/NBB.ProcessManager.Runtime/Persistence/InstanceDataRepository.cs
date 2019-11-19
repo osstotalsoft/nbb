@@ -19,7 +19,7 @@ namespace NBB.ProcessManager.Runtime.Persistence
             _effectRunner = effectRunner;
         }
 
-        public async Task Save<TData>(Instance<TData> instance, CancellationToken cancellationToken)
+        public async Task Save<TData>(Instance<TData> instance, CancellationToken cancellationToken = default)
             where TData : struct
         {
             var events = instance.GetUncommittedChanges().Cast<IEvent>().ToList();
@@ -33,7 +33,7 @@ namespace NBB.ProcessManager.Runtime.Persistence
                 await effect.Computation(_effectRunner);
         }
 
-        public async Task<Instance<TData>> Get<TData>(IDefinition<TData> definition, object identity, CancellationToken cancellationToken)
+        public async Task<Instance<TData>> Get<TData>(IDefinition<TData> definition, object identity, CancellationToken cancellationToken = default)
             where TData : struct
         {
             var instance = new Instance<TData>(definition);

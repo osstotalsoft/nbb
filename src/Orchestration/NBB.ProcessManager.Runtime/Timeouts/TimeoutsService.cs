@@ -13,9 +13,9 @@ namespace NBB.ProcessManager.Runtime.Timeouts
             _timeoutsManager = timeoutsManager;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override Task ExecuteAsync(CancellationToken cancellationToken = default)
         {
-            return _timeoutsManager.Poll(stoppingToken);
+            return _timeoutsManager.Poll(cancellationToken);
         }
     }
 }

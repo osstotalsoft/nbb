@@ -12,13 +12,13 @@ namespace NBB.EventStore.InMemory
         private readonly ConcurrentDictionary<string, SnapshotDescriptor> _storage =
             new ConcurrentDictionary<string, SnapshotDescriptor>();
 
-        public Task<SnapshotDescriptor> LoadSnapshotAsync(string stream, CancellationToken cancellationToken)
+        public Task<SnapshotDescriptor> LoadSnapshotAsync(string stream, CancellationToken cancellationToken = default)
         {
             var snapshotDescriptor = _storage.GetValueOrDefault(stream, null);
             return Task.FromResult(snapshotDescriptor);
         }
 
-        public Task StoreSnapshotAsync(string stream, SnapshotDescriptor snapshotDescriptor, CancellationToken cancellationToken)
+        public Task StoreSnapshotAsync(string stream, SnapshotDescriptor snapshotDescriptor, CancellationToken cancellationToken = default)
         {
             _storage.AddOrUpdate(stream,
                 key => snapshotDescriptor,

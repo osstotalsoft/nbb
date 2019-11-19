@@ -8,7 +8,7 @@ namespace NBB.Data.EntityFramework
 {
     public static class PagedResultExtensions
     {
-        public static async Task<PagedResult<TEntity>> ToPagedResult<TEntity>(this IQueryable<TEntity> query, PageRequest pageRequest, CancellationToken cancellationToken)
+        public static async Task<PagedResult<TEntity>> ToPagedResult<TEntity>(this IQueryable<TEntity> query, PageRequest pageRequest, CancellationToken cancellationToken = default)
         {
             int page = pageRequest.Page,
                 pageSize = pageRequest.PageSize;

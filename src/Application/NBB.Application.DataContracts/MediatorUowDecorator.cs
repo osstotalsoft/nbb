@@ -24,14 +24,14 @@ namespace NBB.Application.DataContracts
             return _inner.GetChanges();
         }
 
-        public async Task SaveChangesAsync(CancellationToken cancellationToken)
+        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var events = this.GetChanges().SelectMany(e => e.GetUncommittedChanges().ToList()).ToList();
             await _inner.SaveChangesAsync(cancellationToken);
             await OnAfterSave(events, cancellationToken);
         }
 
-        private async Task OnAfterSave(List<IEvent> events, CancellationToken cancellationToken)
+        private async Task OnAfterSave(List<IEvent> events, CancellationToken cancellationToken = default)
         {
             foreach (var @event in events.OfType<INotification>())
             {

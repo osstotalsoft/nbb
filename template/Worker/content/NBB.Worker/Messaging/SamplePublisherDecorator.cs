@@ -19,7 +19,7 @@ namespace NBB.Worker.Messaging
             _logger = logger;
         }
 
-        public Task PublishAsync<T>(T message, CancellationToken cancellationToken, Action<MessagingEnvelope> customizer = null, string topicName = null)
+        public Task PublishAsync<T>(T message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> customizer = null, string topicName = null)
         {
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {

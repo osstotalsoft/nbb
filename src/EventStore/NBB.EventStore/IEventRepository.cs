@@ -6,7 +6,7 @@ namespace NBB.EventStore
 {
     public interface IEventRepository
     {
-        Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken);
-        Task AppendEventsToStreamAsync(string stream, IList<EventDescriptor> eventDescriptors, int? expectedVersion, CancellationToken cancellationToken);
+        Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default);
+        Task AppendEventsToStreamAsync(string stream, IList<EventDescriptor> eventDescriptors, int? expectedVersion, CancellationToken cancellationToken = default);
     }
 }

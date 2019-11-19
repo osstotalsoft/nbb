@@ -20,7 +20,7 @@ namespace NBB.Domain.Abstractions
             return _inner.GetChanges();
         }
 
-        public Task SaveChangesAsync(CancellationToken cancellationToken)
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             OnBeforeSave();
 

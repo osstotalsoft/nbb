@@ -27,7 +27,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             }
         }
 
-        public async Task AddSubscription(string topic, Func<string, Task> handler, CancellationToken cancellationToken) 
+        public async Task AddSubscription(string topic, Func<string, Task> handler, CancellationToken cancellationToken = default) 
         {
             lock (_subscriptions)
             {
@@ -41,7 +41,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             var startBrokerTask = Task.Run(async () => { await StartBroker(topic, handler, cancellationToken); }, cancellationToken);
         }
 
-        private async Task StartBroker(string topic, Func<string, Task> handler, CancellationToken cancellationToken)
+        private async Task StartBroker(string topic, Func<string, Task> handler, CancellationToken cancellationToken = default)
         {
             var ev = _brokersAutoReset.GetOrAdd(topic, new AutoResetEvent(false));
 

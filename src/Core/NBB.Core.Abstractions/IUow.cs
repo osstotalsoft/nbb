@@ -7,6 +7,6 @@ namespace NBB.Core.Abstractions
     public interface IUow<out TEntity>
     {
         IEnumerable<TEntity> GetChanges();
-        Task SaveChangesAsync(CancellationToken cancellationToken);
+        Task SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

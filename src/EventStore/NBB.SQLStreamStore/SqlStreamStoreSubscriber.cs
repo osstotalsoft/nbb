@@ -24,7 +24,7 @@ namespace NBB.SQLStreamStore
         }
 
 
-        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken token)
+        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default)
         {
             var are = new AutoResetEvent(false);
             var sub = _store.SubscribeToAll(null, (s, m, t) => MessageReceived(s, m, handler, are, t), null, null, true, "x");
@@ -34,7 +34,7 @@ namespace NBB.SQLStreamStore
         }
 
 
-        private async Task MessageReceived(IAllStreamSubscription subscription, StreamMessage streamMessage, Func<IEvent, Task> handler, AutoResetEvent are, CancellationToken cancellationToken)
+        private async Task MessageReceived(IAllStreamSubscription subscription, StreamMessage streamMessage, Func<IEvent, Task> handler, AutoResetEvent are, CancellationToken cancellationToken = default)
         {
             if (cancellationToken.IsCancellationRequested)
                 are.Set();

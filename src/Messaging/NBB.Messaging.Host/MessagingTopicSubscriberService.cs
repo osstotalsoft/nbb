@@ -43,7 +43,7 @@ namespace NBB.Messaging.Host
             _topic = _topicRegistry.GetTopicForName(topic);
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
         {
             _logger.LogInformation($"MessagingTopicSubscriberService for topic {_topic} is starting");
 
@@ -57,7 +57,7 @@ namespace NBB.Messaging.Host
         }
 
 
-        private async Task Handle(string message, CancellationToken cancellationToken)
+        private async Task Handle(string message, CancellationToken cancellationToken = default)
         {
             MessagingEnvelope messageEnvelope = null;
             try

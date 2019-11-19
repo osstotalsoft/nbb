@@ -7,14 +7,16 @@ namespace NBB.Messaging.Abstractions
 {
     public interface IMessageBusSubscriber<TMessage>
     {
-        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token, string topicName = null, MessagingSubscriberOptions options = null);
-        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token);
+        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token = default, string topicName = null, MessagingSubscriberOptions options = null);
+        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token = default);
     }
 
 
     public static class MessageBusSubscriberExtensions
     {
-        public static async Task<MessagingEnvelope<TMessage>> WaitForMessage<TMessage>(this IMessageBusSubscriber<TMessage> subscriber, Func<MessagingEnvelope<TMessage>, bool> predicate, CancellationToken cancellationToken)
+        public static async Task<MessagingEnvelope<TMessage>> WaitForMessage<TMessage>(this IMessageBusSubscriber<TMessage> subscriber,
+            Func<MessagingEnvelope<TMessage>, bool> predicate,
+            CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<MessagingEnvelope<TMessage>>();
 

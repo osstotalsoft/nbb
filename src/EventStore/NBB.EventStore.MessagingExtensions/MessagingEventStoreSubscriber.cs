@@ -26,7 +26,7 @@ namespace NBB.EventStore.MessagingExtensions
         }
 
 
-        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken)
+        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default)
         {
             return _messageBusSubscriber.SubscribeAsync(async envelope =>
             {

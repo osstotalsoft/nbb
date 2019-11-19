@@ -24,12 +24,12 @@ namespace NBB.Data.EntityFramework
             c.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
         }
 
-        public Task AddAsync(TEntity entity, CancellationToken cancellationToken)
+        public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
             return _c.Set<TEntity>().AddAsync(entity, cancellationToken);
         }
 
-        public async Task Update(TEntity entity, CancellationToken cancellationToken)
+        public async Task Update(TEntity entity, CancellationToken cancellationToken = default)
         {
             var pks = _c.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties.Select(a => a.Name).ToList();
             var entityPkValues = pks.Select(pk => entity.GetType().GetProperty(pk).GetValue(entity)).ToArray();
@@ -38,7 +38,7 @@ namespace NBB.Data.EntityFramework
             _c.Entry(existingEntity).CurrentValues.SetValues(entity);
         }
 
-        public async Task Remove(object id, CancellationToken cancellationToken)
+        public async Task Remove(object id, CancellationToken cancellationToken = default)
         {
             object[] ids = (id is object[] list) ? list : new object[] {id};
 

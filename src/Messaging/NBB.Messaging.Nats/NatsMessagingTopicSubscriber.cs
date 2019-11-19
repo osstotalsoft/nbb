@@ -25,7 +25,7 @@ namespace NBB.Messaging.Nats
             _logger = logger;
         }
 
-        public Task SubscribeAsync(string topic, Func<string, Task> handler, CancellationToken token, MessagingSubscriberOptions options = null)
+        public Task SubscribeAsync(string topic, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
             if (!_subscribedToTopic)
             {
@@ -34,7 +34,7 @@ namespace NBB.Messaging.Nats
                     if (!_subscribedToTopic)
                     {
                         _subscribedToTopic = true;
-                        return SubscribeToTopicAsync(topic, handler, token, options);
+                        return SubscribeToTopicAsync(topic, handler, cancellationToken, options);
                     }
                 }
             }
@@ -47,7 +47,7 @@ namespace NBB.Messaging.Nats
             return Task.CompletedTask;
         }
 
-        private Task SubscribeToTopicAsync(string subject, Func<string, Task> handler, CancellationToken token, MessagingSubscriberOptions options = null)
+        private Task SubscribeToTopicAsync(string subject, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
             var opts = StanSubscriptionOptions.GetDefaultOptions();
             opts.DurableName = _configuration.GetSection("Messaging").GetSection("Nats")["durableName"];
@@ -70,7 +70,7 @@ namespace NBB.Messaging.Nats
                 {
                     if (subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial)
                     {
-                        handler(json).Wait(token);
+                        handler(json).Wait(cancellationToken);
                     }
                 }
                 catch (Exception ex)

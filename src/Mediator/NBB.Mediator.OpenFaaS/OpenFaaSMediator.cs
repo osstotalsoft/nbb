@@ -21,26 +21,26 @@ namespace NBB.Mediator.OpenFaaS
             _logger = logger;
         }
 
-        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = new CancellationToken())
+        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }
 
-        public async Task Send(IRequest request, CancellationToken cancellationToken = new CancellationToken())
+        public async Task Send(IRequest request, CancellationToken cancellationToken = default)
         {
             var functionName = string.Format(_commands_format, request.GetType().Name.ToLower());
             var url = $"{_gatewayUrl}/{functionName}";
             await InvokeFunction(url, cancellationToken);
         }
 
-        public async Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = new CancellationToken()) where TNotification : INotification
+        public async Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
         {
             var functionName = string.Format(_events_format, notification.GetType().Name.ToLower());
             var url = $"{_gatewayUrl}/{functionName}";
             await InvokeFunction(url, cancellationToken);
         }
 
-        private async Task InvokeFunction(string url, CancellationToken cancellationToken)
+        private async Task InvokeFunction(string url, CancellationToken cancellationToken = default)
         {
             using (HttpClient cl = new HttpClient())
             {

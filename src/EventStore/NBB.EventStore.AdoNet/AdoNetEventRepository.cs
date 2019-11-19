@@ -38,7 +38,7 @@ namespace NBB.EventStore.AdoNet
             _logger = logger;
         }
 
-        public async Task AppendEventsToStreamAsync(string streamId, IList<EventDescriptor> eventDescriptors, int? expectedVersion, CancellationToken cancellationToken)
+        public async Task AppendEventsToStreamAsync(string streamId, IList<EventDescriptor> eventDescriptors, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -57,7 +57,7 @@ namespace NBB.EventStore.AdoNet
             _logger.LogDebug("AdoNetEventRepository.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms.", streamId, stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken)
+        public async Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -90,7 +90,7 @@ namespace NBB.EventStore.AdoNet
         }
 
 
-        private async Task AppendEventsToStreamExpectedVersionAsync(string streamId, IList<EventDescriptor> eventDescriptors, int expectedVersion, CancellationToken cancellationToken)
+        private async Task AppendEventsToStreamExpectedVersionAsync(string streamId, IList<EventDescriptor> eventDescriptors, int expectedVersion, CancellationToken cancellationToken = default)
         {
             if (!eventDescriptors.Any())
                 return;
@@ -136,7 +136,7 @@ namespace NBB.EventStore.AdoNet
             }
         }
 
-        private async Task AppendEventsToStreamExpectedVersionAnyAsync(string streamId, IList<EventDescriptor> eventDescriptors, CancellationToken cancellationToken)
+        private async Task AppendEventsToStreamExpectedVersionAnyAsync(string streamId, IList<EventDescriptor> eventDescriptors, CancellationToken cancellationToken = default)
         {
             if (!eventDescriptors.Any())
                 return;

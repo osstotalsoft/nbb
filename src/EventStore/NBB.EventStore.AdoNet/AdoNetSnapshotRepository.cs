@@ -26,7 +26,7 @@ namespace NBB.EventStore.AdoNet
             _logger = logger;
         }
 
-        public async Task<SnapshotDescriptor> LoadSnapshotAsync(string stream, CancellationToken cancellationToken)
+        public async Task<SnapshotDescriptor> LoadSnapshotAsync(string stream, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -62,7 +62,7 @@ namespace NBB.EventStore.AdoNet
         }
 
         public async Task StoreSnapshotAsync(string stream, SnapshotDescriptor snapshotDescriptor,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             if (snapshotDescriptor == null) throw new ArgumentException(nameof(snapshotDescriptor));
 
