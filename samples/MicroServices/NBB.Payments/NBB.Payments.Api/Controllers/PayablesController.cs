@@ -34,7 +34,7 @@ namespace NBB.Payments.Api.Controllers
         [HttpGet("{id}")]
         public Task<Payable> Get(Guid id)
         {
-            return _payableQuery.FirstOrDefaultAsync(x=> x.PayableId == id, default);
+            return _payableQuery.FirstOrDefaultAsync(x=> x.PayableId == id);
         }
 
         // POSt api/payables/6AF6F8C8-117C-45C0-BB88-F49C13B8DE8D/pay
