@@ -1,4 +1,6 @@
-﻿namespace NBB.SQLStreamStore.Migrations
+﻿using System.Threading;
+
+namespace NBB.SQLStreamStore.Migrations
 {
     class Program
     {
@@ -6,7 +8,6 @@
         {
             var migrator = new SqlStreamStoreMigrator();
             migrator.MigrateDatabaseToLatestVersion(args).Wait();
-
         }
     }
 }

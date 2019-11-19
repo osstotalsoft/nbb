@@ -18,7 +18,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             _logger = logger;
         }
 
-        public Task SubscribeAsync(string topic, Func<string, Task> handler, CancellationToken token, MessagingSubscriberOptions options = null)
+        public Task SubscribeAsync(string topic, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
             if (!_subscribedToTopic)
             {
@@ -27,7 +27,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                     if (!_subscribedToTopic)
                     {
                         _subscribedToTopic = true;
-                        return InternalSubscribeAsync(topic, handler, token);
+                        return InternalSubscribeAsync(topic, handler, cancellationToken);
                     }
                 }
             }
@@ -35,7 +35,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             return Task.CompletedTask;
         }
 
-        private async Task InternalSubscribeAsync(string topic, Func<string, Task> handler, CancellationToken token)
+        private async Task InternalSubscribeAsync(string topic, Func<string, Task> handler, CancellationToken cancellationToken = default)
         {
             await _storage.AddSubscription(topic, async msg =>
             {
@@ -50,12 +50,12 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                         topic, ex);
                     //TODO: push to DLQ
                 }
-            }, token);
+            }, cancellationToken);
 
             //_logger.LogInformation("InProcessMessagingTopicSubscriber has subscribed to topic {Topic}", topic);
         }
 
-        public Task UnSubscribeAsync(CancellationToken token)
+        public Task UnSubscribeAsync(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

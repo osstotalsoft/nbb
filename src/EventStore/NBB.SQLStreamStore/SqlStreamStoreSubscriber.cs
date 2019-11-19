@@ -24,7 +24,7 @@ namespace NBB.SQLStreamStore
         }
 
 
-        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken token)
+        public Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default)
         {
             var are = new AutoResetEvent(false);
             var sub = _store.SubscribeToAll(null, (s, m, t) => MessageReceived(s, m, handler, are, t), null, null, true, "x");
@@ -34,15 +34,15 @@ namespace NBB.SQLStreamStore
         }
 
 
-        private async Task MessageReceived(IAllStreamSubscription subscription, StreamMessage streamMessage, Func<IEvent, Task> handler, AutoResetEvent are, CancellationToken token)
+        private async Task MessageReceived(IAllStreamSubscription subscription, StreamMessage streamMessage, Func<IEvent, Task> handler, AutoResetEvent are, CancellationToken cancellationToken = default)
         {
-            if (token.IsCancellationRequested)
+            if (cancellationToken.IsCancellationRequested)
                 are.Set();
 
             var metadata = _serDes.Deserialize<EventMetadata>(streamMessage.JsonMetadata);
             var eventType = metadata.GetEventType();
             _logger.LogDebug("SqlStreamStoreSubscriber subscriber received message of type {EventType}", eventType.FullName);
-            var eventData = await streamMessage.GetJsonData(token);
+            var eventData = await streamMessage.GetJsonData(cancellationToken);
             var @event = _serDes.Deserialize(eventData, eventType) as IEvent;
 
             await handler(@event);

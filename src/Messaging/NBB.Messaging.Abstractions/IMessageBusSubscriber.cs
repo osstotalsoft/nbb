@@ -1,20 +1,22 @@
-﻿using System;
+﻿using NBB.Messaging.DataContracts;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.Messaging.DataContracts;
 
 namespace NBB.Messaging.Abstractions
 {
     public interface IMessageBusSubscriber<TMessage>
     {
-        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token, string topicName = null, MessagingSubscriberOptions options = null);
-        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token);
+        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token = default, string topicName = null, MessagingSubscriberOptions options = null);
+        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token = default);
     }
 
 
     public static class MessageBusSubscriberExtensions
     {
-        public static async Task<MessagingEnvelope<TMessage>> WaitForMessage<TMessage>(this IMessageBusSubscriber<TMessage> subscriber, Func<MessagingEnvelope<TMessage>, bool> predicate, CancellationToken token)
+        public static async Task<MessagingEnvelope<TMessage>> WaitForMessage<TMessage>(this IMessageBusSubscriber<TMessage> subscriber,
+            Func<MessagingEnvelope<TMessage>, bool> predicate,
+            CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<MessagingEnvelope<TMessage>>();
 
@@ -23,11 +25,11 @@ namespace NBB.Messaging.Abstractions
                 if (predicate(msg))
                 {
                     tcs.SetResult(msg);
-                    await subscriber.UnSubscribeAsync(HandleMessage, token);
+                    await subscriber.UnSubscribeAsync(HandleMessage, cancellationToken);
                 }
             }
 
-            await subscriber.SubscribeAsync(HandleMessage, token);
+            await subscriber.SubscribeAsync(HandleMessage, cancellationToken);
 
             return await tcs.Task;
         }

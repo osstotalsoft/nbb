@@ -1,17 +1,17 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Kafka;
 using NBB.Messaging.Nats;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MessagingBenchmarks
 {
@@ -97,9 +97,9 @@ namespace MessagingBenchmarks
         private async Task SubscribeAndReceiveMsgs()
         {
             using (var scope = _container.CreateScope())
+            using (var cts = new CancellationTokenSource())
             {
                 var cnt = 0;
-                var cts = new CancellationTokenSource();
                 var sub = scope.ServiceProvider.GetService<IMessageBusSubscriber<IntegrationMessage>>();
 
                 var stopWatch = new Stopwatch();
@@ -110,14 +110,12 @@ namespace MessagingBenchmarks
                     var ms = stopWatch.ElapsedMilliseconds;
                     Console.WriteLine($"Message {cnt} received in {ms} miliseconds");
                     await Task.Delay(TimeSpan.FromMilliseconds(10), cts.Token);
-                    if(cnt == _msgsCnt)
+                    if (cnt == _msgsCnt)
                         cts.Cancel();
                     cnt++;
                     stopWatch.Restart();
                 }, cts.Token);
             }
         }
-
-
     }
 }

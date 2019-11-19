@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NATS.Client;
 using STAN.Client;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Messaging.Nats.Internal
 {

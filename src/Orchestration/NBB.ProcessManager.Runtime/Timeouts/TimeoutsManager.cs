@@ -31,7 +31,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
             NextRetrieval = now;
         }
 
-        public async Task Poll(CancellationToken cancellationToken)
+        public async Task Poll(CancellationToken cancellationToken = default)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -51,7 +51,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
             }
         }
 
-        internal async Task SpinOnce(CancellationToken cancellationToken)
+        internal async Task SpinOnce(CancellationToken cancellationToken = default)
         {
             if (NextRetrieval > _currentTimeProvider() || cancellationToken.IsCancellationRequested)
             {

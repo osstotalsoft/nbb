@@ -1,23 +1,22 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Core.Abstractions;
-using NBB.EventStore.Abstractions;
-using NBB.EventStore.AdoNet.Migrations;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
+using NBB.EventStore.Abstractions;
 using NBB.EventStore.Host;
 using NBB.EventStore.InMemory;
 using NBB.EventStore.MessagingExtensions;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.InProcessMessaging.Extensions;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace NBB.EventStore.IntegrationTests
 {
@@ -44,7 +43,7 @@ namespace NBB.EventStore.IntegrationTests
                 var host = scope.ServiceProvider.GetService<IHostedService>();
                 try
                 {
-                    await host.StartAsync(default(CancellationToken));
+                    await host.StartAsync(CancellationToken.None);
 
                     var eventStore = scope.ServiceProvider.GetService<IEventStore>();
                     eventStore.AppendEventsToStreamAsync(stream, new[] {new TestEvent {EventId = eventId}}, null,
@@ -54,7 +53,7 @@ namespace NBB.EventStore.IntegrationTests
                 }
                 finally
                 {
-                    await host.StopAsync(default(CancellationToken));
+                    await host.StopAsync(CancellationToken.None);
                 }
             }
 

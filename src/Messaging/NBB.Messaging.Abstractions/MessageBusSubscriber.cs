@@ -29,7 +29,7 @@ namespace NBB.Messaging.Abstractions
             _logger = logger;
         }
 
-        public Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token, string topicName = null, MessagingSubscriberOptions options = null)
+        public Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default, string topicName = null, MessagingSubscriberOptions options = null)
         {
             _handlers.Add(handler);
 
@@ -43,7 +43,7 @@ namespace NBB.Messaging.Abstractions
                         _topicName = _topicRegistry.GetTopicForName(topicName) ??
                                      _topicRegistry.GetTopicForMessageType(typeof(TMessage));
                         _subscriberOptions = options;
-                        _topicSubscriber.SubscribeAsync(_topicName, HandleMessage, token, options);
+                        _topicSubscriber.SubscribeAsync(_topicName, HandleMessage, cancellationToken, options);
                     }
                 }
             }
@@ -77,11 +77,11 @@ namespace NBB.Messaging.Abstractions
             }
         }
 
-        public async Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token)
+        public async Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default)
         {
             _handlers.Remove(handler);
             if (_handlers.Count == 0)
-                await _topicSubscriber.UnSubscribeAsync(token);
+                await _topicSubscriber.UnSubscribeAsync(cancellationToken);
         }
     }
 }

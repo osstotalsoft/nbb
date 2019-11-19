@@ -1,4 +1,7 @@
-﻿using NBB.Core.Pipeline;
+﻿using NBB.Core.Abstractions;
+using NBB.Core.Pipeline;
+using NBB.Correlation;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.DataContracts;
 using OpenTracing;
 using OpenTracing.Propagation;
@@ -6,9 +9,6 @@ using OpenTracing.Tag;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.Core.Abstractions;
-using NBB.Correlation;
-using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.OpenTracing.Subscriber
 {

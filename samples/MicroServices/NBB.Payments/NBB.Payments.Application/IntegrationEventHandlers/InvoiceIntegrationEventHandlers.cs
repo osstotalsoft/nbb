@@ -1,9 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using NBB.Data.Abstractions;
 using NBB.Invoices.PublishedLanguage.IntegrationEvents;
 using NBB.Payments.Domain.PayableAggregate;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Payments.Application.IntegrationEventHandlers
 {
@@ -19,8 +19,8 @@ namespace NBB.Payments.Application.IntegrationEventHandlers
         public async Task Handle(InvoiceCreated e, CancellationToken cancellationToken)
         {
             var payable = new Payable(e.ClientId, e.Amount, e.InvoiceId);
-            await _repository.AddAsync(payable);
-            await _repository.SaveChangesAsync();
+            await _repository.AddAsync(payable, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
         }
     }
 }

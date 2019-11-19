@@ -1,35 +1,35 @@
-﻿using System;
+﻿using NBB.Correlation.Internal;
+using System;
 using System.Threading;
-using NBB.Correlation.Internal;
 
 namespace NBB.Correlation
 {
     public static class CorrelationManager
     {
-        private static readonly AsyncLocal<Guid?> _correlationId = new AsyncLocal<Guid?>();
+        private static readonly AsyncLocal<Guid?> CorrelationId = new AsyncLocal<Guid?>();
 
         public static IDisposable NewCorrelationId(Guid? correlationId = null)
         {
-            if(_correlationId.Value.HasValue)
+            if(CorrelationId.Value.HasValue)
                 throw new Exception("CorrelationId has already been set");
 
-            var uuid = correlationId.HasValue && correlationId.Value!= default(Guid) ? correlationId.Value : Guid.NewGuid();
-            _correlationId.Value = uuid;
+            var uuid = correlationId.HasValue && correlationId.Value!= default ? correlationId.Value : Guid.NewGuid();
+            CorrelationId.Value = uuid;
             return new DisposableCorrelationScope(uuid);
         }
 
         public static Guid? GetCorrelationId()
         {
 
-            return _correlationId.Value;
+            return CorrelationId.Value;
         }
 
         internal static void ClearCorrelationId()
         {
-            if (!_correlationId.Value.HasValue)
+            if (!CorrelationId.Value.HasValue)
                 throw new Exception("CorrelationId has never been set");
 
-            _correlationId.Value = null;
+            CorrelationId.Value = null;
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats.Internal;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Messaging.Nats
 {
@@ -20,7 +20,7 @@ namespace NBB.Messaging.Nats
         }
 
         public async Task PublishAsync(string topic, string key, string message,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

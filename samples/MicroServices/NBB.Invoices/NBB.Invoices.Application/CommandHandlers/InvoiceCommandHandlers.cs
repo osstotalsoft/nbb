@@ -1,9 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using NBB.Data.Abstractions;
 using NBB.Invoices.Application.Commands;
 using NBB.Invoices.Domain.InvoiceAggregate;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Invoices.Application.CommandHandlers
 {
@@ -18,8 +18,8 @@ namespace NBB.Invoices.Application.CommandHandlers
         public async Task Handle(CreateInvoice command, CancellationToken cancellationToken)
         {
             var invoice = new Invoice(command.ClientId, command.ContractId, command.Amount);
-            await _repository.AddAsync(invoice);
-            await _repository.SaveChangesAsync();
+            await _repository.AddAsync(invoice, cancellationToken);
+            await _repository.SaveChangesAsync(cancellationToken);
 
         }
     }

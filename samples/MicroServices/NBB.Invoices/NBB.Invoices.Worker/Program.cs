@@ -1,6 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,11 +16,13 @@ using NBB.Invoices.Data;
 using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Kafka;
 using NBB.Messaging.Nats;
 using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Invoices.Worker
 {
@@ -100,7 +100,7 @@ namespace NBB.Invoices.Worker
                         .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
                 });
 
-            await builder.RunConsoleAsync();
+            await builder.RunConsoleAsync(CancellationToken.None);
         }
     }
 }

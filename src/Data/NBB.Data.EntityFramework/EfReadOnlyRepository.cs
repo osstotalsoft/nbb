@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions.Paging;
 using NBB.Data.Abstractions;
 using NBB.Data.EntityFramework.Internal;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Data.EntityFramework
 {
@@ -20,7 +21,7 @@ namespace NBB.Data.EntityFramework
         private readonly IExpressionBuilder _expressionBuilder;
         private readonly ILogger<EfReadOnlyRepository<TEntity, TContext>> _logger;
 
-        public  EfReadOnlyRepository(TContext c, IExpressionBuilder expressionBuilder, ILogger<EfReadOnlyRepository<TEntity, TContext>> logger)
+        public EfReadOnlyRepository(TContext c, IExpressionBuilder expressionBuilder, ILogger<EfReadOnlyRepository<TEntity, TContext>> logger)
         {
             _c = c;
             _c.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
@@ -28,13 +29,13 @@ namespace NBB.Data.EntityFramework
             _logger = logger;
         }
 
-        public async Task<TEntity> GetByIdAsync(object id, params string[] includePaths)
+        public async Task<TEntity> GetByIdAsync(object id, CancellationToken cancellationToken, params string[] includePaths)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
             var lambda = _expressionBuilder.BuildPrimaryKeyExpressionFromModel<TEntity>(_c.Model, id);
-            var result = await _c.Set<TEntity>().IncludePaths(includePaths).FirstOrDefaultAsync(lambda);
+            var result = await _c.Set<TEntity>().IncludePaths(includePaths).FirstOrDefaultAsync(lambda, cancellationToken);
 
             stopWatch.Stop();
             _logger.LogDebug("EfReadRepository.GetByIdAsync for {EntityType} with {IncludePaths} took {ElapsedMilliseconds} ms", typeof(TEntity).Name, string.Join(", ", includePaths), stopWatch.ElapsedMilliseconds);
@@ -43,13 +44,13 @@ namespace NBB.Data.EntityFramework
         }
 
 
-        public async Task<IEnumerable<TEntity>> GetAllAsync(params string[] includePaths)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken, params string[] includePaths)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
             var results = await _c.Set<TEntity>().IncludePaths(includePaths)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
 
             stopWatch.Stop();
             _logger.LogDebug("EfReadRepository.GetAllAsync for {EntityType} with {IncludePaths} took {ElapsedMilliseconds} ms", typeof(TEntity).Name, string.Join(", ", includePaths), stopWatch.ElapsedMilliseconds);
@@ -57,23 +58,23 @@ namespace NBB.Data.EntityFramework
             return results;
         }
 
-        public async Task<PagedResult<TEntity>> GetAllPagedAsync(PageRequest pageRequest, params string[] includePaths)
+        public async Task<PagedResult<TEntity>> GetAllPagedAsync(PageRequest pageRequest, CancellationToken cancellationToken, params string[] includePaths)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
             var keyProperties = _c.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties;
-            var id = keyProperties.First().Name;                
-            
-            var results = await _c.Set<TEntity>().IncludePaths(includePaths)                
+            var id = keyProperties.First().Name;
+
+            var results = await _c.Set<TEntity>().IncludePaths(includePaths)
                 .OrderBy(id, false)
-                .ToPagedResult(pageRequest);
+                .ToPagedResult(pageRequest, cancellationToken);
 
             stopWatch.Stop();
-            _logger.LogDebug("EfReadRepository.GetAllPagedAsync for {EntityType} with page {Page}, page size {PageSize} and {IncludePaths} took {ElapsedMilliseconds} ms", 
+            _logger.LogDebug("EfReadRepository.GetAllPagedAsync for {EntityType} with page {Page}, page size {PageSize} and {IncludePaths} took {ElapsedMilliseconds} ms",
                 typeof(TEntity).Name, pageRequest.Page, pageRequest.PageSize, string.Join(", ", includePaths), stopWatch.ElapsedMilliseconds);
 
-            return results;            
+            return results;
         }
 
     }
@@ -85,15 +86,14 @@ namespace NBB.Data.EntityFramework
         {
             if (includePaths != null)
             {
-                foreach (var includePath in includePaths)
-                    query = query.Include(includePath);
+                query = includePaths.Aggregate(query, (current, includePath) => current.Include(includePath));
             }
 
             return query;
         }
 
         public static IQueryable<TEntity> OrderBy<TEntity>(this IQueryable<TEntity> source, string orderByProperty,
-            bool desc) 
+            bool desc)
         {
             string command = desc ? "OrderByDescending" : "OrderBy";
             var type = typeof(TEntity);

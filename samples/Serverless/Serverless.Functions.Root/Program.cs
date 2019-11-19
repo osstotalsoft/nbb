@@ -21,7 +21,7 @@ namespace Serverless.Functions.Root
             MainAsync(source.Token).GetAwaiter().GetResult();
         }
 
-        static async Task MainAsync(CancellationToken token)
+        static async Task MainAsync(CancellationToken cancellationToken)
         {
             var function = new Function();
             function.PrepareFunctionContext();
@@ -32,7 +32,7 @@ namespace Serverless.Functions.Root
             var stdin = Console.OpenStandardInput();
             using (TextReader reader = new StreamReader(stdin))
             {
-                while (!token.IsCancellationRequested)
+                while (!cancellationToken.IsCancellationRequested)
                 {
                     HeaderParser parser = new HeaderParser();
                     var header = parser.Parse(reader);
@@ -53,7 +53,7 @@ namespace Serverless.Functions.Root
                         System.Diagnostics.Debug.WriteLine(body);
                     }
 
-                    await function.Invoke(body, token);
+                    await function.Invoke(body, cancellationToken);
 
                     var httpAdded = httpFormatter.Format("");
                     Console.WriteLine(httpAdded);

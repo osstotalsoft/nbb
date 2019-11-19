@@ -29,7 +29,7 @@ namespace NBB.Messaging.Abstractions
             _logger = logger;
         }
 
-        public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default(CancellationToken), Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
+        public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
         {
             var outgoingEnvelope = PrepareMessageEnvelope(message, envelopeCustomizer);
             var key = (message as IKeyProvider)?.Key;

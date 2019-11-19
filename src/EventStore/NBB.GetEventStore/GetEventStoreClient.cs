@@ -1,14 +1,14 @@
-﻿using System;
+﻿using EventStore.ClientAPI;
+using Microsoft.Extensions.Logging;
+using NBB.Core.Abstractions;
+using NBB.EventStore.Abstractions;
+using NBB.GetEventStore.Internal;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using EventStore.ClientAPI;
-using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
-using NBB.EventStore.Abstractions;
-using NBB.GetEventStore.Internal;
 using CorrelationManager = NBB.Correlation.CorrelationManager;
 
 namespace NBB.GetEventStore
@@ -24,7 +24,7 @@ namespace NBB.GetEventStore
             _logger = logger;
         }
 
-        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -47,7 +47,7 @@ namespace NBB.GetEventStore
             _logger.LogDebug("GetEventStoreClient.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

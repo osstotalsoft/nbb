@@ -1,12 +1,12 @@
-﻿using System;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-using EventStore.ClientAPI;
+﻿using EventStore.ClientAPI;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.GetEventStore.Internal;
+using System;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.GetEventStore
 {
@@ -21,7 +21,7 @@ namespace NBB.GetEventStore
             _logger = logger;
         }
 
-        public async Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken token)
+        public async Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default)
         {
             using (var connection = await GetConnectionAsync())
             {
@@ -67,7 +67,7 @@ namespace NBB.GetEventStore
                 }, null, 10, true);
 
 
-                await token.WhenCanceled();
+                await cancellationToken.WhenCanceled();
             }
 
         }

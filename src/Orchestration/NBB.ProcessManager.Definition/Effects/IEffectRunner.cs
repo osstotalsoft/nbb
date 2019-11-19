@@ -1,7 +1,7 @@
-﻿using System;
+﻿using MediatR;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using MediatR;
 
 namespace NBB.ProcessManager.Definition.Effects
 {

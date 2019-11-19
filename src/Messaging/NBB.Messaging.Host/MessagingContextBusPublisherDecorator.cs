@@ -18,7 +18,7 @@ namespace NBB.Messaging.Host
             _messagingContextAccessor = messagingContextAccessor;
         }
 
-        public Task PublishAsync<T>(T message, CancellationToken cancellationToken, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
+        public Task PublishAsync<T>(T message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
         {
             void NewEnvelopeCustomizer(MessagingEnvelope outgoingEnvelope)
             {

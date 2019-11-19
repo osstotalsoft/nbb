@@ -11,7 +11,7 @@ namespace NBB.Worker.HealthChecks
     {
         public string Name { get; } = "GCInfo";
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             // This example will report degraded status if the application is using
             // more than 1gb of memory.

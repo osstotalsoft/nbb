@@ -26,7 +26,7 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             Task next() => Task.CompletedTask;
 
             //Act
-            await correlationMiddleWare.Invoke(envelope, default(CancellationToken), next);
+            await correlationMiddleWare.Invoke(envelope, default, next);
 
             //Assert
             VerifyLog(mockedLogger, LogLevel.Information, "processed in");
@@ -46,7 +46,7 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             //Act
             try
             {
-                await correlationMiddleWare.Invoke(envelope, default(CancellationToken), next);
+                await correlationMiddleWare.Invoke(envelope, default, next);
             }
             catch { }
 
@@ -67,7 +67,7 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             Task next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
             //Act
-            await executionTimeMiddleware.Invoke(envelope, default(CancellationToken), next);
+            await executionTimeMiddleware.Invoke(envelope, default, next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();

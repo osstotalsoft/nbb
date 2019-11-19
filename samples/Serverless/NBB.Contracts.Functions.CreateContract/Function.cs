@@ -40,7 +40,7 @@ namespace NBB.Contracts.Functions.CreateContract
             _container = BuildServiceProvider();
         }
 
-        public async Task Invoke(string body, CancellationToken token)
+        public async Task Invoke(string body, CancellationToken cancellationToken)
         {
             var correlationId = GetCorrelationIdFromBuffer(body);
             using (CorrelationManager.NewCorrelationId(correlationId))
@@ -51,7 +51,7 @@ namespace NBB.Contracts.Functions.CreateContract
                     var commandHandler = scope.ServiceProvider.GetService<IRequestHandler<Application.Commands.CreateContract>>();
                     if (commandHandler != null)
                     {
-                        await commandHandler.Handle(command, token);
+                        await commandHandler.Handle(command, cancellationToken);
                     }
                 }
             }
@@ -159,7 +159,7 @@ namespace NBB.Contracts.Functions.CreateContract
             var eventStoreDecorator = new MessagingEventStoreDecorator(eventStore, messageBusPublisher, new MessagingTopicResolver(configuration));
             var mediator = new OpenFaaSMediator(configuration, new Logger<OpenFaaSMediator>(loggerFactory));
             var repository = new EventSourcedRepository<Contract>(eventStoreDecorator, null, mediator, new EventSourcingOptions(),  new Logger<EventSourcedRepository<Contract>>(loggerFactory));
-            var result = new ContractCommandHandlers(repository, messageBusPublisher);
+            var result = new ContractCommandHandlers(repository);
 
             //disposables = new List<IDisposable>{stanConnectionProvider};
 

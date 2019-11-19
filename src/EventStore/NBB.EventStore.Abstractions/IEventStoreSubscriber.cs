@@ -7,6 +7,6 @@ namespace NBB.EventStore.Abstractions
 {
     public interface IEventStoreSubscriber
     {
-        Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken token);
+        Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default);
     }
 }

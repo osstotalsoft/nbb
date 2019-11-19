@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Data.EventSourcing
 {
@@ -31,7 +31,7 @@ namespace NBB.Data.EventSourcing
             _logger = logger;
         }
 
-        public async Task SaveAsync(TAggregateRoot aggregate, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task SaveAsync(TAggregateRoot aggregate, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -63,7 +63,7 @@ namespace NBB.Data.EventSourcing
             _logger.LogDebug("EventSourcedRepository.SaveAsync for {AggregateType} took {ElapsedMilliseconds} ms.", typeof(TAggregateRoot).Name, stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<TAggregateRoot> GetByIdAsync(object id, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<TAggregateRoot> GetByIdAsync(object id, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -96,7 +96,7 @@ namespace NBB.Data.EventSourcing
         }
 
 
-        private async Task PublishEventsAsync(List<IEvent> events, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task PublishEventsAsync(List<IEvent> events, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

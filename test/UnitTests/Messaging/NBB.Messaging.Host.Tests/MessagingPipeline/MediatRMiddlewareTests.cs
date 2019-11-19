@@ -26,10 +26,10 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => Task.CompletedTask;
 
             //Act
-            await mediatRMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            await mediatRMiddleware.Invoke(envelope, default, Next);
 
             //Assert
-            Mock.Get(mockedMediator).Verify(x => x.Publish<INotification>(sentMessage, default(CancellationToken)), Times.Once);
+            Mock.Get(mockedMediator).Verify(x => x.Publish<INotification>(sentMessage, default), Times.Once);
         }
 
         [Fact]
@@ -44,10 +44,10 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => Task.CompletedTask;
 
             //Act
-            await mediatRMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            await mediatRMiddleware.Invoke(envelope, default, Next);
 
             //Assert
-            Mock.Get(mockedMediator).Verify(x => x.Send(sentMessage, default(CancellationToken)), Times.Once);
+            Mock.Get(mockedMediator).Verify(x => x.Send(sentMessage, default), Times.Once);
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => Task.CompletedTask;
 
             //Act
-            Task Action() => mediatRMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            Task Action() => mediatRMiddleware.Invoke(envelope, default, Next);
 
             //Assert
             
@@ -81,7 +81,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
             //Act
-            await mediatRMiddleware.Invoke(envelope, default(CancellationToken), Next);
+            await mediatRMiddleware.Invoke(envelope, default, Next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();

@@ -27,7 +27,7 @@ namespace NBB.Messaging.Kafka
             _kafkaServers = configuration.GetSection("Messaging").GetSection("Kafka")["bootstrap_servers"];
         }
 
-        public Task SubscribeAsync(string topicName, Func<string, Task> handler, CancellationToken token, MessagingSubscriberOptions options = null)
+        public Task SubscribeAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken = default, MessagingSubscriberOptions options = null)
         {
             if (!_subscribedToTopic)
             {
@@ -38,7 +38,7 @@ namespace NBB.Messaging.Kafka
                         _subscribedToTopic = true;
                         _subscriberOptions = options ?? new MessagingSubscriberOptions();
                         _consumer = GetConsumer();
-                        return SubscribeToTopicAsync(topicName, handler, token);
+                        return SubscribeToTopicAsync(topicName, handler, cancellationToken);
                     }
                 }
             }
@@ -46,7 +46,7 @@ namespace NBB.Messaging.Kafka
             throw new Exception("Already subscribed to this topic: " + topicName);
         }
 
-        private async Task SubscribeToTopicAsync(string topicName, Func<string, Task> handler, CancellationToken token)
+        private async Task SubscribeToTopicAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken = default)
         {
             
 
@@ -67,11 +67,11 @@ namespace NBB.Messaging.Kafka
             await Task.Yield();
             _consumer.Subscribe(topicName);
 
-            var pollTask = Task.Run(async () => await Poll(topicName, handler, _consumer, token), token); //start polling on another thread
+            var pollTask = Task.Run(async () => await Poll(topicName, handler, _consumer, cancellationToken), cancellationToken); //start polling on another thread
 
         }
 
-        public Task UnSubscribeAsync(CancellationToken token)
+        public Task UnSubscribeAsync(CancellationToken cancellationToken = default)
         {
             //_consumer.Unsubscribe();
             return Task.CompletedTask;
@@ -83,9 +83,9 @@ namespace NBB.Messaging.Kafka
         }
 
 
-        private async Task Poll(string topicName, Func<string, Task> handler,Consumer<string, string> consumer, CancellationToken token)
+        private async Task Poll(string topicName, Func<string, Task> handler,Consumer<string, string> consumer, CancellationToken cancellationToken = default)
         {
-            while (!token.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 if (consumer.Consume(out Message<string, string> message, TimeSpan.FromMilliseconds(100)))
                 {
@@ -114,8 +114,6 @@ namespace NBB.Messaging.Kafka
                 }
             }
         }
-
-
         private Consumer<string, string> GetConsumer()
         {
             var isAutoCommit = _subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Auto;
@@ -127,7 +125,6 @@ namespace NBB.Messaging.Kafka
                 {"group.id", _consumerGroup}
                 //{"queued.min.messages", "1000" }
             };
-
 
             var isCollaborativeConsumer = _subscriberOptions.ConsumerType == MessagingConsumerType.CollaborativeConsumer;
             if (isCollaborativeConsumer)

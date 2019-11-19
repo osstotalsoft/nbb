@@ -12,7 +12,7 @@ namespace NBB.EventStore.InMemory
         private readonly ConcurrentDictionary<string, EventDescriptorCollection> _storage =
             new ConcurrentDictionary<string, EventDescriptorCollection>();
 
-        public Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken)
+        public Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             IList<EventDescriptor> list = _storage.GetValueOrDefault(stream, new EventDescriptorCollection(startFromVersion ?? 0));
             return Task.FromResult(list);
@@ -20,7 +20,7 @@ namespace NBB.EventStore.InMemory
 
         public Task AppendEventsToStreamAsync(string stream, IList<EventDescriptor> eventDescriptors,
             int? expectedVersion,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken = default)
         {
             _storage.AddOrUpdate(stream,
                 key =>

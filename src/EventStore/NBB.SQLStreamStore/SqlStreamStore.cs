@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.SQLStreamStore.Internal;
 using SqlStreamStore;
 using SqlStreamStore.Streams;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.SQLStreamStore
 {
@@ -25,7 +25,7 @@ namespace NBB.SQLStreamStore
             _logger = logger;
         }
 
-        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -45,7 +45,7 @@ namespace NBB.SQLStreamStore
             _logger.LogDebug("SqlStreamStore.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

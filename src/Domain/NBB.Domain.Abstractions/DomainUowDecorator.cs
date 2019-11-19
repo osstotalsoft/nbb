@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Abstractions;
 
@@ -19,11 +20,11 @@ namespace NBB.Domain.Abstractions
             return _inner.GetChanges();
         }
 
-        public Task SaveChangesAsync()
+        public Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             OnBeforeSave();
 
-            return _inner.SaveChangesAsync();
+            return _inner.SaveChangesAsync(cancellationToken);
         }
 
         private void OnBeforeSave()

@@ -1,5 +1,5 @@
-﻿using System;
-using NBB.EventStore.AdoNet.Migrations;
+﻿using NBB.EventStore.AdoNet.Migrations;
+using System;
 
 namespace NBB.Payments.Migrations
 {

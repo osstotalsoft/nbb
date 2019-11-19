@@ -112,7 +112,7 @@ namespace TheBenchmarks
 
         private static void MigrateDb()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(null).Wait();
+            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(default).Wait();
         }
 
         private static List<EventDescriptor> GetMockData()

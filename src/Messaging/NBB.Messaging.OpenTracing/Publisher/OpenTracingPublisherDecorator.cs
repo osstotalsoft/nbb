@@ -24,7 +24,7 @@ namespace NBB.Messaging.OpenTracing.Publisher
             _topicRegistry = topicRegistry;
         }
 
-        public Task PublishAsync<T>(T message, CancellationToken cancellationToken, Action<MessagingEnvelope> customizer = null, string topicName = null)
+        public Task PublishAsync<T>(T message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> customizer = null, string topicName = null)
         {
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {

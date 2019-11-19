@@ -6,7 +6,7 @@ namespace NBB.Data.Abstractions
     public interface IEventSourcedRepository<TAggregateRoot>
         where TAggregateRoot : class
     {
-        Task SaveAsync(TAggregateRoot aggregate, CancellationToken cancellationToken = default(CancellationToken));
-        Task<TAggregateRoot> GetByIdAsync(object id, CancellationToken cancellationToken = default(CancellationToken));
+        Task SaveAsync(TAggregateRoot aggregate, CancellationToken cancellationToken = default);
+        Task<TAggregateRoot> GetByIdAsync(object id, CancellationToken cancellationToken = default);
     }
 }
