@@ -223,7 +223,7 @@ namespace TheBenchmarks
 
         private static void MigrateNBBEventStore()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(default, default).Wait();
+            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(default).Wait();
         }
 
         private static TestEvent GetATestEvent()
