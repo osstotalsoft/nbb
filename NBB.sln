@@ -304,6 +304,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orchestration", "Orchestrat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProcessManager.Tests", "test\UnitTests\Orchestration\NBB.ProcessManager.Tests\NBB.ProcessManager.Tests.csproj", "{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Effects", "Effects", "{5B602497-D6CC-479B-BFEA-3193CDC9EE9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Effects.Core", "NBB.Effects.Core\NBB.Effects.Core.csproj", "{24E46343-7043-4A63-BDBB-B94896B263F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -692,6 +696,10 @@ Global
 		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24E46343-7043-4A63-BDBB-B94896B263F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24E46343-7043-4A63-BDBB-B94896B263F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24E46343-7043-4A63-BDBB-B94896B263F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24E46343-7043-4A63-BDBB-B94896B263F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -830,6 +838,8 @@ Global
 		{D11FE59A-F3FE-4A7D-85B3-252294B6447C} = {7D20C931-B59B-4227-A916-3DE892F7A78A}
 		{FE39B11B-26E0-4EDA-AA33-18E1D5EB63D8} = {83E383BB-C9D9-4F5F-BAAF-FF1ADFF0B151}
 		{DB6CACB0-CDC1-47CD-B89E-BE24D9238472} = {FE39B11B-26E0-4EDA-AA33-18E1D5EB63D8}
+		{5B602497-D6CC-479B-BFEA-3193CDC9EE9D} = {7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}
+		{24E46343-7043-4A63-BDBB-B94896B263F9} = {5B602497-D6CC-479B-BFEA-3193CDC9EE9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
