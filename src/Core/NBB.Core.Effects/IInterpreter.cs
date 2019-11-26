@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace NBB.Effects.Core
+namespace NBB.Core.Effects
 {
     public interface IInterpreter
     {

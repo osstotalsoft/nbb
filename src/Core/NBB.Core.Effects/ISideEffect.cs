@@ -1,4 +1,4 @@
-﻿namespace NBB.Effects.Core
+﻿namespace NBB.Core.Effects
 {
     public interface ISideEffect<out TOutput>
     {

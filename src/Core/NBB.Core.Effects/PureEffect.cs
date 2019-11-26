@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NBB.Effects.Core
+namespace NBB.Core.Effects
 {
     public class PureEffect<T> : IEffect<T>
     {

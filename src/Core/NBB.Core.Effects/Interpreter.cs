@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Effects.Core
+namespace NBB.Core.Effects
 {
     public class Interpreter : IInterpreter
     {
@@ -21,6 +22,7 @@ namespace NBB.Effects.Core
         {
             return Task.FromResult(effect.Value);
         }
+
         private async Task<T> InternalInterpret<T1, T2, T>(ParallelEffect<T1, T2, T> parallelEffect)
         {
             var t1 = Interpret(parallelEffect.LeftEffect);
@@ -34,7 +36,7 @@ namespace NBB.Effects.Core
         {
             var sideEffectType = effect.SideEffect.GetType();
             var sideEffectHandlerType = typeof(ISideEffectHandler<,>).MakeGenericType(sideEffectType, typeof(TOutput));
-            var sideEffectHandler = _serviceProvider.GetService(sideEffectHandlerType) as dynamic;
+            var sideEffectHandler = _serviceProvider.GetRequiredService(sideEffectHandlerType) as dynamic;
             var sideEffectResult = (TOutput)(await sideEffectHandler.Handle(effect.SideEffect));
             var innerEffect = effect.Next(sideEffectResult);
             return await Interpret(innerEffect);

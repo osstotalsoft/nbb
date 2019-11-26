@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NBB.Effects.Core
+namespace NBB.Core.Effects
 {
     public class FreeEffect<TOutput, T> : IEffect<T>
     {
