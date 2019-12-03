@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,8 +15,8 @@ namespace NBB.Core.Effects.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped<ISideEffectHandler<Simple.SideEffect, int>, Simple.Handler>();
-            var sp = services.BuildServiceProvider();
-            var sut = new SideEffectHandlerFactory(sp);
+            using var container = services.BuildServiceProvider();
+            var sut = new SideEffectHandlerFactory(container);
 
             //Act
             var sideEffectHandlerType = sut.GetSideEffectHandlerFor(new Simple.SideEffect());
@@ -30,8 +31,8 @@ namespace NBB.Core.Effects.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped(typeof(Generic.Handler<>));
-            var sp = services.BuildServiceProvider();
-            var sut = new SideEffectHandlerFactory(sp);
+            using var container = services.BuildServiceProvider();
+            var sut = new SideEffectHandlerFactory(container);
 
             //Act
             var sideEffectHandler = sut.GetSideEffectHandlerFor(new Generic.SideEffect<int>());
@@ -51,7 +52,7 @@ namespace NBB.Core.Effects.Tests
 
         public class Handler : ISideEffectHandler<SideEffect, int>
         {
-            public Task<int> Handle(SideEffect sideEffect)
+            public Task<int> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
                 throw new NotImplementedException();
             }
@@ -66,7 +67,7 @@ namespace NBB.Core.Effects.Tests
 
         public class Handler<TResponse> : ISideEffectHandler<SideEffect<TResponse>, TResponse>
         {
-            public Task<TResponse> Handle(SideEffect<TResponse> sideEffect)
+            public Task<TResponse> Handle(SideEffect<TResponse> sideEffect, CancellationToken cancellationToken = default)
             {
                 throw new NotImplementedException();
             }

@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
     public interface IInterpreter
     {
-        Task<T> Interpret<T>(IEffect<T> effect);
+        Task<T> Interpret<T>(IEffect<T> effect, CancellationToken cancellationToken = default);
     }
 }

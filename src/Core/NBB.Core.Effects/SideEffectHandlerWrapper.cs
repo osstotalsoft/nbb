@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
@@ -12,9 +13,9 @@ namespace NBB.Core.Effects
             _innerSideEffectHandler = innerSideEffectHandler;
         }
 
-        public Task<TOutput> Handle(ISideEffect<TOutput> sideEffect)
+        public Task<TOutput> Handle(ISideEffect<TOutput> sideEffect, CancellationToken cancellationToken = default)
         {
-            return (_innerSideEffectHandler as dynamic).Handle(sideEffect);
+            return (_innerSideEffectHandler as dynamic).Handle(sideEffect, cancellationToken);
         }
     }
 }

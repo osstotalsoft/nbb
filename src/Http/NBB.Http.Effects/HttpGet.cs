@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Effects;
 
@@ -16,7 +17,7 @@ namespace NBB.Http.Effects
             }
         }
 
-        internal class Handler : ISideEffectHandler<SideEffect, HttpResponseMessage>
+        public class Handler : ISideEffectHandler<SideEffect, HttpResponseMessage>
         {
             private readonly IHttpClientFactory _httpClientFactory;
 
@@ -24,10 +25,10 @@ namespace NBB.Http.Effects
             {
                 _httpClientFactory = httpClientFactory;
             }
-            public Task<HttpResponseMessage> Handle(SideEffect sideEffect)
+            public Task<HttpResponseMessage> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
                 var httpClient = _httpClientFactory.CreateClient();
-                return httpClient.GetAsync(sideEffect.Url);
+                return httpClient.GetAsync(sideEffect.Url, cancellationToken);
             }
         }
     }

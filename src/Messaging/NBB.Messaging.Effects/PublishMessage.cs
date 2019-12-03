@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using NBB.Core.Effects;
 using NBB.Messaging.Abstractions;
 
@@ -25,9 +26,9 @@ namespace NBB.Messaging.Effects
                 _messageBusPublisher = messageBusPublisher;
             }
 
-            public async Task<int> Handle(SideEffect sideEffect)
+            public async Task<int> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
-                await _messageBusPublisher.PublishAsync(sideEffect.Message as dynamic);
+                await _messageBusPublisher.PublishAsync(sideEffect.Message as dynamic, cancellationToken);
                 return 0;
             }
         }

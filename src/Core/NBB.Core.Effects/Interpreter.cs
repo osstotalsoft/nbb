@@ -1,41 +1,43 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
     public class Interpreter : IInterpreter
     {
-        private readonly SideEffectHandlerFactory _sideEffectHandlerFactory;
+        private readonly ISideEffectHandlerFactory _sideEffectHandlerFactory;
 
-        public Interpreter(SideEffectHandlerFactory sideEffectHandlerFactory)
+        public Interpreter(ISideEffectHandlerFactory sideEffectHandlerFactory)
         {
             _sideEffectHandlerFactory = sideEffectHandlerFactory;
         }
 
-        public Task<T> Interpret<T>(IEffect<T> effect)
+        public Task<T> Interpret<T>(IEffect<T> effect, CancellationToken cancellationToken = default)
         {
-            return InternalInterpret(effect as dynamic);
+            return InternalInterpret(effect as dynamic, cancellationToken);
         }
 
-        private Task<T> InternalInterpret<T>(PureEffect<T> effect)
+        // ReSharper disable once UnusedParameter.Local
+        private Task<T> InternalInterpret<T>(PureEffect<T> effect, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(effect.Value);
         }
 
-        private async Task<T> InternalInterpret<T1, T2, T>(ParallelEffect<T1, T2, T> parallelEffect)
+        private async Task<T> InternalInterpret<T1, T2, T>(ParallelEffect<T1, T2, T> parallelEffect, CancellationToken cancellationToken = default)
         {
-            var t1 = Interpret(parallelEffect.LeftEffect);
-            var t2 = Interpret(parallelEffect.RightEffect);
+            var t1 = Interpret(parallelEffect.LeftEffect, cancellationToken);
+            var t2 = Interpret(parallelEffect.RightEffect, cancellationToken);
             await Task.WhenAll(t1, t2);
             var nextEffect = parallelEffect.Next(t1.Result, t2.Result);
-            return await Interpret(nextEffect);
+            return await Interpret(nextEffect, cancellationToken);
         }
 
-        private async Task<T> InternalInterpret<TOutput, T>(FreeEffect<TOutput, T> effect)
+        private async Task<T> InternalInterpret<TOutput, T>(FreeEffect<TOutput, T> effect, CancellationToken cancellationToken = default)
         {
             var sideEffectHandler = _sideEffectHandlerFactory.GetSideEffectHandlerFor(effect.SideEffect);
-            var sideEffectResult = await sideEffectHandler.Handle(effect.SideEffect);
+            var sideEffectResult = await sideEffectHandler.Handle(effect.SideEffect, cancellationToken);
             var innerEffect = effect.Next(sideEffectResult);
-            return await Interpret(innerEffect);
+            return await Interpret(innerEffect, cancellationToken);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using NBB.Core.Abstractions;
 using NBB.Core.Effects;
 
@@ -19,9 +21,16 @@ namespace NBB.Application.Effects
 
         public class Handler<TResponse> : ISideEffectHandler<SideEffect<TResponse>, TResponse>
         {
-            public Task<TResponse> Handle(SideEffect<TResponse> sideEffect)
+            private readonly IMediator _mediator;
+
+            public Handler(IMediator mediator)
             {
-                throw new System.NotImplementedException();
+                _mediator = mediator;
+            }
+
+            public Task<TResponse> Handle(SideEffect<TResponse> sideEffect, CancellationToken cancellationToken = default)
+            {
+                return _mediator.Send(sideEffect.Query as IRequest<TResponse>, cancellationToken);
             }
         }
     }
