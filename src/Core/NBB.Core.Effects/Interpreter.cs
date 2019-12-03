@@ -1,16 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
     public class Interpreter : IInterpreter
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly SideEffectHandlerFactory _sideEffectHandlerFactory;
 
-        public Interpreter(IServiceProvider serviceProvider)
+        public Interpreter(SideEffectHandlerFactory sideEffectHandlerFactory)
         {
-            _serviceProvider = serviceProvider;
+            _sideEffectHandlerFactory = sideEffectHandlerFactory;
         }
 
         public Task<T> Interpret<T>(IEffect<T> effect)
@@ -34,14 +32,10 @@ namespace NBB.Core.Effects
 
         private async Task<T> InternalInterpret<TOutput, T>(FreeEffect<TOutput, T> effect)
         {
-            var sideEffectType = effect.SideEffect.GetType();
-            var sideEffectHandlerType = typeof(ISideEffectHandler<,>).MakeGenericType(sideEffectType, typeof(TOutput));
-            var sideEffectHandler = _serviceProvider.GetRequiredService(sideEffectHandlerType) as dynamic;
-            var sideEffectResult = (TOutput)(await sideEffectHandler.Handle(effect.SideEffect));
+            var sideEffectHandler = _sideEffectHandlerFactory.GetSideEffectHandlerFor(effect.SideEffect);
+            var sideEffectResult = await sideEffectHandler.Handle(effect.SideEffect);
             var innerEffect = effect.Next(sideEffectResult);
             return await Interpret(innerEffect);
         }
-
-        
     }
 }

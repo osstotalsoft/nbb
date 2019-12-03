@@ -2,7 +2,13 @@
 
 namespace NBB.Core.Effects
 {
-    public interface ISideEffectHandler<TSideEffect, TOutput> where TSideEffect : ISideEffect<TOutput>
+
+    public interface ISideEffectHandler
+    {
+    }
+
+    public interface ISideEffectHandler<in TSideEffect, TOutput> : ISideEffectHandler 
+        where TSideEffect : ISideEffect<TOutput>
     {
         Task<TOutput> Handle(TSideEffect sideEffect);
     }
