@@ -7,7 +7,7 @@ namespace NBB.Messaging.Effects
 {
     public class PublishMessage
     {
-        public class SideEffect : ISideEffect<Unit>
+        public class SideEffect : ISideEffect
         {
             public object Message { get; }
 
@@ -17,7 +17,7 @@ namespace NBB.Messaging.Effects
             }
         }
 
-        public class Handler : ISideEffectHandler<SideEffect, Unit>
+        public class Handler : ISideEffectHandler<SideEffect>
         {
             private readonly IMessageBusPublisher _messageBusPublisher;
 
@@ -26,10 +26,9 @@ namespace NBB.Messaging.Effects
                 _messageBusPublisher = messageBusPublisher;
             }
 
-            public async Task<Unit> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
+            public async Task Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
                 await _messageBusPublisher.PublishAsync(sideEffect.Message as dynamic, cancellationToken);
-                return Unit.Value;
             }
         }
     }

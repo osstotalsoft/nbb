@@ -38,7 +38,9 @@ namespace NBB.Core.Effects
                 }
 
                 var outputType = GetFirstTypeParamForOpenGenericInterface(sideEffectType, typeof(ISideEffect<>));
-                return typeof(ISideEffectHandler<,>).MakeGenericType(sideEffType, outputType);
+                return outputType == typeof(Unit)
+                    ? typeof(ISideEffectHandler<>).MakeGenericType(sideEffType)
+                    : typeof(ISideEffectHandler<,>).MakeGenericType(sideEffType, outputType);
             });
 
             return handlerType;

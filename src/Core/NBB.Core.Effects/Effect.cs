@@ -8,6 +8,12 @@ namespace NBB.Core.Effects
         {
             return new FreeEffect<T, T>(sideEffect, x => new PureEffect<T>(x));
         }
+
+        public static IEffect<T> Pure<T>(T value)
+        {
+            return new PureEffect<T>(value);
+        }
+
         public static IEffect<(T1, T2)> Parallel<T1, T2>(IEffect<T1> e1, IEffect<T2> e2)
         {
             return ParallelEffect<T1, T2, (T1, T2)>.From(e1, e2, (t1, t2) => (t1, t2));
@@ -21,6 +27,16 @@ namespace NBB.Core.Effects
         public static IEffect<TResult> Then<T, TResult>(this IEffect<T> effect, Func<T, TResult> selector)
         {
             return effect.Map(selector);
+        }
+
+        public static IEffect ToUnit<T>(this IEffect<T> effect)
+        {
+            return new UnitEffect<T>(effect);
+        }
+
+        public static IEffect<TResult> Then<TResult>(this IEffect effect, IEffect<TResult> next)
+        {
+            return effect.Bind(_ => next);
         }
     }
 }

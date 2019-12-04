@@ -26,6 +26,22 @@ namespace NBB.Core.Effects.Tests
         }
 
         [Fact]
+        public void Should_return_handler_for_void_returning_side_effect()
+        {
+            //Arrange
+            var services = new ServiceCollection();
+            services.AddScoped<ISideEffectHandler<VoidReturning.SideEffect>, VoidReturning.Handler>();
+            using var container = services.BuildServiceProvider();
+            var sut = new SideEffectHandlerFactory(container);
+
+            //Act
+            var sideEffectHandlerType = sut.GetSideEffectHandlerFor(new VoidReturning.SideEffect());
+
+            //Assert
+            sideEffectHandlerType.Should().NotBeNull();
+        }
+
+        [Fact]
         public void Should_return_handler_for_generic_side_effect()
         {
             //Arrange
@@ -68,6 +84,22 @@ namespace NBB.Core.Effects.Tests
         public class Handler<TResponse> : ISideEffectHandler<SideEffect<TResponse>, TResponse>
         {
             public Task<TResponse> Handle(SideEffect<TResponse> sideEffect, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
+    public class VoidReturning
+    {
+        public class SideEffect: ISideEffect
+        {
+
+        }
+
+        public class Handler : ISideEffectHandler<SideEffect>
+        {
+            public Task Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
                 throw new NotImplementedException();
             }

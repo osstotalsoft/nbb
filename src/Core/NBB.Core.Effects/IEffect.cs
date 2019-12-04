@@ -7,4 +7,8 @@ namespace NBB.Core.Effects
         IEffect<TResult> Map<TResult>(Func<T, TResult> selector);
         IEffect<TResult> Bind<TResult>(Func<T, IEffect<TResult>> computation);
     }
+
+    public interface IEffect : IEffect<Unit>
+    {
+    }
 }

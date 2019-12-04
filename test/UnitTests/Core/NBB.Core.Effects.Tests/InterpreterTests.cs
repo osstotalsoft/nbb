@@ -64,5 +64,21 @@ namespace NBB.Core.Effects.Tests
             sideEffectHandler.Verify(x=> x.Handle(sideEffect, default), Times.Once);
             result.Should().Be(sideEffectValue);
         }
+
+        [Fact]
+        public async Task Interpret_unit_effect_should_return_unit_value()
+        {
+            //Arrange
+            var sideEffectHandlerFactory = new Mock<ISideEffectHandlerFactory>();
+            var sut = new Interpreter(sideEffectHandlerFactory.Object);
+            var value = "test";
+            var effect = new PureEffect<string>(value).ToUnit();
+
+            //Act
+            var result = await sut.Interpret(effect);
+
+            //Assert
+            result.Should().Be(Unit.Value);
+        }
     }
 }

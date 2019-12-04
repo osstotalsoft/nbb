@@ -17,7 +17,7 @@ namespace NBB.Application.Effects.Tests
         {
             //Arrange
             var services = new ServiceCollection();
-            //services.AddSingleton(Mock.Of<IMessageBusPublisher>());
+            services.AddSingleton(Mock.Of<IMediator>());
 
             //Act
             services.AddMediatorEffects();

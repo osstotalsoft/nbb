@@ -23,6 +23,12 @@ namespace NBB.Core.Effects
             return Task.FromResult(effect.Value);
         }
 
+        private async Task<Unit> InternalInterpret<T>(UnitEffect<T> effect, CancellationToken cancellationToken = default)
+        {
+            await Interpret(effect.InnerEffect, cancellationToken);
+            return Unit.Value;
+        }
+
         private async Task<T> InternalInterpret<T1, T2, T>(ParallelEffect<T1, T2, T> parallelEffect, CancellationToken cancellationToken = default)
         {
             var t1 = Interpret(parallelEffect.LeftEffect, cancellationToken);

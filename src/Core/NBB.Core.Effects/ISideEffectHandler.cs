@@ -13,4 +13,10 @@ namespace NBB.Core.Effects
     {
         Task<TOutput> Handle(TSideEffect sideEffect, CancellationToken cancellationToken = default);
     }
+
+    public interface ISideEffectHandler<in TSideEffect> : ISideEffectHandler
+        where TSideEffect : ISideEffect
+    {
+        Task Handle(TSideEffect sideEffect, CancellationToken cancellationToken = default);
+    }
 }

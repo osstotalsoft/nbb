@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
@@ -13,9 +12,17 @@ namespace NBB.Core.Effects
             _innerSideEffectHandler = innerSideEffectHandler;
         }
 
-        public Task<TOutput> Handle(ISideEffect<TOutput> sideEffect, CancellationToken cancellationToken = default)
+        public async Task<TOutput> Handle(ISideEffect<TOutput> sideEffect,
+            CancellationToken cancellationToken = default)
         {
-            return (_innerSideEffectHandler as dynamic).Handle(sideEffect, cancellationToken);
+            var task = (_innerSideEffectHandler as dynamic).Handle(sideEffect, cancellationToken);
+            if (typeof(TOutput) == typeof(Unit))
+            {
+                await task;
+                return Unit.Value as dynamic;
+            }
+
+            return task;
         }
     }
 }

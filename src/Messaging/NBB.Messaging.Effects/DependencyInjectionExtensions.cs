@@ -7,7 +7,7 @@ namespace NBB.Messaging.Effects
     {
         public static void AddMessagingEffects(this IServiceCollection services)
         {
-            services.AddSingleton<ISideEffectHandler<PublishMessage.SideEffect, Unit>, PublishMessage.Handler>();
+            services.AddSingleton<ISideEffectHandler<PublishMessage.SideEffect>, PublishMessage.Handler>();
         }
     }
 }
