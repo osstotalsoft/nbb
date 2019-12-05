@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\NBB.Core.Effects\NBB.Core.Effects.csproj" />
+    <ProjectReference Include="..\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj" />
+  </ItemGroup>
+
+</Project>
