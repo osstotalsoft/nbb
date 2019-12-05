@@ -6,7 +6,7 @@ namespace NBB.Core.Effects
     {
         public static IEffect<T> Of<T>(ISideEffect<T> sideEffect)
         {
-            return new FreeEffect<T, T>(sideEffect, x => new PureEffect<T>(x));
+            return new FreeEffect<T, T>(sideEffect, Pure);
         }
 
         public static IEffect<T> Pure<T>(T value)
@@ -29,14 +29,16 @@ namespace NBB.Core.Effects
             return effect.Map(selector);
         }
 
+        public static IEffect<TResult> Then<TResult>(this IEffect effect, IEffect<TResult> next)
+        {
+            return effect.Bind(_ => next);
+        }
+
         public static IEffect ToUnit<T>(this IEffect<T> effect)
         {
             return new UnitEffect<T>(effect);
         }
 
-        public static IEffect<TResult> Then<TResult>(this IEffect effect, IEffect<TResult> next)
-        {
-            return effect.Bind(_ => next);
-        }
+        
     }
 }
