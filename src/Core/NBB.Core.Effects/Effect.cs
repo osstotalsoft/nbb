@@ -38,7 +38,5 @@ namespace NBB.Core.Effects
         {
             return new UnitEffect<T>(effect);
         }
-
-        
     }
 }
