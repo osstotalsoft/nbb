@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
 using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.Builder;
-using NBB.ProcessManager.Definition.Effects;
 using ProcessManagerSample.Commands;
 using ProcessManagerSample.Events;
 using ProcessManagerSample.Queries;
 using System;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using MediatR;
+using System.Collections.Generic;
+using NBB.Core.Effects;
+
+using NBB.Application.Effects;
+using NBB.Messaging.Effects;
 
 namespace ProcessManagerSample
 {
@@ -39,16 +39,17 @@ namespace ProcessManagerSample
                 })
                 .Then((orderCreated, data) =>
                 {
-                    var q1 = Query(new GetClientQuery());
-                    var q2 = Effect.Parallel(Query(new GetPartnerQuery()), Query(new GetPartnerQuery()));
+                    var q1 = Mediator.SendQuery(new GetClientQuery());
+                    var q2 = Effect.Parallel(Mediator.SendQuery(new GetPartnerQuery()), Mediator.SendQuery(new GetPartnerQuery()));
 
                     var queries =
                         from x in q1
                         from y in q2
-                        select x.ClientCode + string.Join("; ", y.Select(z => z.PartnerName));
+                        select new List<string> { x.ClientCode, y.Item1.PartnerCode, y.Item2.PartnerCode };
 
-                    return queries.ContinueWith(partners => PublishMessage(new DoPayment()))
-                        .ContinueWith(partner => PublishMessage(new DoPayment()));
+                    return queries
+                        .Then(partners => MessageBus.Publish(new DoPayment()))
+                        .Then(partner => MessageBus.Publish(new DoPayment()));
                 })
                 .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
 
@@ -61,9 +62,9 @@ namespace ProcessManagerSample
                 .Complete();
         }
 
-        private static IEffect<Unit> OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
+        private static IEffect OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
-            return PublishMessage(new DoPayment());
+            return MessageBus.Publish(new DoPayment());
         }
 
         private static DoPayment OrderPaymentCreatedHandler(OrderPaymentCreated orderPaymentReceived, InstanceData<OrderProcessManagerData> state)

@@ -12,9 +12,9 @@ namespace ProcessManagerSample.Queries
 
     public class GetPartnerQueryHandler : IRequestHandler<GetPartnerQuery, Partner>
     {
-        public async Task<Partner> Handle(GetPartnerQuery request, CancellationToken cancellationToken)
+        public Task<Partner> Handle(GetPartnerQuery request, CancellationToken cancellationToken)
         {
-            return new Partner("ion","vasile");
+            return Task.FromResult(new Partner("ion","vasile"));
         }
     }
 

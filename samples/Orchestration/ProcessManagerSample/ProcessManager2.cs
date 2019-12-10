@@ -1,5 +1,5 @@
-﻿using NBB.ProcessManager.Definition.Builder;
-using NBB.ProcessManager.Definition.Effects;
+﻿using NBB.Core.Effects;
+using NBB.ProcessManager.Definition.Builder;
 using ProcessManagerSample.Events;
 
 namespace ProcessManagerSample
@@ -26,7 +26,7 @@ namespace ProcessManagerSample
             Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
 
             StartWith<OrderCreated>()
-                .Then((created, data) => NoEffect.Instance)
+                .Then((created, data) => Effect.Pure())
                 .Complete();
         }
     }
