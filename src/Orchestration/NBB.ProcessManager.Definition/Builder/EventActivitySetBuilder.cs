@@ -1,6 +1,8 @@
 ﻿using NBB.Core.Abstractions;
-using NBB.ProcessManager.Definition.Effects;
 using System;
+using NBB.Core.Effects;
+using NBB.Messaging.Effects;
+using NBB.ProcessManager.Definition.SideEffects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -20,7 +22,7 @@ namespace NBB.ProcessManager.Definition.Builder
             _eventActivitySet.AddEffectHandler((whenEvent, data) =>
             {
                 if (predicate != null && !predicate(whenEvent, data))
-                    return NoEffect.Instance;
+                    return Effect.Pure();
                 return func(whenEvent, data);
             });
             return this;
@@ -43,7 +45,7 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var command = handler(whenEvent, state);
-                return Effect.PublishMessage(command);
+                return MessageBus.Publish(command);
             }, predicate);
             return this;
         }
@@ -52,8 +54,7 @@ namespace NBB.ProcessManager.Definition.Builder
             EventPredicate<TEvent, TData> predicate = null)
             where T : IEvent
         {
-            Then((whenEvent, state) =>
-                Effect.RequestTimeout(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state), typeof(T)), predicate);
+            Then((whenEvent, state) => Timeout.Request(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state)), predicate);
             return this;
         }
 
@@ -63,7 +64,7 @@ namespace NBB.ProcessManager.Definition.Builder
             Then((whenEvent, state) =>
             {
                 var @event = handler(whenEvent, state);
-                return Effect.PublishMessage(@event);
+                return MessageBus.Publish(@event);
             }, predicate);
             return this;
         }
@@ -71,7 +72,7 @@ namespace NBB.ProcessManager.Definition.Builder
         public void Complete(EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.UseForCompletion(predicate);
-            Then((whenEvent, state) => Effect.CancelTimeout(state.InstanceId), predicate);
+            Then((whenEvent, state) => Timeout.Cancel(state.InstanceId.ToString()), predicate);
         }
     }
 }

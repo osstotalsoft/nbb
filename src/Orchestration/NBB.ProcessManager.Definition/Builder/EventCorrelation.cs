@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
-using NBB.Core.Abstractions;
 
 namespace NBB.ProcessManager.Definition.Builder
 {

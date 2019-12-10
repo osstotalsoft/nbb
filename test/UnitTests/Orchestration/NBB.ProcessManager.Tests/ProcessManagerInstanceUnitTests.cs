@@ -1,12 +1,12 @@
 using FluentAssertions;
 using NBB.ProcessManager.Definition.Builder;
-using NBB.ProcessManager.Definition.Effects;
 using NBB.ProcessManager.Runtime;
 using NBB.ProcessManager.Tests.Commands;
 using NBB.ProcessManager.Tests.Events;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NBB.Messaging.Effects;
 using NBB.ProcessManager.Definition;
 using Xunit;
 
@@ -134,7 +134,7 @@ namespace NBB.ProcessManager.Tests
                     })
                     .Then((ev, state) =>
                     {
-                        var effect = Effect.PublishMessage(new DoPayment());
+                        var effect = MessageBus.Publish(new DoPayment());
                         return effect;
                     });
             }

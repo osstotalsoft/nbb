@@ -1,7 +1,6 @@
-﻿using MediatR;
-using NBB.Core.Abstractions;
-using NBB.ProcessManager.Definition.Effects;
+﻿using NBB.Core.Abstractions;
 using System;
+using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -19,7 +18,7 @@ namespace NBB.ProcessManager.Definition.Builder
         private EventPredicate<TEvent, TData> _completionPredicate;
 
         private static readonly SetStateFunc<IEvent, TData> NoSetStateFunc = (@event, data) => data.Data;
-        private static readonly EffectFunc<IEvent, TData> NoEffectFunc = (@event, data) => NoEffect.Instance;
+        private static readonly EffectFunc<IEvent, TData> NoEffectFunc = (@event, data) => Effect.Pure();
 
 
         public EventActivitySet(bool startsProcess, EventPredicate<TEvent, TData> starterPredicate = null)
@@ -34,14 +33,14 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public void AddEffectHandler(EffectFunc<TEvent, TData> func)
         {
-            IEffect<Unit> newFunc(IEvent @event, InstanceData<TData> data)
+            IEffect NewFunc(IEvent @event, InstanceData<TData> data)
             {
                 if (_starterPredicate != null && !_starterPredicate((TEvent) @event, data))
-                    return NoEffect.Instance;
+                    return Effect.Pure();
                 return func((TEvent) @event, data);
             }
 
-            EffectFunc = EffectFuncs.Sequential(EffectFunc, newFunc);
+            EffectFunc = EffectFuncs.Sequential(EffectFunc, NewFunc);
         }
 
         public void AddSetStateHandler(SetStateFunc<TEvent, TData> func)
