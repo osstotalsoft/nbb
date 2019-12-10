@@ -7,7 +7,6 @@ using NBB.MultiTenancy.Data.EntityFramework.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,13 +16,13 @@ namespace NBB.MultiTenancy.Data.EntityFramework
         where TEntity : class
     {
         private readonly ITenantService _tenantService;
-        private readonly TenantDatabaseConfiguration _tenantDatabaseConfiguration;
+        private readonly ITenantDatabaseConfigService _tenantDatabaseConfigService;
         private readonly IUow<TEntity> _inner;
 
-        public MultitenantUowDecorator(IUow<TEntity> inner, ITenantService tenantService, TenantDatabaseConfiguration tenantDatabaseConfiguration)
+        public MultitenantUowDecorator(IUow<TEntity> inner, ITenantService tenantService, ITenantDatabaseConfigService tenantDatabaseConfigService)
         {
 
-            _tenantDatabaseConfiguration = tenantDatabaseConfiguration;
+            _tenantDatabaseConfigService = tenantDatabaseConfigService;
             _inner = inner;
             _tenantService = tenantService;
         }
@@ -39,22 +38,17 @@ namespace NBB.MultiTenancy.Data.EntityFramework
                 return;
             }
 
-            if (_tenantDatabaseConfiguration.IsReadOnly)
-            {
-                throw new Exception("Readonly");
-            }
-
             var changes = _inner.GetChanges().ToList();
 
-            if (_tenantDatabaseConfiguration.UseDefaultValueOnSave)
+            if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
             {
                 UpdateDefaultTenantId(changes, tenant);
             }
 
-            if (_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
             {
                 ThrowIfMultipleTenants(changes, tenant);
-            }
+            }            
 
             await _inner.SaveChangesAsync();
         }
@@ -68,17 +62,12 @@ namespace NBB.MultiTenancy.Data.EntityFramework
 
             var toCheck = GetViolations(changes);
 
-            if (toCheck.Count >= 1 && _tenantDatabaseConfiguration.IsReadOnly)
-            {
-                throw new Exception("Read only Db context");
-            }
-
             if (toCheck.Count == 0)
             {
                 return;
             }
 
-            if (!_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (!_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
             {
                 return;
             }
@@ -95,20 +84,14 @@ namespace NBB.MultiTenancy.Data.EntityFramework
         }
 
         protected List<Guid> GetViolations(List<TEntity> changes)
-        {
-            var optionalIds = (from e in changes
-                               where e is IMayHaveTenant && !((IMayHaveTenant)e).TenantId.IsNullOrDefault()
-                               select ((IMayHaveTenant)e).TenantId)
-                       .Distinct()
-                       .ToList();
-
+        {           
             var mandatoryIds = (from e in changes
                                 where e is IMustHaveTenant
                                 select ((IMustHaveTenant)e).TenantId)
                        .Distinct()
                        .ToList();
 
-            var toCheck = optionalIds.Union(mandatoryIds).ToList();
+            var toCheck = mandatoryIds;
             return toCheck;
         }
 

@@ -1,16 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Services;
+using NBB.MultiTenancy.Data.Abstractions;
+using NBB.MultiTenancy.Data.EntityFramework.Exceptions;
+using NBB.MultiTenancy.Data.EntityFramework.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System;
-using System.Linq.Expressions;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Metadata;
-using System.Linq;
-using NBB.MultiTenancy.Data.Abstractions;
-using NBB.MultiTenancy.Data.EntityFramework.Extensions;
-using NBB.MultiTenancy.Data.EntityFramework.Exceptions;
 
 namespace NBB.MultiTenancy.Data.EntityFramework
 {
@@ -18,33 +18,21 @@ namespace NBB.MultiTenancy.Data.EntityFramework
     {
         private readonly Tenant _tenant;
         private readonly ITenantService _tenantService;
-        private readonly TenantDatabaseConfiguration _tenantDatabaseConfiguration;
+        private readonly ITenantDatabaseConfigService _tenantDatabaseConfigService;
 
-        public MultiTenantDbContext(ITenantService tenantService, TenantDatabaseConfiguration tenantDatabaseConfiguration)
+        public MultiTenantDbContext(ITenantService tenantService, ITenantDatabaseConfigService tenantDatabaseConfigService)
         {
             _tenantService = tenantService;
-            _tenantDatabaseConfiguration = tenantDatabaseConfiguration;
+            _tenantDatabaseConfigService = tenantDatabaseConfigService;
 
-            _tenant = _tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult();
-
-            if (_tenantDatabaseConfiguration.IsReadOnly)
-            {
-                ChangeTracker.AutoDetectChangesEnabled = false;
-                ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            }
+            _tenant = _tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult();            
         }
 
         #region base
 
-        public Expression<Func<T, bool>> GetMandatoryFilter<T>(ModelBuilder modelBuilder, T tenantId) where T : class, IMustHaveTenant
+        public Expression<Func<T, bool>> GetMandatoryFilter<T>(T tenantId) where T : class, IMustHaveTenant
         {
             Expression<Func<T, bool>> filter = t => t.TenantId.Equals(tenantId);
-            return filter;
-        }
-
-        public Expression<Func<T, bool>> GetOptionalFilter<T>(ModelBuilder modelBuilder, Guid tenantId) where T : class, IMayHaveTenant
-        {
-            Expression<Func<T, bool>> filter = t => !t.TenantId.IsNullOrDefault();
             return filter;
         }
 
@@ -73,44 +61,20 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             });
         }
 
-        protected virtual void AddQueryFilters(ModelBuilder modelBuilder, List<IMutableEntityType> optional, List<IMutableEntityType> mandatory)
+        protected virtual void AddQueryFilters(ModelBuilder modelBuilder, List<IMutableEntityType> mandatory)
         {
             if (_tenant == null)
             {
                 return;
             }
 
-            var tenantId = _tenant.TenantId;
-
-            optional.ForEach(t =>
-            {
-                var filter = GetOptionalFilter(modelBuilder, tenantId as dynamic);
-                modelBuilder.Entity(t.ClrType).HasQueryFilter((LambdaExpression)filter);
-            });
+            var tenantId = _tenant.TenantId;            
 
             mandatory.ToList().ForEach(t =>
             {
-                var filter = GetMandatoryFilter(modelBuilder, tenantId as dynamic);
+                var filter = GetMandatoryFilter(tenantId as dynamic);
                 modelBuilder.Entity(t.ClrType).HasQueryFilter((LambdaExpression)filter);
             });
-        }
-
-        protected List<Guid> GetViolationsByInheritance()
-        {
-            var optionalIds = (from e in ChangeTracker.Entries()
-                               where e.Entity is IMayHaveTenant && !((IMayHaveTenant)e.Entity).TenantId.IsNullOrDefault()
-                               select ((IMayHaveTenant)e.Entity).TenantId)
-                       .Distinct()
-                       .ToList();
-
-            var mandatoryIds = (from e in ChangeTracker.Entries()
-                                where e.Entity is IMustHaveTenant
-                                select ((IMustHaveTenant)e.Entity).TenantId)
-                       .Distinct()
-                       .ToList();
-
-            var toCheck = optionalIds.Union(mandatoryIds).ToList();
-            return toCheck;
         }
 
         protected void UpdateDefaultTenantId()
@@ -129,9 +93,20 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             }
         }
 
+        private Guid GetTenantId(object src)
+        {
+            return Guid.Parse(src.GetType().GetProperty("TenantId").GetValue(src, null).ToString());
+        }
+
         protected List<Guid> GetViolations()
         {
-            var list = GetViolationsByInheritance();
+            var list = (from e in ChangeTracker.Entries()
+                        //where e.Entity is IMustHaveTenant
+                        //select ((IMustHaveTenant)e.Entity).TenantId)
+                        where e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0
+                        select GetTenantId(e.Entity))
+                        .Distinct()
+                        .ToList();
 
             return list.Distinct().ToList();
         }
@@ -144,18 +119,14 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             }
 
             var toCheck = GetViolations();
-
-            if (toCheck.Count >= 1 && _tenantDatabaseConfiguration.IsReadOnly)
-            {
-                throw new Exception("Read only Db context");
-            }
+           
 
             if (toCheck.Count == 0)
             {
                 return;
             }
 
-            if (!_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (!_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 return;
             }
@@ -175,7 +146,7 @@ namespace NBB.MultiTenancy.Data.EntityFramework
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            _tenantDatabaseConfiguration.ConfigureConnection(_tenant);
+            optionsBuilder.UseSqlServer(_tenantDatabaseConfigService.GetConnectionString(_tenant.TenantId));
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -186,26 +157,24 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             {
                 return;
             }
-            if (_tenantDatabaseConfiguration.UseDefaultValueOnSave)
+
+            if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
-                ApplyDefaultValues(modelBuilder);
+                UpdateDefaultTenantId();
             }
 
-            if (!_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (!_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
-                base.OnModelCreating(modelBuilder);
-                return;
+                ThrowIfMultipleTenants();
             }
-            var optional = new List<IMutableEntityType>();
+
             var mandatory = new List<IMutableEntityType>();
-            optional.AddRange(modelBuilder.Model.GetEntityTypes().Where(p => typeof(IMayHaveTenant).IsAssignableFrom(p.GetType())).ToList());
+            
             mandatory.AddRange(modelBuilder.Model.GetEntityTypes().Where(p => typeof(IMustHaveTenant).IsAssignableFrom(p.ClrType)).ToList());
 
-            optional = optional.Distinct().ToList();
             mandatory = mandatory.Distinct().ToList();
 
-            AddQueryFilters(modelBuilder, optional, mandatory);
-
+            AddQueryFilters(modelBuilder, mandatory);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -217,19 +186,14 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             if (_tenant == null)
             {
                 return saveAction();
-            }
+            }            
 
-            if (_tenantDatabaseConfiguration.IsReadOnly)
-            {
-                throw new Exception("Readonly");
-            }
-
-            if (_tenantDatabaseConfiguration.UseDefaultValueOnSave)
+            if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 UpdateDefaultTenantId();
             }
 
-            if (_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (!_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 ThrowIfMultipleTenants();
             }
@@ -241,7 +205,6 @@ namespace NBB.MultiTenancy.Data.EntityFramework
         public override int SaveChanges()
         {
             Func<int> saveAction = () => base.SaveChanges();
-
             return CheckContextIntegrity(saveAction);
             
         }
@@ -259,17 +222,12 @@ namespace NBB.MultiTenancy.Data.EntityFramework
                 return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
             }
 
-            if (_tenantDatabaseConfiguration.IsReadOnly)
-            {
-                throw new Exception("Readonly");
-            }
-
-            if (_tenantDatabaseConfiguration.UseDefaultValueOnSave)
+            if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 UpdateDefaultTenantId();
             }
 
-            if (_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (!_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 ThrowIfMultipleTenants();
             }
@@ -284,17 +242,12 @@ namespace NBB.MultiTenancy.Data.EntityFramework
                 return base.SaveChangesAsync(cancellationToken);
             }
 
-            if (_tenantDatabaseConfiguration.IsReadOnly)
-            {
-                throw new Exception("Readonly");
-            }
-
-            if (_tenantDatabaseConfiguration.UseDefaultValueOnSave)
+            if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 UpdateDefaultTenantId();
             }
 
-            if (_tenantDatabaseConfiguration.RestrictCrossTenantAccess)
+            if (!_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
                 ThrowIfMultipleTenants();
             }

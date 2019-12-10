@@ -6,9 +6,7 @@ namespace NBB.MultiTenancy.Data.EntityFramework.Extensions
     public static class DependencyInjectionExtensions
     {
         public static IServiceCollection AddEfMultiTenantServices(this IServiceCollection services)
-
         {
-            // services.AddScoped<IUow<>, EfUow<>>();
             services
             .Decorate(typeof(IUow<>), typeof(MultitenantUowDecorator<>));
 
