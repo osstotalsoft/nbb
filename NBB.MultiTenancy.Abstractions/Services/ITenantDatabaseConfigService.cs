@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NBB.MultiTenancy.Data.Abstractions
+namespace NBB.MultiTenancy.Abstractions.Services
 {
     public interface ITenantDatabaseConfigService
     {

@@ -14,7 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
-    <ProjectReference Include="..\NBB.MultiTenancy.Data.Abstractions\NBB.MultiTenancy.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Data\NBB.Data.Abstractions\NBB.Data.Abstractions.csproj" />
   </ItemGroup>
   
 

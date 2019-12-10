@@ -4,7 +4,6 @@ using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Data.Abstractions;
 using NBB.MultiTenancy.Data.EntityFramework.Exceptions;
-using NBB.MultiTenancy.Data.EntityFramework.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,41 +24,10 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             _tenantService = tenantService;
             _tenantDatabaseConfigService = tenantDatabaseConfigService;
 
-            _tenant = _tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult();            
+            _tenant = _tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult();
         }
 
         #region base
-
-        public Expression<Func<T, bool>> GetMandatoryFilter<T>(T tenantId) where T : class, IMustHaveTenant
-        {
-            Expression<Func<T, bool>> filter = t => t.TenantId.Equals(tenantId);
-            return filter;
-        }
-
-        public void SetDefaultValue<T>(ModelBuilder modelBuilder, T tenantId) where T : class, IMustHaveTenant
-        {
-            modelBuilder.Entity<T>().Property(nameof(IMustHaveTenant.TenantId)).HasDefaultValue(tenantId);
-        }
-
-        protected void ApplyDefaultValues(ModelBuilder modelBuilder)
-        {
-            if (_tenant == null)
-            {
-                return;
-            }
-            var mandatory = new List<IMutableEntityType>();
-
-            mandatory.AddRange(modelBuilder.Model.GetEntityTypes().Where(p => typeof(IMustHaveTenant).IsAssignableFrom(p.ClrType)).ToList());
-
-            mandatory = mandatory.Distinct().ToList();
-
-            var tenantId = _tenant.TenantId;
-
-            mandatory.ToList().ForEach(t =>
-            {
-                SetDefaultValue(modelBuilder, tenantId as dynamic);
-            });
-        }
 
         protected virtual void AddQueryFilters(ModelBuilder modelBuilder, List<IMutableEntityType> mandatory)
         {
@@ -68,11 +36,11 @@ namespace NBB.MultiTenancy.Data.EntityFramework
                 return;
             }
 
-            var tenantId = _tenant.TenantId;            
+            var tenantId = _tenant.TenantId;
 
             mandatory.ToList().ForEach(t =>
             {
-                var filter = GetMandatoryFilter(tenantId as dynamic);
+                Expression<Func<Guid, bool>> filter = t => EF.Property<Guid>(t, "TenantId") == tenantId;
                 modelBuilder.Entity(t.ClrType).HasQueryFilter((LambdaExpression)filter);
             });
         }
@@ -85,11 +53,15 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             }
 
             var list = ChangeTracker.Entries()
-                .Where(e => e.Entity is IMustHaveTenant && ((IMustHaveTenant)e.Entity).TenantId.IsNullOrDefault())
-                .Select(e => ((IMustHaveTenant)e.Entity));
+                .Where(e => e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0)
+                .ToList();
+
             foreach (var e in list)
             {
-                e.TenantId = _tenant.TenantId;
+                if (e.State == EntityState.Added || e.State == EntityState.Modified)
+                {
+                    e.Property("TenantId").CurrentValue = _tenant.TenantId;
+                }
             }
         }
 
@@ -101,8 +73,6 @@ namespace NBB.MultiTenancy.Data.EntityFramework
         protected List<Guid> GetViolations()
         {
             var list = (from e in ChangeTracker.Entries()
-                        //where e.Entity is IMustHaveTenant
-                        //select ((IMustHaveTenant)e.Entity).TenantId)
                         where e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0
                         select GetTenantId(e.Entity))
                         .Distinct()
@@ -119,7 +89,6 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             }
 
             var toCheck = GetViolations();
-           
 
             if (toCheck.Count == 0)
             {
@@ -150,6 +119,12 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             base.OnConfiguring(optionsBuilder);
         }
 
+        private static void AddTenantProperty<T>(ModelBuilder modelBuilder, T entity) where T : class
+        {
+            modelBuilder.Entity<T>()
+                .Property<Guid>("TenantId");
+
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             OnTenantModelCreating(modelBuilder);
@@ -158,19 +133,19 @@ namespace NBB.MultiTenancy.Data.EntityFramework
                 return;
             }
 
-            if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
-            {
-                UpdateDefaultTenantId();
-            }
-
-            if (!_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
-            {
-                ThrowIfMultipleTenants();
-            }
-
             var mandatory = new List<IMutableEntityType>();
-            
-            mandatory.AddRange(modelBuilder.Model.GetEntityTypes().Where(p => typeof(IMustHaveTenant).IsAssignableFrom(p.ClrType)).ToList());
+
+            //modelBuilder.Entity<Contact>()
+            //    .Property<DateTime>("LastUpdated");
+
+            var listOfTenantAware = modelBuilder.Model.GetEntityTypes().Where(p => p.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
+
+            foreach (var entity in listOfTenantAware)
+            {
+                AddTenantProperty(modelBuilder, entity as dynamic);
+            }
+
+            mandatory.AddRange(listOfTenantAware);
 
             mandatory = mandatory.Distinct().ToList();
 
@@ -186,7 +161,7 @@ namespace NBB.MultiTenancy.Data.EntityFramework
             if (_tenant == null)
             {
                 return saveAction();
-            }            
+            }
 
             if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
             {
@@ -206,13 +181,12 @@ namespace NBB.MultiTenancy.Data.EntityFramework
         {
             Func<int> saveAction = () => base.SaveChanges();
             return CheckContextIntegrity(saveAction);
-            
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             Func<int> saveAction = () => base.SaveChanges(acceptAllChangesOnSuccess);
-            return CheckContextIntegrity(saveAction);            
+            return CheckContextIntegrity(saveAction);
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
