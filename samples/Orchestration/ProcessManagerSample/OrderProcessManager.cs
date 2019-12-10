@@ -40,12 +40,12 @@ namespace ProcessManagerSample
                 .Then((orderCreated, data) =>
                 {
                     var q1 = Mediator.SendQuery(new GetClientQuery());
-                    var q2 = Effect.Parallel(Mediator.SendQuery(new GetPartnerQuery()), Mediator.SendQuery(new GetPartnerQuery()));
+                    var q2 = Effect.Parallel(Mediator.SendQuery(new GetPartnerQuery()), Mediator.SendQuery(new GetClientQuery()));
 
                     var queries =
                         from x in q1
                         from y in q2
-                        select new List<string> { x.ClientCode, y.Item1.PartnerCode, y.Item2.PartnerCode };
+                        select new List<string> { x.ClientCode, y.Item1.PartnerCode, y.Item2.ClientCode };
 
                     return queries
                         .Then(partners => MessageBus.Publish(new DoPayment()))

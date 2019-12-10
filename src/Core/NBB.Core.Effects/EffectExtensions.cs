@@ -24,6 +24,11 @@ namespace NBB.Core.Effects
             return effect.Bind(_ => next);
         }
 
+        public static IEffect Then(this IEffect effect, IEffect next)
+        {
+            return effect.Bind(_ => next).ToUnit();
+        }
+
         public static IEffect ToUnit<T>(this IEffect<T> effect)
         {
             return new UnitEffect<T>(effect);
