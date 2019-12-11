@@ -4,19 +4,19 @@ using NBB.ProcessManager.Definition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.ProcessManager.Definition.Effects;
+using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Runtime.Persistence
 {
     public class InstanceDataRepository : IInstanceDataRepository
     {
         private readonly IEventStore _eventStore;
-        private readonly IEffectRunner _effectRunner;
+        private readonly IInterpreter _interpreter;
 
-        public InstanceDataRepository(IEventStore eventStore, IEffectRunner effectRunner)
+        public InstanceDataRepository(IEventStore eventStore, IInterpreter interpreter)
         {
             _eventStore = eventStore;
-            _effectRunner = effectRunner;
+            _interpreter = interpreter;
         }
 
         public async Task Save<TData>(Instance<TData> instance, CancellationToken cancellationToken = default)
@@ -30,7 +30,7 @@ namespace NBB.ProcessManager.Runtime.Persistence
 
             await _eventStore.AppendEventsToStreamAsync(streamId, events, aggregateLoadedAtVersion, cancellationToken);
             foreach (var effect in effects)
-                await effect.Computation(_effectRunner);
+                await _interpreter.Interpret(effect, cancellationToken);
         }
 
         public async Task<Instance<TData>> Get<TData>(IDefinition<TData> definition, object identity, CancellationToken cancellationToken = default)

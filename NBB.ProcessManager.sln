@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProcessManager.Definition", "src\Orchestration\NBB.ProcessManager.Definition\NBB.ProcessManager.Definition.csproj", "{4577E784-9615-4CD7-B425-0F1A855E36C6}"
 EndProject
@@ -38,6 +38,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Correlation", "src\Correlation\NBB.Correlation\NBB.Correlation.csproj", "{0350CF12-F85D-4FAD-B7F2-F531350D400E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_NBB", "_NBB", "{FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Effects", "src\Core\NBB.Core.Effects\NBB.Core.Effects.csproj", "{DACB9335-ADED-42A8-A09E-F47AC5795BF3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.Effects", "src\Application\NBB.Application.Effects\NBB.Application.Effects.csproj", "{7A0CC3EC-DEF9-479E-9D12-B27FC8CF1C11}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Http.Effects", "src\Http\NBB.Http.Effects\NBB.Http.Effects.csproj", "{2F5DB9AB-4E08-4953-88A8-D4F876D137DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Effects", "src\Messaging\NBB.Messaging.Effects\NBB.Messaging.Effects.csproj", "{069D18D3-199D-4ABB-B8F0-680B0D4A9E4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +101,22 @@ Global
 		{0350CF12-F85D-4FAD-B7F2-F531350D400E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0350CF12-F85D-4FAD-B7F2-F531350D400E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0350CF12-F85D-4FAD-B7F2-F531350D400E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DACB9335-ADED-42A8-A09E-F47AC5795BF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DACB9335-ADED-42A8-A09E-F47AC5795BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DACB9335-ADED-42A8-A09E-F47AC5795BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DACB9335-ADED-42A8-A09E-F47AC5795BF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A0CC3EC-DEF9-479E-9D12-B27FC8CF1C11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A0CC3EC-DEF9-479E-9D12-B27FC8CF1C11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A0CC3EC-DEF9-479E-9D12-B27FC8CF1C11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A0CC3EC-DEF9-479E-9D12-B27FC8CF1C11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F5DB9AB-4E08-4953-88A8-D4F876D137DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5DB9AB-4E08-4953-88A8-D4F876D137DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5DB9AB-4E08-4953-88A8-D4F876D137DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5DB9AB-4E08-4953-88A8-D4F876D137DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{069D18D3-199D-4ABB-B8F0-680B0D4A9E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{069D18D3-199D-4ABB-B8F0-680B0D4A9E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{069D18D3-199D-4ABB-B8F0-680B0D4A9E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{069D18D3-199D-4ABB-B8F0-680B0D4A9E4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +130,10 @@ Global
 		{0B3E501A-F135-4335-AF57-5D8264951C25} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
 		{8565B8B2-C1ED-4051-8251-F935E07D5C54} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
 		{0350CF12-F85D-4FAD-B7F2-F531350D400E} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
+		{DACB9335-ADED-42A8-A09E-F47AC5795BF3} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
+		{7A0CC3EC-DEF9-479E-9D12-B27FC8CF1C11} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
+		{2F5DB9AB-4E08-4953-88A8-D4F876D137DA} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
+		{069D18D3-199D-4ABB-B8F0-680B0D4A9E4F} = {FF10EAE9-3BC8-4DE8-887E-D76F18FE38CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B129B4E9-576B-48B4-8188-A7CF77755D66}
