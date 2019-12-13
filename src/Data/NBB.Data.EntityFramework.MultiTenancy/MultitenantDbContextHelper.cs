@@ -14,16 +14,18 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     public class MultitenantDbContextHelper
     {
         private readonly ITenantDatabaseConfigService _tenantDatabaseConfigService;
-        public MultitenantDbContextHelper(ITenantDatabaseConfigService tenantDatabaseConfigService)
+        private readonly ITenantService _tenantService;
+
+        public MultitenantDbContextHelper(ITenantDatabaseConfigService tenantDatabaseConfigService, ITenantService tenantService)
         {
             _tenantDatabaseConfigService = tenantDatabaseConfigService;
+            _tenantService = tenantService;
         }
 
         private static void AddTenantProperty<T>(ModelBuilder modelBuilder, T entity) where T : class
         {
             modelBuilder.Entity<T>()
                 .Property<Guid>("TenantId");
-
         }
 
         public void AddTenantIdProperties(ModelBuilder modelBuilder, Tenant tenant)
@@ -34,12 +36,20 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             }
             var mandatory = new List<IMutableEntityType>();
 
-            var listOfTenantAware = modelBuilder.Model.GetEntityTypes().Where(p => p.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
+            var entityTypes = modelBuilder.Model.GetEntityTypes();
+            var listOfTenantAware = modelBuilder.Model.GetEntityTypes().Where(p => p.ClrType.GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
 
             foreach (var entity in listOfTenantAware)
             {
-                AddTenantProperty(modelBuilder, entity as dynamic);
+                var e = modelBuilder.Entity(entity.ClrType);
+                e.Property(typeof(Guid), "TenantId");
             }
+        }
+
+        public void AddQueryFilter<T>(ModelBuilder modelBuilder) where T : class
+        {
+            Expression<Func<T, bool>> filter = t => EF.Property<Guid>(t, "TenantId") == _tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult().TenantId;
+            modelBuilder.Entity<T>().HasQueryFilter((LambdaExpression)filter);
         }
 
         public MultitenantDbContextHelper AddQueryFilters(ModelBuilder modelBuilder, Tenant tenant)
@@ -49,18 +59,16 @@ namespace NBB.Data.EntityFramework.MultiTenancy
                 return this;
             }
 
-            var entities = modelBuilder.Model.GetEntityTypes().Where(p => p.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
-
-            var tenantId = tenant.TenantId;
+            var entities = modelBuilder.Model.GetEntityTypes().Where(p => p.ClrType.GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
 
             entities.ToList().ForEach(t =>
             {
-                Expression<Func<Guid, bool>> filter = t => EF.Property<Guid>(t, "TenantId") == tenantId;
-                modelBuilder.Entity(t.ClrType).HasQueryFilter((LambdaExpression)filter);
+                var method = this.GetType().GetMethod("AddQueryFilter");
+                var genericMethod = method.MakeGenericMethod(t.ClrType);
+                genericMethod.Invoke(this, new object[] { modelBuilder });
             });
             return this;
         }
-
 
         public MultitenantDbContextHelper UpdateDefaultTenantId(DbContext dbContext, Tenant tenant)
         {
@@ -71,28 +79,25 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
             var list = dbContext.ChangeTracker.Entries()
                 .Where(e => e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0)
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
                 .ToList();
 
             foreach (var e in list)
             {
-                if (e.State == EntityState.Added || e.State == EntityState.Modified)
+                var tenantProp = e.Property("TenantId");
+                if ((Guid)tenantProp.CurrentValue == Guid.Empty)
                 {
-                    e.Property("TenantId").CurrentValue = tenant.TenantId;
+                    tenantProp.CurrentValue = tenant.TenantId;
                 }
             }
             return this;
-        }
-
-        private Guid GetTenantId(object src)
-        {
-            return Guid.Parse(src.GetType().GetProperty("TenantId").GetValue(src, null).ToString());
         }
 
         protected List<Guid> GetViolations(DbContext dbContext)
         {
             var list = (from e in dbContext.ChangeTracker.Entries()
                         where e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0
-                        select GetTenantId(e.Entity))
+                        select (Guid)dbContext.Entry(e.Entity).Property("TenantId").CurrentValue)
                         .Distinct()
                         .ToList();
 
@@ -141,7 +146,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
                 UpdateDefaultTenantId(dbContext, tenant);
             }
 
-            if (!_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
+            if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
             {
                 ThrowIfMultipleTenants(dbContext, tenant);
             }

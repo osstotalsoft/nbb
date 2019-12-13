@@ -332,6 +332,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Data.EntityFramework.Mu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Abstractions", "src\MultiTenancy\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj", "{653022CD-6FE5-4C13-B194-013860AAB691}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Data.EntityFramework.MultiTenancy.Tests", "test\UnitTests\Data\NBB.Data.EntityFramework.MultiTenancy.Tests\NBB.Data.EntityFramework.MultiTenancy.Tests.csproj", "{88FED6F7-091A-41CA-B6AA-5407597BA70B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -760,6 +762,10 @@ Global
 		{653022CD-6FE5-4C13-B194-013860AAB691}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{653022CD-6FE5-4C13-B194-013860AAB691}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{653022CD-6FE5-4C13-B194-013860AAB691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88FED6F7-091A-41CA-B6AA-5407597BA70B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88FED6F7-091A-41CA-B6AA-5407597BA70B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88FED6F7-091A-41CA-B6AA-5407597BA70B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88FED6F7-091A-41CA-B6AA-5407597BA70B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -912,6 +918,7 @@ Global
 		{6F4DFEED-A5A5-4725-B5A6-40061198AF1B} = {7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}
 		{F3F8DFC0-FBD0-4F38-9B0E-8A53D4EE4C10} = {F031DBDA-5D3F-4CE6-B133-09CE7E212584}
 		{653022CD-6FE5-4C13-B194-013860AAB691} = {6F4DFEED-A5A5-4725-B5A6-40061198AF1B}
+		{88FED6F7-091A-41CA-B6AA-5407597BA70B} = {834777FF-8E4B-4872-9C41-3A712EABAF86}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

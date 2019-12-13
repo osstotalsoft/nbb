@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
 {
-    public abstract class MultiTenantDbContext : DbContext
+    public class MultiTenantDbContext : DbContext
     {
         private readonly Tenant _tenant;
         private readonly ITenantService _tenantService;
@@ -31,16 +31,15 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            OnTenantModelCreating(modelBuilder);
-
-            _multitenantDbContextHelper.AddTenantIdProperties(modelBuilder, _tenant);
-            _multitenantDbContextHelper.AddQueryFilters(modelBuilder, _tenant);
-
+            BeforeModelCreating(modelBuilder);
             base.OnModelCreating(modelBuilder);
         }
 
-        protected abstract void OnTenantModelCreating(ModelBuilder modelBuilder);
-
+        protected void BeforeModelCreating(ModelBuilder modelBuilder)
+        {
+            _multitenantDbContextHelper.AddTenantIdProperties(modelBuilder, _tenant);
+            _multitenantDbContextHelper.AddQueryFilters(modelBuilder, _tenant);
+        }
 
         public override int SaveChanges()
         {
