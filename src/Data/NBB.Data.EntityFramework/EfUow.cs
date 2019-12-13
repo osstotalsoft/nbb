@@ -27,11 +27,6 @@ namespace NBB.Data.EntityFramework
             return _c.ChangeTracker.Entries<TEntity>().Select(ee => ee.Entity);
         }
 
-        public IEnumerable<object> GetAllChanges()
-        {
-            return _c.ChangeTracker.Entries<TEntity>().Select(ee => ee.Entity);
-        }
-
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();

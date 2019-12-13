@@ -32,13 +32,19 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
             if (tenant == null)
             {
-                return;
+                throw new Exception("Tenant could not be identified");
             }
+
             var mandatory = new List<IMutableEntityType>();
 
             var entityTypes = modelBuilder.Model.GetEntityTypes();
-            var listOfTenantAware = modelBuilder.Model.GetEntityTypes().Where(p => p.ClrType.GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
+            var listByAttributes = modelBuilder.Model.GetEntityTypes().Where(p => p.ClrType.GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
 
+            var listByAnnotations = modelBuilder.Model.GetEntityTypes().Where(e => e.IsMultiTenant())            
+                .Distinct()
+                .ToList();
+
+            var listOfTenantAware = listByAnnotations.Union(listByAttributes).Distinct().ToList();
             foreach (var entity in listOfTenantAware)
             {
                 var e = modelBuilder.Entity(entity.ClrType);
@@ -56,7 +62,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
             if (tenant == null)
             {
-                return this;
+                throw new Exception("Tenant could not be identified");
             }
 
             var entities = modelBuilder.Model.GetEntityTypes().Where(p => p.ClrType.GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0).ToList();
@@ -74,13 +80,20 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
             if (tenant == null)
             {
-                return this;
+                throw new Exception("Tenant could not be identified");
             }
 
             var list = dbContext.ChangeTracker.Entries()
                 .Where(e => e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0)
                 .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
                 .ToList();
+
+            var listByAnnotations =
+                dbContext.ChangeTracker.Entries()
+                .Where(e => e.Metadata.IsMultiTenant() && e.State != EntityState.Unchanged)
+                .ToList();
+            
+            list = list.Union(listByAnnotations).ToList();
 
             foreach (var e in list)
             {
@@ -95,19 +108,42 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         protected List<Guid> GetViolations(DbContext dbContext)
         {
-            var list = (from e in dbContext.ChangeTracker.Entries()
-                        where e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0
-                        select (Guid)dbContext.Entry(e.Entity).Property("TenantId").CurrentValue)
+            var list = GetViolationsByAnnotations(dbContext).Union(GetViolationsByAttributes(dbContext));
+
+            return list.ToList();
+        }
+
+        private List<Guid> GetViolationsByAnnotations(DbContext dbContext)
+        {
+            var list = dbContext
+                        .ChangeTracker
+                        .Entries()
+                        .Where(e => e.Metadata.IsMultiTenant() && e.State != EntityState.Unchanged)
+                        .Select(e => (Guid)dbContext.Entry(e.Entity).Property("TenantId").CurrentValue)
                         .Distinct()
                         .ToList();
 
             return list.Distinct().ToList();
         }
+
+        private List<Guid> GetViolationsByAttributes(DbContext dbContext)
+        {
+            var list = dbContext
+                          .ChangeTracker
+                          .Entries()
+                          .Where(e => e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0 && e.State != EntityState.Unchanged)
+                          .Select(e => (Guid)dbContext.Entry(e.Entity).Property("TenantId").CurrentValue)
+                          .Distinct()
+                          .ToList();
+
+            return list.Distinct().ToList();
+        }
+
         public MultitenantDbContextHelper ThrowIfMultipleTenants(DbContext dbContext, Tenant tenant)
         {
             if (tenant == null)
             {
-                return this;
+                throw new Exception("Tenant could not be identified");
             }
 
             var toCheck = GetViolations(dbContext);
@@ -134,31 +170,11 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             return this;
         }
 
-        public int CheckContextIntegrity(DbContext dbContext, Func<int> saveAction, Tenant tenant)
+        public void CheckContextIntegrity(DbContext dbContext, Tenant tenant)
         {
             if (tenant == null)
             {
-                return saveAction();
-            }
-
-            if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
-            {
-                UpdateDefaultTenantId(dbContext, tenant);
-            }
-
-            if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
-            {
-                ThrowIfMultipleTenants(dbContext, tenant);
-            }
-
-            return saveAction();
-        }
-
-        public Task<int> CheckContextIntegrityAsync(DbContext dbContext, Func<Task<int>> saveAction, Tenant tenant)
-        {
-            if (tenant == null)
-            {
-                return saveAction();
+                throw new Exception("Tenant could not be identified");
             }
 
             if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
@@ -170,8 +186,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             {
                 ThrowIfMultipleTenants(dbContext, tenant);
             }
-
-            return saveAction();
         }
     }
 }

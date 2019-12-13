@@ -11,22 +11,16 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         private readonly Tenant _tenant;
         private readonly ITenantService _tenantService;
-        private readonly ITenantDatabaseConfigService _tenantDatabaseConfigService;
         private readonly MultitenantDbContextHelper _multitenantDbContextHelper;
+        private readonly ITenantDatabaseConfigService _tenantDatabaseConfigService;
 
-        public MultiTenantDbContext(ITenantService tenantService, ITenantDatabaseConfigService tenantDatabaseConfigService, MultitenantDbContextHelper multitenantDbContextHelper)
+        public MultiTenantDbContext(ITenantService tenantService, MultitenantDbContextHelper multitenantDbContextHelper, ITenantDatabaseConfigService tenantDatabaseConfigService)
         {
             _tenantService = tenantService;
-            _tenantDatabaseConfigService = tenantDatabaseConfigService;
             _multitenantDbContextHelper = multitenantDbContextHelper;
+            _tenantDatabaseConfigService = tenantDatabaseConfigService;
 
             _tenant = _tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult();
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_tenantDatabaseConfigService.GetConnectionString(_tenant.TenantId));
-            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,32 +31,40 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         protected void BeforeModelCreating(ModelBuilder modelBuilder)
         {
-            _multitenantDbContextHelper.AddTenantIdProperties(modelBuilder, _tenant);
-            _multitenantDbContextHelper.AddQueryFilters(modelBuilder, _tenant);
+            if (_tenant == null)
+            {
+                throw new Exception("Tenant could not be identified");
+            }
+
+            if (_tenantDatabaseConfigService.IsSharedDatabase(_tenant.TenantId))
+            {
+                _multitenantDbContextHelper.AddTenantIdProperties(modelBuilder, _tenant);
+                _multitenantDbContextHelper.AddQueryFilters(modelBuilder, _tenant);
+            }
         }
 
         public override int SaveChanges()
-        {
-            Func<int> saveAction = () => base.SaveChanges();
-            return _multitenantDbContextHelper.CheckContextIntegrity(this, saveAction, _tenant);
+        {            
+            _multitenantDbContextHelper.CheckContextIntegrity(this, _tenant);
+            return base.SaveChanges();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            Func<int> saveAction = () => base.SaveChanges(acceptAllChangesOnSuccess);
-            return _multitenantDbContextHelper.CheckContextIntegrity(this, saveAction, _tenant);
+            _multitenantDbContextHelper.CheckContextIntegrity(this, _tenant);
+            return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            Func<Task<int>> saveAction = () => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-            return _multitenantDbContextHelper.CheckContextIntegrityAsync(this, saveAction, _tenant);
+            _multitenantDbContextHelper.CheckContextIntegrity(this, _tenant);
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            Func<Task<int>> saveAction = () => base.SaveChangesAsync(cancellationToken);
-            return _multitenantDbContextHelper.CheckContextIntegrityAsync(this, saveAction, _tenant);
+            _multitenantDbContextHelper.CheckContextIntegrity(this, _tenant);
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 }
