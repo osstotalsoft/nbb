@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
-using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Services;
-using NBB.MultiTenancy.Data.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
