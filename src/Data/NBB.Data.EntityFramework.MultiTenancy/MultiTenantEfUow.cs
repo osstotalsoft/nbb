@@ -6,6 +6,7 @@ using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Data.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,13 +20,12 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         private readonly TContext _c;
         private readonly ILogger<MultiTenantEfUow<TEntity, TContext>> _logger;
         private readonly ITenantService _tenantService;
-        private readonly ITenantDatabaseConfigService _tenantDatabaseConfigService;
 
-        public MultiTenantEfUow(TContext c, ITenantService tenantService, ITenantDatabaseConfigService tenantDatabaseConfigService)
+        public MultiTenantEfUow(TContext c, ITenantService tenantService, ILogger<MultiTenantEfUow<TEntity, TContext>> logger)
         {
             _c = c;
             _tenantService = tenantService;
-            _tenantDatabaseConfigService = tenantDatabaseConfigService;
+            _logger = logger;
         }
 
         public IEnumerable<TEntity> GetChanges()
@@ -35,120 +35,39 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             var tenant = await _tenantService.GetCurrentTenantAsync();
-            CheckContextIntegrity(_c, tenant);
-            await _c.SaveChangesAsync(cancellationToken);            
-        }
-
-        public void UpdateDefaultTenantId(DbContext dbContext, Tenant tenant)
-        {
             if (tenant == null)
             {
                 throw new Exception("Tenant could not be identified");
             }
 
-            var list = dbContext.ChangeTracker.Entries()
-                .Where(e => e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0)
-                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
-                .ToList();
+            SetTenantId(tenant.TenantId);
+            await _c.SaveChangesAsync(cancellationToken);
+            
+            stopWatch.Stop();
+            _logger.LogDebug("MultiTenantEfUow.SaveChangesAsync for {EntityType} took {ElapsedMilliseconds} ms", typeof(TEntity).Name, stopWatch.ElapsedMilliseconds);
+        }
 
-            var listByAnnotations =
-                dbContext.ChangeTracker.Entries()
-                .Where(e => e.Metadata.IsMultiTenant() && e.State != EntityState.Unchanged)
-                .ToList();
+        private void SetTenantId(Guid tenantId)
+        {
+            var multiTenantEntities =
+                _c.ChangeTracker.Entries()
+                    .Where(e => e.IsMultiTenant() && e.State != EntityState.Unchanged);
 
-            list = list.Union(listByAnnotations).ToList();
-
-            foreach (var e in list)
+            foreach (var e in multiTenantEntities)
             {
-                var tenantProp = e.Property("TenantId");
-                if ((Guid)tenantProp.CurrentValue == Guid.Empty)
+                var attemptedTenantId = e.GetTenantId();
+                if (attemptedTenantId.HasValue && attemptedTenantId != tenantId)
                 {
-                    tenantProp.CurrentValue = tenant.TenantId;
+                    throw new Exception(
+                        $"Attempted to save entities for TenantId {attemptedTenantId} in the context of TenantId {tenantId}");
                 }
+                e.SetTenantId(tenantId);
             }
         }
 
-        protected List<Guid> GetViolations(DbContext dbContext)
-        {
-            var list = GetViolationsByAnnotations(dbContext).Union(GetViolationsByAttributes(dbContext));
-
-            return list.ToList();
-        }
-
-        private List<Guid> GetViolationsByAnnotations(DbContext dbContext)
-        {
-            var list = dbContext
-                        .ChangeTracker
-                        .Entries()
-                        .Where(e => e.Metadata.IsMultiTenant() && e.State != EntityState.Unchanged)
-                        .Select(e => (Guid)dbContext.Entry(e.Entity).Property("TenantId").CurrentValue)
-                        .Distinct()
-                        .ToList();
-
-            return list.Distinct().ToList();
-        }
-
-        private List<Guid> GetViolationsByAttributes(DbContext dbContext)
-        {
-            var list = dbContext
-                          .ChangeTracker
-                          .Entries()
-                          .Where(e => e.Entity.GetType().GetCustomAttributes(typeof(MustHaveTenantAttribute), true).Length > 0 && e.State != EntityState.Unchanged)
-                          .Select(e => (Guid)dbContext.Entry(e.Entity).Property("TenantId").CurrentValue)
-                          .Distinct()
-                          .ToList();
-
-            return list.Distinct().ToList();
-        }
-
-        public void ThrowIfMultipleTenants(DbContext dbContext, Tenant tenant)
-        {
-            if (tenant == null)
-            {
-                throw new Exception("Tenant could not be identified");
-            }
-
-            var toCheck = GetViolations(dbContext);
-
-            if (toCheck.Count == 0)
-            {
-                return;
-            }
-
-            if (!_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
-            {
-                return;
-            }
-
-            if (toCheck.Count > 1)
-            {
-                throw new CrossTenantUpdateException(toCheck);
-            }
-
-            if (!toCheck.First().Equals(tenant.TenantId))
-            {
-                throw new CrossTenantUpdateException(toCheck);
-            }
-            return;
-        }
-
-        public void CheckContextIntegrity(DbContext dbContext, Tenant tenant)
-        {
-            if (tenant == null)
-            {
-                throw new Exception("Tenant could not be identified");
-            }
-
-            if (_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
-            {
-                UpdateDefaultTenantId(dbContext, tenant);
-            }
-
-            if (!_tenantDatabaseConfigService.IsSharedDatabase(tenant.TenantId))
-            {
-                ThrowIfMultipleTenants(dbContext, tenant);
-            }
-        }
     }
 }
