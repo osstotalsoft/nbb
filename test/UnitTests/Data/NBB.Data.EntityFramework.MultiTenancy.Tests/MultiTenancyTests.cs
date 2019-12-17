@@ -24,13 +24,14 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             var services = new ServiceCollection();
             services.AddSingleton(tenantService);
             services.AddSingleton(tenantDatabaseConfigService);
+            services.AddLogging();
 
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TestDbContext>((sp, options) =>
                 {
                     var tenantId = sp.GetRequiredService<ITenantService>().GetCurrentTenantAsync().Result.TenantId;
                     var conn = sp.GetRequiredService<ITenantDatabaseConfigService>().GetConnectionString(tenantId);
-                    options.UseInMemoryDatabase(conn);
+                    options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
             
 
@@ -48,7 +49,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 
             //assert
             dbContext.Entry(testEntity).GetTenantId().Should().Be(testTenantId);
-
         }
     }
 }
