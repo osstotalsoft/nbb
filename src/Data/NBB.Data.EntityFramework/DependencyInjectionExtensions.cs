@@ -19,7 +19,7 @@ namespace NBB.Data.EntityFramework
             where TContext : DbContext
         {
             services.AddScoped<ICrudRepository<TEntity>, EfCrudRepository<TEntity, TContext>>();
-            services.AddScoped<IUow<TEntity>, EfUow<TEntity, TContext>>();
+            services.AddEfUow<TEntity, TContext>();
         }
 
         public static void AddEfReadOnlyRepository<TEntity, TContext>(this IServiceCollection services)
@@ -34,6 +34,13 @@ namespace NBB.Data.EntityFramework
             where TContext : DbContext
         {
             services.AddScoped<IQueryable<TEntity>, EfQuery<TEntity, TContext>>();
+        }
+
+        public static void AddEfUow<TEntity, TContext>(this IServiceCollection services)
+            where TEntity : class
+            where TContext : DbContext
+        {
+            services.AddScoped<IUow<TEntity>, EfUow<TEntity, TContext>>();
         }
     }
 }
