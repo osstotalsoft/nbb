@@ -15,20 +15,20 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         where TEntity : class
         where TContext : DbContext
     {
-        private readonly TContext _c;
+        private readonly TContext _dbContext;
         private readonly ILogger<MultiTenantEfUow<TEntity, TContext>> _logger;
         private readonly ITenantService _tenantService;
 
-        public MultiTenantEfUow(TContext c, ITenantService tenantService, ILogger<MultiTenantEfUow<TEntity, TContext>> logger)
+        public MultiTenantEfUow(TContext dbContext, ITenantService tenantService, ILogger<MultiTenantEfUow<TEntity, TContext>> logger)
         {
-            _c = c;
+            _dbContext = dbContext;
             _tenantService = tenantService;
             _logger = logger;
         }
 
         public IEnumerable<TEntity> GetChanges()
         {
-            return _c.ChangeTracker.Entries<TEntity>().Select(ee => ee.Entity);
+            return _dbContext.ChangeTracker.Entries<TEntity>().Select(ee => ee.Entity);
         }
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -42,30 +42,11 @@ namespace NBB.Data.EntityFramework.MultiTenancy
                 throw new Exception("Tenant could not be identified");
             }
 
-            SetTenantId(tenant.TenantId);
-            await _c.SaveChangesAsync(cancellationToken);
+            _dbContext.SetTenantId(tenant.TenantId);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             
             stopWatch.Stop();
             _logger.LogDebug("MultiTenantEfUow.SaveChangesAsync for {EntityType} took {ElapsedMilliseconds} ms", typeof(TEntity).Name, stopWatch.ElapsedMilliseconds);
         }
-
-        private void SetTenantId(Guid tenantId)
-        {
-            var multiTenantEntities =
-                _c.ChangeTracker.Entries()
-                    .Where(e => e.IsMultiTenant() && e.State != EntityState.Unchanged);
-
-            foreach (var e in multiTenantEntities)
-            {
-                var attemptedTenantId = e.GetTenantId();
-                if (attemptedTenantId.HasValue && attemptedTenantId != tenantId)
-                {
-                    throw new Exception(
-                        $"Attempted to save entities for TenantId {attemptedTenantId} in the context of TenantId {tenantId}");
-                }
-                e.SetTenantId(tenantId);
-            }
-        }
-
     }
 }

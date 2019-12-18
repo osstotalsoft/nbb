@@ -58,7 +58,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         private void AddTenantIdQueryFilter(EntityTypeBuilder<TEntity> builder, Guid tenantId, bool isSharedDb)
         {
-            if (isSharedDb)
+            if (!isSharedDb)
             {
                 return;
             }
