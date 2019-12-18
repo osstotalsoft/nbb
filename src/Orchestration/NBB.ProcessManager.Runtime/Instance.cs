@@ -3,9 +3,7 @@ using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Runtime.Events;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using MediatR;
-using NBB.ProcessManager.Definition.Effects;
+using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Runtime
 {
@@ -19,7 +17,7 @@ namespace NBB.ProcessManager.Runtime
 
 
         private readonly List<IEvent> _changes = new List<IEvent>();
-        private readonly List<IEffect<Unit>> _effects = new List<IEffect<Unit>>();
+        private readonly List<IEffect> _effects = new List<IEffect>();
         public int Version { get; internal set; }
 
         public Instance(IDefinition<TData> definition)
@@ -129,7 +127,7 @@ namespace NBB.ProcessManager.Runtime
         }
 
         public IEnumerable<object> GetUncommittedChanges() => _changes;
-        public IEnumerable<IEffect<Unit>> GetUncommittedEffects() => _effects;
+        public IEnumerable<IEffect> GetUncommittedEffects() => _effects;
 
         public void MarkChangesAsCommitted()
         {

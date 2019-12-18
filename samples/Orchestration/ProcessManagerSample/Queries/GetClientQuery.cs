@@ -12,9 +12,9 @@ namespace ProcessManagerSample.Queries
 
     public class GetClientQueryHandler : IRequestHandler<GetClientQuery, Client>
     {
-        public async Task<Client> Handle(GetClientQuery request, CancellationToken cancellationToken)
+        public Task<Client> Handle(GetClientQuery request, CancellationToken cancellationToken)
         {
-            return new Client("ion","vasile");
+            return Task.FromResult(new Client("ion","vasile"));
         }
     }
 

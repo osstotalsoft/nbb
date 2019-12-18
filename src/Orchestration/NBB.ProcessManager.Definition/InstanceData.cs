@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NBB.ProcessManager.Definition
+﻿namespace NBB.ProcessManager.Definition
 {
     public struct InstanceData<TData>
         where TData : struct

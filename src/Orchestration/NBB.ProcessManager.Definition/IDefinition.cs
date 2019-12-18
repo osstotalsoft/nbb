@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using NBB.ProcessManager.Definition.Effects;
 
 namespace NBB.ProcessManager.Definition
 {
