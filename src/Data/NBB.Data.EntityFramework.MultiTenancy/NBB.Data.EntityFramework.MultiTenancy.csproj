@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(MicrosoftEntityFrameworkPackagesVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(MicrosoftEntityFrameworkPackagesVersion)" />
+    <PackageReference Include="Microsoft.CSharp" Version="$(MicrosoftCSharpPackageVersion)" />    
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MultiTenancy\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj" />
+    <ProjectReference Include="..\NBB.Data.Abstractions\NBB.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\NBB.Data.EntityFramework\NBB.Data.EntityFramework.csproj" />
+  </ItemGroup>
+
+
+</Project>
