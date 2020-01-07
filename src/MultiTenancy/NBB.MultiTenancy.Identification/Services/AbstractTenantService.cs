@@ -20,6 +20,6 @@ namespace NBB.MultiTenancy.Identification.Services
             return await Identifier.GetTenantIdAsync(token);
         }
 
-        public abstract Task<string> GetTenantToken();
+        protected abstract Task<string> GetTenantToken();
     }
 }

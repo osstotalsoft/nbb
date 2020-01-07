@@ -11,7 +11,7 @@
     <PackageReference Include="Moq" Version="$(MoqPackageVersion)" />
     <PackageReference Include="xunit" Version="$(XunitPackageVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioPackageVersion)" />    
-    <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsPackageVersion)" />
+    <PackageReference Include="FluentAssertions" Version="5.10.0" />
   </ItemGroup>
 
   <ItemGroup>
