@@ -1,4 +1,6 @@
-﻿namespace NBB.Core.Effects
+﻿using System;
+
+namespace NBB.Core.Effects
 {
     public static class Effect
     {
@@ -25,6 +27,16 @@
         public static IEffect Parallel(IEffect e1, IEffect e2)
         {
             return ParallelEffect<Unit, Unit, Unit>.From(e1, e2, (_, __) => Unit.Value).ToUnit();
+        }
+
+        public static IEffect<TResult> Bind<T, TResult>(Func<T, IEffect<TResult>> computation, IEffect<T> effect)
+        {
+            return effect.Bind(computation);
+        }
+
+        public static IEffect<TResult> Map<T, TResult>(Func<T, TResult> selector, IEffect<T> effect)
+        {
+            return effect.Map(selector);
         }
 
         
