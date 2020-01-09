@@ -1,4 +1,4 @@
-﻿using NBB.MultiTenancy.Identification.Repositories;
+﻿using NBB.MultiTenancy.Abstractions.Repositories;
 using System;
 using System.Threading.Tasks;
 
@@ -6,16 +6,17 @@ namespace NBB.MultiTenancy.Identification.Identifiers
 {
     public class HostTenantIdentifier : ITenantIdentifier
     {
-        private readonly IHostTenantRepository _hostTenantRepository;
+        private readonly ITenantRepository _hostTenantRepository;
 
-        public HostTenantIdentifier(IHostTenantRepository hostTenantRepository)
+        public HostTenantIdentifier(ITenantRepository hostTenantRepository)
         {
             _hostTenantRepository = hostTenantRepository;
         }
 
-        public Task<Guid> GetTenantIdAsync(string tenantToken)
+        public async Task<Guid> GetTenantIdAsync(string tenantToken)
         {
-            return _hostTenantRepository.GetTenantId(tenantToken);
+            var tenant = await _hostTenantRepository.GetByHost(tenantToken);
+            return tenant.TenantId;
         }
     }
 }

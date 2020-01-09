@@ -29,21 +29,27 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             }
         }
 
+        private readonly Mock<ITenantIdentifier> _identifier;
+
+        public AbstractTenantServiceTests()
+        {
+            _identifier = new Mock<ITenantIdentifier>();
+        }
+
         [Fact]
         public void Service_Should_Pass_Token_To_Identifier()
         {
             // Arrange
             const string tenantToken = "mock token";
-            var identifier = new Mock<ITenantIdentifier>();
-            identifier.Setup(i => i.GetTenantIdAsync(It.IsAny<string>())).Returns(Task.FromResult(Guid.Empty));
-            var sut = new SutTenantService(identifier.Object);
+            _identifier.Setup(i => i.GetTenantIdAsync(It.IsAny<string>())).Returns(Task.FromResult(Guid.Empty));
+            var sut = new SutTenantService(_identifier.Object);
             sut.SetTenantToken(tenantToken);
 
             // Act
             var result = sut.GetTenantIdAsync().Result;
 
             // Assert
-            identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
+            _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
         }
 
         [Fact]
@@ -52,9 +58,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
 
             // Arrange
             var tenantId = Guid.NewGuid();
-            var identifier = new Mock<ITenantIdentifier>();
-            identifier.Setup(i => i.GetTenantIdAsync(It.IsAny<string>())).Returns(Task.FromResult(tenantId));
-            var sut = new SutTenantService(identifier.Object);
+            _identifier.Setup(i => i.GetTenantIdAsync(It.IsAny<string>())).Returns(Task.FromResult(tenantId));
+            var sut = new SutTenantService(_identifier.Object);
 
             // Act
             var result = sut.GetTenantIdAsync().Result;
