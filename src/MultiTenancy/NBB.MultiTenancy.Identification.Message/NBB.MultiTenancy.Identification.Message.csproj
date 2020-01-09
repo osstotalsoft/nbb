@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\NBB.MultiTenancy.Identification\NBB.MultiTenancy.Identification.csproj" />
+  </ItemGroup>
+
+</Project>
