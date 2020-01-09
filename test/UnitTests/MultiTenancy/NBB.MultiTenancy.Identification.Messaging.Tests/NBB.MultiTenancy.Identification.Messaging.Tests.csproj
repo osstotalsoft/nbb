@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Message\NBB.MultiTenancy.Identification.Message.csproj" />
+    <ProjectReference Include="..\..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Messaging\NBB.MultiTenancy.Identification.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

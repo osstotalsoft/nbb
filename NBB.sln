@@ -342,9 +342,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Identifica
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Identification.Http.Tests", "test\UnitTests\MultiTenancy\NBB.MultiTenancy.Identification.Http.Tests\NBB.MultiTenancy.Identification.Http.Tests.csproj", "{45ECA8AA-9AF9-430C-A73D-016FE11596FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.MultiTenancy.Identification.Message", "src\MultiTenancy\NBB.MultiTenancy.Identification.Message\NBB.MultiTenancy.Identification.Message.csproj", "{C2E1D2F8-EDC2-40CA-A4A4-8DE9AC97706A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.MultiTenancy.Identification.Messaging", "src\MultiTenancy\NBB.MultiTenancy.Identification.Messaging\NBB.MultiTenancy.Identification.Messaging.csproj", "{C2E1D2F8-EDC2-40CA-A4A4-8DE9AC97706A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.MultiTenancy.Identification.Message.Tests", "test\UnitTests\MultiTenancy\NBB.MultiTenancy.Identification.Message.Tests\NBB.MultiTenancy.Identification.Message.Tests.csproj", "{713919AF-8797-4EBD-B2E0-2D9BC87AD362}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Identification.Messaging.Tests", "test\UnitTests\MultiTenancy\NBB.MultiTenancy.Identification.Messaging.Tests\NBB.MultiTenancy.Identification.Messaging.Tests.csproj", "{713919AF-8797-4EBD-B2E0-2D9BC87AD362}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

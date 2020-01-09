@@ -1,39 +1,22 @@
-﻿using System;
+﻿using FluentAssertions;
 using Moq;
 using NBB.MultiTenancy.Identification.Identifiers;
-using NBB.MultiTenancy.Identification.Services;
+using System;
 using System.Threading.Tasks;
-using FluentAssertions;
+using NBB.MultiTenancy.Identification.Services;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Tests.Services
 {
-    public class AbstractTenantServiceTests
+    public class TenantServiceTests
     {
-        public class SutTenantService : AbstractTenantService
-        {
-            private string _tenantToken;
-
-            public SutTenantService(ITenantIdentifier identifier) : base(identifier)
-            {
-            }
-
-            protected override Task<string> GetTenantToken()
-            {
-                return Task.FromResult(_tenantToken);
-            }
-
-            public void SetTenantToken(string tenantToken)
-            {
-                _tenantToken = tenantToken;
-            }
-        }
-
         private readonly Mock<ITenantIdentifier> _identifier;
+        private readonly Mock<ITenantTokenResolver> _resolver;
 
-        public AbstractTenantServiceTests()
+        public TenantServiceTests()
         {
             _identifier = new Mock<ITenantIdentifier>();
+            _resolver = new Mock<ITenantTokenResolver>();
         }
 
         [Fact]
@@ -41,8 +24,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
         {
             // Arrange
             const string tenantToken = "mock token";
-            var sut = new SutTenantService(_identifier.Object);
-            sut.SetTenantToken(tenantToken);
+            _resolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
+            var sut = new TenantService(_identifier.Object, _resolver.Object);
 
             // Act
             var result = sut.GetTenantIdAsync().Result;
@@ -58,7 +41,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             // Arrange
             var tenantId = Guid.NewGuid();
             _identifier.Setup(i => i.GetTenantIdAsync(It.IsAny<string>())).Returns(Task.FromResult(tenantId));
-            var sut = new SutTenantService(_identifier.Object);
+            var sut = new TenantService(_identifier.Object, _resolver.Object);
 
             // Act
             var result = sut.GetTenantIdAsync().Result;
@@ -72,8 +55,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
         {
             // Arrange
             const string tenantToken = "mock token";
-            var sut = new SutTenantService(_identifier.Object);
-            sut.SetTenantToken(tenantToken);
+            _resolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
+            var sut = new TenantService(_identifier.Object, _resolver.Object);
 
             // Act
             var resultFirst = sut.GetTenantIdAsync().Result;
@@ -91,8 +74,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             _identifier.SetupSequence(i => i.GetTenantIdAsync(It.IsAny<string>()))
                 .Returns(Task.FromResult(Guid.NewGuid()))
                 .Returns(Task.FromResult(Guid.NewGuid()));
-            var sut = new SutTenantService(_identifier.Object);
-            sut.SetTenantToken(tenantToken);
+            _resolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
+            var sut = new TenantService(_identifier.Object, _resolver.Object);
 
             // Act
             var resultFirst = sut.GetTenantIdAsync().Result;
@@ -100,27 +83,6 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
 
             // Assert
             resultFirst.Should().Be(resultSecond);
-        }
-
-        [Fact]
-        public void Should_Retreive_Different_TenantId_For_Different_Tokens()
-        {
-            // Arrange
-            const string firstMockToken = "first mock token";
-            const string secondMockToken = "second mock token";
-            _identifier.SetupSequence(i => i.GetTenantIdAsync(It.IsAny<string>()))
-                .Returns(Task.FromResult(Guid.NewGuid()))
-                .Returns(Task.FromResult(Guid.NewGuid()));
-            var sut = new SutTenantService(_identifier.Object);
-
-            // Act
-            sut.SetTenantToken(firstMockToken);
-            var resultFirst = sut.GetTenantIdAsync().Result;
-            sut.SetTenantToken(secondMockToken);
-            var resultSecond = sut.GetTenantIdAsync().Result;
-
-            // Assert
-            resultFirst.Should().NotBe(resultSecond);
         }
     }
 }
