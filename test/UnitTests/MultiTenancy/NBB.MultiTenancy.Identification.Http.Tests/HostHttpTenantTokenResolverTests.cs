@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 
@@ -58,6 +59,21 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
 
             // Assert
             _mockHttpRequest.Verify(i => i.Host, Times.Once());
+        }
+
+        [Fact]
+        public void Should_Return_Host_Value()
+        {
+            // Arrange
+            var host = new HostString("test.host");
+            _mockHttpRequest.Setup(r => r.Host).Returns(host);
+            var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
+
+            // Act
+            var result = sut.GetTenantToken().Result;
+
+            // Assert
+            result.Should().Be(host.Host);
         }
     }
 }
