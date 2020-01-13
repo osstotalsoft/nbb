@@ -1,5 +1,6 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using NBB.MultiTenancy.Identification.Resolvers;
+using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Identification.Http
 {

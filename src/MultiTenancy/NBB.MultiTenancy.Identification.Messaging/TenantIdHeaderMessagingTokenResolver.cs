@@ -1,5 +1,6 @@
 ﻿using NBB.Messaging.Abstractions;
 using System.Threading.Tasks;
+using NBB.MultiTenancy.Identification.Resolvers;
 
 namespace NBB.MultiTenancy.Identification.Messaging
 {
