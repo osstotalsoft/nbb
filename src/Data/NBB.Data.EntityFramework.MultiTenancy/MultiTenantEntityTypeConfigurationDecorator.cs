@@ -42,10 +42,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
             var tenantService = _sp.GetRequiredService<ITenantService>();
             var tenantId = tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
-            if (tenantId.Equals(Guid.Empty))
-            {
-                throw new Exception("Tenant not available");
-            }
 
             return tenantId;
         }

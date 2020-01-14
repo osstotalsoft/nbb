@@ -1,4 +1,5 @@
-﻿using NBB.MultiTenancy.Abstractions.Services;
+﻿using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Resolvers;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,10 @@ namespace NBB.MultiTenancy.Identification.Services
 {
     public class TenantService : ITenantService
     {
-        private readonly IEnumerable<TenantIdentificationPair> _tenantIdentificationPairs;
+        private readonly IEnumerable<TenantIdentificationStrategy> _tenantIdentificationPairs;
         private Guid? _tenantId;
 
-        public TenantService(IEnumerable<TenantIdentificationPair> tenantIdentificationPairs)
+        public TenantService(IEnumerable<TenantIdentificationStrategy> tenantIdentificationPairs)
         {
             _tenantIdentificationPairs = tenantIdentificationPairs;
         }
@@ -36,7 +37,7 @@ namespace NBB.MultiTenancy.Identification.Services
             throw new TenantNotFoundException();
         }
 
-        private static async Task<Guid?> TryGetTenantIdAsync(TenantIdentificationPair tenantIdentificationPair)
+        private static async Task<Guid?> TryGetTenantIdAsync(TenantIdentificationStrategy tenantIdentificationPair)
         {
             var tenantTokenResolvers = tenantIdentificationPair.TenantTokenResolvers;
             var identifier = tenantIdentificationPair.TenantIdentifier;

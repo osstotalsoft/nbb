@@ -17,7 +17,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             var identifier = new Mock<ITenantIdentifier>();
 
             // Act
-            Action act = () => new TenantIdentificationPair(null, identifier.Object);
+            Action act = () => new TenantIdentificationStrategy(null, identifier.Object);
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
@@ -30,7 +30,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             var identifier = new Mock<ITenantIdentifier>();
 
             // Act
-            Action act = () => new TenantIdentificationPair(new List<ITenantTokenResolver>(), identifier.Object);
+            Action act = () => new TenantIdentificationStrategy(new List<ITenantTokenResolver>(), identifier.Object);
 
             // Assert
             act.Should().Throw<ArgumentException>();
@@ -43,7 +43,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             var tokenResolver = new Mock<ITenantTokenResolver>();
 
             // Act
-            Action act = () => new TenantIdentificationPair(new List<ITenantTokenResolver>() { tokenResolver.Object }, null);
+            Action act = () => new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { tokenResolver.Object }, null);
 
             // Assert
             act.Should().Throw<ArgumentNullException>();

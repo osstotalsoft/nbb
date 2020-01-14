@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace NBB.MultiTenancy.Identification
 {
-    public class TenantIdentificationPair
+    public class TenantIdentificationStrategy
     {
-        public TenantIdentificationPair(IEnumerable<ITenantTokenResolver> tenantTokenResolvers, ITenantIdentifier tenantIdentifier)
+        public TenantIdentificationStrategy(IEnumerable<ITenantTokenResolver> tenantTokenResolvers, ITenantIdentifier tenantIdentifier)
         {
             var tokenResolvers = tenantTokenResolvers.ToList();
             TenantTokenResolvers = tokenResolvers.Any() ? tokenResolvers : throw new ArgumentException(nameof(tenantTokenResolvers));

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.MultiTenancy.Abstractions.Services;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -37,10 +36,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             stopWatch.Start();
 
             var tenantId = await _tenantService.GetTenantIdAsync();
-            if (tenantId.Equals(Guid.Empty))
-            {
-                throw new Exception("Tenant could not be identified");
-            }
 
             _dbContext.SetTenantId(tenantId);
             await _dbContext.SaveChangesAsync(cancellationToken);

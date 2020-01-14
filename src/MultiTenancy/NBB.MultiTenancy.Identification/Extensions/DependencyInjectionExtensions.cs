@@ -38,7 +38,7 @@ namespace NBB.MultiTenancy.Identification.Extensions
             service.AddSingleton(sp =>
             {
                 var desiredResolvers = sp.GetServices<ITenantTokenResolver>().Where(tr => resolvers.Contains(tr.GetType())).ToList();
-                return new TenantIdentificationPair(desiredResolvers, sp.GetService<TTenantIdentifier>());
+                return new TenantIdentificationStrategy(desiredResolvers, sp.GetService<TTenantIdentifier>());
             });
         }
     }

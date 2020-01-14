@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NBB.MultiTenancy.Identification
+namespace NBB.MultiTenancy.Abstractions
 {
     public class TenantNotFoundException : Exception
     {

@@ -127,7 +127,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             var serviceProvider = sut.BuildServiceProvider();
 
             // Act
-            var tokenIdentifierPair = serviceProvider.GetService<TenantIdentificationPair>();
+            var tokenIdentifierPair = serviceProvider.GetService<TenantIdentificationStrategy>();
 
             // Assert
             tokenIdentifierPair.TenantIdentifier.Should().BeOfType<MockIdentifier>();
@@ -148,7 +148,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             var serviceProvider = sut.BuildServiceProvider();
 
             // Act
-            var pairs = serviceProvider.GetServices<TenantIdentificationPair>().ToList();
+            var pairs = serviceProvider.GetServices<TenantIdentificationStrategy>().ToList();
             var firstPair = pairs.First();
             var secondPair = pairs.Last();
 
