@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
     <PackageReference Include="Moq" Version="$(MoqPackageVersion)" />
     <PackageReference Include="xunit" Version="$(XunitPackageVersion)" />
