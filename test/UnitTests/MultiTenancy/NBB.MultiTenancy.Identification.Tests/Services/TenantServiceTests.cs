@@ -154,7 +154,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             const string tenantToken = "mock token";
             _firstResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
             _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
-            _thirdResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
+            _thirdResolver.Setup(r => r.GetTenantToken()).Throws<Exception>();
             var firstPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object }, _identifier.Object);
             var secondPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _secondResolver.Object }, _identifier.Object);
             var thirdPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _thirdResolver.Object }, _identifier.Object);
