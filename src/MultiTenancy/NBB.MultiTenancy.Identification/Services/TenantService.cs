@@ -29,16 +29,11 @@ namespace NBB.MultiTenancy.Identification.Services
 
                 if (_tenantId.HasValue)
                 {
-                    break;
+                    return _tenantId.Value;
                 }
             }
 
-            if (!_tenantId.HasValue)
-            {
-                throw new TenantNotFoundException();
-            }
-
-            return _tenantId.Value;
+            throw new TenantNotFoundException();
         }
 
         private static async Task<Guid?> TryGetTenantIdAsync(TenantIdentificationPair tenantIdentificationPair)

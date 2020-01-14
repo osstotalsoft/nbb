@@ -11,8 +11,8 @@ namespace NBB.MultiTenancy.Identification
         public TenantIdentificationPair(IEnumerable<ITenantTokenResolver> tenantTokenResolvers, ITenantIdentifier tenantIdentifier)
         {
             var tokenResolvers = tenantTokenResolvers.ToList();
-            TenantTokenResolvers = tokenResolvers.Any() ? tokenResolvers : throw new ArgumentException();
-            TenantIdentifier = tenantIdentifier ?? throw new ArgumentNullException();
+            TenantTokenResolvers = tokenResolvers.Any() ? tokenResolvers : throw new ArgumentException(nameof(tenantTokenResolvers));
+            TenantIdentifier = tenantIdentifier ?? throw new ArgumentNullException(nameof(tenantIdentifier));
         }
 
         public IEnumerable<ITenantTokenResolver> TenantTokenResolvers { get; }
