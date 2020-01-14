@@ -5,12 +5,10 @@ namespace NBB.MultiTenancy.Abstractions
     public class Tenant
     {
         public Guid TenantId { get; }
-        public string Name { get; }
 
-        public Tenant(Guid tenantId, string name)
+        public Tenant(Guid tenantId)
         {
             TenantId = tenantId;
-            Name = name;
         }
     }
 }

@@ -5,15 +5,14 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.DataContracts;
+using NBB.Messaging.Host.Builder;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.Messaging.Abstractions;
 using Xunit;
-using Microsoft.Extensions.Configuration;
-using NBB.Messaging.Host.Builder;
 
 namespace NBB.Messaging.Host.Tests
 {

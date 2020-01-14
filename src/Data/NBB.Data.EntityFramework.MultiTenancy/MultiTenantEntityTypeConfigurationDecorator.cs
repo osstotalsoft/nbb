@@ -32,7 +32,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
             var tenantId = ResolveTenantId();
             var isSharedDb = IsSharedDb(tenantId);
-            
+
             builder.HasAnnotation(MultiTenancy.MultiTenantAnnotation, true);
             AddTenantIdProperty(builder);
             AddTenantIdQueryFilter(builder, tenantId, isSharedDb);
@@ -41,13 +41,9 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         private Guid ResolveTenantId()
         {
             var tenantService = _sp.GetRequiredService<ITenantService>();
-            var tenant = tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult();
-            if (tenant == null)
-            {
-                throw new Exception("Tenant not available");
-            }
+            var tenantId = tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
 
-            return tenant.TenantId;
+            return tenantId;
         }
 
         private bool IsSharedDb(Guid tenantId)

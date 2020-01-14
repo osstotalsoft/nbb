@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.MultiTenancy.Abstractions.Services;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -36,15 +35,11 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var tenant = await _tenantService.GetCurrentTenantAsync();
-            if (tenant == null)
-            {
-                throw new Exception("Tenant could not be identified");
-            }
+            var tenantId = await _tenantService.GetTenantIdAsync();
 
-            _dbContext.SetTenantId(tenant.TenantId);
+            _dbContext.SetTenantId(tenantId);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            
+
             stopWatch.Stop();
             _logger.LogDebug("MultiTenantEfUow.SaveChangesAsync for {EntityType} took {ElapsedMilliseconds} ms", typeof(TEntity).Name, stopWatch.ElapsedMilliseconds);
         }

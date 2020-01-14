@@ -14,14 +14,14 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 
         public MultiTenantDbContext(DbContextOptions<MultiTenantDbContext> options, ITenantService tenantService) : base(options)
         {
-            _tenantId = tenantService.GetCurrentTenantAsync().GetAwaiter().GetResult().TenantId;
+            _tenantId = tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyMultiTenantConfiguration(new TestEntityConfiguration(), this);
-        }      
+        }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
