@@ -8,7 +8,7 @@ using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Tests
 {
-    public class TenantIdentificationPairTests
+    public class TenantIdentificationStrategyTests
     {
         [Fact]
         public void Should_Throw_ArgumentNullException_If_Resolvers_Are_Null()
