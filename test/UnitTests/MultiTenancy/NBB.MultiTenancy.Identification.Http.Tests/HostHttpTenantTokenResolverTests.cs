@@ -27,7 +27,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
+            var _ = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
@@ -40,7 +40,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var _ = sut.GetTenantToken().Result;
 
             // Assert
             _mockHttpContext.Verify(c => c.Request, Times.Once());
@@ -55,7 +55,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var _ = sut.GetTenantToken().Result;
 
             // Assert
             _mockHttpRequest.Verify(i => i.Host, Times.Once());

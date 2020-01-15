@@ -11,18 +11,16 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
     public class TenantIdHeaderMessagingTokenResolverTests
     {
         private readonly MessagingContextAccessor _mockMessagingContextAccessor;
-        private readonly MessagingContext _mockMessagingContext;
-        private readonly MessagingEnvelope _mockMessagingEnvelope;
         private readonly Dictionary<string, string> _headers;
 
         public TenantIdHeaderMessagingTokenResolverTests()
         {
             _mockMessagingContextAccessor = new MessagingContextAccessor();
             _headers = new Dictionary<string, string>();
-            _mockMessagingEnvelope = new MessagingEnvelope(_headers, new object());
-            _mockMessagingContext = new MessagingContext(_mockMessagingEnvelope);
+            var mockMessagingEnvelope = new MessagingEnvelope(_headers, new object());
+            var mockMessagingContext = new MessagingContext(mockMessagingEnvelope);
 
-            _mockMessagingContextAccessor.MessagingContext = _mockMessagingContext;
+            _mockMessagingContextAccessor.MessagingContext = mockMessagingContext;
         }
 
         [Fact]
