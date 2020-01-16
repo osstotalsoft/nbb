@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NBB.MultiTenancy.Identification.Resolvers;
+using System;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
