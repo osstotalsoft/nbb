@@ -1,20 +1,27 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
 {
-    public class HostHttpTenantTokenResolverTests
+    public class TenantIdHeaderHttpTokenResolverTests
     {
         private readonly Mock<HttpContext> _mockHttpContext;
         private readonly Mock<HttpRequest> _mockHttpRequest;
+        private readonly Mock<IHeaderDictionary> _mockHeaders;
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
-        public HostHttpTenantTokenResolverTests()
+        public TenantIdHeaderHttpTokenResolverTests()
         {
             _mockHttpContext = new Mock<HttpContext>();
             _mockHttpRequest = new Mock<HttpRequest>();
+            _mockHeaders = new Mock<IHeaderDictionary>();
+            _mockHttpRequest.Setup(r => r.Headers).Returns(_mockHeaders.Object);
             _mockHttpContext.Setup(c => c.Request).Returns(_mockHttpRequest.Object);
 
             _mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
@@ -27,53 +34,40 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
+            var _ = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
         }
 
         [Fact]
-        public void Should_Retrieve_Request_From_Context()
+        public void Should_Retrieve_Headers_From_Request_From_Context()
         {
             // Arrange
-            var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Act
             var _ = sut.GetTenantToken().Result;
 
             // Assert
             _mockHttpContext.Verify(c => c.Request, Times.Once());
+            _mockHttpRequest.Verify(r => r.Headers, Times.Once());
         }
 
         [Fact]
-        public void Should_Retrieve_Host_From_Request()
+        public void Should_Return_Value_From_Header()
         {
             // Arrange
-            var host = new HostString("test.host");
-            _mockHttpRequest.Setup(r => r.Host).Returns(host);
-            var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
-
-            // Act
-            var _ = sut.GetTenantToken().Result;
-
-            // Assert
-            _mockHttpRequest.Verify(i => i.Host, Times.Once());
-        }
-
-        [Fact]
-        public void Should_Return_Host_Value()
-        {
-            // Arrange
-            var host = new HostString("test.host");
-            _mockHttpRequest.Setup(r => r.Host).Returns(host);
-            var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
+            var hKey = "key";
+            var hValue = "value";
+            _mockHeaders.Setup(h => h[hKey]).Returns(new StringValues(hValue));
+            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
             var result = sut.GetTenantToken().Result;
 
             // Assert
-            result.Should().Be(host.Host);
+            result.Should().Be(hValue);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace NBB.MultiTenancy.Identification.Messaging
                 throw new CannotResolveTokenException();
             }
 
-            return Task.FromResult(headers[_headerKey]);
+            return Task.FromResult(token);
         }
     }
 }
