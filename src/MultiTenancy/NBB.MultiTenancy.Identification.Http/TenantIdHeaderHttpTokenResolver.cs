@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using NBB.MultiTenancy.Identification.Resolvers;
 using System.Threading.Tasks;
 
@@ -17,7 +18,13 @@ namespace NBB.MultiTenancy.Identification.Http
 
         public Task<string> GetTenantToken()
         {
-            return Task.FromResult(_httpContext.Request.Headers[_headerKey].ToString());
+            var headerValues = _httpContext.Request.Headers[_headerKey];
+            if (headerValues == StringValues.Empty || headerValues.Count != 1)
+            {
+                throw new CannotResolveTokenException();
+            }
+
+            return Task.FromResult(headerValues.ToString());
         }
     }
 }

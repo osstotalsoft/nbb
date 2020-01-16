@@ -21,24 +21,6 @@ namespace NBB.MultiTenancy.Identification.Extensions
             return AddTenantTokenResolver(typeof(TTenantTokenResolver), args);
         }
 
-        public TenantTokenResolverConfiguration AddTenantTokenResolver(Type resolverType)
-        {
-            if (resolverType == null)
-            {
-                throw new ArgumentNullException(nameof(resolverType));
-            }
-
-            var tokenResolverType = typeof(ITenantTokenResolver);
-            if (!resolverType.IsClass || !tokenResolverType.IsAssignableFrom(resolverType))
-            {
-                throw new ArgumentException(nameof(resolverType));
-            }
-
-            ITenantTokenResolver ImplementationFactory(IServiceProvider serviceProvider) => (ITenantTokenResolver)ActivatorUtilities.CreateInstance(serviceProvider, resolverType);
-
-            return AddTenantTokenResolver(ImplementationFactory);
-        }
-
         public TenantTokenResolverConfiguration AddTenantTokenResolver(Type resolverType, params object[] args)
         {
             if (resolverType == null)
