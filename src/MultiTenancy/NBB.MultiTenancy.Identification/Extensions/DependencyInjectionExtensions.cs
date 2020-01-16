@@ -92,8 +92,10 @@ namespace NBB.MultiTenancy.Identification.Extensions
             });
         }
 
-        private static TTenantIdentifier ImplementationFactory<TTenantIdentifier>(IServiceProvider serviceProvider) where TTenantIdentifier : class, ITenantIdentifier => ActivatorUtilities.CreateInstance<TTenantIdentifier>(serviceProvider);
+        private static TTenantIdentifier ImplementationFactory<TTenantIdentifier>(IServiceProvider serviceProvider) where TTenantIdentifier : class, ITenantIdentifier
+            => ActivatorUtilities.CreateInstance<TTenantIdentifier>(serviceProvider);
 
-        private static Func<IServiceProvider, TTenantIdentifier> ImplementationFactory<TTenantIdentifier>(TTenantIdentifier identifier) where TTenantIdentifier : class, ITenantIdentifier => _ => identifier;
+        private static Func<IServiceProvider, TTenantIdentifier> ImplementationFactory<TTenantIdentifier>(TTenantIdentifier identifier) where TTenantIdentifier : class, ITenantIdentifier
+            => _ => identifier;
     }
 }
