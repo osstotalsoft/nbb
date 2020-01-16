@@ -2,78 +2,75 @@
 using NBB.MultiTenancy.Identification.Resolvers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NBB.MultiTenancy.Identification.Extensions
 {
     public class TenantTokenResolverConfiguration
     {
-        private readonly IServiceCollection _service;
-        private readonly List<Type> _resolvers;
+        private readonly List<Func<IServiceProvider, ITenantTokenResolver>> _resolverFactories;
 
-        public TenantTokenResolverConfiguration(IServiceCollection service)
+        public TenantTokenResolverConfiguration()
         {
-            _service = service;
-            _resolvers = new List<Type>();
+            _resolverFactories = new List<Func<IServiceProvider, ITenantTokenResolver>>();
         }
 
-        public TenantTokenResolverConfiguration AddTenantTokenResolver<TTenantTokenResolver>()
+        public TenantTokenResolverConfiguration AddTenantTokenResolver<TTenantTokenResolver>(params object[] args)
             where TTenantTokenResolver : class, ITenantTokenResolver
         {
-            _service.AddSingleton<ITenantTokenResolver, TTenantTokenResolver>();
-            _resolvers.Add(typeof(TTenantTokenResolver));
-
-            return this;
+            return AddTenantTokenResolver(typeof(TTenantTokenResolver), args);
         }
 
-        public TenantTokenResolverConfiguration AddTenantTokenResolver(ITenantTokenResolver tenantTokenResolverType)
+        public TenantTokenResolverConfiguration AddTenantTokenResolver(Type resolverType)
         {
-            if (tenantTokenResolverType == null)
-            {
-                throw new ArgumentNullException(nameof(tenantTokenResolverType));
-            }
-
-            _service.AddSingleton(tenantTokenResolverType);
-            _resolvers.Add(tenantTokenResolverType.GetType());
-
-            return this;
+            return AddTenantTokenResolver(resolverType, null);
         }
 
-        public TenantTokenResolverConfiguration AddTenantTokenResolver(Type resolver)
+        public TenantTokenResolverConfiguration AddTenantTokenResolver(Type resolverType, params object[] args)
         {
-            if (resolver == null)
+            if (resolverType == null)
             {
-                throw new ArgumentNullException(nameof(resolver));
+                throw new ArgumentNullException(nameof(resolverType));
             }
 
             var tokenResolverType = typeof(ITenantTokenResolver);
-            if (!resolver.IsClass || !tokenResolverType.IsAssignableFrom(resolver))
+            if (!resolverType.IsClass || !tokenResolverType.IsAssignableFrom(resolverType))
             {
-                throw new ArgumentException(nameof(resolver));
+                throw new ArgumentException(nameof(resolverType));
             }
 
-            _service.AddSingleton(tokenResolverType, resolver);
-            _resolvers.Add(resolver);
+            ITenantTokenResolver ImplementationFactory(IServiceProvider serviceProvider) => (ITenantTokenResolver)ActivatorUtilities.CreateInstance(serviceProvider, resolverType, args);
 
-            return this;
+            return AddTenantTokenResolver(ImplementationFactory);
         }
 
-        public TenantTokenResolverConfiguration AddTenantTokenResolver<TTenantTokenResolver>(Func<IServiceProvider, TTenantTokenResolver> implementationFactory)
-            where TTenantTokenResolver : class, ITenantTokenResolver
+        public TenantTokenResolverConfiguration AddTenantTokenResolver(ITenantTokenResolver tenantTokenResolver)
+        {
+            if (tenantTokenResolver == null)
+            {
+                throw new ArgumentNullException(nameof(tenantTokenResolver));
+            }
+
+            ITenantTokenResolver ImplementationFactory(IServiceProvider _) => tenantTokenResolver;
+
+            return AddTenantTokenResolver(ImplementationFactory);
+        }
+
+        public TenantTokenResolverConfiguration AddTenantTokenResolver(Func<IServiceProvider, ITenantTokenResolver> implementationFactory)
         {
             if (implementationFactory == null)
             {
                 throw new ArgumentNullException(nameof(implementationFactory));
             }
 
-            _service.AddSingleton<ITenantTokenResolver>(implementationFactory);
-            _resolvers.Add(typeof(TTenantTokenResolver));
+            _resolverFactories.Add(implementationFactory);
 
             return this;
         }
 
-        public Type[] GetResolvers()
+        public IEnumerable<ITenantTokenResolver> GetTenantTokenResolvers(IServiceProvider serviceProvider)
         {
-            return _resolvers.ToArray();
+            return _resolverFactories.Select(f => f(serviceProvider));
         }
     }
 }
