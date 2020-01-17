@@ -23,12 +23,11 @@ namespace NBB.MultiTenancy.Identification
         {
             foreach (var tokenResolver in TenantTokenResolvers)
             {
-                try
+                var tenantToken = await tokenResolver.GetTenantToken();
+                if (!string.IsNullOrWhiteSpace(tenantToken))
                 {
-                    var tenantToken = await tokenResolver.GetTenantToken();
                     return await TenantIdentifier.GetTenantIdAsync(tenantToken);
                 }
-                catch (CannotResolveTokenException) { }
             }
 
             return null;

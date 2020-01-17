@@ -92,8 +92,8 @@ namespace NBB.MultiTenancy.Identification.Tests
         {
             // Arrange
             const string tenantToken = "mock token";
-            _firstResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
-            _secondResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             _thirdResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
@@ -107,8 +107,9 @@ namespace NBB.MultiTenancy.Identification.Tests
         [Fact]
         public void Service_Should_Return_Identifier_Result()
         {
-
             // Arrange
+            const string tenantToken = "mock token";
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
             var tenantId = Guid.NewGuid();
             _identifier.Setup(i => i.GetTenantIdAsync(It.IsAny<string>())).Returns(Task.FromResult(tenantId));
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
@@ -138,9 +139,9 @@ namespace NBB.MultiTenancy.Identification.Tests
         public void Should_Return_Null_If_All_Resolvers_Fail()
         {
             // Arrange
-            _firstResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
-            _secondResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
-            _thirdResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _thirdResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
             // Act

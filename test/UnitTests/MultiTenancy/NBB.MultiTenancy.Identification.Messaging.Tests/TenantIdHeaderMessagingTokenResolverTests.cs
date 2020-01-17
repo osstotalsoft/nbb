@@ -40,17 +40,17 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
         }
 
         [Fact]
-        public void Should_Throw_CannotResolveTokenException_For_Bad_Keys()
+        public void Should_Return_Null_For_Bad_Keys()
         {
             // Arrange
             const string key = "bad token key";
             var sut = new TenantIdHeaderMessagingTokenResolver(_mockMessagingContextAccessor, key);
 
             // Act
-            Action act = () => sut.GetTenantToken();
+            var result= sut.GetTenantToken().Result;
 
             // Assert
-            act.Should().Throw<CannotResolveTokenException>();
+            result.Should().BeNull();
         }
     }
 }

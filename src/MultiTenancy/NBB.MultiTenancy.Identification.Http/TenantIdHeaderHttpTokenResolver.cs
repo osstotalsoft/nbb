@@ -13,18 +13,18 @@ namespace NBB.MultiTenancy.Identification.Http
         public TenantIdHeaderHttpTokenResolver(IHttpContextAccessor httpContextAccessor, string headerKey)
         {
             _headerKey = headerKey;
-            _httpContext = httpContextAccessor.HttpContext;
+            _httpContext = httpContextAccessor?.HttpContext;
         }
 
         public Task<string> GetTenantToken()
         {
-            var headerValues = _httpContext.Request.Headers[_headerKey];
-            if (headerValues == StringValues.Empty || headerValues.Count != 1)
+            var headerValues = _httpContext?.Request?.Headers[_headerKey];
+            if (!headerValues.HasValue || headerValues.Value == StringValues.Empty || headerValues.Value.Count != 1)
             {
-                throw new CannotResolveTokenException();
+                return Task.FromResult<string>(null);
             }
 
-            return Task.FromResult(headerValues.ToString());
+            return Task.FromResult(headerValues.Value.ToString());
         }
     }
 }
