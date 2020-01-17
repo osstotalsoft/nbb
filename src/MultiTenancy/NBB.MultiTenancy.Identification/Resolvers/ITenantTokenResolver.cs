@@ -8,7 +8,6 @@ namespace NBB.MultiTenancy.Identification.Resolvers
         /// Gets tenant identification token form a context
         /// </summary>
         /// <returns>Tenant token</returns>
-        /// <exception cref="CannotResolveTokenException"></exception>
         Task<string> GetTenantToken();
     }
 }

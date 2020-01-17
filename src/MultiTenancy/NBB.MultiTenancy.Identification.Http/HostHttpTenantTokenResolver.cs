@@ -10,12 +10,12 @@ namespace NBB.MultiTenancy.Identification.Http
 
         public HostHttpTenantTokenResolver(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContext = httpContextAccessor.HttpContext;
+            _httpContext = httpContextAccessor?.HttpContext;
         }
 
         public Task<string> GetTenantToken()
         {
-            return Task.FromResult(_httpContext.Request.Host.Host);
+            return Task.FromResult(_httpContext?.Request?.Host.Host);
         }
     }
 }
