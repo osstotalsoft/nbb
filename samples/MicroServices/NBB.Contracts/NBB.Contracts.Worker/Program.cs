@@ -21,6 +21,15 @@ using Serilog.Events;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using NBB.Contracts.Api.MultiTenancy;
+using NBB.Contracts.Worker.MultiTenancy;
+using NBB.Messaging.MultiTenancy;
+using NBB.MultiTenancy.Abstractions.Services;
+using NBB.MultiTenancy.Identification.Extensions;
+using NBB.MultiTenancy.Identification.Identifiers;
+using NBB.MultiTenancy.Identification.Messaging;
+using NBB.MultiTenancy.Identification.Services;
 
 namespace NBB.Contracts.Worker
 {
@@ -34,10 +43,7 @@ namespace NBB.Contracts.Worker
         public static async Task MainAsync(string[] args)
         {
             var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config =>
-                {
-                    config.AddEnvironmentVariables("NETCORE_");
-                })
+                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
                 .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
                 {
                     configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
@@ -92,6 +98,14 @@ namespace NBB.Contracts.Worker
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
                         );
+
+                    services.AddMultiTenantMessaging();
+                    services.AddSingleton<ITenantService, TenantService>();
+                    services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
+                    services.AddResolverForIdentifier<IdTenantIdentifier>(
+                        typeof(MessagingHeaderTenantTokenResolver),
+                        typeof(StaticTenantTokenResolver)
+                    );
                 });
 
             await builder.RunConsoleAsync(default);

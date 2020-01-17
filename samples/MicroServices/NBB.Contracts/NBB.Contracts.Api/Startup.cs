@@ -1,10 +1,18 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NBB.Contracts.Api.MultiTenancy;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
+using NBB.MultiTenancy.Abstractions.Services;
+using NBB.MultiTenancy.Identification.Extensions;
+using NBB.MultiTenancy.Identification.Identifiers;
+using NBB.MultiTenancy.Identification.Services;
 
 namespace NBB.Contracts.Api
 {
@@ -25,6 +33,12 @@ namespace NBB.Contracts.Api
 
             //services.AddKafkaMessaging();
             services.AddNatsMessaging();
+
+            services.AddMultiTenantMessaging();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITenantService, TenantService>();
+            services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
+            services.AddResolverForIdentifier<IdTenantIdentifier>(typeof(HttpHeaderTenantTokenResolver));
 
             services.AddContractsReadModelDataAccess();
         }
