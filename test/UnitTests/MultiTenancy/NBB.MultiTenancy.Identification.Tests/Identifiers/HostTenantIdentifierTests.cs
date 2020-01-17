@@ -43,7 +43,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
             var sut = new HostTenantIdentifier(_hostTenantRepository.Object);
 
             // Act
-            var result = sut.GetTenantIdAsync(tenantToken).Result;
+            var _ = sut.GetTenantIdAsync(tenantToken).Result;
 
             // Assert
             _hostTenantRepository.Verify(r => r.GetByHost(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());

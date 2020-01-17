@@ -11,18 +11,16 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
     public class TenantIdHeaderMessagingTokenResolverTests
     {
         private readonly MessagingContextAccessor _mockMessagingContextAccessor;
-        private readonly MessagingContext _mockMessagingContext;
-        private readonly MessagingEnvelope _mockMessagingEnvelope;
         private readonly Dictionary<string, string> _headers;
 
         public TenantIdHeaderMessagingTokenResolverTests()
         {
             _mockMessagingContextAccessor = new MessagingContextAccessor();
             _headers = new Dictionary<string, string>();
-            _mockMessagingEnvelope = new MessagingEnvelope(_headers, new object());
-            _mockMessagingContext = new MessagingContext(_mockMessagingEnvelope);
+            var mockMessagingEnvelope = new MessagingEnvelope(_headers, new object());
+            var mockMessagingContext = new MessagingContext(mockMessagingEnvelope);
 
-            _mockMessagingContextAccessor.MessagingContext = _mockMessagingContext;
+            _mockMessagingContextAccessor.MessagingContext = mockMessagingContext;
         }
 
         [Fact]
@@ -42,17 +40,17 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
         }
 
         [Fact]
-        public void Should_Throw_CannotResolveTokenException_For_Bad_Keys()
+        public void Should_Return_Null_For_Bad_Keys()
         {
             // Arrange
             const string key = "bad token key";
             var sut = new TenantIdHeaderMessagingTokenResolver(_mockMessagingContextAccessor, key);
 
             // Act
-            Action act = () => sut.GetTenantToken();
+            var result= sut.GetTenantToken().Result;
 
             // Assert
-            act.Should().Throw<CannotResolveTokenException>();
+            result.Should().BeNull();
         }
     }
 }

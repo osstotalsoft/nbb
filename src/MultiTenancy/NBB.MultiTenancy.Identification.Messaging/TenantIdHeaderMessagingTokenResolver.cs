@@ -12,18 +12,18 @@ namespace NBB.MultiTenancy.Identification.Messaging
         public TenantIdHeaderMessagingTokenResolver(MessagingContextAccessor messageContextAccessor, string headerKey)
         {
             _headerKey = headerKey;
-            _messageContext = messageContextAccessor.MessagingContext;
+            _messageContext = messageContextAccessor?.MessagingContext;
         }
 
         public Task<string> GetTenantToken()
         {
-            var headers = _messageContext.ReceivedMessageEnvelope.Headers;
-            if (!headers.TryGetValue(_headerKey, out var token))
+            var headers = _messageContext?.ReceivedMessageEnvelope?.Headers;
+            if (headers == null || !headers.TryGetValue(_headerKey, out var token))
             {
-                throw new CannotResolveTokenException();
+                return Task.FromResult<string>(null);
             }
 
-            return Task.FromResult(headers[_headerKey]);
+            return Task.FromResult(token);
         }
     }
 }

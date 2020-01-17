@@ -4,7 +4,6 @@ using NBB.MultiTenancy.Identification.Extensions;
 using NBB.MultiTenancy.Identification.Identifiers;
 using NBB.MultiTenancy.Identification.Resolvers;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -12,22 +11,14 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
 {
     public class DependencyInjectionExtensionsTests
     {
-        public class MockIdentifier : ITenantIdentifier
+        class FirstIdentifier : ITenantIdentifier
         {
             public Task<Guid> GetTenantIdAsync(string tenantToken)
             {
                 throw new NotImplementedException();
             }
         }
-        public class MockSecondIdentifier : ITenantIdentifier
-        {
-            public Task<Guid> GetTenantIdAsync(string tenantToken)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public class MockTenantTokenResolver : ITenantTokenResolver
+        class FirstResolver : ITenantTokenResolver
         {
             public Task<string> GetTenantToken()
             {
@@ -35,133 +26,209 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             }
         }
 
-        public class MockSecondTenantTokenResolver : ITenantTokenResolver
-        {
-            public Task<string> GetTenantToken()
-            {
-                throw new NotImplementedException();
-            }
-        }
+        private readonly IServiceCollection _serviceCollection;
 
-        public class MockBadClass
-        { }
+        public DependencyInjectionExtensionsTests()
+        {
+            _serviceCollection = new ServiceCollection();
+        }
 
         [Fact]
-        public void Should_Throw_ArgumentNullException_If_No_Types_Are_Provided()
+        public void Adding_Null_Resolver_Types_Should_Throw_ArgumentNullException()
         {
             // Arrange
-            var sut = new ServiceCollection();
 
             // Act
-            Action act = () => sut.AddResolverForIdentifier<MockIdentifier>(null);
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(resolverTypes: null);
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
-        public void Should_Throw_ArgumentException_If_No_Types_Are_Empty()
+        public void Adding_Empty_Resolver_Types_Should_Throw_ArgumentException()
         {
             // Arrange
-            var sut = new ServiceCollection();
-            var types = new Type[0];
 
             // Act
-            Action act = () => sut.AddResolverForIdentifier<MockIdentifier>(types);
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>();
 
             // Assert
             act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
-        public void Should_Throw_ArgumentException_If_Types_Contain_Interfaces()
+        public void Adding_Bad_Resolver_Types_Should_Throw_ArgumentException()
         {
             // Arrange
-            var sut = new ServiceCollection();
-            var types = new[] { typeof(ITenantTokenResolver) };
 
             // Act
-            Action act = () => sut.AddResolverForIdentifier<MockIdentifier>(types);
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstIdentifier));
 
             // Assert
             act.Should().Throw<ArgumentException>();
         }
 
         [Fact]
-        public void Should_Throw_ArgumentException_If_Types_Contain_Bad_Class()
+        public void Adding_Resolver_Should_Be_In_Strategy()
         {
             // Arrange
-            var sut = new ServiceCollection();
-            var types = new[] { typeof(MockBadClass) };
+            _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstResolver));
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
 
             // Act
-            Action act = () => sut.AddResolverForIdentifier<MockIdentifier>(types);
+            var result = serviceProvider.GetService<TenantIdentificationStrategy>();
 
             // Assert
-            act.Should().Throw<ArgumentException>();
+            result.Should().NotBeNull();
+            result.TenantIdentifier.Should().BeOfType<FirstIdentifier>();
+            result.TenantTokenResolvers.Should().HaveCount(1);
+            result.TenantTokenResolvers.Should().AllBeOfType<FirstResolver>();
         }
 
         [Fact]
-        public void Same_Identifier_Types_Should_Be_Added_Once()
+        public void Adding_Null_Identifier_With_Types_Should_Throw_ArgumentNullException()
         {
             // Arrange
-            var sut = new ServiceCollection();
-            var types = new[] { typeof(MockTenantTokenResolver), typeof(MockTenantTokenResolver) };
 
             // Act
-            sut.AddResolverForIdentifier<MockIdentifier>(types);
-            sut.AddResolverForIdentifier<MockIdentifier>(types);
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((ITenantIdentifier)null, typeof(FirstResolver));
 
-            // Assert
-            var serviceProvider = sut.BuildServiceProvider();
-            serviceProvider.GetServices<MockIdentifier>().Should().HaveCount(1);
+            // Arrange
+            act.Should().Throw<ArgumentNullException>();
         }
 
         [Fact]
-        public void Created_Token_Identifier_Pair_Should_Have_Registered_Implementation()
+        public void Adding_Identifier_With_Type_Should_Be_In_Strategy()
         {
             // Arrange
-            var sut = new ServiceCollection();
-            var type = typeof(MockTenantTokenResolver);
-            sut.AddResolverForIdentifier<MockIdentifier>(type);
-            var serviceProvider = sut.BuildServiceProvider();
+            _serviceCollection.AddTenantIdentificationStrategy(new FirstIdentifier(), typeof(FirstResolver));
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
 
             // Act
-            var tokenIdentifierPair = serviceProvider.GetService<TenantIdentificationStrategy>();
+            var result = serviceProvider.GetService<TenantIdentificationStrategy>();
 
             // Assert
-            tokenIdentifierPair.TenantIdentifier.Should().BeOfType<MockIdentifier>();
-            tokenIdentifierPair.TenantTokenResolvers.Should().HaveCount(1);
-            tokenIdentifierPair.TenantTokenResolvers.Should().AllBeOfType<MockTenantTokenResolver>();
+            result.Should().NotBeNull();
+            result.TenantIdentifier.Should().BeOfType<FirstIdentifier>();
+            result.TenantTokenResolvers.Should().HaveCount(1);
+            result.TenantTokenResolvers.Should().AllBeOfType<FirstResolver>();
         }
 
         [Fact]
-        public void Should_Not_Mix_Types()
+        public void Adding_Null_ImplementationFactory_With_Type_Should_Throw_ArgumentNullException()
         {
             // Arrange
-            var sut = new ServiceCollection();
-            var firstType = typeof(MockTenantTokenResolver);
-            var secondType = typeof(MockSecondTenantTokenResolver);
-
-            sut.AddResolverForIdentifier<MockIdentifier>(firstType);
-            sut.AddResolverForIdentifier<MockSecondIdentifier>(secondType);
-            var serviceProvider = sut.BuildServiceProvider();
 
             // Act
-            var pairs = serviceProvider.GetServices<TenantIdentificationStrategy>().ToList();
-            var firstPair = pairs.First();
-            var secondPair = pairs.Last();
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((Func<IServiceProvider, ITenantIdentifier>)null, typeof(FirstResolver));
+
+            // Arrange
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Adding_Implementation_Factory_With_Type_Should_Be_In_Strategy()
+        {
+            // Arrange
+            _serviceCollection.AddTenantIdentificationStrategy(_ => new FirstIdentifier(), typeof(FirstResolver));
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
+
+            // Act
+            var result = serviceProvider.GetService<TenantIdentificationStrategy>();
 
             // Assert
-            pairs.Should().HaveCount(2);
-            firstPair.TenantTokenResolvers.Should().HaveCount(1);
-            secondPair.TenantTokenResolvers.Should().HaveCount(1);
+            result.Should().NotBeNull();
+            result.TenantIdentifier.Should().BeOfType<FirstIdentifier>();
+            result.TenantTokenResolvers.Should().HaveCount(1);
+            result.TenantTokenResolvers.Should().AllBeOfType<FirstResolver>();
+        }
 
-            firstPair.TenantIdentifier.Should().BeOfType<MockIdentifier>();
-            secondPair.TenantIdentifier.Should().BeOfType<MockSecondIdentifier>();
+        [Fact]
+        public void Adding_Null_Builder_Should_Throw_ArgumentNullException()
+        {
+            // Arrange
 
-            firstPair.TenantTokenResolvers.Should().AllBeOfType<MockTenantTokenResolver>();
-            secondPair.TenantTokenResolvers.Should().AllBeOfType<MockSecondTenantTokenResolver>();
+            // Act
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(builder: null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Adding_Resolver_Through_Builder_Should_Be_In_Strategy()
+        {
+            // Arrange
+            _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(config => config.AddTenantTokenResolver<FirstResolver>());
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
+
+            // Act
+            var result = serviceProvider.GetService<TenantIdentificationStrategy>();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.TenantIdentifier.Should().BeOfType<FirstIdentifier>();
+            result.TenantTokenResolvers.Should().HaveCount(1);
+            result.TenantTokenResolvers.Should().AllBeOfType<FirstResolver>();
+        }
+
+        [Fact]
+        public void Adding_Null_Identifier_With_Builder_Should_Throw_ArgumentNullException()
+        {
+            // Arrange
+
+            // Act
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((ITenantIdentifier)null, config => config.AddTenantTokenResolver<FirstResolver>());
+
+            // Arrange
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Adding_Identifier_With_Builder_Should_Be_In_Strategy()
+        {
+            // Arrange
+            _serviceCollection.AddTenantIdentificationStrategy(new FirstIdentifier(), config => config.AddTenantTokenResolver<FirstResolver>());
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
+
+            // Act
+            var result = serviceProvider.GetService<TenantIdentificationStrategy>();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.TenantIdentifier.Should().BeOfType<FirstIdentifier>();
+            result.TenantTokenResolvers.Should().HaveCount(1);
+            result.TenantTokenResolvers.Should().AllBeOfType<FirstResolver>();
+        }
+
+        [Fact]
+        public void Adding_Null_ImplementationFactory_With_Builder_Should_Throw_ArgumentNullException()
+        {
+            // Arrange
+
+            // Act
+            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((Func<IServiceProvider, ITenantIdentifier>)null, config => config.AddTenantTokenResolver<FirstResolver>());
+
+            // Arrange
+            act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void Adding_Implementation_Factory_With_Builder_Should_Be_In_Strategy()
+        {
+            // Arrange
+            _serviceCollection.AddTenantIdentificationStrategy(_ => new FirstIdentifier(), config => config.AddTenantTokenResolver<FirstResolver>());
+            var serviceProvider = _serviceCollection.BuildServiceProvider();
+
+            // Act
+            var result = serviceProvider.GetService<TenantIdentificationStrategy>();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.TenantIdentifier.Should().BeOfType<FirstIdentifier>();
+            result.TenantTokenResolvers.Should().HaveCount(1);
+            result.TenantTokenResolvers.Should().AllBeOfType<FirstResolver>();
         }
     }
 }
