@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
-using NBB.MultiTenancy.Identification.Resolvers;
-using System;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
@@ -73,17 +71,31 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         }
 
         [Fact]
-        public void Should_Throw_CannotResolveTokenException_When_The_Key_Is_Bad()
+        public void Should_Return_Null_When_The_Key_Is_Bad()
         {
             // Arrange
             var hKey = "bad key";
             var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
-            Action act = () => sut.GetTenantToken();
+            var result = sut.GetTenantToken().Result;
 
             // Assert
-            act.Should().Throw<CannotResolveTokenException>();
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public void Should_Return_Null_If_Context_Is_Null()
+        {
+            // Arrange
+            _mockHttpContextAccessor.Setup(a => a.HttpContext).Returns((HttpContext)null);
+            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+
+            // Act
+            var result = sut.GetTenantToken().Result;
+
+            // Assert
+            result.Should().BeNull();
         }
     }
 }

@@ -27,12 +27,12 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
         }
 
         [Fact]
-        public void Should_Throw_TenantNotFoundException_If_All_Resolvers_Fail()
+        public void Should_Throw_TenantNotFoundException_If_All_Resolvers_Return_Null()
         {
             // Arrange
-            _firstResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
-            _secondResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
-            _thirdResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _thirdResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             var identifierPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
             var sut = new TenantService(new List<TenantIdentificationStrategy>() { identifierPair });
 
@@ -48,7 +48,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
         {
             // Arrange
             const string tenantToken = "mock token";
-            _firstResolver.Setup(r => r.GetTenantToken()).Throws<CannotResolveTokenException>();
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
             _thirdResolver.Setup(r => r.GetTenantToken()).Throws<Exception>();
             var firstPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object }, _identifier.Object);
