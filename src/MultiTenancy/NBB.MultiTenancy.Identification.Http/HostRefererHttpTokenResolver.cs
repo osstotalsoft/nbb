@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Identification.Http
 {
-    public class HostRequestHttpTokenResolver : ITenantTokenResolver
+    public class HostRefererHttpTokenResolver : ITenantTokenResolver
     {
         private const string HeaderReferer = "Referer";
         private readonly HttpContext _httpContext;
 
-        public HostRequestHttpTokenResolver(IHttpContextAccessor accessor)
+        public HostRefererHttpTokenResolver(IHttpContextAccessor accessor)
         {
             _httpContext = accessor.HttpContext;
         }

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
 {
-    public class HostRequestHttpTokenResolverTests
+    public class HostRefererHttpTokenResolverTests
     {
         private const string HeaderReferer = "Referer";
         private readonly Mock<HttpContext> _mockHttpContext;
@@ -14,7 +14,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         private readonly Mock<IHeaderDictionary> _mockHeaders;
         private readonly Mock<IHttpContextAccessor> _mockHttpContextAccessor;
 
-        public HostRequestHttpTokenResolverTests()
+        public HostRefererHttpTokenResolverTests()
         {
             _mockHttpContext = new Mock<HttpContext>();
             _mockHttpRequest = new Mock<HttpRequest>();
@@ -32,7 +32,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var _ = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
@@ -42,7 +42,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         public void Should_Retrieve_Request_From_Context()
         {
             // Arrange
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var _ = sut.GetTenantToken().Result;
@@ -55,7 +55,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         public void Should_Retrieve_Header_From_Request()
         {
             // Arrange
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var _ = sut.GetTenantToken().Result;
@@ -68,7 +68,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         public void Should_Try_To_Retrieve_HeaderReferer_From_Headers()
         {
             // Arrange
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var _ = sut.GetTenantToken().Result;
@@ -82,7 +82,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             _mockHttpContextAccessor.Setup(a => a.HttpContext).Returns((HttpContext)null);
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -96,7 +96,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             _mockHttpContext.Setup(a => a.Request).Returns((HttpRequest)null);
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -110,7 +110,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             _mockHttpRequest.Setup(a => a.Headers).Returns((IHeaderDictionary)null);
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -124,7 +124,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             _mockHeaders.Setup(h => h.TryGetValue(It.Is<string>(key => string.Equals(key, HeaderReferer)), out It.Ref<StringValues>.IsAny)).Returns(false);
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -140,7 +140,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             const string host = "test.com";
             var headerReferrer = new StringValues($"HTTP://{host}:81/path/query?test=pass&success=true");
             _mockHeaders.Setup(h => h.TryGetValue(It.Is<string>(key => string.Equals(key, HeaderReferer)), out headerReferrer)).Returns(true);
-            var sut = new HostRequestHttpTokenResolver(_mockHttpContextAccessor.Object);
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
             var result = sut.GetTenantToken().Result;
