@@ -1,5 +1,7 @@
 ﻿using System;
+using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
+using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 
 namespace NBB.Messaging.MultiTenancy
@@ -9,12 +11,15 @@ namespace NBB.Messaging.MultiTenancy
         private readonly ITopicRegistry _innerTopicRegistry;
         private readonly ITenantService _tenantService;
         private readonly ITenantMessagingConfigService _tenantMessagingConfigService;
+        private readonly IOptions<TenancyOptions> _tenancyOptions;
+        private const string SharedTopicPrefix = "Shared_";
 
-        public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService)
+        public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyOptions> tenancyOptions)
         {
             _innerTopicRegistry = innerTopicRegistry;
             _tenantService = tenantService;
             _tenantMessagingConfigService = tenantMessagingConfigService;
+            _tenancyOptions = tenancyOptions;
         }
 
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
@@ -41,12 +46,33 @@ namespace NBB.Messaging.MultiTenancy
             return includePrefix ? $"{GetTopicPrefix()}{topicName}" : topicName;
         }
 
-        private string GetTopicPrefix()
+        public string GetTopicPrefix()
         {
-            var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
-            var topicPrefix = _tenantMessagingConfigService.GetTopicPrefix(tenantId);
+            var baseTopicPrefix = _innerTopicRegistry.GetTopicPrefix();
+            switch (_tenancyOptions.Value.TenancyContextType)
+            {
+                case TenancyContextType.MultiTenant:
+                    return $"{baseTopicPrefix}{SharedTopicPrefix}";
+                case TenancyContextType.MonoTenant:
+                {
+                    var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
+                    return $"{baseTopicPrefix}Tenant_{tenantId}_";
+                }
 
-            return topicPrefix;
+                default:
+                    return baseTopicPrefix;
+            }
+
+            /*
+            try
+            {
+             
+
+            }
+            catch (TenantNotFoundException)
+            {
+                return $"{baseTopicPrefix}{SharedTopicPrefix}";
+            }*/
         }
     }
 }

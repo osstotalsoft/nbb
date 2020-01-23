@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Messaging.Abstractions;
@@ -11,8 +9,6 @@ namespace NBB.Messaging.MultiTenancy
 {
     public class MultiTenancyMessageBusPublisherDecorator : IMessageBusPublisher
     {
-        private const string TenantIdHeader = "nbb-tenantId";
-
         private readonly IMessageBusPublisher _inner;
         private readonly ITenantService _tenantService;
 
@@ -30,7 +26,7 @@ namespace NBB.Messaging.MultiTenancy
 
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {
-                outgoingEnvelope.SetHeader(TenantIdHeader, tenantId.ToString());
+                outgoingEnvelope.SetHeader(MessagingHeaders.TenantId, tenantId.ToString());
                 envelopeCustomizer?.Invoke(outgoingEnvelope);
             }
 

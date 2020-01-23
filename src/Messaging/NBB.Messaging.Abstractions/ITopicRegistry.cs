@@ -6,5 +6,6 @@ namespace NBB.Messaging.Abstractions
     {
         string GetTopicForMessageType(Type messageType, bool includePrefix = true);
         string GetTopicForName(string topicName, bool includePrefix = true);
+        string GetTopicPrefix();
     }
 }

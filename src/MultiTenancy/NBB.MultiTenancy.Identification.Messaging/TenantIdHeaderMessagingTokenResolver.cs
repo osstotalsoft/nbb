@@ -7,17 +7,17 @@ namespace NBB.MultiTenancy.Identification.Messaging
     public class TenantIdHeaderMessagingTokenResolver : ITenantTokenResolver
     {
         private readonly string _headerKey;
-        private readonly MessagingContext _messageContext;
+        private readonly MessagingContextAccessor _messageContextAccessor;
 
         public TenantIdHeaderMessagingTokenResolver(MessagingContextAccessor messageContextAccessor, string headerKey)
         {
             _headerKey = headerKey;
-            _messageContext = messageContextAccessor?.MessagingContext;
+            _messageContextAccessor = messageContextAccessor;
         }
 
         public Task<string> GetTenantToken()
         {
-            var headers = _messageContext?.ReceivedMessageEnvelope?.Headers;
+            var headers = _messageContextAccessor?.MessagingContext?.ReceivedMessageEnvelope?.Headers;
             if (headers == null || !headers.TryGetValue(_headerKey, out var token))
             {
                 return Task.FromResult<string>(null);

@@ -66,7 +66,7 @@ namespace NBB.Messaging.Abstractions
             return topicNameResolver?.ResolveTopicName(messageType, _configuration);
         }
 
-        private string GetTopicPrefix()
+        public string GetTopicPrefix()
         {
             var topicPrefix = _configuration.GetSection("Messaging")?["TopicPrefix"];
             return topicPrefix ?? "";

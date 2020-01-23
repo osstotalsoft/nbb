@@ -9,10 +9,11 @@ using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
 using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
+using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
+using NBB.MultiTenancy.Identification.Http;
 using NBB.MultiTenancy.Identification.Identifiers;
-using NBB.MultiTenancy.Identification.Services;
 
 namespace NBB.Contracts.Api
 {
@@ -36,9 +37,12 @@ namespace NBB.Contracts.Api
 
             services.AddMultiTenantMessaging();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITenantService, TenantService>();
             services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
-            services.AddResolverForIdentifier<IdTenantIdentifier>(typeof(HttpHeaderTenantTokenResolver));
+            services.Configure<TenancyOptions>(Configuration.GetSection("MultiTenancy"));
+
+            services.AddTenantIdentification()
+                .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder =>
+                    builder.AddTenantTokenResolver<TenantIdHeaderHttpTokenResolver>("TenantId"));
 
             services.AddContractsReadModelDataAccess();
         }

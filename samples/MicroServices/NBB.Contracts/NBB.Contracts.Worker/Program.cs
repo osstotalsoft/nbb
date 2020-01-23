@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,17 +20,19 @@ using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Contracts.Api.MultiTenancy;
 using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.MultiTenancy;
+using NBB.Messaging.MultiTenancy.MessagingPipeline;
+using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
 using NBB.MultiTenancy.Identification.Identifiers;
 using NBB.MultiTenancy.Identification.Messaging;
+using NBB.MultiTenancy.Identification.Resolvers;
 using NBB.MultiTenancy.Identification.Services;
+using MessagingHeaders = NBB.Messaging.MultiTenancy.MessagingHeaders;
 
 namespace NBB.Contracts.Worker
 {
@@ -95,17 +98,31 @@ namespace NBB.Contracts.Worker
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
+                            .UseTenantValidationMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
                         );
 
+                    var tenancyOptions = hostingContext.Configuration.GetSection("MultiTenancy").Get<TenancyOptions>();
+
                     services.AddMultiTenantMessaging();
-                    services.AddSingleton<ITenantService, TenantService>();
                     services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
-                    services.AddResolverForIdentifier<IdTenantIdentifier>(
-                        typeof(MessagingHeaderTenantTokenResolver),
-                        typeof(StaticTenantTokenResolver)
-                    );
+                    services.Configure<TenancyOptions>(hostingContext.Configuration.GetSection("MultiTenancy"));
+
+                    services.AddTenantIdentification();
+                    switch (tenancyOptions.TenancyContextType)
+                    {
+                        case TenancyContextType.MultiTenant:
+                            services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
+                                .AddTenantTokenResolver<TenantIdHeaderMessagingTokenResolver>(MessagingHeaders.TenantId));
+                            break;
+                        case TenancyContextType.MonoTenant when tenancyOptions.MonoTenantId.HasValue:
+                            services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
+                                .AddTenantTokenResolver(new DefaultTenantTokenResolver(tenancyOptions.MonoTenantId.Value)));
+                            break;
+                        default:
+                            throw new Exception("Invalid tenancy configuration");
+                    }
                 });
 
             await builder.RunConsoleAsync(default);
