@@ -35,16 +35,9 @@ namespace NBB.Contracts.Api
             //services.AddKafkaMessaging();
             services.AddNatsMessaging();
 
-            services.AddMultiTenantMessaging();
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
-            services.Configure<TenancyOptions>(Configuration.GetSection("MultiTenancy"));
-
-            services.AddTenantIdentification()
-                .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder =>
-                    builder.AddTenantTokenResolver<TenantIdHeaderHttpTokenResolver>("TenantId"));
-
             services.AddContractsReadModelDataAccess();
+
+            services.AddMultiTenancy(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

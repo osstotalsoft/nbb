@@ -28,7 +28,7 @@ namespace NBB.Messaging.Nats
                 await connection.PublishAsync(topic, System.Text.Encoding.UTF8.GetBytes(message)));
             stopWatch.Stop();
 
-            _logger.LogInformation("Nats message published to subject {Subject} in {ElapsedMilliseconds} ms", topic,
+            _logger.LogDebug("Nats message published to subject {Subject} in {ElapsedMilliseconds} ms", topic,
                 stopWatch.ElapsedMilliseconds);
         }
     }

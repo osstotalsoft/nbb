@@ -98,31 +98,12 @@ namespace NBB.Contracts.Worker
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
-                            .UseTenantValidationMiddleware()
+                            //.UseTenantValidationMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
                         );
 
-                    var tenancyOptions = hostingContext.Configuration.GetSection("MultiTenancy").Get<TenancyOptions>();
-
-                    services.AddMultiTenantMessaging();
-                    services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
-                    services.Configure<TenancyOptions>(hostingContext.Configuration.GetSection("MultiTenancy"));
-
-                    services.AddTenantIdentification();
-                    switch (tenancyOptions.TenancyContextType)
-                    {
-                        case TenancyContextType.MultiTenant:
-                            services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
-                                .AddTenantTokenResolver<TenantIdHeaderMessagingTokenResolver>(MessagingHeaders.TenantId));
-                            break;
-                        case TenancyContextType.MonoTenant when tenancyOptions.MonoTenantId.HasValue:
-                            services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
-                                .AddTenantTokenResolver(new DefaultTenantTokenResolver(tenancyOptions.MonoTenantId.Value)));
-                            break;
-                        default:
-                            throw new Exception("Invalid tenancy configuration");
-                    }
+                   services.AddMultiTenancy(hostingContext.Configuration);
                 });
 
             await builder.RunConsoleAsync(default);

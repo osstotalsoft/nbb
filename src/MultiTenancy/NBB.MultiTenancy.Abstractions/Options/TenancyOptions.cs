@@ -13,7 +13,8 @@ namespace NBB.MultiTenancy.Abstractions.Options
 
     public enum TenancyContextType
     {
-        MultiTenant,
-        MonoTenant
+        None = 0,
+        MultiTenant = 1,
+        MonoTenant = 2
     }
 }

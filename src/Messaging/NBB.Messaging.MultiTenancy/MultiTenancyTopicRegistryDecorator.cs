@@ -12,7 +12,7 @@ namespace NBB.Messaging.MultiTenancy
         private readonly ITenantService _tenantService;
         private readonly ITenantMessagingConfigService _tenantMessagingConfigService;
         private readonly IOptions<TenancyOptions> _tenancyOptions;
-        private const string SharedTopicPrefix = "Shared_";
+        private const string SharedTopicPrefix = "Shared";
 
         public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyOptions> tenancyOptions)
         {
@@ -52,27 +52,18 @@ namespace NBB.Messaging.MultiTenancy
             switch (_tenancyOptions.Value.TenancyContextType)
             {
                 case TenancyContextType.MultiTenant:
-                    return $"{baseTopicPrefix}{SharedTopicPrefix}";
+                    return $"{baseTopicPrefix}{SharedTopicPrefix}.";
                 case TenancyContextType.MonoTenant:
                 {
                     var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
-                    return $"{baseTopicPrefix}Tenant_{tenantId}_";
+                    return $"{baseTopicPrefix}Tenant.{tenantId}.";
                 }
-
+                case TenancyContextType.None:
                 default:
-                    return baseTopicPrefix;
+                {
+                    throw new ApplicationException("Invalid multiTenant context configuration");
+                }
             }
-
-            /*
-            try
-            {
-             
-
-            }
-            catch (TenantNotFoundException)
-            {
-                return $"{baseTopicPrefix}{SharedTopicPrefix}";
-            }*/
         }
     }
 }
