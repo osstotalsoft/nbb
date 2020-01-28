@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 
-namespace NBB.Messaging.MultiTenancy.MessagingPipeline
+namespace NBB.Messaging.MultiTenancy
 {
     /// <summary>
     /// A pipeline middleware that checks if the tenant received in messages is the same as the tenant
@@ -25,6 +25,8 @@ namespace NBB.Messaging.MultiTenancy.MessagingPipeline
             _tenantService = tenantService;
             _tenantMessagingConfigService = tenantMessagingConfigService;
             _tenancyOptions = tenancyOptions;
+
+            CheckMonoTenant();
         }
 
         public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
@@ -57,6 +59,17 @@ namespace NBB.Messaging.MultiTenancy.MessagingPipeline
             }
 
             await next();
+        }
+
+        private void CheckMonoTenant()
+        {
+            if (_tenancyOptions.Value.TenancyContextType != TenancyContextType.MonoTenant) return;
+            var tenantId = _tenancyOptions.Value.MonoTenantId ?? throw new ApplicationException("MonoTenant Id is not configured");
+
+            if (_tenantMessagingConfigService.IsShared(tenantId))
+            {
+                throw  new ApplicationException($"Starting message host for premium tenant {tenantId} in a MultiTenant (shared) context");
+            }
         }
     }
 

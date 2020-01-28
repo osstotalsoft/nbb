@@ -2,23 +2,19 @@
 using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
 using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Services;
 
 namespace NBB.Messaging.MultiTenancy
 {
     public class MultiTenancyTopicRegistryDecorator : ITopicRegistry
     {
         private readonly ITopicRegistry _innerTopicRegistry;
-        private readonly ITenantService _tenantService;
-        private readonly ITenantMessagingConfigService _tenantMessagingConfigService;
         private readonly IOptions<TenancyOptions> _tenancyOptions;
         private const string SharedTopicPrefix = "Shared";
+        private const string TenantTopicPrefix = "Tenant";
 
-        public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyOptions> tenancyOptions)
+        public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IOptions<TenancyOptions> tenancyOptions)
         {
             _innerTopicRegistry = innerTopicRegistry;
-            _tenantService = tenantService;
-            _tenantMessagingConfigService = tenantMessagingConfigService;
             _tenancyOptions = tenancyOptions;
         }
 
@@ -53,12 +49,12 @@ namespace NBB.Messaging.MultiTenancy
             {
                 case TenancyContextType.MultiTenant:
                     return $"{baseTopicPrefix}{SharedTopicPrefix}.";
-                case TenancyContextType.MonoTenant:
+                case TenancyContextType.MonoTenant when _tenancyOptions.Value.MonoTenantId.HasValue:
                 {
-                    var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
-                    return $"{baseTopicPrefix}Tenant.{tenantId}.";
+                    //var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
+                    var tenantId = _tenancyOptions.Value.MonoTenantId.Value;
+                    return $"{baseTopicPrefix}{TenantTopicPrefix}.{tenantId}.";
                 }
-                case TenancyContextType.None:
                 default:
                 {
                     throw new ApplicationException("Invalid multiTenant context configuration");

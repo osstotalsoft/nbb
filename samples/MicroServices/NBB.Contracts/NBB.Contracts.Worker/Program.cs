@@ -24,7 +24,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.MultiTenancy;
-using NBB.Messaging.MultiTenancy.MessagingPipeline;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
