@@ -16,30 +16,30 @@ namespace NBB.Contracts.Worker.MultiTenancy
         public static void AddMultiTenancy(this IServiceCollection services, IConfiguration configuration)
         {
             var configurationSection = configuration.GetSection("MultiTenancy");
-            var tenancyOptions = configurationSection.Get<TenancyOptions>();
-            if (tenancyOptions == null || tenancyOptions.TenancyContextType == TenancyContextType.None)
+            var tenancyOptions = configurationSection.Get<TenancyHostingOptions>();
+            if (tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None)
             {
                 return;
             }
 
             services.AddMultiTenantMessaging();
             services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
-            services.Configure<TenancyOptions>(configurationSection);
+            services.Configure<TenancyHostingOptions>(configurationSection);
 
             services.AddTenantIdentification();
-            switch (tenancyOptions.TenancyContextType)
+            switch (tenancyOptions.TenancyType)
             {
-                case TenancyContextType.MultiTenant:
+                case TenancyType.MultiTenant:
                     services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
                         .AddTenantTokenResolver<TenantIdHeaderMessagingTokenResolver>(MessagingHeaders
                             .TenantId));
                     break;
-                case TenancyContextType.MonoTenant when tenancyOptions.MonoTenantId.HasValue:
+                case TenancyType.MonoTenant when tenancyOptions.MonoTenantId.HasValue:
                     services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
                         .AddTenantTokenResolver(
                             new DefaultTenantTokenResolver(tenancyOptions.MonoTenantId.Value)));
                     break;
-                case TenancyContextType.None:
+                case TenancyType.None:
                 default:
                     throw new Exception("Invalid tenancy configuration");
             }

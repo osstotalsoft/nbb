@@ -9,6 +9,7 @@ using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
 using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
@@ -41,8 +42,10 @@ namespace NBB.Contracts.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env/*, TenancyHostingValidator tenancyHostingValidator*/)
         {
+            //tenancyHostingValidator.Validate();
+
             app.UseCorrelation();
 
             if (env.IsDevelopment())

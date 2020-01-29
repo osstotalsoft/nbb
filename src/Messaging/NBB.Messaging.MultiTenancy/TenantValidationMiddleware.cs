@@ -18,59 +18,51 @@ namespace NBB.Messaging.MultiTenancy
     {
         private readonly ITenantService _tenantService;
         private readonly ITenantMessagingConfigService _tenantMessagingConfigService;
-        private readonly IOptions<TenancyOptions> _tenancyOptions;
+        private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
 
-        public TenantValidationMiddleware(ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyOptions> tenancyOptions)
+        public TenantValidationMiddleware(ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _tenantService = tenantService;
             _tenantMessagingConfigService = tenantMessagingConfigService;
             _tenancyOptions = tenancyOptions;
-
-            CheckMonoTenant();
         }
 
         public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
             var contextTenantId = await _tenantService.GetTenantIdAsync();
-            if (message.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
+            if (!message.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
             {
-                if (!Guid.TryParse(messageTenantIdHeader, out var messageTenantId))
-                {
-                    if (messageTenantId != contextTenantId)
-                    {
-                        throw new ApplicationException(
-                            $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {contextTenantId} but received {messageTenantIdHeader}");
-                    }
+                throw new ApplicationException($"The tenant ID message header is missing from the message envelope");
+            }
 
-                    if (_tenantMessagingConfigService.IsShared(messageTenantId) &&
-                        _tenancyOptions.Value.TenancyContextType == TenancyContextType.MonoTenant)
-                    {
-                        throw new ApplicationException($"Received a message for shared tenant {messageTenantIdHeader} in a MonoTenant hosting");
+            if (!Guid.TryParse(messageTenantIdHeader, out var messageTenantId))
+            {
+                throw new ApplicationException($"The tenant ID message header is invalid");
+            }
 
-                    }
+            if (messageTenantId != contextTenantId)
+            {
+                throw new ApplicationException(
+                    $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {contextTenantId} but received {messageTenantIdHeader}");
+            }
 
-                    if (!_tenantMessagingConfigService.IsShared(messageTenantId) &&
-                        _tenancyOptions.Value.TenancyContextType == TenancyContextType.MultiTenant)
-                    {
-                        throw new ApplicationException($"Received a message for premium tenant {messageTenantIdHeader} in a MultiTenant (shared) context");
+            if (_tenantMessagingConfigService.IsShared(messageTenantId) &&
+                _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
+            {
+                throw new ApplicationException(
+                    $"Received a message for shared tenant {messageTenantIdHeader} in a MonoTenant hosting");
+            }
 
-                    }
-                }
+            if (!_tenantMessagingConfigService.IsShared(messageTenantId) &&
+                _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant)
+            {
+                throw new ApplicationException(
+                    $"Received a message for premium tenant {messageTenantIdHeader} in a MultiTenant (shared) context");
             }
 
             await next();
         }
 
-        private void CheckMonoTenant()
-        {
-            if (_tenancyOptions.Value.TenancyContextType != TenancyContextType.MonoTenant) return;
-            var tenantId = _tenancyOptions.Value.MonoTenantId ?? throw new ApplicationException("MonoTenant Id is not configured");
-
-            if (_tenantMessagingConfigService.IsShared(tenantId))
-            {
-                throw  new ApplicationException($"Starting message host for premium tenant {tenantId} in a MultiTenant (shared) context");
-            }
-        }
     }
 
     public static class MessagingPipelineExtensions

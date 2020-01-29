@@ -7,12 +7,12 @@ namespace NBB.Contracts.Worker.MultiTenancy
 {
     public class TenantMessagingConfigService : ITenantMessagingConfigService
     {
-        private readonly IOptions<TenancyOptions> _tenancyOptions;
-        public TenantMessagingConfigService(IOptions<TenancyOptions> tenancyOptions)
+        private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
+        public TenantMessagingConfigService(IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _tenancyOptions = tenancyOptions;
         }
 
-        public bool IsShared(Guid tenantId) => _tenancyOptions.Value.TenancyContextType == TenancyContextType.MultiTenant;
+        public bool IsShared(Guid tenantId) => _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant;
     }
 }

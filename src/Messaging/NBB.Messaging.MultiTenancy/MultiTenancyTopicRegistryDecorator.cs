@@ -8,11 +8,11 @@ namespace NBB.Messaging.MultiTenancy
     public class MultiTenancyTopicRegistryDecorator : ITopicRegistry
     {
         private readonly ITopicRegistry _innerTopicRegistry;
-        private readonly IOptions<TenancyOptions> _tenancyOptions;
+        private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
         private const string SharedTopicPrefix = "Shared";
         private const string TenantTopicPrefix = "Tenant";
 
-        public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IOptions<TenancyOptions> tenancyOptions)
+        public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _innerTopicRegistry = innerTopicRegistry;
             _tenancyOptions = tenancyOptions;
@@ -45,11 +45,11 @@ namespace NBB.Messaging.MultiTenancy
         public string GetTopicPrefix()
         {
             var baseTopicPrefix = _innerTopicRegistry.GetTopicPrefix();
-            switch (_tenancyOptions.Value.TenancyContextType)
+            switch (_tenancyOptions.Value.TenancyType)
             {
-                case TenancyContextType.MultiTenant:
+                case TenancyType.MultiTenant:
                     return $"{baseTopicPrefix}{SharedTopicPrefix}.";
-                case TenancyContextType.MonoTenant when _tenancyOptions.Value.MonoTenantId.HasValue:
+                case TenancyType.MonoTenant when _tenancyOptions.Value.MonoTenantId.HasValue:
                 {
                     //var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
                     var tenantId = _tenancyOptions.Value.MonoTenantId.Value;

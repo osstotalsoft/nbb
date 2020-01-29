@@ -2,12 +2,12 @@
 
 namespace NBB.MultiTenancy.Abstractions.Options
 {
-    public class TenancyOptions
+    public class TenancyHostingOptions
     {
         /// <summary>
         /// Returns the tenancy model used by the current process
         /// </summary>
-        public TenancyContextType TenancyContextType { get; set; }
+        public TenancyType TenancyType { get; set; }
 
         /// <summary>
         /// Returns the current Tenant ID if the current tenancy context type is "MonoTenant"
@@ -15,7 +15,7 @@ namespace NBB.MultiTenancy.Abstractions.Options
         public Guid? MonoTenantId { get; set; }
     }
 
-    public enum TenancyContextType
+    public enum TenancyType
     {
         None = 0,
 

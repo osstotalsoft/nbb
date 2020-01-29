@@ -16,8 +16,8 @@ namespace NBB.Contracts.Api.MultiTenancy
         public static void AddMultiTenancy(this IServiceCollection services, IConfiguration configuration)
         {
             var configurationSection = configuration.GetSection("MultiTenancy");
-            var tenancyOptions = configurationSection.Get<TenancyOptions>();
-            if (tenancyOptions == null || tenancyOptions.TenancyContextType == TenancyContextType.None)
+            var tenancyOptions = configurationSection.Get<TenancyHostingOptions>();
+            if (tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None)
             {
                 return;
             }
@@ -25,7 +25,7 @@ namespace NBB.Contracts.Api.MultiTenancy
             services.AddMultiTenantMessaging();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
-            services.Configure<TenancyOptions>(configurationSection);
+            services.Configure<TenancyHostingOptions>(configurationSection);
 
             services.AddTenantIdentification()
                 .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder => builder

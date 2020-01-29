@@ -16,8 +16,8 @@ namespace NBB.Messaging.MultiTenancy.Tests
         {
             // Arrange
             var topicRegistryMock = new Mock<ITopicRegistry>();
-            var options = Options.Create(new TenancyOptions
-                {TenancyContextType = TenancyContextType.MultiTenant});
+            var options = Options.Create(new TenancyHostingOptions
+                {TenancyType = TenancyType.MultiTenant});
             var sut = new MultiTenancyTopicRegistryDecorator(topicRegistryMock.Object, options);
             const string topicName = "test";
 
@@ -44,8 +44,8 @@ namespace NBB.Messaging.MultiTenancy.Tests
             var topicRegistryMock = new Mock<ITopicRegistry>();
             topicRegistryMock.Setup(x => x.GetTopicForMessageType(typeof(string), It.IsAny<bool>())).Returns("topic");
             var tenantId = Guid.NewGuid();
-            var options = Options.Create(new TenancyOptions
-                {TenancyContextType = TenancyContextType.MonoTenant, MonoTenantId = tenantId});
+            var options = Options.Create(new TenancyHostingOptions
+                {TenancyType = TenancyType.MonoTenant, MonoTenantId = tenantId});
 
             var sut = new MultiTenancyTopicRegistryDecorator(topicRegistryMock.Object,  options);
 

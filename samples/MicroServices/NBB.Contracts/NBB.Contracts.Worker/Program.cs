@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.MultiTenancy;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
@@ -102,10 +103,13 @@ namespace NBB.Contracts.Worker
                             .UseMediatRMiddleware()
                         );
 
-                   services.AddMultiTenancy(hostingContext.Configuration);
+                    services.AddMultiTenancy(hostingContext.Configuration);
                 });
 
-            await builder.RunConsoleAsync(default);
+            var host = builder.UseConsoleLifetime().Build();
+            //host.Services.GetRequiredService<TenancyHostingValidator>().Validate();
+
+            await host.RunAsync();
         }
     }
 }
