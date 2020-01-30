@@ -7,18 +7,18 @@ namespace NBB.MultiTenancy.Identification.Http
 {
     public class TenantIdHeaderHttpTokenResolver : ITenantTokenResolver
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly string _headerKey;
-        private readonly HttpContext _httpContext;
 
         public TenantIdHeaderHttpTokenResolver(IHttpContextAccessor httpContextAccessor, string headerKey)
         {
+            _httpContextAccessor = httpContextAccessor;
             _headerKey = headerKey;
-            _httpContext = httpContextAccessor?.HttpContext;
         }
 
         public Task<string> GetTenantToken()
         {
-            var headerValues = _httpContext?.Request?.Headers[_headerKey];
+            var headerValues = _httpContextAccessor?.HttpContext?.Request?.Headers[_headerKey];
             if (!headerValues.HasValue || headerValues.Value == StringValues.Empty || headerValues.Value.Count != 1)
             {
                 return Task.FromResult<string>(null);

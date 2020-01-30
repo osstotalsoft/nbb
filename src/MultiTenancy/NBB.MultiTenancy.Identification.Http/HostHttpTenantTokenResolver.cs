@@ -6,16 +6,16 @@ namespace NBB.MultiTenancy.Identification.Http
 {
     public class HostHttpTenantTokenResolver : ITenantTokenResolver
     {
-        private readonly HttpContext _httpContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public HostHttpTenantTokenResolver(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContext = httpContextAccessor?.HttpContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Task<string> GetTenantToken()
         {
-            return Task.FromResult(_httpContext?.Request?.Host.Host);
+            return Task.FromResult(_httpContextAccessor?.HttpContext?.Request?.Host.Host);
         }
     }
 }
