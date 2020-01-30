@@ -27,12 +27,25 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         }
 
         [Fact]
-        public void Should_Retrieve_Context_From_Accessor()
+        public void Should_Not_Retrieve_Context_From_Accessor_At_Constructor()
         {
             // Arrange
 
             // Act
             var _ = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
+
+            // Assert
+            _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
+        }
+
+        [Fact]
+        public void Should_Retrieve_Context_From_Accessor()
+        {
+            // Arrange
+            var sut = new HostRefererHttpTokenResolver(_mockHttpContextAccessor.Object);
+
+            // Act
+            var _ = sut.GetTenantToken().Result;
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());

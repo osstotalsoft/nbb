@@ -26,7 +26,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         }
 
         [Fact]
-        public void Should_Retrieve_Context_From_Accessor()
+        public void Should_Not_Retrieve_Context_From_Accessor_At_Constructor()
         {
             // Arrange
 
@@ -34,11 +34,11 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var _ = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Assert
-            _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
+            _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
         }
 
         [Fact]
-        public void Should_Retrieve_Headers_From_Request_From_Context()
+        public void Should_Retrieve_Headers_From_Request_From_Context_From_Accessor()
         {
             // Arrange
             var hKey = "key";
@@ -50,6 +50,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var _ = sut.GetTenantToken().Result;
 
             // Assert
+            _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
             _mockHttpContext.Verify(c => c.Request, Times.Once());
             _mockHttpRequest.Verify(r => r.Headers, Times.Once());
         }
