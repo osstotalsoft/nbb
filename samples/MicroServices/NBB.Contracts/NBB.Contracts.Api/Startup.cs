@@ -1,20 +1,11 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NBB.Contracts.Api.MultiTenancy;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
-using NBB.MultiTenancy.Abstractions.Hosting;
-using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Services;
-using NBB.MultiTenancy.Identification.Extensions;
-using NBB.MultiTenancy.Identification.Http;
-using NBB.MultiTenancy.Identification.Identifiers;
 
 namespace NBB.Contracts.Api
 {
@@ -44,8 +35,6 @@ namespace NBB.Contracts.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env/*, TenancyHostingValidator tenancyHostingValidator*/)
         {
-            //tenancyHostingValidator.Validate();
-
             app.UseCorrelation();
 
             if (env.IsDevelopment())

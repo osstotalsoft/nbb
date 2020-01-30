@@ -3,12 +3,12 @@ using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 
-namespace NBB.Contracts.Api.MultiTenancy
+namespace NBB.Contracts.Worker.MultiTenancy
 {
-    public class TenantMessagingConfigService : ITenantMessagingConfigService
+    public class TenantHostingConfigService : ITenantHostingConfigService
     {
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
-        public TenantMessagingConfigService(IOptions<TenancyHostingOptions> tenancyOptions)
+        public TenantHostingConfigService(IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _tenancyOptions = tenancyOptions;
         }

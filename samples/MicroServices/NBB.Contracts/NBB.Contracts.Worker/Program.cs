@@ -1,5 +1,4 @@
-﻿using System;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,18 +20,8 @@ using Serilog;
 using Serilog.Events;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.MultiTenancy;
-using NBB.MultiTenancy.Abstractions.Hosting;
-using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Services;
-using NBB.MultiTenancy.Identification.Extensions;
-using NBB.MultiTenancy.Identification.Identifiers;
-using NBB.MultiTenancy.Identification.Messaging;
-using NBB.MultiTenancy.Identification.Resolvers;
-using NBB.MultiTenancy.Identification.Services;
-using MessagingHeaders = NBB.Messaging.MultiTenancy.MessagingHeaders;
 
 namespace NBB.Contracts.Worker
 {
@@ -107,7 +96,6 @@ namespace NBB.Contracts.Worker
                 });
 
             var host = builder.UseConsoleLifetime().Build();
-            //host.Services.GetRequiredService<TenancyHostingValidator>().Validate();
 
             await host.RunAsync();
         }

@@ -48,12 +48,12 @@ namespace NBB.Messaging.MultiTenancy
             switch (_tenancyOptions.Value.TenancyType)
             {
                 case TenancyType.MultiTenant:
-                    return $"{baseTopicPrefix}{SharedTopicPrefix}.";
-                case TenancyType.MonoTenant when _tenancyOptions.Value.MonoTenantId.HasValue:
+                    return $"{baseTopicPrefix}{TenantTopicPrefix}_{SharedTopicPrefix}.";
+                case TenancyType.MonoTenant when _tenancyOptions.Value.TenantId.HasValue:
                 {
                     //var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
-                    var tenantId = _tenancyOptions.Value.MonoTenantId.Value;
-                    return $"{baseTopicPrefix}{TenantTopicPrefix}.{tenantId}.";
+                    var tenantId = _tenancyOptions.Value.TenantId.Value;
+                    return $"{baseTopicPrefix}{TenantTopicPrefix}_{tenantId}.";
                 }
                 default:
                 {

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Messaging.MultiTenancy;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
@@ -22,8 +23,9 @@ namespace NBB.Contracts.Worker.MultiTenancy
                 return;
             }
 
+            services.AddHostingConfigValidation();
             services.AddMultiTenantMessaging();
-            services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
+            services.AddSingleton<ITenantHostingConfigService, TenantHostingConfigService>();
             services.Configure<TenancyHostingOptions>(configurationSection);
 
             services.AddTenantIdentification();
@@ -31,13 +33,12 @@ namespace NBB.Contracts.Worker.MultiTenancy
             {
                 case TenancyType.MultiTenant:
                     services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
-                        .AddTenantTokenResolver<TenantIdHeaderMessagingTokenResolver>(MessagingHeaders
-                            .TenantId));
+                        .AddMessagingTokenResolver());
                     break;
-                case TenancyType.MonoTenant when tenancyOptions.MonoTenantId.HasValue:
+                case TenancyType.MonoTenant when tenancyOptions.TenantId.HasValue:
                     services.AddTenantIdentificationStrategy<IdTenantIdentifier>(config => config
                         .AddTenantTokenResolver(
-                            new DefaultTenantTokenResolver(tenancyOptions.MonoTenantId.Value)));
+                            new DefaultTenantTokenResolver(tenancyOptions.TenantId.Value)));
                     break;
                 case TenancyType.None:
                 default:

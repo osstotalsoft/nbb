@@ -17,13 +17,13 @@ namespace NBB.Messaging.MultiTenancy
     public class TenantValidationMiddleware : IPipelineMiddleware<MessagingEnvelope>
     {
         private readonly ITenantService _tenantService;
-        private readonly ITenantMessagingConfigService _tenantMessagingConfigService;
+        private readonly ITenantHostingConfigService _tenantHostingConfigService;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
 
-        public TenantValidationMiddleware(ITenantService tenantService, ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
+        public TenantValidationMiddleware(ITenantService tenantService, ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _tenantService = tenantService;
-            _tenantMessagingConfigService = tenantMessagingConfigService;
+            _tenantHostingConfigService = tenantHostingConfigService;
             _tenancyOptions = tenancyOptions;
         }
 
@@ -46,14 +46,14 @@ namespace NBB.Messaging.MultiTenancy
                     $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {contextTenantId} but received {messageTenantIdHeader}");
             }
 
-            if (_tenantMessagingConfigService.IsShared(messageTenantId) &&
+            if (_tenantHostingConfigService.IsShared(messageTenantId) &&
                 _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
                 throw new ApplicationException(
                     $"Received a message for shared tenant {messageTenantIdHeader} in a MonoTenant hosting");
             }
 
-            if (!_tenantMessagingConfigService.IsShared(messageTenantId) &&
+            if (!_tenantHostingConfigService.IsShared(messageTenantId) &&
                 _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant)
             {
                 throw new ApplicationException(

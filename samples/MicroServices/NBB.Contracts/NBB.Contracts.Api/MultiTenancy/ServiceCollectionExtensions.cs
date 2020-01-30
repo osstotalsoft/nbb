@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NBB.Messaging.MultiTenancy;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Extensions;
@@ -22,11 +23,12 @@ namespace NBB.Contracts.Api.MultiTenancy
                 return;
             }
 
+            services.AddHostingConfigValidation();
             services.AddMultiTenantMessaging();
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<ITenantMessagingConfigService, TenantMessagingConfigService>();
+            services.AddSingleton<ITenantHostingConfigService, TenantHostingConfigService>();
             services.Configure<TenancyHostingOptions>(configurationSection);
 
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTenantIdentification()
                 .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder => builder
                     .AddTenantTokenResolver<TenantIdHeaderHttpTokenResolver>("TenantId"));

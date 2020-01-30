@@ -45,7 +45,7 @@ namespace NBB.Messaging.MultiTenancy.Tests
             topicRegistryMock.Setup(x => x.GetTopicForMessageType(typeof(string), It.IsAny<bool>())).Returns("topic");
             var tenantId = Guid.NewGuid();
             var options = Options.Create(new TenancyHostingOptions
-                {TenancyType = TenancyType.MonoTenant, MonoTenantId = tenantId});
+                {TenancyType = TenancyType.MonoTenant, TenantId = tenantId});
 
             var sut = new MultiTenancyTopicRegistryDecorator(topicRegistryMock.Object,  options);
 

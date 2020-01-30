@@ -2,7 +2,7 @@
 
 namespace NBB.MultiTenancy.Abstractions.Services
 {
-    public interface ITenantMessagingConfigService
+    public interface ITenantHostingConfigService
     {
         bool IsShared(Guid tenantId);
     }

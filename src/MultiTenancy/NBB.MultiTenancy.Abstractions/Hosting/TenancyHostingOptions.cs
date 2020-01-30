@@ -12,7 +12,7 @@ namespace NBB.MultiTenancy.Abstractions.Options
         /// <summary>
         /// Returns the current Tenant ID if the current tenancy context type is "MonoTenant"
         /// </summary>
-        public Guid? MonoTenantId { get; set; }
+        public Guid? TenantId { get; set; }
     }
 
     public enum TenancyType

@@ -1,35 +1,50 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Services;
 
 namespace NBB.MultiTenancy.Abstractions.Hosting
 {
-    public class TenancyHostingValidator
+    public class TenancyHostingValidator : IHostedService
     {
-        private readonly ITenantMessagingConfigService _tenantMessagingConfigService;
+        private readonly ITenantHostingConfigService _tenantHostingConfigService;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
+        private readonly ILogger<TenancyHostingValidator> _logger;
+        private readonly IApplicationLifetime _applicationLifetime;
 
-        public TenancyHostingValidator(ITenantMessagingConfigService tenantMessagingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
+        public TenancyHostingValidator(ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions, ILogger<TenancyHostingValidator> logger, IApplicationLifetime applicationLifetime)
         {
-            _tenantMessagingConfigService = tenantMessagingConfigService;
+            _tenantHostingConfigService = tenantHostingConfigService;
             _tenancyOptions = tenancyOptions;
-        }
-
-        public void Validate()
-        {
-            CheckMonoTenant();
+            _logger = logger;
+            _applicationLifetime = applicationLifetime;
         }
 
         private void CheckMonoTenant()
         {
             if (_tenancyOptions.Value.TenancyType != TenancyType.MonoTenant) return;
-            var tenantId = _tenancyOptions.Value.MonoTenantId ?? throw new ApplicationException("MonoTenant Id is not configured");
+            var tenantId = _tenancyOptions.Value.TenantId ?? throw new ApplicationException("MonoTenant Id is not configured");
 
-            if (_tenantMessagingConfigService.IsShared(tenantId))
+            if (_tenantHostingConfigService.IsShared(tenantId))
             {
-                throw  new ApplicationException($"Starting message host for shared tenant {tenantId} in a MonoTenant context");
+                _logger.LogCritical($"Attempting to start host for shared tenant {tenantId} in a MonoTenant context");
+                _applicationLifetime.StopApplication();
             }
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            CheckMonoTenant();
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }
