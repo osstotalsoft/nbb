@@ -62,5 +62,42 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
         }
+
+        [Fact]
+        public void Try_Method_Should_Return_Null_If_All_Resolvers_Return_Null()
+        {
+            // Arrange
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _thirdResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            var identifierPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
+            var sut = new TenantService(new List<TenantIdentificationStrategy>() { identifierPair });
+
+            // Act
+            var result = sut.TryGetTenantIdAsync().Result;
+
+            // Assert
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public void Try_Method_Should_Pass_Token_And_Stop()
+        {
+            // Arrange
+            const string tenantToken = "mock token";
+            _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
+            _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult(tenantToken));
+            _thirdResolver.Setup(r => r.GetTenantToken()).Throws<Exception>();
+            var firstPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object }, _identifier.Object);
+            var secondPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _secondResolver.Object }, _identifier.Object);
+            var thirdPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _thirdResolver.Object }, _identifier.Object);
+            var sut = new TenantService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
+
+            // Act
+            var _ = sut.TryGetTenantIdAsync().Result;
+
+            // Assert
+            _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
+        }
     }
 }
