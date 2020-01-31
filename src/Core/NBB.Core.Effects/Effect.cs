@@ -39,6 +39,10 @@ namespace NBB.Core.Effects
             return effect.Map(selector);
         }
 
+        public static IEffect<TResult> Apply<T, TResult>(IEffect<Func<T, TResult>> fn, IEffect<T> effect)
+        {
+            return effect.Bind(x=> fn.Map(f=> f(x)));
+        }
         
     }
 }

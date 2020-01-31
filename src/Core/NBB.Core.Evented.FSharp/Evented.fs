@@ -2,18 +2,21 @@
 
 type Evented<'a, 'e> = 'a * 'e list
 
-module Evented =  
+module Evented = 
+    let map func (value, events) = 
+        (func value, events)
+
     let bind func (value, events) = 
         let (result, events') = func value
         (result, events @ events')
 
-    let map func (value, events) = 
-        (func value, events)
+    let apply (func, events) (value, events') = (func value, events @ events')
 
     let result value = (value, [])
 
-    let composeK fn1 fn2 =
-        fun x -> bind fn2 (fn1 x)
+    let composeK fn1 fn2 = fn1 >> bind fn2
+
+    let lift2 f = map f >> apply
 
 module EventedBuilder =
     type EventedBuilder() =
@@ -28,6 +31,7 @@ module Events =
     let evented = new EventedBuilder.EventedBuilder()
 
     let (<!>) = Evented.map
+    let (<*>) = Evented.apply
     let (>>=) = Evented.bind
     let (>=>) = Evented.composeK
 
@@ -62,3 +66,6 @@ module private Tests =
             let! x' = create x
             return increment x'
         }
+
+    let liftedSum = Evented.lift2 (+)
+    let z = liftedSum (1, [Added]) (2, [Updated])
