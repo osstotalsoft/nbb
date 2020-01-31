@@ -17,17 +17,22 @@ namespace NBB.MultiTenancy.Identification.Services
 
         public async Task<Guid> GetTenantIdAsync()
         {
+            return await TryGetTenantIdAsync() ?? throw new TenantNotFoundException();
+        }
+
+        public async Task<Guid?> TryGetTenantIdAsync()
+        {
             foreach (var tenantIdentificationStrategy in _tenantIdentificationStrategies)
             {
                 var tenantId = await tenantIdentificationStrategy.TryGetTenantIdAsync();
 
                 if (tenantId.HasValue)
                 {
-                    return tenantId.Value;
+                    return tenantId;
                 }
             }
 
-            throw new TenantNotFoundException();
+            return null;
         }
     }
 }

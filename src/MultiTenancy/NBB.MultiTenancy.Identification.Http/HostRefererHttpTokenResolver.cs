@@ -7,17 +7,17 @@ namespace NBB.MultiTenancy.Identification.Http
 {
     public class HostRefererHttpTokenResolver : ITenantTokenResolver
     {
+        private readonly IHttpContextAccessor _accessor;
         private const string HeaderReferer = "Referer";
-        private readonly HttpContext _httpContext;
 
         public HostRefererHttpTokenResolver(IHttpContextAccessor accessor)
         {
-            _httpContext = accessor.HttpContext;
+            _accessor = accessor;
         }
 
         public Task<string> GetTenantToken()
         {
-            var headers = _httpContext?.Request?.Headers;
+            var headers = _accessor?.HttpContext?.Request?.Headers;
             if (headers == null || !headers.TryGetValue(HeaderReferer, out var headerReferer))
             {
                 return Task.FromResult<string>(null);
