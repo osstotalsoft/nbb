@@ -1,16 +1,19 @@
 ﻿namespace NBB.Core.Evented.FSharp
 
-type Evented<'a, 'e> = Evented of 'a * 'e list
+type Evented<'a, 'e> = 'a * 'e list
 
 module Evented =  
-    let bind func (Evented (value, events)) = 
-        let (Evented (result, events')) = func value
-        Evented (result, events @ events')
+    let bind func (value, events) = 
+        let (result, events') = func value
+        (result, events @ events')
 
-    let map func (Evented (value, events)) = 
-        Evented (func value, events)
+    let map func (value, events) = 
+        (func value, events)
 
-    let result value = Evented (value, [])
+    let result value = (value, [])
+
+    let composeK fn1 fn2 =
+        fun x -> bind fn2 (fn1 x)
 
 module EventedBuilder =
     type EventedBuilder() =
@@ -23,3 +26,39 @@ module EventedBuilder =
 [<AutoOpen>]
 module Events =
     let evented = new EventedBuilder.EventedBuilder()
+
+    let (<!>) = Evented.map
+    let (>>=) = Evented.bind
+    let (>=>) = Evented.composeK
+
+
+module private Tests =
+    type AggRoot = AggRoot of int
+    type DomainEvent = 
+        | Added
+        | Updated
+
+
+    let create x =  (AggRoot x, [Added])
+    let update (x:AggRoot) = (x, [Updated])
+    let increment (AggRoot x) = AggRoot (x + 1)
+
+    let createAndUpdate x = x |> create |> Evented.bind update
+    let createAndUpdate'= create >> Evented.bind update
+    let createAndUpdate'' x = update >>= create x
+    let createAndUpdate''' = create >=> update
+    let createAndUpdate'''' x =
+        evented {
+            let! x' = create x
+            let! x'' = update x'
+            return x''
+        }
+
+    let createAndIncrement x = x |> create |> Evented.map increment
+    let createAndIncrement' = create >> Evented.map increment
+    let createAndIncrement'' x = increment <!> create x
+    let createAndIncrement''' x =
+        evented {
+            let! x' = create x
+            return increment x'
+        }
