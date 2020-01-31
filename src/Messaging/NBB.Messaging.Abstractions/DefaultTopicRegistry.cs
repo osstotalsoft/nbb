@@ -66,10 +66,17 @@ namespace NBB.Messaging.Abstractions
             return topicNameResolver?.ResolveTopicName(messageType, _configuration);
         }
 
-        private string GetTopicPrefix()
+        public string GetTopicPrefix()
         {
-            var topicPrefix = _configuration.GetSection("Messaging")?["TopicPrefix"];
-            return topicPrefix ?? "";
+            var messagingSection = _configuration.GetSection("Messaging");
+            var envPrefix = messagingSection?["Env"];
+            if (!string.IsNullOrWhiteSpace(envPrefix))
+            {
+                envPrefix += ".";
+            }
+
+            var topicPrefix = envPrefix ?? messagingSection?["TopicPrefix"];
+            return topicPrefix ?? string.Empty;
         }
     }
 }

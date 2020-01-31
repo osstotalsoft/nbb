@@ -7,7 +7,7 @@
     <MoqPackageVersion>4.8.2</MoqPackageVersion>
     <XunitPackageVersion>2.3.1</XunitPackageVersion>
     <XunitRunnerVisualStudioPackageVersion>2.4.0-beta.1.build3958</XunitRunnerVisualStudioPackageVersion>
-    <FluentAssertionsPackageVersion>5.3.2</FluentAssertionsPackageVersion>
+    <FluentAssertionsPackageVersion>5.10.0</FluentAssertionsPackageVersion>
     <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>2.1.4</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftAspNetCoreAppPackageVersion>2.1.5</MicrosoftAspNetCoreAppPackageVersion>
