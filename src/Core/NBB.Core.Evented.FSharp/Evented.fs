@@ -1,29 +1,28 @@
 ﻿namespace NBB.Core.Evented.FSharp
 
-type Evented<'a, 'e> = 'a * 'e list
+type Evented<'a, 'e> = Evented of payload:'a * events:'e list
 
 module Evented = 
-    let map func (value, events) = 
-        (func value, events)
+    let map func (Evented(value, events)) = Evented(func value, events)
 
-    let bind func (value, events) = 
-        let (result, events') = func value
-        (result, events @ events')
+    let bind (Evented(value, events)) func = 
+        let (Evented(result, events')) = func value
+        Evented(result, events @ events')
 
-    let apply (func, events) (value, events') = (func value, events @ events')
+    let apply (Evented(func, events)) (Evented(value, events')) = Evented(func value, events @ events')
 
-    let result value = (value, [])
+    let result value = Evented(value, [])
 
-    let composeK fn1 fn2 = fn1 >> bind fn2
+    let composeK f g x = bind (f x) g
 
     let lift2 f = map f >> apply
 
 module EventedBuilder =
     type EventedBuilder() =
-        member _.Bind(eff, func) = Evented.bind func eff
+        member _.Bind(eff, func) = Evented.bind eff func
         member _.Return(value) = Evented.result value
         member _.ReturnFrom(value) = value
-        member _.Combine(eff1, eff2) = Evented.bind (fun _ -> eff2) eff1
+        member _.Combine(eff1, eff2) = Evented.bind eff1 (fun _ -> eff2)
         member _.Zero() = Evented.result ()
 
 [<AutoOpen>]
@@ -42,14 +41,12 @@ module private Tests =
         | Added
         | Updated
 
+    let create x =  Evented(AggRoot x, [Added])
 
-    let create x =  (AggRoot x, [Added])
-    let update (x:AggRoot) = (x, [Updated])
+    let update (x:AggRoot) = Evented(x, [Updated])
     let increment (AggRoot x) = AggRoot (x + 1)
 
-    let createAndUpdate x = x |> create |> Evented.bind update
-    let createAndUpdate'= create >> Evented.bind update
-    let createAndUpdate'' x = update >>= create x
+    let createAndUpdate x = x |> create >>= update
     let createAndUpdate''' = create >=> update
     let createAndUpdate'''' x =
         evented {
@@ -57,6 +54,12 @@ module private Tests =
             let! x'' = update x'
             return x''
         }
+
+    let createAndUpdate'''''  x =
+        let (Evented(agg, events)) = create x
+        let (Evented(agg', events')) = update agg
+        Evented(agg', events @ events')
+
 
     let createAndIncrement x = x |> create |> Evented.map increment
     let createAndIncrement' = create >> Evented.map increment
@@ -68,4 +71,4 @@ module private Tests =
         }
 
     let liftedSum = Evented.lift2 (+)
-    let z = liftedSum (1, [Added]) (2, [Updated])
+    let z = liftedSum (Evented(1, [Added])) (Evented(2, [Updated]))

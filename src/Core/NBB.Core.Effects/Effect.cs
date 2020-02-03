@@ -29,7 +29,7 @@ namespace NBB.Core.Effects
             return ParallelEffect<Unit, Unit, Unit>.From(e1, e2, (_, __) => Unit.Value).ToUnit();
         }
 
-        public static IEffect<TResult> Bind<T, TResult>(Func<T, IEffect<TResult>> computation, IEffect<T> effect)
+        public static IEffect<TResult> Bind<T, TResult>(IEffect<T> effect, Func<T, IEffect<TResult>> computation)
         {
             return effect.Bind(computation);
         }
