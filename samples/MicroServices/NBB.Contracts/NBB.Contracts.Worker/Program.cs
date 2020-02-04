@@ -19,8 +19,9 @@ using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
+using NBB.Contracts.Worker.MultiTenancy;
+using NBB.Messaging.MultiTenancy;
 
 namespace NBB.Contracts.Worker
 {
@@ -34,10 +35,7 @@ namespace NBB.Contracts.Worker
         public static async Task MainAsync(string[] args)
         {
             var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config =>
-                {
-                    config.AddEnvironmentVariables("NETCORE_");
-                })
+                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
                 .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
                 {
                     configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
@@ -89,12 +87,17 @@ namespace NBB.Contracts.Worker
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
+                            //.UseTenantValidationMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
                         );
+
+                    services.AddMultiTenancy(hostingContext.Configuration);
                 });
 
-            await builder.RunConsoleAsync(default);
+            var host = builder.UseConsoleLifetime().Build();
+
+            await host.RunAsync();
         }
     }
 }

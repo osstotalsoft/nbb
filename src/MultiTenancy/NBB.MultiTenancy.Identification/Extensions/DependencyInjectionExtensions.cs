@@ -1,13 +1,22 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Identifiers;
 using NBB.MultiTenancy.Identification.Resolvers;
+using NBB.MultiTenancy.Identification.Services;
 using System;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 
 namespace NBB.MultiTenancy.Identification.Extensions
 {
     public static class DependencyInjectionExtensions
     {
+        public static IServiceCollection AddTenantIdentification(this IServiceCollection services)
+        {
+            services.TryAddSingleton<ITenantService, TenantService>();
+            return services;
+        }
 
         public static void AddTenantIdentificationStrategy<TTenantIdentifier>(this IServiceCollection service, params Type[] resolverTypes)
             where TTenantIdentifier : class, ITenantIdentifier

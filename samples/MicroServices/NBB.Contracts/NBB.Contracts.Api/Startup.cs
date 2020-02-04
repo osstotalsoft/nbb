@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.Contracts.Api.MultiTenancy;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
 using NBB.Messaging.Nats;
@@ -27,10 +28,12 @@ namespace NBB.Contracts.Api
             services.AddNatsMessaging();
 
             services.AddContractsReadModelDataAccess();
+
+            services.AddMultiTenancy(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env/*, TenancyHostingValidator tenancyHostingValidator*/)
         {
             app.UseCorrelation();
 
