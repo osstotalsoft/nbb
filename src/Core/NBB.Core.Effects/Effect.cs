@@ -29,7 +29,7 @@ namespace NBB.Core.Effects
             return ParallelEffect<Unit, Unit, Unit>.From(e1, e2, (_, __) => Unit.Value).ToUnit();
         }
 
-        public static IEffect<TResult> Bind<T, TResult>(Func<T, IEffect<TResult>> computation, IEffect<T> effect)
+        public static IEffect<TResult> Bind<T, TResult>(IEffect<T> effect, Func<T, IEffect<TResult>> computation)
         {
             return effect.Bind(computation);
         }
@@ -39,6 +39,10 @@ namespace NBB.Core.Effects
             return effect.Map(selector);
         }
 
+        public static IEffect<TResult> Apply<T, TResult>(IEffect<Func<T, TResult>> fn, IEffect<T> effect)
+        {
+            return effect.Bind(x=> fn.Map(f=> f(x)));
+        }
         
     }
 }
