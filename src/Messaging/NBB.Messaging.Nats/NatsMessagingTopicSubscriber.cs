@@ -57,7 +57,7 @@ namespace NBB.Messaging.Nats
             
             //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
             opts.MaxInflight = 1;
-            opts.AckWait = 50000;
+            opts.AckWait = _configuration.GetSection("Messaging").GetSection("Nats").GetValue<int?>("ackWait") ?? 50000;
             
             void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
