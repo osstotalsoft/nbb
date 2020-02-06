@@ -46,6 +46,12 @@ namespace NBB.Messaging.MultiTenancy
                     $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {contextTenantId} but received {messageTenantIdHeader}");
             }
 
+            if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant && _tenancyOptions.Value.TenantId != messageTenantId)
+            {
+                throw new ApplicationException(
+                    $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {_tenancyOptions.Value.TenantId} but received {messageTenantIdHeader}");
+            }
+
             if (_tenantHostingConfigService.IsShared(messageTenantId) &&
                 _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
