@@ -158,7 +158,7 @@ namespace NBB.Contracts.Functions.CreateContract
 
             var eventStoreSerDes = new NewtonsoftJsonEventStoreSerDes();
             var eventStore = new EventStore.EventStore(eventRepository, eventStoreSerDes, new Logger<EventStore.EventStore>(loggerFactory));
-            var eventStoreDecorator = new MessagingEventStoreDecorator(eventStore, messageBusPublisher, new MessagingTopicResolver(configuration));
+            var eventStoreDecorator = new MessagingEventStoreDecorator(eventStore, messageBusPublisher, new MessagingTopicResolver(new Options()));
             var mediator = new OpenFaaSMediator(configuration, new Logger<OpenFaaSMediator>(loggerFactory));
             var repository = new EventSourcedRepository<Contract>(eventStoreDecorator, null, mediator, new EventSourcingOptions(), new Logger<EventSourcedRepository<Contract>>(loggerFactory));
             var result = new ContractCommandHandlers(repository);
@@ -170,7 +170,7 @@ namespace NBB.Contracts.Functions.CreateContract
 
         internal class Options : IOptions<EventStoreOptions>
         {
-            public EventStoreOptions Value => new EventStoreOptions { ConnectionString = "test" };
+            public EventStoreOptions Value => new EventStoreOptions { ConnectionString = "test", TopicSufix = "Test" };
         }
 
 

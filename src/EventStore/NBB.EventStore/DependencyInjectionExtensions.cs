@@ -49,10 +49,7 @@ namespace NBB.EventStore
             _configuration = configuration;
         }
 
-        public void Configure(Abstractions.EventStoreOptions options)
-        {
-            var connectionString = _configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
-            options.ConnectionString = connectionString;
-        }
+        public void Configure(Abstractions.EventStoreOptions options) =>
+            _configuration.GetSection("EventStore").GetSection("NBB").Bind(options);
     }
 }
