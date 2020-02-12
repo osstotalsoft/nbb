@@ -94,7 +94,7 @@ namespace NBB.Contracts.Worker
                             .UseMediatRMiddleware()
                         );
 
-                    services.AddTenantHosting(hostingContext.Configuration, _ =>
+                    services.AddMultitenancy(hostingContext.Configuration, _ =>
                     {
                         services.AddTenantHostingConfigService<TenantHostingConfigService>();
                         services.AddMultiTenantMessaging()

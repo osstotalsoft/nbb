@@ -11,7 +11,7 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
     {
         private const string MessagingSectionName = "MultiTenancy";
 
-        public static void AddTenantHosting(this IServiceCollection services, IConfiguration configuration,
+        public static void AddMultitenancy(this IServiceCollection services, IConfiguration configuration,
             Action<TenancyHostingOptions> addTenantAwareServices)
         {
             var configurationSection = configuration.GetSection(MessagingSectionName);

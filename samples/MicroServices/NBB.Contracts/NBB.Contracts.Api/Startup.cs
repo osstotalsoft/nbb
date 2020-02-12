@@ -35,7 +35,7 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            services.AddTenantHosting(Configuration, _ =>
+            services.AddMultitenancy(Configuration, _ =>
             {
                 services.AddMultiTenantMessaging();
                 services.AddTenantHostingConfigService<TenantHostingConfigService>();
