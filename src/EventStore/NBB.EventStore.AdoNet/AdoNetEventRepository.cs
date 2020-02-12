@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.SqlServer.Server;
+using NBB.Core.Abstractions;
+using NBB.EventStore.Abstractions;
+using NBB.EventStore.AdoNet.Internal;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -6,19 +13,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.SqlServer.Server;
-using NBB.Core.Abstractions;
-using NBB.EventStore.AdoNet.Internal;
 
 namespace NBB.EventStore.AdoNet
 {
     public class AdoNetEventRepository : IEventRepository
     {
         private readonly Scripts _scripts;
-        private readonly string _connectionString;
         private readonly ILogger<AdoNetEventRepository> _logger;
+        private readonly IOptions<EventStoreOptions> _eventstoreOptions;
 
         private readonly SqlMetaData[] _appendEventsMetadata = new List<SqlMetaData>
         {
@@ -27,14 +29,12 @@ namespace NBB.EventStore.AdoNet
             new SqlMetaData("EventData", SqlDbType.NVarChar, SqlMetaData.Max),
             new SqlMetaData("EventType", SqlDbType.VarChar, 300),
             new SqlMetaData("CorrelationId", SqlDbType.UniqueIdentifier),
-            
-
         }.ToArray();
 
-        public AdoNetEventRepository(Scripts scripts, IConfiguration configuration, ILogger<AdoNetEventRepository> logger)
+        public AdoNetEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptions<EventStoreOptions> eventstoreOptions)
         {
             _scripts = scripts;
-            _connectionString = configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
+            _eventstoreOptions = eventstoreOptions;
             _logger = logger;
         }
 
@@ -64,20 +64,20 @@ namespace NBB.EventStore.AdoNet
 
             var eventDescriptors = new List<EventDescriptor>();
 
-            using (var cnx = new SqlConnection(_connectionString))
+            using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.GetEventsFromStream, cnx);
-                cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200) {Value = stream});
-                cmd.Parameters.Add(new SqlParameter("@MinStreamVersion", SqlDbType.Int) {Value = (object)startFromVersion ?? DBNull.Value});
-                cmd.Parameters.Add(new SqlParameter("@MaxStreamVersion", SqlDbType.Int) {Value = DBNull.Value}); // To be implemented for loading aggregate at a specific version
+                cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200) { Value = stream });
+                cmd.Parameters.Add(new SqlParameter("@MinStreamVersion", SqlDbType.Int) { Value = (object)startFromVersion ?? DBNull.Value });
+                cmd.Parameters.Add(new SqlParameter("@MaxStreamVersion", SqlDbType.Int) { Value = DBNull.Value }); // To be implemented for loading aggregate at a specific version
 
                 using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
                 {
                     while (reader.Read())
                     {
-                        var ed = new EventDescriptor(reader.GetGuid(0), reader.GetString(1), reader.GetString(2), stream, reader.IsDBNull(3) ? (Guid?) null : reader.GetGuid(3));
+                        var ed = new EventDescriptor(reader.GetGuid(0), reader.GetString(1), reader.GetString(2), stream, reader.IsDBNull(3) ? (Guid?)null : reader.GetGuid(3));
                         eventDescriptors.Add(ed);
                     }
                 }
@@ -97,7 +97,7 @@ namespace NBB.EventStore.AdoNet
 
             var sqlDataRecords = CreateSqlDataRecords(eventDescriptors);
 
-            using (var cnx = new SqlConnection(_connectionString))
+            using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
                 cnx.Open();
 
@@ -143,7 +143,7 @@ namespace NBB.EventStore.AdoNet
 
             var sqlDataRecords = CreateSqlDataRecords(eventDescriptors);
 
-            using (var cnx = new SqlConnection(_connectionString))
+            using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
                 cnx.Open();
 

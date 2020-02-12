@@ -1,12 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Contracts.WriteModel.Data;
@@ -16,6 +12,7 @@ using NBB.Data.EventSourcing;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain;
 using NBB.EventStore;
+using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Internal;
 using NBB.EventStore.Internal;
@@ -28,13 +25,18 @@ using NBB.Messaging.Nats;
 using NBB.Messaging.Nats.Internal;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Contracts.Functions.CreateContract
 {
     public class Function
     {
         private ServiceProvider _container;
-     
+
         public void PrepareFunctionContext()
         {
             _container = BuildServiceProvider();
@@ -106,7 +108,7 @@ namespace NBB.Contracts.Functions.CreateContract
             services.AddContractsWriteModelDataAccess();
 
             services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository()
                 .WithMessagingExtensions();
 
@@ -152,18 +154,23 @@ namespace NBB.Contracts.Functions.CreateContract
             var messageBusPublisher = new MessageBusPublisher(messagingTopicPublisher, topicRegistry, messageSerdes, configuration, new Logger<MessageBusPublisher>(loggerFactory));
 
             var scripts = new Scripts();
-            var eventRepository = new AdoNetEventRepository(scripts, configuration, new Logger<AdoNetEventRepository>(loggerFactory));
+            var eventRepository = new AdoNetEventRepository(scripts, new Logger<AdoNetEventRepository>(loggerFactory), new Options());
 
             var eventStoreSerDes = new NewtonsoftJsonEventStoreSerDes();
             var eventStore = new EventStore.EventStore(eventRepository, eventStoreSerDes, new Logger<EventStore.EventStore>(loggerFactory));
             var eventStoreDecorator = new MessagingEventStoreDecorator(eventStore, messageBusPublisher, new MessagingTopicResolver(configuration));
             var mediator = new OpenFaaSMediator(configuration, new Logger<OpenFaaSMediator>(loggerFactory));
-            var repository = new EventSourcedRepository<Contract>(eventStoreDecorator, null, mediator, new EventSourcingOptions(),  new Logger<EventSourcedRepository<Contract>>(loggerFactory));
+            var repository = new EventSourcedRepository<Contract>(eventStoreDecorator, null, mediator, new EventSourcingOptions(), new Logger<EventSourcedRepository<Contract>>(loggerFactory));
             var result = new ContractCommandHandlers(repository);
 
             //disposables = new List<IDisposable>{stanConnectionProvider};
 
             return result;
+        }
+
+        internal class Options : IOptions<EventStoreOptions>
+        {
+            public EventStoreOptions Value => new EventStoreOptions { ConnectionString = "test" };
         }
 
 
