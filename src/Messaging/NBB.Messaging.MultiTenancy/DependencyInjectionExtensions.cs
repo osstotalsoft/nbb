@@ -5,10 +5,12 @@ namespace NBB.Messaging.MultiTenancy
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddMultiTenantMessaging(this IServiceCollection services)
+        public static IServiceCollection AddMultiTenantMessaging(this IServiceCollection services)
         {
             services.Decorate<ITopicRegistry, MultiTenancyTopicRegistryDecorator>();
             services.Decorate<IMessageBusPublisher, MultiTenancyMessageBusPublisherDecorator>();
+
+            return services;
         }
     }
 }

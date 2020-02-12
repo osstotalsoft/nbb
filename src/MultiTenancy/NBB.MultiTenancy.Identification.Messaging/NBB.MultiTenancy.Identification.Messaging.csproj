@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Messaging\NBB.Messaging.MultiTenancy\NBB.Messaging.MultiTenancy.csproj" />
     <ProjectReference Include="..\NBB.MultiTenancy.Identification\NBB.MultiTenancy.Identification.csproj" />
   </ItemGroup>
 

@@ -22,6 +22,8 @@ using System.IO;
 using System.Threading.Tasks;
 using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.MultiTenancy;
+using NBB.MultiTenancy.Abstractions.Hosting;
+using NBB.MultiTenancy.Identification.Messaging.Extensions;
 
 namespace NBB.Contracts.Worker
 {
@@ -92,7 +94,12 @@ namespace NBB.Contracts.Worker
                             .UseMediatRMiddleware()
                         );
 
-                    services.AddMultiTenancy(hostingContext.Configuration);
+                    services.AddMultitenancy(hostingContext.Configuration, _ =>
+                    {
+                        services.AddTenantHostingConfigService<TenantHostingConfigService>();
+                        services.AddMultiTenantMessaging()
+                            .AddDefaultMessagingTenantIdentification();
+                    });
                 });
 
             var host = builder.UseConsoleLifetime().Build();
