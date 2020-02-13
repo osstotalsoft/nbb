@@ -1,22 +1,20 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Extensions.Options;
+using NBB.EventStore.Abstractions;
 
 namespace NBB.EventStore.MessagingExtensions.Internal
 {
     public class MessagingTopicResolver
     {
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<EventStoreOptions> _options;
 
-        public MessagingTopicResolver(IConfiguration configuration)
+        public MessagingTopicResolver(IOptions<EventStoreOptions> options)
         {
-            _configuration = configuration;
+            _options = options;
         }
 
         public string ResolveTopicName()
         {
-            var topicSuffix = _configuration["EventStore:NBB:TopicSufix"];
+            var topicSuffix = _options.Value.TopicSufix;
             var topic = "ch.eventStore." + topicSuffix;
 
             return topic;
