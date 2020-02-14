@@ -35,12 +35,13 @@ module Events =
     let (>=>) = Evented.composeK
 
 module List =
-    let sequenceEvented list =
+    let traverseEvented f list =
         let cons head tail = head :: tail  
         let initState = Evented.result []
-        let folder head tail = Evented.result cons <*> head <*> tail
-
+        let folder head tail = Evented.result cons <*> (f head) <*> tail
         List.foldBack folder list initState
+
+    let sequenceEvented list = traverseEvented id list
 
 
 module private Tests =
@@ -81,3 +82,5 @@ module private Tests =
 
     let liftedSum = Evented.lift2 (+)
     let z = liftedSum (Evented(1, [Added])) (Evented(2, [Updated]))
+
+    let createAndIncrementList = List.traverseEvented createAndIncrement

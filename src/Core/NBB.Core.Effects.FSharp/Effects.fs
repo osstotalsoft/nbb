@@ -33,12 +33,13 @@ module Effects =
 
 
 module List =
-    let sequenceEffect list =
+    let traverseEffect f list =
         let cons head tail = head :: tail      
         let initState = Effect.pureEffect []
-        let folder head tail = Effect.pureEffect cons <*> head <*> tail
-
+        let folder head tail = Effect.pureEffect cons <*> (f head) <*> tail
         List.foldBack folder list initState
+
+    let sequenceEffect list = traverseEffect id list
 
 module private Tests =
     module Domain =
@@ -67,3 +68,5 @@ module private Tests =
         let handler'' (IncrementCommand id) = 
             let handle = loadById >> Effect.map increment >> Effect.bind save
             handle id
+
+        let listHandler = List.traverseEffect handler
