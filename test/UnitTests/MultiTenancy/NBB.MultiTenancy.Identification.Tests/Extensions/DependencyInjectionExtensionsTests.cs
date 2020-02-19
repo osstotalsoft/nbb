@@ -26,11 +26,13 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             }
         }
 
-        private readonly IServiceCollection _serviceCollection;
+        private readonly IServiceCollection _services;
+        private readonly TenantServiceBuilder _serviceBuilder;
 
         public DependencyInjectionExtensionsTests()
         {
-            _serviceCollection = new ServiceCollection();
+            _services = new ServiceCollection();
+            _serviceBuilder = new TenantServiceBuilder(_services);
         }
 
         [Fact]
@@ -39,7 +41,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(resolverTypes: null);
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy<FirstIdentifier>(resolverTypes: null);
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
@@ -51,7 +53,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>();
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy<FirstIdentifier>();
 
             // Assert
             act.Should().Throw<ArgumentException>();
@@ -63,7 +65,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstIdentifier));
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstIdentifier));
 
             // Assert
             act.Should().Throw<ArgumentException>();
@@ -73,8 +75,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Resolver_Should_Be_In_Strategy()
         {
             // Arrange
-            _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstResolver));
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _services.AddTenantService().AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstResolver));
+            var serviceProvider = _services.BuildServiceProvider();
 
             // Act
             var result = serviceProvider.GetService<TenantIdentificationStrategy>();
@@ -92,7 +94,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((ITenantIdentifier)null, typeof(FirstResolver));
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy((ITenantIdentifier)null, typeof(FirstResolver));
 
             // Arrange
             act.Should().Throw<ArgumentNullException>();
@@ -102,8 +104,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Identifier_With_Type_Should_Be_In_Strategy()
         {
             // Arrange
-            _serviceCollection.AddTenantIdentificationStrategy(new FirstIdentifier(), typeof(FirstResolver));
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _serviceBuilder.AddTenantIdentificationStrategy(new FirstIdentifier(), typeof(FirstResolver));
+            var serviceProvider = _services.BuildServiceProvider();
 
             // Act
             var result = serviceProvider.GetService<TenantIdentificationStrategy>();
@@ -121,7 +123,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((Func<IServiceProvider, ITenantIdentifier>)null, typeof(FirstResolver));
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy((Func<IServiceProvider, ITenantIdentifier>)null, typeof(FirstResolver));
 
             // Arrange
             act.Should().Throw<ArgumentNullException>();
@@ -131,8 +133,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Implementation_Factory_With_Type_Should_Be_In_Strategy()
         {
             // Arrange
-            _serviceCollection.AddTenantIdentificationStrategy(_ => new FirstIdentifier(), typeof(FirstResolver));
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _serviceBuilder.AddTenantIdentificationStrategy(_ => new FirstIdentifier(), typeof(FirstResolver));
+            var serviceProvider = _services.BuildServiceProvider();
 
             // Act
             var result = serviceProvider.GetService<TenantIdentificationStrategy>();
@@ -150,7 +152,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(builder: null);
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy<FirstIdentifier>(builder: null);
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
@@ -160,8 +162,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Resolver_Through_Builder_Should_Be_In_Strategy()
         {
             // Arrange
-            _serviceCollection.AddTenantIdentificationStrategy<FirstIdentifier>(config => config.AddTenantTokenResolver<FirstResolver>());
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _serviceBuilder.AddTenantIdentificationStrategy<FirstIdentifier>(config => config.AddTenantTokenResolver<FirstResolver>());
+            var serviceProvider = _services.BuildServiceProvider();
 
             // Act
             var result = serviceProvider.GetService<TenantIdentificationStrategy>();
@@ -179,7 +181,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((ITenantIdentifier)null, config => config.AddTenantTokenResolver<FirstResolver>());
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy((ITenantIdentifier)null, config => config.AddTenantTokenResolver<FirstResolver>());
 
             // Arrange
             act.Should().Throw<ArgumentNullException>();
@@ -189,8 +191,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Identifier_With_Builder_Should_Be_In_Strategy()
         {
             // Arrange
-            _serviceCollection.AddTenantIdentificationStrategy(new FirstIdentifier(), config => config.AddTenantTokenResolver<FirstResolver>());
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _serviceBuilder.AddTenantIdentificationStrategy(new FirstIdentifier(), config => config.AddTenantTokenResolver<FirstResolver>());
+            var serviceProvider = _services.BuildServiceProvider();
 
             // Act
             var result = serviceProvider.GetService<TenantIdentificationStrategy>();
@@ -208,7 +210,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             // Arrange
 
             // Act
-            Action act = () => _serviceCollection.AddTenantIdentificationStrategy((Func<IServiceProvider, ITenantIdentifier>)null, config => config.AddTenantTokenResolver<FirstResolver>());
+            Action act = () => _serviceBuilder.AddTenantIdentificationStrategy((Func<IServiceProvider, ITenantIdentifier>)null, config => config.AddTenantTokenResolver<FirstResolver>());
 
             // Arrange
             act.Should().Throw<ArgumentNullException>();
@@ -218,8 +220,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Implementation_Factory_With_Builder_Should_Be_In_Strategy()
         {
             // Arrange
-            _serviceCollection.AddTenantIdentificationStrategy(_ => new FirstIdentifier(), config => config.AddTenantTokenResolver<FirstResolver>());
-            var serviceProvider = _serviceCollection.BuildServiceProvider();
+            _serviceBuilder.AddTenantIdentificationStrategy(_ => new FirstIdentifier(), config => config.AddTenantTokenResolver<FirstResolver>());
+            var serviceProvider = _services.BuildServiceProvider();
 
             // Act
             var result = serviceProvider.GetService<TenantIdentificationStrategy>();
