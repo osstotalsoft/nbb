@@ -1,6 +1,7 @@
 ﻿module Sample
 
 open NBB.Core.Evented.FSharp
+open FSharpPlus
 
 module Domain =
     type AggRoot = AggRoot of int
@@ -14,7 +15,7 @@ module Domain =
     let increment (AggRoot x) = AggRoot (x + 1)
 
     let createAndUpdate x = x |> create >>= update
-    let createAndUpdate' = create >> Evented.bind update
+    let createAndUpdate' = create >> bind update
     let createAndUpdate'' = create >=> update
     let createAndUpdate''' x =
         evented {
@@ -29,8 +30,8 @@ module Domain =
         Evented(agg', events @ events')
 
 
-    let createAndIncrement x = x |> create |> Evented.map increment
-    let createAndIncrement' = create >> Evented.map increment
+    let createAndIncrement x = x |> create |> map increment
+    let createAndIncrement' = create >> map increment
     let createAndIncrement'' x = increment <!> create x
     let createAndIncrement''' x =
         evented {
@@ -38,8 +39,8 @@ module Domain =
             return increment x'
         }
 
-    let liftedSum = Evented.lift2 (+)
+    let liftedSum = lift2 (+)
     let z = liftedSum (Evented(1, [Added])) (Evented(2, [Updated]))
 
-    let createAndIncrementList = List.traverseEvented createAndIncrement
+    let createAndIncrementList (lst: _ list) = traverse createAndIncrement lst
 
