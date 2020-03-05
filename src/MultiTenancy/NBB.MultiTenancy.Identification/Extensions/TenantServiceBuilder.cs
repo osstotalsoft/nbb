@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Identifiers;
 using NBB.MultiTenancy.Identification.Resolvers;
+using NBB.MultiTenancy.Identification.Services;
 using System;
 using System.Linq;
 
@@ -13,25 +16,26 @@ namespace NBB.MultiTenancy.Identification.Extensions
         public TenantServiceBuilder(IServiceCollection serviceCollector)
         {
             _serviceCollector = serviceCollector;
+            _serviceCollector.TryAddSingleton<ITenantService, TenantService>();
         }
 
-        public void AddTenantIdentificationStrategy<TTenantIdentifier>(params Type[] resolverTypes)
+        public TenantServiceBuilder AddTenantIdentificationStrategy<TTenantIdentifier>(params Type[] resolverTypes)
             where TTenantIdentifier : class, ITenantIdentifier
         {
-            AddTenantIdentificationStrategy(ImplementationFactory<TTenantIdentifier>, resolverTypes);
+            return AddTenantIdentificationStrategy(ImplementationFactory<TTenantIdentifier>, resolverTypes);
         }
 
-        public void AddTenantIdentificationStrategy(ITenantIdentifier identifier, params Type[] resolverTypes)
+        public TenantServiceBuilder AddTenantIdentificationStrategy(ITenantIdentifier identifier, params Type[] resolverTypes)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            AddTenantIdentificationStrategy(ImplementationFactory(identifier), resolverTypes);
+            return AddTenantIdentificationStrategy(ImplementationFactory(identifier), resolverTypes);
         }
 
-        public void AddTenantIdentificationStrategy(Func<IServiceProvider, ITenantIdentifier> implementationFactory, params Type[] resolverTypes)
+        public TenantServiceBuilder AddTenantIdentificationStrategy(Func<IServiceProvider, ITenantIdentifier> implementationFactory, params Type[] resolverTypes)
         {
             if (implementationFactory == null)
             {
@@ -56,25 +60,27 @@ namespace NBB.MultiTenancy.Identification.Extensions
 
                 return new TenantIdentificationStrategy(resolvers, identifier);
             });
+
+            return this;
         }
 
-        public void AddTenantIdentificationStrategy<TTenantIdentifier>(Action<TenantTokenResolverConfiguration> builder)
+        public TenantServiceBuilder AddTenantIdentificationStrategy<TTenantIdentifier>(Action<TenantTokenResolverConfiguration> builder)
             where TTenantIdentifier : class, ITenantIdentifier
         {
-            AddTenantIdentificationStrategy(ImplementationFactory<TTenantIdentifier>, builder);
+            return AddTenantIdentificationStrategy(ImplementationFactory<TTenantIdentifier>, builder);
         }
 
-        public void AddTenantIdentificationStrategy(ITenantIdentifier identifier, Action<TenantTokenResolverConfiguration> builder)
+        public TenantServiceBuilder AddTenantIdentificationStrategy(ITenantIdentifier identifier, Action<TenantTokenResolverConfiguration> builder)
         {
             if (identifier == null)
             {
                 throw new ArgumentNullException(nameof(identifier));
             }
 
-            AddTenantIdentificationStrategy(ImplementationFactory(identifier), builder);
+            return AddTenantIdentificationStrategy(ImplementationFactory(identifier), builder);
         }
 
-        public void AddTenantIdentificationStrategy(Func<IServiceProvider, ITenantIdentifier> implementationFactory, Action<TenantTokenResolverConfiguration> builder)
+        public TenantServiceBuilder AddTenantIdentificationStrategy(Func<IServiceProvider, ITenantIdentifier> implementationFactory, Action<TenantTokenResolverConfiguration> builder)
         {
             if (implementationFactory == null)
             {
@@ -96,6 +102,8 @@ namespace NBB.MultiTenancy.Identification.Extensions
 
                 return new TenantIdentificationStrategy(resolvers, identifier);
             });
+
+            return this;
         }
 
         private static TTenantIdentifier ImplementationFactory<TTenantIdentifier>(IServiceProvider serviceProvider) where TTenantIdentifier : class, ITenantIdentifier
