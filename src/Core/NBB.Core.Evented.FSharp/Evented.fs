@@ -13,9 +13,15 @@ module Evented =
     let pure' value = Evented(value, [])
     let return' = pure'
 
-    let composeK f g x = bind g (f x)
+    //let composeK f g x = bind g (f x)
 
-    let lift2 f = map f >> apply
+    //let lift2 f = map f >> apply
+
+type Evented<'a, 'e> with
+    static member Map (x, f) = Evented.map  f x
+    static member Return (x) = Evented.return' x
+    static member (>>=) (x,f) = Evented.bind f x
+    static member (<*>) (f,x) = Evented.apply f x
 
 module EventedBuilder =
     type EventedBuilder() =
@@ -29,16 +35,16 @@ module EventedBuilder =
 module Events =
     let evented = new EventedBuilder.EventedBuilder()
 
-    let (<!>) = Evented.map
-    let (<*>) = Evented.apply
-    let (>>=) evented func = Evented.bind func evented
-    let (>=>) = Evented.composeK
+    //let (<!>) = Evented.map
+    //let (<*>) = Evented.apply
+    //let (>>=) evented func = Evented.bind func evented
+    //let (>=>) = Evented.composeK
 
-module List =
-    let traverseEvented f list =
-        let cons head tail = head :: tail  
-        let initState = Evented.pure' []
-        let folder head tail = Evented.pure' cons <*> (f head) <*> tail
-        List.foldBack folder list initState
+//module List =
+//    let traverseEvented f list =
+//        let cons head tail = head :: tail  
+//        let initState = Evented.pure' []
+//        let folder head tail = Evented.pure' cons <*> (f head) <*> tail
+//        List.foldBack folder list initState
 
-    let sequenceEvented list = traverseEvented id list
+//    let sequenceEvented list = traverseEvented id list

@@ -2,12 +2,11 @@ module Tests
 open Xunit
 open FsUnit.Xunit
 open NBB.Core.Effects.FSharp
-open NBB.Core.Effects
 open Moq
 
 [<Fact>]
 let ``Pure(1) + Pure(2) should equal Pure(3)`` () =
-    let interpreter = Interpreter(Mock.Of<ISideEffectHandlerFactory>());
+    let interpreter = NBB.Core.Effects.Interpreter(Mock.Of<NBB.Core.Effects.ISideEffectHandlerFactory>());
     let eff = 
         effect {
             let! x = Effect.pure' 1
