@@ -15,9 +15,9 @@ module Data =
 
 module Application =
     open Domain
-    open Data
+    open Data    
     type IncrementCommand = IncrementCommand of int
-
+  
     let handler (IncrementCommand id) = 
         effect {
             let! agg = loadById id

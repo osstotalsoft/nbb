@@ -1,7 +1,8 @@
-﻿namespace NBB.Core.Effects.FSharp.Data
+﻿namespace NBB.Core.Effects.FSharp.Data.StateEffect
 
 open NBB.Core.Effects.FSharp
 open NBB.Core.FSharp.Data
+open NBB.Core.FSharp.Data.State
 
 type StateEffect<'s, 't> = 's -> Effect<'t * 's>
 module StateEffect =

@@ -23,8 +23,8 @@ module Domain =
 module Data =
     module Contract =
         open Domain.ContractAggregate
-        let loadById contractId = Effect.pureEffect { ContractId = contractId; Value = 78m; Status = Draft; }
-        let save (contract:Contract) = Effect.pureEffect contract |> Effect.ignore
+        let loadById contractId = Effect.pure' { ContractId = contractId; Value = 78m; Status = Draft; }
+        let save (contract:Contract) = Effect.pure' contract |> Effect.ignore
 
 
 module Application =

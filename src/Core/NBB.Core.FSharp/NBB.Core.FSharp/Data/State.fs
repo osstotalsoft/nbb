@@ -1,4 +1,4 @@
-﻿namespace NBB.Core.FSharp.Data
+﻿namespace NBB.Core.FSharp.Data.State
 
 type State<'s, 't> = 's -> 't * 's
 module State =

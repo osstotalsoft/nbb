@@ -1,7 +1,8 @@
-﻿namespace NBB.Core.Effects.FSharp.Data
+﻿namespace NBB.Core.Effects.FSharp.Data.ReaderEffect
 
 open NBB.Core.Effects.FSharp
 open NBB.Core.FSharp.Data
+open NBB.Core.FSharp.Data.Reader
 
 type ReaderEffect<'s, 't> = 's -> Effect<'t>
 module ReaderEffect =
@@ -36,7 +37,7 @@ module ReaderEffectBulder =
 
 [<AutoOpen>]
 module ReaderEffectExtensions =
-    let rde = new ReaderEffectBulder.ReaderEffectBulder()
+    let readerEffect = new ReaderEffectBulder.ReaderEffectBulder()
 
     let (<!>) = ReaderEffect.map
     let (<*>) = ReaderEffect.apply

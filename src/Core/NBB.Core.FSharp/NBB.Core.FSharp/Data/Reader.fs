@@ -1,4 +1,4 @@
-﻿namespace NBB.Core.FSharp.Data
+﻿namespace NBB.Core.FSharp.Data.Reader
 
 type Reader<'s, 't> = 's -> 't
 module Reader =
@@ -31,7 +31,7 @@ module ReaderBulder =
 
 [<AutoOpen>]
 module ReaderExtensions =
-    let state = new ReaderBulder.ReaderBulder()
+    let reader = new ReaderBulder.ReaderBulder()
 
     let (<!>) = Reader.map
     let (<*>) = Reader.apply
