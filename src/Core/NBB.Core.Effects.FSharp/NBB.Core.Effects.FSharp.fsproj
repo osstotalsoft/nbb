@@ -6,6 +6,11 @@
 
   <ItemGroup>
     <Compile Include="Effects.fs" />
+    <Compile Include="Data\ResultExtensions.fs" />
+    <Compile Include="Data\Reader.fs" />
+    <Compile Include="Data\ReaderEffect.fs" />
+    <Compile Include="Data\State.fs" />
+    <Compile Include="Data\StateEffect.fs" />
   </ItemGroup>
 
   <ItemGroup>
