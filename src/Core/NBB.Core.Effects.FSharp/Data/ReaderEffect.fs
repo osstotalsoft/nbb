@@ -1,6 +1,7 @@
 ﻿namespace NBB.Core.Effects.FSharp.Data
 
 open NBB.Core.Effects.FSharp
+open NBB.Core.FSharp.Data
 
 type ReaderEffect<'s, 't> = 's -> Effect<'t>
 module ReaderEffect =

@@ -1,4 +1,4 @@
-﻿namespace NBB.Core.Effects.FSharp.Data
+﻿namespace NBB.Core.FSharp.Data
 
 [<AutoOpen>]
 module ResultExtensions =

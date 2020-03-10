@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Data\Reader.fs" />
+    <Compile Include="Data\ResultExtensions.fs" />
+    <Compile Include="Data\State.fs" />
+  </ItemGroup>
+
+</Project>
