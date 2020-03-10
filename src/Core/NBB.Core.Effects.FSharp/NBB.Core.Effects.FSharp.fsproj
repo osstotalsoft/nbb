@@ -6,10 +6,13 @@
 
   <ItemGroup>
     <Compile Include="Effects.fs" />
+    <Compile Include="Data\ReaderEffect.fs" />
+    <Compile Include="Data\StateEffect.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NBB.Core.Effects\NBB.Core.Effects.csproj" />
+    <ProjectReference Include="..\NBB.Core.FSharp\NBB.Core.FSharp\NBB.Core.FSharp.fsproj" />
   </ItemGroup>
 
 </Project>

@@ -23,8 +23,8 @@ module Effect =
 
     let ignore eff = map (fun _ -> ()) eff
 
-    //let composeK f g x = bind g (f x)
-    //let lift2 f = map f >> apply
+    let composeK f g x = bind g (f x)
+    let lift2 f = map f >> apply
 
     let interpret<'a> (interpreter:IInterpreter) (Effect eff) = interpreter.Interpret<'a>(eff) |> Async.AwaitTask
 
@@ -60,17 +60,27 @@ module EffectBuilder =
 module Effects =
     let effect = new EffectBuilder.EffectBuilder()
 
-    //let (<!>) = Effect.map
-    //let (<*>) = Effect.apply
-    //let (>>=) eff func = Effect.bind func eff
-    //let (>=>) = Effect.composeK
+    let (<!>) = Effect.map
+    let (<*>) = Effect.apply
+    let (>>=) eff func = Effect.bind func eff
+    let (>=>) = Effect.composeK
 
 
-//module List =
-//    let traverseEffect f list =
-//        let cons head tail = head :: tail      
-//        let initState = Effect.pure' []
-//        let folder head tail = Effect.pure' cons <*> (f head) <*> tail
-//        List.foldBack folder list initState
+    [<RequireQualifiedAccess>]
+    module List =
+        let traverseEffect f list =
+            let cons head tail = head :: tail      
+            let initState = Effect.pure' []
+            let folder head tail = Effect.pure' cons <*> (f head) <*> tail
+            List.foldBack folder list initState
 
-//    let sequenceEffect list = traverseEffect id list
+        let sequenceEffect list = traverseEffect id list
+
+    [<RequireQualifiedAccess>]
+    module Result = 
+        let traverseEffect (f: 'a-> Effect<'c>) (result:Result<'a,'e>) : Effect<Result<'c, 'e>> = 
+            match result with
+                | Error err -> Effect.pure' (Error err)
+                | Ok v -> Effect.map Ok (f v)
+
+        let sequenceEffect result = traverseEffect id result
