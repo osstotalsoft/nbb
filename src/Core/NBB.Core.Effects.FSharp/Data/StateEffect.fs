@@ -27,6 +27,9 @@ module StateEffect =
     let put (x: 's) : StateEffect<'s, unit> = 
         fun _ -> Effect.pure' ((), x)
 
+    let modify (f: 's -> 's) : StateEffect<'s, unit> =
+         get() |> bind (put << f)
+
     let flatten x = 
         bind id x
 
@@ -74,3 +77,17 @@ module StateEffectExtensions =
                   | Ok v -> StateEffect.map Result.Ok (f v)
 
           let sequenceStateEffect result = traverseStateEffect id result
+
+    [<RequireQualifiedAccess>]
+    module StateEffect =
+        let addCaching (key: 'k) (stateEff: StateEffect<Map<'k, 'v>, 'v>) : StateEffect<Map<'k, 'v>, 'v> =
+            stateEffect {
+                let! cache = StateEffect.get ()
+                match (cache.TryFind key) with
+                    | Some value -> 
+                        return value
+                    | None -> 
+                        let! value = stateEff
+                        do! StateEffect.modify(fun cache -> cache.Add (key, value))
+                        return value     
+            } 
