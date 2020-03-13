@@ -34,19 +34,6 @@ type Effect<'T> with
     static member (>>=) (x,f) = Effect.bind f x
     static member (<*>) (f,x) = Effect.apply f x
 
-//module Effect = 
-//    let bind func eff = Effect.Bind(eff, Func<'a, IEffect<'b>>(func))
-//    let map func eff = Effect.Map(Func<'a, 'b>(func), eff)
-//    let apply (func: IEffect<'a->'b>) eff = Effect.Apply(map (fun fn -> Func<'a,'b>(fn)) func, eff)
-//    let pure' x = Effect.Pure x
-//    let return' = pure'
-//    let ignore eff = map (fun _ -> ()) eff
-
-//    let composeK f g x = bind g (f x)
-//    let lift2 f = map f >> apply
-
-//    let interpret<'a> (interpreter:IInterpreter) eff = interpreter.Interpret<'a>(eff) |> Async.AwaitTask
-
 module EffectBuilder =
     type EffectBuilder() =
         member _.Bind(eff, func) = Effect.bind func eff

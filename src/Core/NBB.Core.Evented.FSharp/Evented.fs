@@ -13,9 +13,9 @@ module Evented =
     let pure' value = Evented(value, [])
     let return' = pure'
 
-    //let composeK f g x = bind g (f x)
+    let composeK f g x = bind g (f x)
 
-    //let lift2 f = map f >> apply
+    let lift2 f = map f >> apply
 
 type Evented<'a, 'e> with
     static member Map (x, f) = Evented.map  f x
@@ -35,16 +35,26 @@ module EventedBuilder =
 module Events =
     let evented = new EventedBuilder.EventedBuilder()
 
-    //let (<!>) = Evented.map
-    //let (<*>) = Evented.apply
-    //let (>>=) evented func = Evented.bind func evented
-    //let (>=>) = Evented.composeK
+    let (<!>) = Evented.map
+    let (<*>) = Evented.apply
+    let (>>=) evented func = Evented.bind func evented
+    let (>=>) = Evented.composeK
 
-//module List =
-//    let traverseEvented f list =
-//        let cons head tail = head :: tail  
-//        let initState = Evented.pure' []
-//        let folder head tail = Evented.pure' cons <*> (f head) <*> tail
-//        List.foldBack folder list initState
+[<RequireQualifiedAccess>]
+module List =
+    let traverseEvented f list =
+        let cons head tail = head :: tail      
+        let initState = Evented.pure' []
+        let folder head tail = Evented.pure' cons <*> (f head) <*> tail
+        List.foldBack folder list initState
 
-//    let sequenceEvented list = traverseEvented id list
+    let sequenceEvented list = traverseEvented id list
+
+[<RequireQualifiedAccess>]
+module Result = 
+    let traverseEvented f result = 
+        match result with
+            | Error err -> Evented.pure' (Error err)
+            | Ok v -> Evented.map Ok (f v)
+
+    let sequenceEvented result = traverseEvented id result
