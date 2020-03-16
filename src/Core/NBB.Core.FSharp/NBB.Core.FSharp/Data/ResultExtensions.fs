@@ -4,6 +4,11 @@
 module ResultExtensions =
 
     [<RequireQualifiedAccess>]
+    module Result =
+        let inline join (res: Result<Result<'t, 'e>, 'e>) =
+           res |> Result.bind id 
+
+    [<RequireQualifiedAccess>]
     module List =
         let traverseResult f list =
             let pure' = Result.Ok

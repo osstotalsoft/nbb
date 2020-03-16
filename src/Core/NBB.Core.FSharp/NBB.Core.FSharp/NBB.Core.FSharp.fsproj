@@ -8,6 +8,7 @@
     <Compile Include="Data\Reader.fs" />
     <Compile Include="Data\ResultExtensions.fs" />
     <Compile Include="Data\State.fs" />
+    <Compile Include="Data\ReaderState.fs" />
   </ItemGroup>
 
 </Project>
