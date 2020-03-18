@@ -1,4 +1,4 @@
-﻿module Sample
+﻿namespace NBB.Core.Evented.FSharp.Tests
 
 open NBB.Core.Evented.FSharp
 open FSharpPlus
@@ -10,7 +10,6 @@ module Domain =
         | Updated
 
     let create x =  Evented(AggRoot x, [Added])
-
     let update (x:AggRoot) = Evented(x, [Updated])
     let increment (AggRoot x) = AggRoot (x + 1)
 
