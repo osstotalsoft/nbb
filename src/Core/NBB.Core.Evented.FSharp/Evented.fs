@@ -2,6 +2,7 @@
 
 type Evented<'a, 'e> = Evented of payload:'a * events:'e list
 
+[<RequireQualifiedAccess>]
 module Evented = 
     let map func (Evented(value, events)) = Evented(func value, events)
 
@@ -16,6 +17,8 @@ module Evented =
     let composeK f g x = bind g (f x)
 
     let lift2 f = map f >> apply
+
+    let run (Evented(value, events): Evented<'a, 'e>) = (value, events)
 
 type Evented<'a, 'e> with
     static member Map (x, f) = Evented.map  f x
@@ -32,13 +35,15 @@ module EventedBuilder =
         member _.Zero() = Evented.return' ()
 
 [<AutoOpen>]
-module Events =
+module EventedExtensions =
     let evented = new EventedBuilder.EventedBuilder()
 
     let (<!>) = Evented.map
     let (<*>) = Evented.apply
     let (>>=) evented func = Evented.bind func evented
     let (>=>) = Evented.composeK
+
+    let addEvent (ev:'e) = Evented((),[ev])
 
 [<RequireQualifiedAccess>]
 module List =
