@@ -19,6 +19,8 @@ module Evented =
     let lift2 f = map f >> apply
 
     let run (Evented(value, events): Evented<'a, 'e>) = (value, events)
+    let exec (Evented(_value, events): Evented<'a, 'e>) = events
+    let mapE (func:'e->'f) (Evented(value, events): Evented<'a,'e>) = Evented(value, events |> List.map func)
 
 type Evented<'a, 'e> with
     static member Map (x, f) = Evented.map  f x
@@ -44,6 +46,7 @@ module EventedExtensions =
     let (>=>) = Evented.composeK
 
     let addEvent (ev:'e) = Evented((),[ev])
+    let listen (Evented (value, events): Evented<'a,'e>) = Evented((value,events),events)
 
 [<RequireQualifiedAccess>]
 module List =
