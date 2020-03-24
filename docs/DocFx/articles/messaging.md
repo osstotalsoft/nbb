@@ -75,6 +75,8 @@ The `MessagingHostBuilder` can be used to register the subscriber services and t
 
 
 ### Registration examples:
+
+#### Using default options:
 ```csharp
 services.AddMessagingHost()
     .AddSubscriberServices(config => config
@@ -88,6 +90,7 @@ services.AddMessagingHost()
         .UseMediatRMiddleware());
 ```
 
+#### Using custom options per message type and custom middleware:
 ```csharp
 services.AddMessagingHost()
     .AddSubscriberServices(config => config.FromTopics(topics))
@@ -104,6 +107,26 @@ services.AddMessagingHost()
         .UseMediatRMiddleware());
 ```
 
+#### Using parallel handling on speciffic message type:
+- Note: when using "parallel" HandlerStrategy you must also use "manual" AcknowledgeStrategy and increase the MaxInFlight value.
+```csharp
+    services.AddMessagingHost()
+        .AddSubscriberServices(config => config.FromMediatRHandledCommands().AddClassesWhere(x => x != typeof(LongRunningIOCommand)))
+            .WithDefaultOptions()
+        .AddSubscriberServices(config => config.AddType<LongRunningIOCommand>())
+            .WithOptions(config =>
+            {
+                config.Options.HandlerStrategy = MessagingHandlerStrategy.Parallel;
+                config.Options.AcknowledgeStrategy = MessagingAcknowledgeStrategy.Manual;
+                config.Options.MaxInFlight = 10;
+            })
+        .UsePipeline(pipelineBuilder => pipelineBuilder
+            .UseCorrelationMiddleware()
+            .UseExceptionHandlingMiddleware()
+            .UseDefaultResiliencyMiddleware()
+            .UseMediatRMiddleware()
+        );
+```
 ### Adding subscriber services:
 `AddSubscriberServices(Action<ITypeSourceSelector> builder)` registers messagebus subscriber services for messages from the following sources:
 The fluent API for configuration starts with specifying the sources of message types/topics

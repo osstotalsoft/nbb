@@ -56,7 +56,7 @@ namespace NBB.Messaging.Nats
             opts.ManualAcks = subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
             
             //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
-            opts.MaxInflight = 1;
+            opts.MaxInflight = options.MaxInFlight;
             opts.AckWait = _configuration.GetSection("Messaging").GetSection("Nats").GetValue<int?>("ackWait") ?? 50000;
             
             void StanMsgHandler(object obj, StanMsgHandlerArgs args)
@@ -65,25 +65,31 @@ namespace NBB.Messaging.Nats
                     subject);
 
                 var json = System.Text.Encoding.UTF8.GetString(args.Message.Data);
-
-                try
+                var handlerTask = handler(json).ContinueWith(t =>
                 {
-                    if (subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial)
+                    if (t.IsFaulted)
                     {
-                        handler(json).Wait(cancellationToken);
+                        _logger.LogError(
+                            "Nats consumer {QGroup} encountered an error when handling a message from subject {Subject}.\n {Error}",
+                            qGroup, subject, t.Exception);
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(
-                        "Nats consumer {QGroup} encountered an error when handling a message from subject {Subject}.\n {Error}",
-                        qGroup, subject, ex);
-                    //TODO: push to DLQ
-                }
 
-                if (subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Serial)
+                    if (subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual)
+                    {
+                        args.Message.Ack();
+                    }
+                });
+               
+                switch (subscriberOptions.HandlerStrategy)
                 {
-                    args.Message.Ack();
+                    case MessagingHandlerStrategy.Serial:
+                        handlerTask.Wait(cancellationToken);
+                        break;
+                    case MessagingHandlerStrategy.Parallel:
+                        handlerTask.Start(); // Fire and forget
+                        break;
+                    default:
+                        throw new Exception("Invalid HandlerStrategy configuration");
                 }
             }
 
