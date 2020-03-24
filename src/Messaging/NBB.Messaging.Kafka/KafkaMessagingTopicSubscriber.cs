@@ -105,18 +105,11 @@ namespace NBB.Messaging.Kafka
                         return _subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual 
                             ? consumer.CommitAsync() 
                             : Task.CompletedTask;
-                     });
+                     }).Unwrap();
 
-                     switch (_subscriberOptions.HandlerStrategy)
+                     if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
                      {
-                        case MessagingHandlerStrategy.Serial:
-                            await handlerTask.Unwrap();
-                            break;
-                        case MessagingHandlerStrategy.Parallel:
-                            handlerTask.Unwrap().Start(); // Fire and forget
-                            break;
-                        default:
-                            throw new Exception("Invalid HandlerStrategy configuration");
+                         await handlerTask;
                      }
                 }
             }

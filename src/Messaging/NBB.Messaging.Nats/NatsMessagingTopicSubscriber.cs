@@ -79,17 +79,10 @@ namespace NBB.Messaging.Nats
                         args.Message.Ack();
                     }
                 });
-               
-                switch (subscriberOptions.HandlerStrategy)
+
+                if (subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
                 {
-                    case MessagingHandlerStrategy.Serial:
-                        handlerTask.Wait(cancellationToken);
-                        break;
-                    case MessagingHandlerStrategy.Parallel:
-                        handlerTask.Start(); // Fire and forget
-                        break;
-                    default:
-                        throw new Exception("Invalid HandlerStrategy configuration");
+                    handlerTask.Wait(cancellationToken);
                 }
             }
 
