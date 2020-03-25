@@ -29,6 +29,14 @@ namespace NBB.Messaging.Abstractions
         /// </value>
         public MessagingHandlerStrategy HandlerStrategy { get; set; } = MessagingHandlerStrategy.Serial;
 
+        /// <summary>
+        /// Maximum number of messages received at time for a topic (default 1). 
+        /// Increase the value when using the parallel HandlerStrategy
+        /// </summary>
+        /// <value>
+        /// The handler strategy.
+        /// </value>
+        public int MaxInFlight { get; set; } = 1;
 
         /// <summary>
         /// Options for serialization/deserialization. See next section.
@@ -90,7 +98,7 @@ namespace NBB.Messaging.Abstractions
         /// <summary>
         /// Acknowlegments are sent synchroniously after the message handler is called.
         /// </summary>
-        Serial = 0,
+        Manual = 0,
         /// <summary>
         /// Messages are acknowledged automatically by the transport library (eg: Nats/Kafka auto commit).
         /// </summary>
@@ -105,6 +113,10 @@ namespace NBB.Messaging.Abstractions
         /// <summary>
         ///  The handler is called sinchroniously for each message. The next message is consumed after the current handler is finished.
         /// </summary>
-        Serial = 0
+        Serial = 0,
+        /// <summary>
+        ///  The handler is called asynchroniously for each message. It allows multiple messages to be handled in paralel.
+        /// </summary>
+        Parallel = 1
     }
 }

@@ -92,25 +92,25 @@ namespace NBB.Messaging.Kafka
                     _logger.LogDebug("Kafka _consumer {ConsumerGroup} received message from topic {TopicName}",
                         _consumerGroup, topicName);
 
-                    try
-                    {
-                        if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial)
+                     var handlerTask = handler(message.Value).ContinueWith(t =>
+                     {
+                        if (t.IsFaulted)
                         {
-                            await handler(message.Value);
+                            _logger.LogError(
+                                "Kafka _consumer {ConsumerGroup} encountered an error when handling a message from topic {TopicName}.\n {Error}",
+                                _consumerGroup, topicName, t.Exception);
+                            //TODO: push to DLQ
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(
-                            "Kafka _consumer {ConsumerGroup} encountered an error when handling a message from topic {TopicName}.\n {Error}",
-                            _consumerGroup, topicName, ex);
-                        //TODO: push to DLQ
-                    }
-                }
 
-                if (_subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Serial)
-                {
-                    await consumer.CommitAsync();
+                        return _subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual 
+                            ? consumer.CommitAsync() 
+                            : Task.CompletedTask;
+                     }).Unwrap();
+
+                     if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
+                     {
+                         await handlerTask;
+                     }
                 }
             }
         }
