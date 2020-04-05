@@ -12,7 +12,7 @@ namespace NBB.Core.Effects.Tests
         public async Task Interpret_pure_effect_should_return_inner_value()
         {
             //Arrange
-            var sideEffectHandlerFactory = new Mock<ISideEffectHandlerFactory>();
+            var sideEffectHandlerFactory = new Mock<ISideEffectMediator>();
             var sut = new Interpreter(sideEffectHandlerFactory.Object);
             var value = "test";
             var effect = new PureEffect<string>(value);
@@ -28,7 +28,7 @@ namespace NBB.Core.Effects.Tests
         public async Task Interpret_parallel_effect_should_interpret_both_effects()
         {
             //Arrange
-            var sideEffectHandlerFactory = new Mock<ISideEffectHandlerFactory>();
+            var sideEffectHandlerFactory = new Mock<ISideEffectMediator>();
             var sut = new Interpreter(sideEffectHandlerFactory.Object);
             var expectedInt = 5;
             var expectedString = "test";
@@ -43,33 +43,26 @@ namespace NBB.Core.Effects.Tests
         }
 
         [Fact]
-        public async Task Interpret_free_effect_should_execute_side_effect_handler()
+        public async Task Interpret_free_effect_should_execute_side_effect_mediator()
         {
             //Arrange
-            var sideEffectValue = 5;
             var sideEffect = Mock.Of<ISideEffect<int>>();
-            var sideEffectHandler = new Mock<ISideEffectHandler<ISideEffect<int>, int>>();
-            sideEffectHandler.Setup(x => x.Handle(sideEffect, default)).Returns(Task.FromResult(sideEffectValue));
-            var sideEffectHandlerFactory = new Mock<ISideEffectHandlerFactory>();
-            sideEffectHandlerFactory.Setup(x => x.GetSideEffectHandlerFor(sideEffect))
-                .Returns(sideEffectHandler.Object);
-
-            var sut = new Interpreter(sideEffectHandlerFactory.Object);
+            var sideEffectMediator = new Mock<ISideEffectMediator>();
+            var sut = new Interpreter(sideEffectMediator.Object);
             var effect = Effect.Of(sideEffect);
 
             //Act
             var result = await sut.Interpret(effect);
 
             //Assert
-            sideEffectHandler.Verify(x=> x.Handle(sideEffect, default), Times.Once);
-            result.Should().Be(sideEffectValue);
+            sideEffectMediator.Verify(x=> x.Run(sideEffect, default), Times.Once);
         }
 
         [Fact]
         public async Task Interpret_unit_effect_should_return_unit_value()
         {
             //Arrange
-            var sideEffectHandlerFactory = new Mock<ISideEffectHandlerFactory>();
+            var sideEffectHandlerFactory = new Mock<ISideEffectMediator>();
             var sut = new Interpreter(sideEffectHandlerFactory.Object);
             var value = "test";
             var effect = new PureEffect<string>(value).ToUnit();

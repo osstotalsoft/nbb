@@ -5,11 +5,11 @@ namespace NBB.Core.Effects
 {
     public class Interpreter : IInterpreter
     {
-        private readonly ISideEffectHandlerFactory _sideEffectHandlerFactory;
+        private readonly ISideEffectMediator _sideEffectMediator;
 
-        public Interpreter(ISideEffectHandlerFactory sideEffectHandlerFactory)
+        public Interpreter(ISideEffectMediator sideEffectMediator)
         {
-            _sideEffectHandlerFactory = sideEffectHandlerFactory;
+            _sideEffectMediator = sideEffectMediator;
         }
 
         public Task<T> Interpret<T>(IEffect<T> effect, CancellationToken cancellationToken = default)
@@ -40,8 +40,7 @@ namespace NBB.Core.Effects
 
         private async Task<T> InternalInterpret<TOutput, T>(FreeEffect<TOutput, T> effect, CancellationToken cancellationToken = default)
         {
-            var sideEffectHandler = _sideEffectHandlerFactory.GetSideEffectHandlerFor(effect.SideEffect);
-            var sideEffectResult = await sideEffectHandler.Handle(effect.SideEffect, cancellationToken);
+            var sideEffectResult = await _sideEffectMediator.Run(effect.SideEffect, cancellationToken);
             var innerEffect = effect.Next(sideEffectResult);
             return await Interpret(innerEffect, cancellationToken);
         }

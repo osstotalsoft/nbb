@@ -23,13 +23,12 @@ let ``Pure(1) + Pure(2) should equal Pure(3)`` () =
 let ``Effect computations are lazy evaluated`` () =
     let interpreter = createInterpreter()
     let mutable printfnWasCalled = false
-    let printfn' str = 
+    let printfn _str = 
         printfnWasCalled <- true
-        printfn "Execute side effect"
 
     let eff = 
         effect {
-            printfn' "Execute side effect"
+            printfn "Execute side effect"
         }
 
     eff |> ignore
