@@ -1,30 +1,43 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
-    public class SideEffectHandlerFactory : ISideEffectHandlerFactory
+    public class SideEffectMediator : ISideEffectMediator
     {
         private static readonly ConcurrentDictionary<Type, Type> Cache = new ConcurrentDictionary<Type, Type>();
         private readonly IServiceProvider _serviceProvider;
 
-        public SideEffectHandlerFactory(IServiceProvider serviceProvider)
+        public SideEffectMediator(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public ISideEffectHandler<ISideEffect<TOutput>, TOutput> GetSideEffectHandlerFor<TOutput>(ISideEffect<TOutput> sideEffect)
+        public async Task<T> Run<T>(ISideEffect<T> sideEffect, CancellationToken cancellationToken = default)
         {
             var sideEffectHandlerType = GetSideEffectHandlerTypeFor(sideEffect.GetType());
             var sideEffectHandler = _serviceProvider.GetRequiredService(sideEffectHandlerType) as ISideEffectHandler;
-
             if (sideEffectHandler == null)
             {
                 throw new Exception($"Could not create a side effect handler for type {sideEffectHandlerType.Name}");
             }
-            return new SideEffectHandlerWrapper<TOutput>(sideEffectHandler);
+            var mi = sideEffectHandler.GetType().GetMethod("Handle");
+            var task = mi.Invoke(sideEffectHandler, new object[] { sideEffect, cancellationToken }) as Task;
+            //var task = sideEffectHandler.AsDynamic().Handle((sideEffect as dynamic), cancellationToken);
+            if (typeof(T) == typeof(Unit))
+            {
+                await task;
+                return Unit.Value as dynamic;
+            }
+            else
+            {
+                var x = await (task as Task<T>);
+                return x;
+            }
         }
 
 

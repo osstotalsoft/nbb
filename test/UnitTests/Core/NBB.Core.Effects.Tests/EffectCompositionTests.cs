@@ -16,7 +16,7 @@ namespace NBB.Core.Effects.Tests
                 .Then(Effect.Pure)
                 .Then(int.Parse);
 
-            var interpreter = new Interpreter(Mock.Of<ISideEffectHandlerFactory>());
+            var interpreter = new Interpreter(Mock.Of<ISideEffectMediator>());
             var actual = await interpreter.Interpret(effect);
             actual.Should().Be(expected);
         }
@@ -32,7 +32,7 @@ namespace NBB.Core.Effects.Tests
                 .ToUnit()
                 .Then(Effect.Pure(expected));
 
-            var interpreter = new Interpreter(Mock.Of<ISideEffectHandlerFactory>());
+            var interpreter = new Interpreter(Mock.Of<ISideEffectMediator>());
             var actual = await interpreter.Interpret(effect);
             actual.Should().Be(expected);
         }
@@ -48,7 +48,7 @@ namespace NBB.Core.Effects.Tests
                     Effect.Pure(6).Then(Double))
                 .Then(((int first, int second) t) => t.first + t.second);
 
-            var interpreter = new Interpreter(Mock.Of<ISideEffectHandlerFactory>());
+            var interpreter = new Interpreter(Mock.Of<ISideEffectMediator>());
             var actual = await interpreter.Interpret(effect);
             actual.Should().Be(Add1(5)+Double(6));
         }
