@@ -65,20 +65,27 @@ namespace NBB.Messaging.Nats
                     subject);
 
                 var json = System.Text.Encoding.UTF8.GetString(args.Message.Data);
-                var handlerTask = handler(json).ContinueWith(t =>
+
+                async Task Handler()
                 {
-                    if (t.IsFaulted)
+                    await Task.Yield();
+                    try {
+                        await handler(json);
+
+                        if (subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual)
+                        {
+                            args.Message.Ack();
+                        }
+                    }
+                    catch(Exception ex)
                     {
                         _logger.LogError(
                             "Nats consumer {QGroup} encountered an error when handling a message from subject {Subject}.\n {Error}",
-                            qGroup, subject, t.Exception);
+                            qGroup, subject, ex);
                     }
+                }
 
-                    if (subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual)
-                    {
-                        args.Message.Ack();
-                    }
-                });
+                var handlerTask = Handler();
 
                 if (subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
                 {
