@@ -20,6 +20,9 @@ module State =
     let put (x: 's) : State<'s, unit> = 
         fun _ -> ((), x)
 
+    let modify (f: 's -> 's) : State<'s, unit> =
+         get() |> bind (put << f)
+
     let pure' x = 
         fun s -> (x, s)
 

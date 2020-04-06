@@ -41,6 +41,7 @@ module EffectBuilder =
         member _.ReturnFrom(value) = value
         member _.Combine(eff1, eff2) = Effect.bind (fun _ -> eff2) eff1
         member _.Zero() = Effect.pure' ()
+        member _.Delay(f) = f()
 
 
 [<AutoOpen>]
