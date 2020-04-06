@@ -6,7 +6,8 @@ namespace NBB.Core.Effects
     {
         public static void AddEffects(this IServiceCollection services)
         {
-            services.AddScoped<ISideEffectHandlerFactory, SideEffectHandlerFactory>();
+            services.AddSingleton(typeof(Thunk.Handler<>));
+            services.AddScoped<ISideEffectMediator, SideEffectMediator>();
             services.AddScoped<IInterpreter, Interpreter>();
         }
 

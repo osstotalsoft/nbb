@@ -6,6 +6,7 @@ open NBB.Core.Effects
 
 type Effect<'T> = Effect of IEffect<'T>
 
+[<RequireQualifiedAccess>]
 module Effect = 
     let wrap eff = Effect eff
     let unWrap (Effect eff) = eff
@@ -21,10 +22,16 @@ module Effect =
 
     let return' = pure'
 
+    let from (func: unit -> 'a) = 
+        let func' = Func<'a>(func)
+        Effect.From func' |> wrap
+
     let ignore eff = map (fun _ -> ()) eff
 
     let composeK f g x = bind g (f x)
     let lift2 f = map f >> apply
+
+    let flatten eff = bind id eff
 
     let interpret<'a> (interpreter:IInterpreter) (Effect eff) = interpreter.Interpret<'a>(eff) |> Async.AwaitTask
 
@@ -41,7 +48,8 @@ module EffectBuilder =
         member _.ReturnFrom(value) = value
         member _.Combine(eff1, eff2) = Effect.bind (fun _ -> eff2) eff1
         member _.Zero() = Effect.pure' ()
-        member _.Delay(f) = f()
+        member _.Delay(f) = f |> Effect.from |> Effect.flatten
+        //member _.Run(f) = Effect.flatten f
 
 
 [<AutoOpen>]

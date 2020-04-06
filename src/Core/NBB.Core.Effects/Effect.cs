@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
@@ -18,6 +20,18 @@ namespace NBB.Core.Effects
         {
             return new PureEffect<Unit>(Unit.Value).ToUnit();
         }
+
+        public static IEffect<T> From<T>(Func<CancellationToken, Task<T>> impure)
+            => Of(Thunk.From(impure));
+
+        public static IEffect From(Func<CancellationToken, Task> impure)
+            => Of(Thunk.From(impure)).ToUnit();
+
+        public static IEffect<TOutput> From<TOutput>(Func<TOutput> impure)
+            => Of(Thunk.From(impure));
+
+        public static IEffect From(Action impure)
+            => Of(Thunk.From(impure)).ToUnit();
 
         public static IEffect<(T1, T2)> Parallel<T1, T2>(IEffect<T1> e1, IEffect<T2> e2)
         {
@@ -41,8 +55,8 @@ namespace NBB.Core.Effects
 
         public static IEffect<TResult> Apply<T, TResult>(IEffect<Func<T, TResult>> fn, IEffect<T> effect)
         {
-            return effect.Bind(x=> fn.Map(f=> f(x)));
+            return effect.Bind(x => fn.Map(f => f(x)));
         }
-        
+
     }
 }

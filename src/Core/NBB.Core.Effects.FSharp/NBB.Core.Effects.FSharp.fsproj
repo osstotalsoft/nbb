@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="Effects.fs" />
+    <Compile Include="Interpreter.fs" />
     <Compile Include="Data\ReaderEffect.fs" />
     <Compile Include="Data\StateEffect.fs" />
     <Compile Include="Data\ReaderStateEffect.fs" />

@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -7,55 +6,55 @@ using Xunit;
 
 namespace NBB.Core.Effects.Tests
 {
-    public class SideEffectHandlerFactoryTests
+    public class SideEffectMediatorTests
     {
         [Fact]
-        public void Should_return_handler_for_simple_side_effect()
+        public async Task Should_handle_simple_side_effect()
         {
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped<ISideEffectHandler<Simple.SideEffect, int>, Simple.Handler>();
             using var container = services.BuildServiceProvider();
-            var sut = new SideEffectHandlerFactory(container);
+            var sut = new SideEffectMediator(container);
 
             //Act
-            var sideEffectHandlerType = sut.GetSideEffectHandlerFor(new Simple.SideEffect());
+            var result = await sut.Run(new Simple.SideEffect(10));
 
             //Assert
-            sideEffectHandlerType.Should().NotBeNull();
+            result.Should().Be(10);
         }
 
         [Fact]
-        public void Should_return_handler_for_void_returning_side_effect()
+        public async Task Should_handle_void_returning_side_effect()
         {
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped<ISideEffectHandler<VoidReturning.SideEffect>, VoidReturning.Handler>();
             using var container = services.BuildServiceProvider();
-            var sut = new SideEffectHandlerFactory(container);
+            var sut = new SideEffectMediator(container);
 
             //Act
-            var sideEffectHandlerType = sut.GetSideEffectHandlerFor(new VoidReturning.SideEffect());
+            var sideEffectHandlerType = await sut.Run(new VoidReturning.SideEffect());
 
             //Assert
-            sideEffectHandlerType.Should().NotBeNull();
+            sideEffectHandlerType.Should().Be(Unit.Value);
         }
 
         [Fact]
-        public void Should_return_handler_for_generic_side_effect()
+        public async Task Should_handle_generic_side_effect()
         {
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped(typeof(Generic.Handler<>));
             using var container = services.BuildServiceProvider();
-            var sut = new SideEffectHandlerFactory(container);
+            var sut = new SideEffectMediator(container);
 
             //Act
-            var sideEffectHandler = sut.GetSideEffectHandlerFor(new Generic.SideEffect<int>());
+            var sideEffectHandler = await sut.Run(new Generic.SideEffect<int>());
 
 
             //Assert
-            sideEffectHandler.Should().NotBeNull();
+            sideEffectHandler.Should().Be(0);
         }
     }
 
@@ -63,14 +62,19 @@ namespace NBB.Core.Effects.Tests
     {
         public class SideEffect: ISideEffect<int>
         {
+            public int Value { get; }
 
+            public SideEffect(int value)
+            {
+                Value = value;
+            }
         }
 
         public class Handler : ISideEffectHandler<SideEffect, int>
         {
             public Task<int> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
-                throw new NotImplementedException();
+                return Task.FromResult(sideEffect.Value);
             }
         }
     }
@@ -85,7 +89,7 @@ namespace NBB.Core.Effects.Tests
         {
             public Task<TResponse> Handle(SideEffect<TResponse> sideEffect, CancellationToken cancellationToken = default)
             {
-                throw new NotImplementedException();
+                return Task.FromResult(default(TResponse));
             }
         }
     }
@@ -94,14 +98,13 @@ namespace NBB.Core.Effects.Tests
     {
         public class SideEffect: ISideEffect
         {
-
         }
 
         public class Handler : ISideEffectHandler<SideEffect>
         {
             public Task Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
-                throw new NotImplementedException();
+                return Task.CompletedTask;
             }
         }
     }

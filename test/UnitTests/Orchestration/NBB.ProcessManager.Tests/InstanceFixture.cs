@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -21,23 +20,12 @@ namespace NBB.ProcessManager.Tests
                 .BuildServiceProvider();
 
             var logger = serviceProvider.GetRequiredService<ILogger<EventStore.EventStore>>();
-            var interpreter = new Interpreter(new SideEffectHandlerFactoryMock());
+            var sideEffectMediator = Mock.Of<ISideEffectMediator>();
+            var interpreter = new Interpreter(sideEffectMediator);
 
             Repository = new InstanceDataRepository(
                 new EventStore.EventStore(new InMemoryRepository(), new NewtonsoftJsonEventStoreSerDes(), logger),
                 interpreter);
-        }
-    }
-
-    public class SideEffectHandlerFactoryMock : ISideEffectHandlerFactory
-    {
-        public ISideEffectHandler<ISideEffect<TOutput>, TOutput> GetSideEffectHandlerFor<TOutput>(ISideEffect<TOutput> sideEffect)
-        {
-            var mock = new Mock<ISideEffectHandler<ISideEffect<TOutput>, TOutput>>();
-            mock.Setup(x => x.Handle(It.IsAny<ISideEffect<TOutput>>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(default(TOutput)));
-
-            return mock.Object;
         }
     }
 }
