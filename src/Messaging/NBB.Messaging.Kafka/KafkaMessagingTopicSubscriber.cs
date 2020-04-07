@@ -94,7 +94,6 @@ namespace NBB.Messaging.Kafka
 
                     async Task Handler()
                     {
-                        await Task.Yield();
                         try {
                             await handler(message.Value);
                             
@@ -112,11 +111,13 @@ namespace NBB.Messaging.Kafka
                         }
                     }
 
-                    var handlerTask = Handler();
-
                     if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
                     {
-                        await handlerTask;
+                        await Handler();
+                    }
+                    else
+                    {
+                        var _unAwaitedTask = Task.Run(Handler);
                     }
                 }
             }

@@ -68,7 +68,6 @@ namespace NBB.Messaging.Nats
 
                 async Task Handler()
                 {
-                    await Task.Yield();
                     try {
                         await handler(json);
 
@@ -85,11 +84,13 @@ namespace NBB.Messaging.Nats
                     }
                 }
 
-                var handlerTask = Handler();
-
                 if (subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
                 {
-                    handlerTask.Wait(cancellationToken);
+                    Handler().Wait(cancellationToken);
+                }
+                else
+                {
+                    Task.Run(Handler);
                 }
             }
 
