@@ -92,25 +92,33 @@ namespace NBB.Messaging.Kafka
                     _logger.LogDebug("Kafka _consumer {ConsumerGroup} received message from topic {TopicName}",
                         _consumerGroup, topicName);
 
-                     var handlerTask = handler(message.Value).ContinueWith(t =>
-                     {
-                        if (t.IsFaulted)
+                    async Task Handler()
+                    {
+                        try {
+                            await handler(message.Value);
+                            
+                            if (_subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual)
+                            {
+                                await consumer.CommitAsync();
+                            }
+                        }
+                        catch(Exception ex)
                         {
                             _logger.LogError(
                                 "Kafka _consumer {ConsumerGroup} encountered an error when handling a message from topic {TopicName}.\n {Error}",
-                                _consumerGroup, topicName, t.Exception);
+                                _consumerGroup, topicName, ex);
                             //TODO: push to DLQ
                         }
+                    }
 
-                        return _subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual 
-                            ? consumer.CommitAsync() 
-                            : Task.CompletedTask;
-                     }).Unwrap();
-
-                     if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
-                     {
-                         await handlerTask;
-                     }
+                    if (_subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial) 
+                    {
+                        await Handler();
+                    }
+                    else
+                    {
+                        var _unAwaitedTask = Task.Run(Handler);
+                    }
                 }
             }
         }
