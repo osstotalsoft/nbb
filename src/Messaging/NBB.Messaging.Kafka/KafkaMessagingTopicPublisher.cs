@@ -17,14 +17,10 @@ namespace NBB.Messaging.Kafka
         private readonly IConfiguration _configuration;
         private readonly Producer<string, string> _producer;
         private readonly ILogger<KafkaMessagingTopicPublisher> _logger;
-        private readonly ITopicRegistry _topicRegistry;
-        private readonly IMessageSerDes _messageSerDes;
 
-        public KafkaMessagingTopicPublisher(IConfiguration configuration, ITopicRegistry topicRegistry, IMessageSerDes messageSerDes, ILogger<KafkaMessagingTopicPublisher> logger)
+        public KafkaMessagingTopicPublisher(IConfiguration configuration, ILogger<KafkaMessagingTopicPublisher> logger)
         {
             _configuration = configuration;
-            _topicRegistry = topicRegistry;
-            _messageSerDes = messageSerDes;
             _producer = GetProducer();
             _logger = logger;
         }
@@ -34,10 +30,9 @@ namespace NBB.Messaging.Kafka
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var resp = await _producer.ProduceAsync(topicName, key, message);
+            await _producer.ProduceAsync(topicName, key, message);
             stopWatch.Stop();
             _logger.LogDebug("Kafka message produced to topic {TopicName} in {ElapsedMilliseconds} ms", topicName, stopWatch.ElapsedMilliseconds);
-
 
             //https://github.com/confluentinc/confluent-kafka-dotnet/issues/92
             await Task.Yield();
@@ -48,7 +43,6 @@ namespace NBB.Messaging.Kafka
             var kafkaServers = _configuration.GetSection("Messaging").GetSection("Kafka")["bootstrap_servers"];
             var config = new Dictionary<string, object>
             {
-                //{"bootstrap.servers", "10.1.3.166:19092,10.1.3.166:29092,10.1.3.166:39092"}
                 {"bootstrap.servers", kafkaServers},
                 {"socket.blocking.max.ms", 50}
             };
@@ -58,10 +52,26 @@ namespace NBB.Messaging.Kafka
             return producer;
         }
 
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _producer?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
 
         public void Dispose()
         {
-            _producer.Dispose();
+            Dispose(true);
         }
+        #endregion
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Abstractions;
-using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Services;
 using Xunit;
 

@@ -99,7 +99,7 @@ namespace NBB.ProcessManager.Definition.Builder
 
             var func = acts.Select(x => x.CompletionPredicate)
                 .DefaultIfEmpty()
-                .Aggregate((func1, func2) => (@event, data) => func2(@event, data) && func2(@event, data));
+                .Aggregate((func1, func2) => (@event, data) => func2(@event, data));
 
             return (@event, data) => func?.Invoke((IEvent) @event, data) ?? true;
         }

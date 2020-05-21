@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +18,6 @@ namespace NBB.Messaging.Host
         private readonly IMessageSerDes _messageSerDes;
         private readonly MessagingContextAccessor _messagingContextAccessor;
         private readonly ILogger<MessagingTopicSubscriberService> _logger;
-        private readonly ITopicRegistry _topicRegistry;
         private readonly string _topic;
         private readonly MessagingSubscriberOptions _subscriberOptions;
 
@@ -39,8 +37,7 @@ namespace NBB.Messaging.Host
             _messageSerDes = messageSerDes;
             _logger = logger;
             _subscriberOptions = subscriberOptions;
-            _topicRegistry = topicRegistry;
-            _topic = _topicRegistry.GetTopicForName(topic);
+            _topic = topicRegistry.GetTopicForName(topic);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)

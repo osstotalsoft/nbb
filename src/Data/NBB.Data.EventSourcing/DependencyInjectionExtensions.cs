@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
 using NBB.Data.Abstractions;

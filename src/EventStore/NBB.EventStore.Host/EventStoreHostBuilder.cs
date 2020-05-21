@@ -3,8 +3,6 @@ using Microsoft.Extensions.Hosting;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NBB.EventStore.Host
 {

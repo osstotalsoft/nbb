@@ -1,5 +1,4 @@
-﻿using System;
-using NBB.Application.DataContracts;
+﻿using NBB.Application.DataContracts;
 
 namespace NBB.Worker
 {

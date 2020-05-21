@@ -2,11 +2,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Moq;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.DataContracts;
 using NBB.Messaging.Host.MessagingPipeline;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 

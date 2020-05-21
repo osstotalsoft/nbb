@@ -5,7 +5,7 @@ using NBB.Payments.Migrations;
 
 namespace NBB.Mono.Migrations
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

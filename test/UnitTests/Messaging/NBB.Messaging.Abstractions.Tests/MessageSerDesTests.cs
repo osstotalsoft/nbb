@@ -6,7 +6,6 @@ using Moq;
 using NBB.Application.DataContracts;
 using NBB.Core.Abstractions;
 using NBB.Messaging.DataContracts;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace NBB.Messaging.Abstractions.Tests
@@ -22,8 +21,7 @@ namespace NBB.Messaging.Abstractions.Tests
             public string Details { get; private set; }
             public int SequenceNumber { get; set; }
 
-            private readonly bool _constructedWithPrivateConstructor;
-            public bool ConstructedWithPrivateConstructor() => _constructedWithPrivateConstructor;
+            public bool ConstructedWithPrivateConstructor() => false;
 
             public TestMessage(long partnerId, long contractId, string details, EventMetadata metadata = null) : base(metadata)
             {

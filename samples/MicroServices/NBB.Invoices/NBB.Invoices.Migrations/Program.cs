@@ -3,7 +3,7 @@ using NBB.EventStore.AdoNet.Migrations;
 
 namespace NBB.Invoices.Migrations
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

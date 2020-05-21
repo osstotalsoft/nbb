@@ -1,6 +1,5 @@
 ﻿using NBB.Core.Abstractions;
 using System;
-using System.Collections.Generic;
 
 namespace NBB.Messaging.DataContracts
 {
@@ -20,7 +19,7 @@ namespace NBB.Messaging.DataContracts
             MessageId = messageId;
             CreationDate = creationDate;
             CorrelationId = correlationId;
-            Key = Key;
+            Key = key;
         }
     }
 }

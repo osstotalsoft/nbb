@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using MediatR;
 using NBB.Invoices.Domain.InvoiceAggregate.DomainEvents;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 
 namespace NBB.Invoices.Application.DomainEventHandlers
 {

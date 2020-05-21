@@ -2,6 +2,7 @@
 
 namespace NBB.EventStore
 {
+    [Serializable]
     public class AggregateNotFoundException : Exception
     {
     }
