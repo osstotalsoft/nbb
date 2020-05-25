@@ -14,3 +14,4 @@ TestResults
 */**/appsettings.Development.json
 *.user
 *.suo
+/.sonarqube
