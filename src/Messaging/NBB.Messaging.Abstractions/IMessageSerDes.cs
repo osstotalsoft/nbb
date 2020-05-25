@@ -1,5 +1,4 @@
 ﻿using NBB.Messaging.DataContracts;
-using System;
 
 namespace NBB.Messaging.Abstractions
 {

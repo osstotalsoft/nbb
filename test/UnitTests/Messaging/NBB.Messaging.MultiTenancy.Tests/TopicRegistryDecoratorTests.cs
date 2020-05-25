@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Messaging.Abstractions;
 using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Services;
 using Xunit;
 
 namespace NBB.Messaging.MultiTenancy.Tests

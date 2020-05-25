@@ -1,8 +1,5 @@
 ﻿using NBB.Domain;
-using NBB.Domain.Abstractions;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace NBB.Contracts.Domain.ContractAggregate.DomainEvents
 {

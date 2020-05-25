@@ -75,7 +75,7 @@ namespace NBB.ProcessManager.Definition.Builder
                         return _completionPredicate((TEvent) @event, data) && _starterPredicate((TEvent) @event, data);
                     if (_completionPredicate == null && _starterPredicate != null)
                         return _starterPredicate((TEvent) @event, data);
-                    if (_completionPredicate != null && _starterPredicate == null)
+                    if (_completionPredicate != null)
                         return _completionPredicate((TEvent) @event, data);
 
                     return true;

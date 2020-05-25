@@ -1,7 +1,6 @@
 ﻿using NBB.Core.Abstractions;
 using NBB.Correlation;
 using NBB.EventStore.Abstractions;
-using NBB.EventStore.Internal;
 using NBB.EventStore.MessagingExtensions.Internal;
 using NBB.Messaging.Abstractions;
 using System;
@@ -12,14 +11,12 @@ namespace NBB.EventStore.MessagingExtensions
 {
     public class MessagingEventStoreSubscriber : IEventStoreSubscriber
     {
-        private readonly IEventStoreSerDes _eventStoreSerDes;
         private readonly IMessageBusSubscriber<IEvent> _messageBusSubscriber;
         private readonly MessagingTopicResolver _messagingTopicResolver;
         private readonly MessagingSubscriberOptions _subscriberOptions;
 
-        public MessagingEventStoreSubscriber(IEventStoreSerDes eventStoreSerDes, IMessageBusSubscriber<IEvent> messageBusSubscriber, MessagingTopicResolver messagingTopicResolver, MessagingSubscriberOptions subscriberOptions)
+        public MessagingEventStoreSubscriber(IMessageBusSubscriber<IEvent> messageBusSubscriber, MessagingTopicResolver messagingTopicResolver, MessagingSubscriberOptions subscriberOptions)
         {
-            _eventStoreSerDes = eventStoreSerDes;
             _messageBusSubscriber = messageBusSubscriber;
             _messagingTopicResolver = messagingTopicResolver;
             _subscriberOptions = subscriberOptions;

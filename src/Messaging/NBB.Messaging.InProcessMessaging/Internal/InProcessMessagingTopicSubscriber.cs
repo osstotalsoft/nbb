@@ -11,6 +11,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
         private readonly IStorage _storage;
         private readonly ILogger<InProcessMessagingTopicSubscriber> _logger;
         private bool _subscribedToTopic;
+        private readonly object lockObj = new object();
 
         public InProcessMessagingTopicSubscriber(IStorage storage, ILogger<InProcessMessagingTopicSubscriber> logger)
         {
@@ -22,7 +23,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
         {
             if (!_subscribedToTopic)
             {
-                lock (this)
+                lock (lockObj)
                 {
                     if (!_subscribedToTopic)
                     {

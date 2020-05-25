@@ -1,13 +1,11 @@
-﻿using System.Threading;
-
-namespace NBB.SQLStreamStore.Migrations
+﻿namespace NBB.SQLStreamStore.Migrations
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             var migrator = new SqlStreamStoreMigrator();
-            migrator.MigrateDatabaseToLatestVersion(args).Wait();
+            migrator.MigrateDatabaseToLatestVersion().Wait();
         }
     }
 }

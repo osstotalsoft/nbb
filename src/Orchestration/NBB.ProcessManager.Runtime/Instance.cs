@@ -15,10 +15,12 @@ namespace NBB.ProcessManager.Runtime
         public InstanceStates State { get; private set; }
         public object InstanceId { get; private set; }
 
-
         private readonly List<IEvent> _changes = new List<IEvent>();
         private readonly List<IEffect> _effects = new List<IEffect>();
         public int Version { get; internal set; }
+
+        public IEnumerable<object> GetUncommittedChanges() => _changes;
+        public IEnumerable<IEffect> GetUncommittedEffects() => _effects;
 
         public Instance(IDefinition<TData> definition)
         {
@@ -75,11 +77,6 @@ namespace NBB.ProcessManager.Runtime
             Data = _definition.GetSetStateFunc<TEvent>()(@event.ReceivedEvent, GetInstanceData());
         }
 
-        private InstanceData<TData> GetInstanceData()
-        {
-            return new InstanceData<TData>(InstanceId, Data);
-        }
-
         private void Apply(ProcessStarted @event)
         {
             State = InstanceStates.Started;
@@ -126,8 +123,12 @@ namespace NBB.ProcessManager.Runtime
             }
         }
 
-        public IEnumerable<object> GetUncommittedChanges() => _changes;
-        public IEnumerable<IEffect> GetUncommittedEffects() => _effects;
+        private InstanceData<TData> GetInstanceData()
+        {
+            return new InstanceData<TData>(InstanceId, Data);
+        }
+
+
 
         public void MarkChangesAsCommitted()
         {

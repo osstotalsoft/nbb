@@ -14,8 +14,8 @@ namespace NBB.Messaging.Nats
         private readonly StanConnectionProvider _stanConnectionManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<NatsMessagingTopicSubscriber> _logger;
-
         private bool _subscribedToTopic;
+        private readonly object lockObj = new object();
 
         public NatsMessagingTopicSubscriber(StanConnectionProvider stanConnectionManager, IConfiguration configuration, 
             ILogger<NatsMessagingTopicSubscriber> logger)
@@ -29,7 +29,7 @@ namespace NBB.Messaging.Nats
         {
             if (!_subscribedToTopic)
             {
-                lock (this)
+                lock (lockObj)
                 {
                     if (!_subscribedToTopic)
                     {
@@ -56,7 +56,7 @@ namespace NBB.Messaging.Nats
             opts.ManualAcks = subscriberOptions.AcknowledgeStrategy != MessagingAcknowledgeStrategy.Auto;
             
             //https://github.com/nats-io/go-nats-streaming#subscriber-rate-limiting
-            opts.MaxInflight = options.MaxInFlight;
+            opts.MaxInflight = subscriberOptions.MaxInFlight;
             opts.AckWait = _configuration.GetSection("Messaging").GetSection("Nats").GetValue<int?>("ackWait") ?? 50000;
             
             void StanMsgHandler(object obj, StanMsgHandlerArgs args)
@@ -90,7 +90,7 @@ namespace NBB.Messaging.Nats
                 }
                 else
                 {
-                    Task.Run(Handler);
+                    Task.Run(Handler, cancellationToken);
                 }
             }
 

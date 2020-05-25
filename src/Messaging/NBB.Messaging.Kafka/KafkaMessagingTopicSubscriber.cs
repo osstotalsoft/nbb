@@ -19,6 +19,7 @@ namespace NBB.Messaging.Kafka
         private readonly string _kafkaServers;
         private bool _subscribedToTopic;
         private MessagingSubscriberOptions _subscriberOptions;
+        private readonly object lockObj = new object();
 
         public KafkaMessagingTopicSubscriber(IConfiguration configuration, ILogger<KafkaMessagingTopicSubscriber> logger)
         {
@@ -31,7 +32,7 @@ namespace NBB.Messaging.Kafka
         {
             if (!_subscribedToTopic)
             {
-                lock (this)
+                lock (lockObj)
                 {
                     if (!_subscribedToTopic)
                     {
@@ -48,8 +49,6 @@ namespace NBB.Messaging.Kafka
 
         private async Task SubscribeToTopicAsync(string topicName, Func<string, Task> handler, CancellationToken cancellationToken = default)
         {
-            
-
             _consumer.OnPartitionsAssigned += (_, partitions) =>
             {
                 _logger.LogDebug("Kafka _consumer {ConsumerGroup} assigned partitions: {Partitions}", _consumerGroup,
@@ -76,12 +75,6 @@ namespace NBB.Messaging.Kafka
             //_consumer.Unsubscribe();
             return Task.CompletedTask;
         }
-
-        public void Dispose()
-        {
-            _consumer?.Dispose();
-        }
-
 
         private async Task Poll(string topicName, Func<string, Task> handler,Consumer<string, string> consumer, CancellationToken cancellationToken = default)
         {
@@ -146,5 +139,28 @@ namespace NBB.Messaging.Kafka
 
             return consumer;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _consumer?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

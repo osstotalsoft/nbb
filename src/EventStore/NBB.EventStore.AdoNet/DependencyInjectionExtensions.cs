@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NBB.EventStore.AdoNet.Internal;
 
 namespace NBB.EventStore.AdoNet

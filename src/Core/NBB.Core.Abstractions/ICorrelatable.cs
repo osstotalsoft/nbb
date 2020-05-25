@@ -1,5 +1,9 @@
 using System;
 
-public interface ICorrelatable {
-    Guid? CorrelationId { get; set; }
+namespace NBB.Core.Abstractions
+{
+    public interface ICorrelatable
+    {
+        Guid? CorrelationId { get; set; }
+    }
 }

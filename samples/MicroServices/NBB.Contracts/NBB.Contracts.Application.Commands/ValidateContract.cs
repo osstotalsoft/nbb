@@ -1,6 +1,5 @@
 ﻿using NBB.Application.DataContracts;
 using NBB.Core.Abstractions;
-using Newtonsoft.Json;
 using System;
 
 namespace NBB.Contracts.Application.Commands

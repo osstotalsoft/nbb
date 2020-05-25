@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NBB.Data.EventSourcing.Infrastructure
+﻿namespace NBB.Data.EventSourcing.Infrastructure
 {
     public class EventSourcingOptions
     {
