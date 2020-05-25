@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NBB.Application.DataContracts;
 
 namespace ProcessManagerSample.Commands
 {
-    public class ShipOrder
+    public class ShipOrder: Command
     {
     }
 }

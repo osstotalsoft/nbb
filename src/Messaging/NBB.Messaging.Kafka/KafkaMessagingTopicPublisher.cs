@@ -25,14 +25,14 @@ namespace NBB.Messaging.Kafka
             _logger = logger;
         }
 
-        public async Task PublishAsync(string topicName, string key, string message, CancellationToken cancellationToken = default)
+        public async Task PublishAsync(string topic, string key, string message, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            await _producer.ProduceAsync(topicName, key, message);
+            await _producer.ProduceAsync(topic, key, message);
             stopWatch.Stop();
-            _logger.LogDebug("Kafka message produced to topic {TopicName} in {ElapsedMilliseconds} ms", topicName, stopWatch.ElapsedMilliseconds);
+            _logger.LogDebug("Kafka message produced to topic {TopicName} in {ElapsedMilliseconds} ms", topic, stopWatch.ElapsedMilliseconds);
 
             //https://github.com/confluentinc/confluent-kafka-dotnet/issues/92
             await Task.Yield();

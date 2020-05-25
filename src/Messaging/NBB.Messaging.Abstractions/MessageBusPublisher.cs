@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
+﻿using NBB.Core.Abstractions;
 using NBB.Messaging.DataContracts;
 using System;
 using System.Collections.Generic;

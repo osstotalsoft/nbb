@@ -5,15 +5,15 @@ namespace NBB.SQLStreamStore.Internal
 {
     public class SerDes : ISerDes
     {
-        public T Deserialize<T>(string json)
+        public T Deserialize<T>(string data)
         {
-            var obj = JsonConvert.DeserializeObject<T>(json);
+            var obj = JsonConvert.DeserializeObject<T>(data);
             return obj;
         }
 
-        public object Deserialize(string json, Type type)
+        public object Deserialize(string data, Type type)
         {
-            var obj = JsonConvert.DeserializeObject(json, type);
+            var obj = JsonConvert.DeserializeObject(data, type);
             return obj;
         }
 

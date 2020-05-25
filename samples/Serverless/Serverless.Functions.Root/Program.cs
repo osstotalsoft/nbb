@@ -9,6 +9,10 @@ namespace Serverless.Functions.Root
 {
     class Program
     {
+        protected Program()
+        {
+
+        }
 
         static void Main(string[] args)
         {

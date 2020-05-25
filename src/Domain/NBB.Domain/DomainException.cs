@@ -2,6 +2,7 @@
 
 namespace NBB.Domain
 {
+    [Serializable]
     public class DomainException : Exception
     {
         public DomainException()

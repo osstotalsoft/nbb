@@ -25,7 +25,7 @@ namespace Serverless.Functions.Root.Lib
     {
         public string Parse(TextReader reader, int length) {
             var buffer = new char[length];
-            var data = reader.ReadBlock(buffer, 0, length);
+            reader.ReadBlock(buffer, 0, length);
 
             return new string(buffer);
         }
@@ -56,8 +56,8 @@ namespace Serverless.Functions.Root.Lib
             var req = new HttpRequest{
                 HttpHeaders = new NameValueCollection()
             };
-            string line = null;
-            while((line = reader.ReadLine()).Length > 0) {
+            string line;
+            while(!string.IsNullOrEmpty(line = reader.ReadLine())) {
 
                 int keyIndex = line.IndexOf(":");
                 if (keyIndex > -1) {

@@ -12,7 +12,6 @@ using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.InProcessMessaging.Extensions;
 using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Runtime;
-using NBB.ProcessManager.Runtime.Timeouts;
 using NBB.Resiliency;
 using ProcessManagerSample.MessageMiddlewares;
 using ProcessManagerSample.Queries;

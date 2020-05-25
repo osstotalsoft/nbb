@@ -3,8 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace NBB.Contracts.Api
 {
-    public static class Program
+    public class Program
     {
+        protected Program()
+        {
+
+        }
+
         public static void Main(string[] args)
         {
             BuildWebHost(args).Run();

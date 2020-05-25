@@ -7,7 +7,6 @@ using ProcessManagerSample.Queries;
 using System;
 using System.Collections.Generic;
 using NBB.Core.Effects;
-
 using NBB.Application.Effects;
 using NBB.Messaging.Effects;
 

@@ -59,12 +59,12 @@ namespace NBB.Http.Effects.Tests
             CancellationToken cancellationToken)
         {
             _requests.Add(request);
-
-            return new HttpResponseMessage
+            var response = new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent("my string, that needs to be returned")
             };
+            return await Task.FromResult(response);            
         }
 
         public void Verify(Predicate<HttpRequestMessage> predicate)

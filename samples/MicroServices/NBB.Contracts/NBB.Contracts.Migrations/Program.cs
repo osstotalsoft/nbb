@@ -5,6 +5,11 @@ namespace NBB.Contracts.Migrations
 {
     class Program
     {
+        protected Program()
+        {
+
+        }
+
         private static void Main(string[] args)
         {
             var contractsMigrator = new ContractsReadDatabaseMigrator();

@@ -11,14 +11,12 @@ namespace NBB.Data.EntityFramework
     public class EfQuery<TEntity, TContext> : IQueryable<TEntity>, IAsyncEnumerable<TEntity>
         where TContext : DbContext where TEntity : class
     {
-        private readonly TContext _c;
         private readonly IQueryable<TEntity> _q;
 
         public EfQuery(TContext c)
         {
-            _c = c;
-            _c.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            _q = _c.Set<TEntity>();
+            c.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            _q = c.Set<TEntity>();
         }
 
 

@@ -5,6 +5,11 @@ namespace NBB.Payments.Migrations
 {
     class Program
     {
+        protected Program()
+        {
+
+        }
+
         static void Main(string[] args)
         {
             var paymentsMigrator = new PaymentsDatabaseMigrator();

@@ -16,25 +16,25 @@ namespace NBB.Contracts.Application.CommandHandlers
 
         public ContractCommandHandlers(IEventSourcedRepository<Contract> repository)
         {
-            this._repository = repository;
+            _repository = repository;
         }
 
-        public async Task Handle(CreateContract command, CancellationToken cancellationToken)
+        public async Task Handle(CreateContract request, CancellationToken cancellationToken)
         {
-            var contract = new Contract(command.ClientId);
+            var contract = new Contract(request.ClientId);
             await _repository.SaveAsync(contract, cancellationToken);
         }
 
-        public async Task Handle(AddContractLine command, CancellationToken cancellationToken)
+        public async Task Handle(AddContractLine request, CancellationToken cancellationToken)
         {
-            var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
-            contract.AddContractLine(command.Product, command.Price, command.Quantity);
+            var contract = await _repository.GetByIdAsync(request.ContractId, cancellationToken);
+            contract.AddContractLine(request.Product, request.Price, request.Quantity);
             await _repository.SaveAsync(contract, cancellationToken);
         }
 
-        public async Task Handle(ValidateContract command, CancellationToken cancellationToken)
+        public async Task Handle(ValidateContract request, CancellationToken cancellationToken)
         {
-            var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
+            var contract = await _repository.GetByIdAsync(request.ContractId, cancellationToken);
             contract.Validate();
             await _repository.SaveAsync(contract, cancellationToken);
         }

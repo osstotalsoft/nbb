@@ -42,7 +42,7 @@ namespace NBB.Messaging.Nats
             return Task.CompletedTask;
         }
 
-        public Task UnSubscribeAsync(CancellationToken token)
+        public Task UnSubscribeAsync(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

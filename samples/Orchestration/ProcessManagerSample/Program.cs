@@ -12,6 +12,11 @@ namespace ProcessManagerSample
 {
     class Program
     {
+        protected Program()
+        {
+
+        }
+
         static async Task<int> Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()

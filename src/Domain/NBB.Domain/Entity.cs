@@ -19,7 +19,7 @@ namespace NBB.Domain
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Entity<TIdentity>))
+            if (!(obj is Entity<TIdentity>))
                 return false;
 
             if (Object.ReferenceEquals(this, obj))
@@ -53,7 +53,7 @@ namespace NBB.Domain
         public static bool operator ==(Entity<TIdentity> left, Entity<TIdentity> right)
         {
             if (Object.Equals(left, null))
-                return (Object.Equals(right, null)) ? true : false;
+                return (Object.Equals(right, null));
             else
                 return left.Equals(right);
         }

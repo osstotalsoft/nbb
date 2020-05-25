@@ -21,54 +21,51 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             _contractReadModelRepository = contractReadModelRepository;
         }
 
-        public async Task Handle(ContractCreated @event, CancellationToken cancellationToken)
+        public async Task Handle(ContractCreated notification, CancellationToken cancellationToken)
         {
 
-            var c = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
+            var c = await _contractReadModelRepository.GetByIdAsync(notification.ContractId, cancellationToken);
             if (c == null)
             {
-                await _contractReadModelRepository.AddAsync(new ContractReadModel(@event.ContractId, @event.ClientId, 0), cancellationToken);
+                await _contractReadModelRepository.AddAsync(new ContractReadModel(notification.ContractId, notification.ClientId, 0), cancellationToken);
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
             }
         }
 
-        public async Task Handle(ContractAmountUpdated @event, CancellationToken cancellationToken)
+        public async Task Handle(ContractAmountUpdated notification, CancellationToken cancellationToken)
         {
-            var e = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
+            var e = await _contractReadModelRepository.GetByIdAsync(notification.ContractId, cancellationToken);
 
             //if(e == null)
             //    throw new Exception("Could not find entity in readModel");
 
             if (e != null)
             {
-                e.Amount = @event.NewAmount;
-                e.Version = e.Version + 1;
+                e.Amount = notification.NewAmount;
+                e.Version += 1;
 
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
-
             }
         }
 
-        public async Task Handle(ContractLineAdded @event, CancellationToken cancellationToken)
+        public async Task Handle(ContractLineAdded notification, CancellationToken cancellationToken)
         {
-            var e = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken,nameof(ContractReadModel.ContractLines));
+            var e = await _contractReadModelRepository.GetByIdAsync(notification.ContractId, cancellationToken, nameof(ContractReadModel.ContractLines));
 
-            if (e != null)
+            if (e != null && e.ContractLines.All(cl => cl.ContractLineId != notification.ContractLineId))
             {
-                if (e.ContractLines.All(cl => cl.ContractLineId != @event.ContractLineId))
-                {
-                    var contractLine = new ContractLineReadModel(@event.ContractLineId, @event.Product, @event.Price, @event.Quantity, @event.ContractId);
-                    e.ContractLines.Add(contractLine);
-                    e.Version = e.Version + 1;
+                var contractLine = new ContractLineReadModel(notification.ContractLineId, notification.Product, notification.Price, notification.Quantity, notification.ContractId);
+                e.ContractLines.Add(contractLine);
+                e.Version += 1;
 
-                    await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
-                }
+                await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
             }
+
         }
 
-        public async Task Handle(ContractValidated @event, CancellationToken cancellationToken)
+        public async Task Handle(ContractValidated notification, CancellationToken cancellationToken)
         {
-            var contract = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
+            var contract = await _contractReadModelRepository.GetByIdAsync(notification.ContractId, cancellationToken);
 
             //if(e == null)
             //    throw new Exception("Could not find entity in readModel");
@@ -76,7 +73,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             if (contract != null)
             {
                 contract.IsValidated = true;
-                contract.Version = contract.Version + 1;
+                contract.Version += 1;
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
             }
         }

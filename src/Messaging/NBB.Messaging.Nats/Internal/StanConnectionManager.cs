@@ -138,9 +138,26 @@ namespace NBB.Messaging.Nats.Internal
                 ex is StanMaxPingsException;
         }
 
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _connection?.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
         public void Dispose()
         {
-            _connection?.Dispose();
+            Dispose(true);
         }
+        #endregion
     }
 }

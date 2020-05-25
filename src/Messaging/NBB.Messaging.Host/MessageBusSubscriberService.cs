@@ -34,14 +34,14 @@ namespace NBB.Messaging.Host
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken = default)
         {
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is starting", typeof(TMessage).GetPrettyName());
 
-            Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, cancellationToken);
+            Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, stoppingToken);
 
-            await _messageBusSubscriber.SubscribeAsync(HandleMsg, cancellationToken, null, _subscriberOptions);
-            await cancellationToken.WhenCanceled();
+            await _messageBusSubscriber.SubscribeAsync(HandleMsg, stoppingToken, null, _subscriberOptions);
+            await stoppingToken.WhenCanceled();
             await _messageBusSubscriber.UnSubscribeAsync(HandleMsg, CancellationToken.None);
 
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is stopping", typeof(TMessage).GetPrettyName());

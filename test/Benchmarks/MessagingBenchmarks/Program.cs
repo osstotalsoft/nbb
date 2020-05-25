@@ -4,6 +4,11 @@ namespace MessagingBenchmarks
 {
     class Program
     {
+        protected Program()
+        {
+
+        }
+
         static void Main(string[] args)
         {
             var summary = BenchmarkRunner.Run<MessagingPublisherBenchmark>();

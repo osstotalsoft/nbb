@@ -30,11 +30,9 @@ namespace NBB.EventStore.Host
             return this;
         }
 
-        private EventStoreHostBuilder AddSubscriberService()
+        private void AddSubscriberService()
         {
             ServiceCollection.AddSingleton<IHostedService, EventStoreSubscriberService>();
-
-            return this;
         }
     }
 }
