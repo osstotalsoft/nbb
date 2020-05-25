@@ -149,7 +149,7 @@ namespace NBB.Messaging.Kafka
             {
                 if (disposing)
                 {
-                    _consumer.Dispose();
+                    _consumer?.Dispose();
                 }
 
                 disposedValue = true;
