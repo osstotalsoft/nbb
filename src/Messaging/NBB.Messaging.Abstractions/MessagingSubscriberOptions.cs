@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-
-namespace NBB.Messaging.Abstractions
+﻿namespace NBB.Messaging.Abstractions
 {
     public class MessagingSubscriberOptions
     {

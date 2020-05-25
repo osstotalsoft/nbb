@@ -1,5 +1,4 @@
-﻿using System;
-using NBB.Domain.Abstractions;
+﻿using NBB.Domain.Abstractions;
 using ReflectionMagic;
 
 namespace NBB.Domain

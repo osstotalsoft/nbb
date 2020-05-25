@@ -50,8 +50,6 @@ namespace NBB.Domain
 
         }
 
-
-
         public static bool operator ==(Entity<TIdentity> left, Entity<TIdentity> right)
         {
             if (Object.Equals(left, null))

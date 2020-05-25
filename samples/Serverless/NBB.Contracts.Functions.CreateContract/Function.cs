@@ -151,7 +151,7 @@ namespace NBB.Contracts.Functions.CreateContract
             var messageTypeRegistry = new DefaultMessageTypeRegistry();
             var messageSerdes = new NewtonsoftJsonMessageSerDes(messageTypeRegistry);
             var messagingTopicPublisher = new NatsMessagingTopicPublisher(stanConnectionProvider, new Logger<NatsMessagingTopicPublisher>(loggerFactory));
-            var messageBusPublisher = new MessageBusPublisher(messagingTopicPublisher, topicRegistry, messageSerdes, configuration, new Logger<MessageBusPublisher>(loggerFactory));
+            var messageBusPublisher = new MessageBusPublisher(messagingTopicPublisher, topicRegistry, messageSerdes, configuration);
 
             var scripts = new Scripts();
             var eventRepository = new AdoNetEventRepository(scripts, new Logger<AdoNetEventRepository>(loggerFactory), new Options());

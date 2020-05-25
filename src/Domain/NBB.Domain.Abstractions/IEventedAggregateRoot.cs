@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using NBB.Core.Abstractions;
+﻿using NBB.Core.Abstractions;
 
 namespace NBB.Domain.Abstractions
 {

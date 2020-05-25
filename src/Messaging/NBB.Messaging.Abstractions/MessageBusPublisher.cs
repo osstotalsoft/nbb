@@ -16,17 +16,13 @@ namespace NBB.Messaging.Abstractions
         private readonly IMessageSerDes _messageSerDes;
         private readonly IConfiguration _configuration;
         private readonly IMessagingTopicPublisher _topicPublisher;
-        private readonly ILogger<MessageBusPublisher> _logger;
-
         public MessageBusPublisher(IMessagingTopicPublisher topicPublisher, ITopicRegistry topicRegistry,
-            IMessageSerDes messageSerDes, IConfiguration configuration,
-            ILogger<MessageBusPublisher> logger)
+            IMessageSerDes messageSerDes, IConfiguration configuration)
         {
             _topicPublisher = topicPublisher;
             _topicRegistry = topicRegistry;
             _messageSerDes = messageSerDes;
             _configuration = configuration;
-            _logger = logger;
         }
 
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)

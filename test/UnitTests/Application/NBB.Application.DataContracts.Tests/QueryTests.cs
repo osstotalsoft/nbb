@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using FluentAssertions;
-using NBB.Application.DataContracts;
-using Newtonsoft.Json;
+﻿using FluentAssertions;
 using Xunit;
 
 namespace NBB.Application.DataContracts.Tests

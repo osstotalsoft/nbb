@@ -11,16 +11,13 @@ namespace NBB.ProcessManager.Runtime.Timeouts
         private readonly Func<DateTime> _currentTimeProvider;
         private readonly ReaderWriterLockSlim _readerWriterLock = new ReaderWriterLockSlim();
         private readonly List<TimeoutRecord> _storage = new List<TimeoutRecord>();
-        public static TimeSpan EmptyResultsNextTimeToRunQuerySpan = TimeSpan.FromMinutes(1);
+        public readonly static TimeSpan EmptyResultsNextTimeToRunQuerySpan = TimeSpan.FromMinutes(1);
 
         public InMemoryTimeoutRepository(Func<DateTime> currentTimeProvider)
         {
             _currentTimeProvider = currentTimeProvider;
         }
 
-        public void Dispose()
-        {
-        }
 
         public Task Add(TimeoutRecord timeout)
         {
@@ -132,5 +129,22 @@ namespace NBB.ProcessManager.Runtime.Timeouts
 
             return Task.FromResult(new TimeoutBatch(dueTimeouts.ToArray(), nextTimeToRunQuery));
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

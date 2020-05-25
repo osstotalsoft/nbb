@@ -24,7 +24,7 @@ namespace NBB.Tools.Reflection
         /// <summary>
         /// Default module name in which new types will be created
         /// </summary>
-        public static string ModuleName = "MainModule";
+        public readonly static string ModuleName = "MainModule";
 
         /// <summary>
         /// Function that will be used to create type names. You can override class name generation

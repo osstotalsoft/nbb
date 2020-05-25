@@ -18,6 +18,7 @@ namespace NBB.Messaging.Abstractions
         private readonly ILogger<MessageBusSubscriber<TMessage>> _logger;
         private string _topicName;
         private MessagingSubscriberOptions _subscriberOptions;
+        private readonly object lockObj = new object();
 
         public MessageBusSubscriber(IMessagingTopicSubscriber topicSubscriber, ITopicRegistry topicRegistry,
             IMessageSerDes messageSerDes,
@@ -35,7 +36,7 @@ namespace NBB.Messaging.Abstractions
 
             if (!_subscribedToTopic)
             {
-                lock (this)
+                lock (lockObj)
                 {
                     if (!_subscribedToTopic)
                     {
