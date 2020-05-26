@@ -364,6 +364,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProcessManager", "ProcessMa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManagerSample", "samples\Orchestration\ProcessManagerSample\ProcessManagerSample.csproj", "{9791C0D6-88E0-450F-AAAD-748A3837AB70}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nbb.Exporter.Csv.Tests", "test\UnitTests\Export\Nbb.Exporter.Csv.Tests\Nbb.Exporter.Csv.Tests.csproj", "{DE3477D6-773B-4CD5-981A-8132DD187D9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -852,6 +854,10 @@ Global
 		{9791C0D6-88E0-450F-AAAD-748A3837AB70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9791C0D6-88E0-450F-AAAD-748A3837AB70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9791C0D6-88E0-450F-AAAD-748A3837AB70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE3477D6-773B-4CD5-981A-8132DD187D9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE3477D6-773B-4CD5-981A-8132DD187D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE3477D6-773B-4CD5-981A-8132DD187D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE3477D6-773B-4CD5-981A-8132DD187D9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1020,6 +1026,7 @@ Global
 		{06E25E78-E1B6-4237-8D48-2A4EFBD73240} = {14726095-DA28-43A6-A9A9-F16C605932E1}
 		{75F348B7-316F-4933-BFF6-D3A618BCFFAE} = {D28298B7-63A2-4751-BEB9-C3C30F2E7107}
 		{9791C0D6-88E0-450F-AAAD-748A3837AB70} = {75F348B7-316F-4933-BFF6-D3A618BCFFAE}
+		{DE3477D6-773B-4CD5-981A-8132DD187D9A} = {591A109B-2CEB-47A2-8B4E-0FCDCED6C8D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

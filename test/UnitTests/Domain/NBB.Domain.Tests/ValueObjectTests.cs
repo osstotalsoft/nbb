@@ -8,7 +8,7 @@ namespace NBB.Domain.Tests
 {
     public class ValueObjectTests
     {
-        private class TestValueObject: ValueObject
+        private class TestValueObject : ValueObject
         {
             public int A { get; }
             public string B { get; }
@@ -60,6 +60,34 @@ namespace NBB.Domain.Tests
 
             //Assert
             deserializedEntity.Should().Be(sut);
+        }
+
+        [Fact]
+        public void Should_be_different()
+        {
+            //Arrange
+            var sut = new TestValueObject(3, "different", Guid.NewGuid(), 2324.52m);
+            var another = new TestValueObject(3, "same", sut.C, 2324.52m);
+
+            //Act
+            var areEqual = !sut.Equals(another) && sut != another;
+
+            //Assert
+            areEqual.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Should_be_equal_if_cloned()
+        {
+            //Arrange
+            var sut = new TestValueObject(3, "different", Guid.NewGuid(), 2324.52m);
+            var another = sut.GetCopy();
+
+            //Act
+            var areEqual = sut.Equals(another) && sut == another && sut.GetHashCode() == another.GetHashCode();
+
+            //Assert
+            areEqual.Should().BeTrue();
         }
     }
 }
