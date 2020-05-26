@@ -1,25 +1,54 @@
 ﻿<Project>
   <PropertyGroup Label="Package Versions">
-    <NewtonsoftJsonPackageVersion>11.0.2</NewtonsoftJsonPackageVersion>
-    <MediatRPackageVersion>4.1.0</MediatRPackageVersion>
-    <ScrutorPackageVersion>3.1.0</ScrutorPackageVersion>
+    <AutoMapperPackageVersion>9.0.0</AutoMapperPackageVersion>
+    <AutoMapperExtensionsMicrosoftDependencyInjectionPackageVersion>7.0.0</AutoMapperExtensionsMicrosoftDependencyInjectionPackageVersion>
     <BenchmarkDotNetPackageVersion>0.10.14</BenchmarkDotNetPackageVersion>
-    <MoqPackageVersion>4.8.2</MoqPackageVersion>
-    <XunitPackageVersion>2.3.1</XunitPackageVersion>
-    <XunitRunnerVisualStudioPackageVersion>2.4.0-beta.1.build3958</XunitRunnerVisualStudioPackageVersion>
+    <ConfluentKafkaPackageVersion>0.11.5</ConfluentKafkaPackageVersion>
+    <CoverletCollectorPackageVersion>1.2.0</CoverletCollectorPackageVersion>
+    <CoverletMsbuildPackageVersion>2.8.1</CoverletMsbuildPackageVersion>
+    <DotNetXUnitPackageVersion>2.3.1</DotNetXUnitPackageVersion>
+    <DynamicExpressoCorePackageVersion>2.1.0</DynamicExpressoCorePackageVersion>
+    <EventStoreClientAPINetCorePackageVersion>4.1.0.23</EventStoreClientAPINetCorePackageVersion>
     <FluentAssertionsPackageVersion>5.10.0</FluentAssertionsPackageVersion>
-    <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
-    <MicrosoftEntityFrameworkPackagesVersion>2.1.4</MicrosoftEntityFrameworkPackagesVersion>
+    <FoqPackageVersion>1.8.0</FoqPackageVersion>
+    <FSharpPlusPackageVersion>1.1.0-RC3</FSharpPlusPackageVersion>
+    <FsUnitxUnitPackageVersion>3.8.0</FsUnitxUnitPackageVersion>
+    <JaegerPackageVersion>0.2.2</JaegerPackageVersion>
+    <JetBrainsAnnotationsPackageVersion>2019.1.3</JetBrainsAnnotationsPackageVersion>
+    <MediatRPackageVersion>4.1.0</MediatRPackageVersion>
     <MicrosoftAspNetCoreAppPackageVersion>2.1.5</MicrosoftAspNetCoreAppPackageVersion>
     <MicrosoftCSharpPackageVersion>4.6.0</MicrosoftCSharpPackageVersion>
-    <SerilogPackageVersion>2.7.1</SerilogPackageVersion>
-    <SerilogExtensionsLoggingPackageVersion>2.0.2</SerilogExtensionsLoggingPackageVersion>
-    <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
-    <SerilogAspNetCorePackageVersion>2.1.1</SerilogAspNetCorePackageVersion>
-    <AutoMapperPackageVersion>8.0.0</AutoMapperPackageVersion>
-    <OpenTracingPackageVersion>0.12.0</OpenTracingPackageVersion>
-    <OpenTracingContribPackageVersion>0.5.0</OpenTracingContribPackageVersion>
-    <JaegerPackageVersion>0.2.2</JaegerPackageVersion>
+    <MicrosoftEntityFrameworkPackagesVersion>2.1.4</MicrosoftEntityFrameworkPackagesVersion>
+    <MicrosoftEntityFrameworkCoreInMemoryPackageVersion>3.1.0</MicrosoftEntityFrameworkCoreInMemoryPackageVersion>
+    <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
+    <MicrosoftExtensionsLoggingDebugPackageVersion>3.1.0</MicrosoftExtensionsLoggingDebugPackageVersion>
+    <MicrosoftNETTestSdkPackageVersion>16.5.0</MicrosoftNETTestSdkPackageVersion>
+    <MoqPackageVersion>4.13.1</MoqPackageVersion>
+    <NatsClientPackageVersion>0.8.1</NatsClientPackageVersion>
     <NBBPackagesVersion>4.1.0</NBBPackagesVersion>
+    <NewtonsoftJsonPackageVersion>11.0.2</NewtonsoftJsonPackageVersion>
+    <NJsonSchemaPackageVersion>9.13.15</NJsonSchemaPackageVersion>
+    <NpoiPackageVersion>2.4.0</NpoiPackageVersion>
+    <OpenTracingContribPackageVersion>0.5.0</OpenTracingContribPackageVersion>
+    <OpenTracingPackageVersion>0.12.0</OpenTracingPackageVersion>
+    <PollyPackageVersion>6.0.1</PollyPackageVersion>
+    <ReflectionMagicPackageVersion>3.1.0</ReflectionMagicPackageVersion>
+    <ScrutorPackageVersion>3.1.0</ScrutorPackageVersion>
+    <SerilogAspNetCorePackageVersion>2.1.1</SerilogAspNetCorePackageVersion>
+    <SerilogExtensionsLoggingPackageVersion>2.0.2</SerilogExtensionsLoggingPackageVersion>
+    <SerilogExtensionsHostingPackageVersion>3.0.0</SerilogExtensionsHostingPackageVersion>
+    <SerilogSinksConsolePackageVersion>3.1.1</SerilogSinksConsolePackageVersion>
+    <SerilogPackageVersion>2.7.1</SerilogPackageVersion>
+    <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
+    <SqlStreamStoreMsSqlPackageVersion>1.1.2</SqlStreamStoreMsSqlPackageVersion>
+    <StanClientPackageVersion>0.1.5</StanClientPackageVersion>
+    <SystemDataSqlClientPackageVersion>4.5.0</SystemDataSqlClientPackageVersion>
+    <SystemDynamicRuntimePackageVersion>4.3.0</SystemDynamicRuntimePackageVersion>
+    <SystemReflectionEmitPackageVersion>4.3.0</SystemReflectionEmitPackageVersion>
+    <SystemInteractiveAsyncPackageVersion>3.1.1</SystemInteractiveAsyncPackageVersion>
+    <SystemNetHttpPackageVersion>4.3.4</SystemNetHttpPackageVersion>
+    <XunitPackageVersion>2.4.1</XunitPackageVersion>
+    <XunitRunnerVisualStudioPackageVersion>2.4.1</XunitRunnerVisualStudioPackageVersion>
+
   </PropertyGroup>
 </Project>

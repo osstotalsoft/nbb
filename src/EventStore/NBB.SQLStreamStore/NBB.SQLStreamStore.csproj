@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-    <PackageReference Include="SqlStreamStore.MsSql" Version="1.1.2" />
+    <PackageReference Include="SqlStreamStore.MsSql" Version="$(SqlStreamStoreMsSqlPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>

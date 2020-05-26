@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPOI" Version="2.4.0" />
+    <PackageReference Include="NPOI" Version="$(NpoiPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>

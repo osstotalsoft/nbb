@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
-    <PackageReference Include="SqlStreamStore.MsSql" Version="1.1.2" />
+    <PackageReference Include="SqlStreamStore.MsSql" Version="$(SqlStreamStoreMsSqlPackageVersion)" />
   </ItemGroup>
 
 </Project>
