@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.Configuration;
 using FluentAssertions;
 using Xunit;
 
@@ -12,32 +11,18 @@ namespace NBB.Tools.AutoMapperExtensions.Tests
         {
             //Arrange
             var source = new Source(111, 222);
-            var config = new MapperConfigurationExpression();
-            config.CreateMap<Source, Destination>();
-            config.AddProfile<MappingProfile>();
-
-            var mapperConfig = new MapperConfiguration(config);
-            var mapper = new Mapper(mapperConfig);
-            
 
             //Act
+            Mapper.Initialize(cfg => cfg
+                .CreateMap<Source, Destination>()
+                .ForCtorParamMatching(dest => dest.DestinationValue, opt => opt.MapFrom(src => src.SourceValue)));
 
-            var destination = mapper.Map<Destination>(source);
+            var destination = Mapper.Map<Destination>(source);
 
             //Assert
             destination.CommonValue.Should().Be(source.CommonValue);
             destination.DestinationValue.Should().Be(source.SourceValue);
         }
-
-        class MappingProfile: Profile
-        {
-            public MappingProfile()
-            {
-                CreateMap<Source, Destination>()
-                     .ForCtorParamMatching(dest => dest.DestinationValue, opt => opt.MapFrom(src => src.SourceValue));
-            }
-        }
-
 
         private class Source
         {

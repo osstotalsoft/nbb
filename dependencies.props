@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup Label="Package Versions">
-    <AutoMapperPackageVersion>9.0.0</AutoMapperPackageVersion>
+    <AutoMapperPackageVersion>7.0.0</AutoMapperPackageVersion>
     <AutoMapperExtensionsMicrosoftDependencyInjectionPackageVersion>7.0.0</AutoMapperExtensionsMicrosoftDependencyInjectionPackageVersion>
     <BenchmarkDotNetPackageVersion>0.10.14</BenchmarkDotNetPackageVersion>
     <ConfluentKafkaPackageVersion>0.11.5</ConfluentKafkaPackageVersion>
