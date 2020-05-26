@@ -32,37 +32,37 @@ namespace NBB.Messaging.MultiTenancy
             var contextTenantId = await _tenantService.GetTenantIdAsync();
             if (!message.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
             {
-                throw new ApplicationException($"The tenant ID message header is missing from the message envelope");
+                throw new MultiTenantMessagingException($"The tenant ID message header is missing from the message envelope");
             }
 
             if (!Guid.TryParse(messageTenantIdHeader, out var messageTenantId))
             {
-                throw new ApplicationException($"The tenant ID message header is invalid");
+                throw new MultiTenantMessagingException($"The tenant ID message header is invalid");
             }
 
             if (messageTenantId != contextTenantId)
             {
-                throw new ApplicationException(
+                throw new MultiTenantMessagingException(
                     $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {contextTenantId} but received {messageTenantIdHeader}");
             }
 
             if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant && _tenancyOptions.Value.TenantId != messageTenantId)
             {
-                throw new ApplicationException(
+                throw new MultiTenantMessagingException(
                     $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {_tenancyOptions.Value.TenantId} but received {messageTenantIdHeader}");
             }
 
             if (_tenantHostingConfigService.IsShared(messageTenantId) &&
                 _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
-                throw new ApplicationException(
+                throw new MultiTenantMessagingException(
                     $"Received a message for shared tenant {messageTenantIdHeader} in a MonoTenant hosting");
             }
 
             if (!_tenantHostingConfigService.IsShared(messageTenantId) &&
                 _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant)
             {
-                throw new ApplicationException(
+                throw new MultiTenantMessagingException(
                     $"Received a message for premium tenant {messageTenantIdHeader} in a MultiTenant (shared) context");
             }
 
