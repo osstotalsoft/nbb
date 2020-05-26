@@ -106,14 +106,14 @@ namespace NBB.Tools.Reflection
         /// <returns>MD5 hash of the string</returns>
         private static string CalculateMD5Hash(string input)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            using (var md5 = MD5.Create())
+            using (var md5 = SHA256.Create())
             {
-                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
-                byte[] hash = md5.ComputeHash(inputBytes);
+                var inputBytes = Encoding.ASCII.GetBytes(input);
+                var hash = md5.ComputeHash(inputBytes);
 
-                for (int i = 0; i < hash.Length; i++)
+                for (var i = 0; i < hash.Length; i++)
                 {
                     sb.Append(hash[i].ToString("X2"));
                 }

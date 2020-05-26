@@ -21,6 +21,11 @@ namespace ProcessManagerSample
 {
     public class Startup
     {
+        protected Startup()
+        {
+
+        }
+
         public static void ConfigureServicesDelegate(HostBuilderContext context, IServiceCollection services)
         {
             services.AddAutoMapper(Assembly.GetEntryAssembly());
