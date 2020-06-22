@@ -34,7 +34,7 @@ namespace NBB.Exporter.Excel.Tests
 
             var exporter = new ExcelDataExport<Customer>();
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "excel1.xlsx");
-            
+
 
             //Act
             var stream = exporter.Export(list, new Dictionary<string, string>(), null);
@@ -46,7 +46,7 @@ namespace NBB.Exporter.Excel.Tests
 
             var fileExistsAndNotEmpty = File.Exists(filePath) && new FileInfo(filePath).Length > 0;
 
-            if(File.Exists(filePath))
+            if (File.Exists(filePath))
                 File.Delete(filePath);
 
             //Assert
@@ -69,7 +69,7 @@ namespace NBB.Exporter.Excel.Tests
             var exporter = new ExcelDataExport<Customer>();
 
             //Act
-            
+
             var stream = exporter.Export(list, new Dictionary<string, string>(), headers);
             using (var fileStream = File.Create(filePath))
             {
@@ -78,8 +78,8 @@ namespace NBB.Exporter.Excel.Tests
             }
 
             var fileExistsAndNotEmpty = File.Exists(filePath) && new FileInfo(filePath).Length > 0;
-            
-            if(File.Exists(filePath))
+
+            if (File.Exists(filePath))
                 File.Delete(filePath);
 
             //Assert
@@ -88,6 +88,53 @@ namespace NBB.Exporter.Excel.Tests
             stream.Length.Should().BeGreaterThan(0);
             fileExistsAndNotEmpty.Should().BeTrue();
         }
+        [Fact]
+        public void Should_Generate_excel_from_object_list()
+        {
+            var numberOfElements = 10;
+            var exportDataList = new List<List<object>>();
+            for (var i = 0; i < numberOfElements; i++)
+            {
+                var list = new List<object>();
+                var id = i;
+                var name = "Customer " + i;
 
+                list.Add(id);
+                list.Add(name);
+                exportDataList.Add(list);
+            }
+
+            var headers = new List<string>
+            {
+                "ID",
+                "Nume"
+            };
+            var types = new List<string>
+            {
+                "int",
+                "string"
+            };
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "excel3.xlsx");
+            var exporter = new ExcelDataExport<Customer>();
+
+            //Act
+            var stream = exporter.ExportFromListOfObjects(exportDataList, types, headers);
+            using (var fileStream = File.Create(filePath))
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.CopyTo(fileStream);
+            }
+
+            var fileExistsAndNotEmpty = File.Exists(filePath) && new FileInfo(filePath).Length > 0;
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            //Assert
+
+            stream.Should().NotBeNull();
+            stream.Length.Should().BeGreaterThan(0);
+            fileExistsAndNotEmpty.Should().BeTrue();
+        }
     }
 }
