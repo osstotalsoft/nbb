@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Abstractions;
+using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Services;
 using Xunit;
 
@@ -127,8 +128,8 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         private IServiceProvider GetServiceProvider<TDBContext>(Guid tenantId, bool isSharedDB, bool useUow) where TDBContext : DbContext
         {
 
-            var tenantService = Mock.Of<ITenantService>(x =>
-                x.GetTenantIdAsync() == Task.FromResult(tenantId));
+            var tenantService = Mock.Of<ITenantContextAccessor>(x =>
+                x.TenantContext == new TenantContext(new TenantInfo(tenantId, null)));
             var tenantDatabaseConfigService =
                 Mock.Of<ITenantDatabaseConfigService>(x => x.IsSharedDatabase(tenantId) == isSharedDB && x.GetConnectionString(tenantId) == "Test");
             var services = new ServiceCollection();
@@ -139,7 +140,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TDBContext>((sp, options) =>
                 {
-                    var tenantId = sp.GetRequiredService<ITenantService>().GetTenantIdAsync().Result;
+                    var tenantId = sp.GetRequiredService<ITenantContextAccessor>().TenantContext.GetTenantId();
                     var conn = sp.GetRequiredService<ITenantDatabaseConfigService>().GetConnectionString(tenantId);
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });

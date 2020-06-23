@@ -75,7 +75,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
         public void Adding_Resolver_Should_Be_In_Strategy()
         {
             // Arrange
-            _services.AddTenantService().AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstResolver));
+            _services.AddTenantIdentificationService().AddTenantIdentificationStrategy<FirstIdentifier>(typeof(FirstResolver));
             var serviceProvider = _services.BuildServiceProvider();
 
             // Act

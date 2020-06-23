@@ -15,7 +15,7 @@ namespace NBB.MultiTenancy.AspNet
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ITenantService tenantIdentificationService, ITenantContextAccessor tenantContextAccessor)
+        public async Task Invoke(HttpContext context, ITenantIdentificationService tenantIdentificationService, ITenantContextAccessor tenantContextAccessor)
         {
             if (tenantContextAccessor.TenantContext == null)
             {

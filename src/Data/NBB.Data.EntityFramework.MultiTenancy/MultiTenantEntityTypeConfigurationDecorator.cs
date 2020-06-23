@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Services;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
@@ -40,8 +41,8 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         private Guid ResolveTenantId()
         {
-            var tenantService = _sp.GetRequiredService<ITenantService>();
-            var tenantId = tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
+            var tenantContextAccessor = _sp.GetRequiredService<ITenantContextAccessor>();
+            var tenantId = tenantContextAccessor.TenantContext.GetTenantId();
 
             return tenantId;
         }

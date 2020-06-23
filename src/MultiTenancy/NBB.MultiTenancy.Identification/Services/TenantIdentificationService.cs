@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Identification.Services
 {
-    public class TenantService : ITenantService
+    public class TenantIdentificationService : ITenantIdentificationService
     {
         private readonly IEnumerable<TenantIdentificationStrategy> _tenantIdentificationStrategies;
 
-        public TenantService(IEnumerable<TenantIdentificationStrategy> tenantIdentificationStrategies)
+        public TenantIdentificationService(IEnumerable<TenantIdentificationStrategy> tenantIdentificationStrategies)
         {
             _tenantIdentificationStrategies = tenantIdentificationStrategies;
         }

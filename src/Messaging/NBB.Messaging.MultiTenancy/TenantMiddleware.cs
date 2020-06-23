@@ -19,11 +19,11 @@ namespace NBB.Messaging.MultiTenancy
     {
         
         private readonly ITenantContextAccessor _tenantContextAccessor;
-        private readonly ITenantService _tenantIdentificationService;
+        private readonly ITenantIdentificationService _tenantIdentificationService;
         private readonly ITenantHostingConfigService _tenantHostingConfigService;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
 
-        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantService tenantIdentificationService, ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
+        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantIdentificationService tenantIdentificationService, ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _tenantContextAccessor = tenantContextAccessor;
             _tenantIdentificationService = tenantIdentificationService;

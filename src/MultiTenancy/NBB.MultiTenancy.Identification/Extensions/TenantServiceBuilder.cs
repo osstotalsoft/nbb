@@ -16,7 +16,7 @@ namespace NBB.MultiTenancy.Identification.Extensions
         public TenantServiceBuilder(IServiceCollection serviceCollector)
         {
             _serviceCollector = serviceCollector;
-            _serviceCollector.TryAddSingleton<ITenantService, TenantService>();
+            _serviceCollector.TryAddSingleton<ITenantIdentificationService, TenantIdentificationService>();
         }
 
         public TenantServiceBuilder AddTenantIdentificationStrategy<TTenantIdentifier>(params Type[] resolverTypes)

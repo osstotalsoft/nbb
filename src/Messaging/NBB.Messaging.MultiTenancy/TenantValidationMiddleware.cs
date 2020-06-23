@@ -16,11 +16,11 @@ namespace NBB.Messaging.MultiTenancy
     /// <seealso cref="IPipelineMiddleware{MessagingEnvelope}" />
     public class TenantValidationMiddleware : IPipelineMiddleware<MessagingEnvelope>
     {
-        private readonly ITenantService _tenantService;
+        private readonly ITenantIdentificationService _tenantService;
         private readonly ITenantHostingConfigService _tenantHostingConfigService;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
 
-        public TenantValidationMiddleware(ITenantService tenantService, ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
+        public TenantValidationMiddleware(ITenantIdentificationService tenantService, ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
         {
             _tenantService = tenantService;
             _tenantHostingConfigService = tenantHostingConfigService;

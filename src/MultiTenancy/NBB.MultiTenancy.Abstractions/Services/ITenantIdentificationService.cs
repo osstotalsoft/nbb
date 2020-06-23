@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Abstractions.Services
 {
-    public interface ITenantService
+    public interface ITenantIdentificationService
     {
         /// <summary>
         /// Gets current tenant id
