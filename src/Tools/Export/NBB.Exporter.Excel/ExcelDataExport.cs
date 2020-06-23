@@ -27,7 +27,7 @@ namespace NBB.Exporter.Excel
         public Stream Export(List<T> exportData, Dictionary<string, string> properties = null, List<string> headers = null)
         {
             if (exportData == null)
-                throw new ArgumentNullException("exportData");
+                throw new ArgumentNullException(nameof(exportData));
 
             var types = new List<string>();
             var excelHeaders = headers ?? new List<string>();
