@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj" />
+    <ProjectReference Include="..\NBB.MultiTenancy.Identification\NBB.MultiTenancy.Identification.csproj" />
   </ItemGroup>
 
 </Project>

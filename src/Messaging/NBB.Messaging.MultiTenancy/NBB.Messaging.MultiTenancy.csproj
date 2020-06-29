@@ -8,6 +8,7 @@
     <ProjectReference Include="..\..\Core\NBB.Core.DependencyInjection\NBB.Core.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.Pipeline\NBB.Core.Pipeline.csproj" />
     <ProjectReference Include="..\..\MultiTenancy\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj" />
+    <ProjectReference Include="..\..\MultiTenancy\NBB.MultiTenancy.Identification\NBB.MultiTenancy.Identification.csproj" />
     <ProjectReference Include="..\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
   </ItemGroup>
 

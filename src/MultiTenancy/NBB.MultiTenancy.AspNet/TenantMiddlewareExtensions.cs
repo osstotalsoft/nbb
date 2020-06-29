@@ -4,7 +4,7 @@ namespace NBB.MultiTenancy.AspNet
 {
     public static class TenantMiddlewareExtensions
     {
-        public static IApplicationBuilder UseTenantContextMiddleware(this IApplicationBuilder app)
+        public static IApplicationBuilder UseTenantMiddleware(this IApplicationBuilder app)
         {
             return app.UseMiddleware<TenantMiddleware>();
         }

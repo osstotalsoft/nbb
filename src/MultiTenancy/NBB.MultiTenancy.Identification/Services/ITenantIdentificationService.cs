@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using NBB.MultiTenancy.Abstractions;
 
-namespace NBB.MultiTenancy.Abstractions.Services
+namespace NBB.MultiTenancy.Identification.Services
 {
     public interface ITenantIdentificationService
     {

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Services;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;

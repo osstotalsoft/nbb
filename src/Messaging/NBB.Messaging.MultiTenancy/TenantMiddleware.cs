@@ -5,8 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Repositories;
+using NBB.MultiTenancy.Identification.Services;
 
 namespace NBB.Messaging.MultiTenancy
 {
@@ -17,23 +18,22 @@ namespace NBB.Messaging.MultiTenancy
     /// <seealso cref="IPipelineMiddleware{MessagingEnvelope}" />
     public class TenantMiddleware : IPipelineMiddleware<MessagingEnvelope>
     {
-        
         private readonly ITenantContextAccessor _tenantContextAccessor;
         private readonly ITenantIdentificationService _tenantIdentificationService;
-        private readonly ITenantHostingConfigService _tenantHostingConfigService;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
+        private readonly ITenantRepository _tenantRepository;
 
-        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantIdentificationService tenantIdentificationService, ITenantHostingConfigService tenantHostingConfigService, IOptions<TenancyHostingOptions> tenancyOptions)
+        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantIdentificationService tenantIdentificationService, IOptions<TenancyHostingOptions> tenancyOptions, ITenantRepository tenantRepository)
         {
             _tenantContextAccessor = tenantContextAccessor;
             _tenantIdentificationService = tenantIdentificationService;
-            _tenantHostingConfigService = tenantHostingConfigService;
             _tenancyOptions = tenancyOptions;
+            _tenantRepository = tenantRepository;
         }
 
         public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
-            var contextTenantId = await _tenantIdentificationService.GetTenantIdAsync();
+            var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
 
             if (!message.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
             {
@@ -45,10 +45,10 @@ namespace NBB.Messaging.MultiTenancy
                 throw new ApplicationException($"The tenant ID message header is invalid");
             }
 
-            if (messageTenantId != contextTenantId)
+            if (messageTenantId != tenantId)
             {
                 throw new ApplicationException(
-                    $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {contextTenantId} but received {messageTenantIdHeader}");
+                    $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {tenantId} but received {messageTenantIdHeader}");
             }
 
             if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant && _tenancyOptions.Value.TenantId != messageTenantId)
@@ -57,15 +57,16 @@ namespace NBB.Messaging.MultiTenancy
                     $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {_tenancyOptions.Value.TenantId} but received {messageTenantIdHeader}");
             }
 
-            if (_tenantHostingConfigService.IsShared(messageTenantId) &&
-                _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
+            var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
+                         ?? throw new ApplicationException($"Tenant {tenantId} not found");
+
+            if (tenant.IsShared && _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
                 throw new ApplicationException(
                     $"Received a message for shared tenant {messageTenantIdHeader} in a MonoTenant hosting");
             }
 
-            if (!_tenantHostingConfigService.IsShared(messageTenantId) &&
-                _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant)
+            if (!tenant.IsShared && _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant)
             {
                 throw new ApplicationException(
                     $"Received a message for premium tenant {messageTenantIdHeader} in a MultiTenant (shared) context");
@@ -76,7 +77,8 @@ namespace NBB.Messaging.MultiTenancy
                 throw new ApplicationException("Tenant context is already set");
             }
 
-            _tenantContextAccessor.TenantContext = new TenantContext(new TenantInfo(messageTenantId, null));
+            _tenantContextAccessor.TenantContext = new TenantContext(tenant);
+            
             await next();
         }
     }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NBB.MultiTenancy.Abstractions.Services;
 using NBB.MultiTenancy.Identification.Identifiers;
 using NBB.MultiTenancy.Identification.Resolvers;
 using NBB.MultiTenancy.Identification.Services;
@@ -16,7 +15,7 @@ namespace NBB.MultiTenancy.Identification.Extensions
         public TenantServiceBuilder(IServiceCollection serviceCollector)
         {
             _serviceCollector = serviceCollector;
-            _serviceCollector.TryAddSingleton<ITenantIdentificationService, TenantIdentificationService>();
+            _serviceCollector.TryAddSingleton<ITenantIdentificationService, DefaultTenantIdentificationService>();
         }
 
         public TenantServiceBuilder AddTenantIdentificationStrategy<TTenantIdentifier>(params Type[] resolverTypes)

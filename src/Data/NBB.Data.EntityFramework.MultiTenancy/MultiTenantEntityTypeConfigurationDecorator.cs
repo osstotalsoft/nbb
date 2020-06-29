@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Services;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
 {

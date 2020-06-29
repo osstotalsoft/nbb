@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Abstractions;
+using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Services;
 using Xunit;
 
 namespace NBB.Data.EntityFramework.MultiTenancy.Tests
@@ -46,7 +46,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             dbContext.TestEntities.Add(testEntity);
             dbContext.TestEntities.Add(testEntityOtherId);
 
-            await uow.SaveChangesAsync(); // Bypasses multitenancy UoW !
+            await uow.SaveChangesAsync(); // Bypasses multi tenancy UoW !
             dbContext.Entry(testEntityOtherId).Property("TenantId").CurrentValue = Guid.NewGuid();
 
             // act && assert
@@ -129,7 +129,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
 
             var tenantService = Mock.Of<ITenantContextAccessor>(x =>
-                x.TenantContext == new TenantContext(new TenantInfo(tenantId, null)));
+                x.TenantContext == new TenantContext(new Tenant(tenantId, null, false)));
             var tenantDatabaseConfigService =
                 Mock.Of<ITenantDatabaseConfigService>(x => x.IsSharedDatabase(tenantId) == isSharedDB && x.GetConnectionString(tenantId) == "Test");
             var services = new ServiceCollection();
