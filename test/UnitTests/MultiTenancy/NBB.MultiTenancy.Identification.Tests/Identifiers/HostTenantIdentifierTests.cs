@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using Xunit;
+using System.Threading;
 
 namespace NBB.MultiTenancy.Identification.Tests.Identifiers
 {
@@ -23,8 +24,8 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
         {
             // Arrange
             var tenantId = Guid.NewGuid();
-            var tenant = new Tenant(tenantId);
-            _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>())).Returns(Task.FromResult(tenant));
+            var tenant = new Tenant(tenantId, string.Empty, false);
+            _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(tenant));
             var sut = new HostTenantIdentifier(_hostTenantRepository.Object);
 
             // Act
@@ -39,14 +40,14 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
         {
             // Arrange
             const string tenantToken = "tenant token";
-            _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>())).Returns(Task.FromResult(new Tenant(Guid.Empty)));
+            _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tenant(Guid.Empty, string.Empty, false)));
             var sut = new HostTenantIdentifier(_hostTenantRepository.Object);
 
             // Act
             var _ = sut.GetTenantIdAsync(tenantToken).Result;
 
             // Assert
-            _hostTenantRepository.Verify(r => r.GetByHost(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
+            _hostTenantRepository.Verify(r => r.GetByHost(It.Is<string>(s => string.Equals(s, tenantToken)), It.IsAny<CancellationToken>()), Times.Once());
         }
     }
 }

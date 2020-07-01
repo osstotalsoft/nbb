@@ -10,7 +10,7 @@ namespace NBB.MultiTenancy.Identification.Messaging.Extensions
         public static IServiceCollection AddDefaultMessagingTenantIdentification(this IServiceCollection services)
         {
             
-            services.AddTenantService()
+            services.AddTenantIdentificationService()
                 .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder => builder
                     .AddTenantTokenResolver<TenantIdHeaderMessagingTokenResolver>(MessagingHeaders.TenantId));
 

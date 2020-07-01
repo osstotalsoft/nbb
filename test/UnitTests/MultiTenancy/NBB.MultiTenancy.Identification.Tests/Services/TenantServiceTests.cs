@@ -34,7 +34,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             _thirdResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             var identifierPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
-            var sut = new TenantService(new List<TenantIdentificationStrategy>() { identifierPair });
+            var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { identifierPair });
 
             // Act
             Action act = () => Task.WaitAll(sut.GetTenantIdAsync());
@@ -54,7 +54,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var firstPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object }, _identifier.Object);
             var secondPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _secondResolver.Object }, _identifier.Object);
             var thirdPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _thirdResolver.Object }, _identifier.Object);
-            var sut = new TenantService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
+            var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
 
             // Act
             var _ = sut.GetTenantIdAsync().Result;
@@ -71,7 +71,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             _secondResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             _thirdResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
             var identifierPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
-            var sut = new TenantService(new List<TenantIdentificationStrategy>() { identifierPair });
+            var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { identifierPair });
 
             // Act
             var result = sut.TryGetTenantIdAsync().Result;
@@ -91,7 +91,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var firstPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object }, _identifier.Object);
             var secondPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _secondResolver.Object }, _identifier.Object);
             var thirdPair = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _thirdResolver.Object }, _identifier.Object);
-            var sut = new TenantService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
+            var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
 
             // Act
             var _ = sut.TryGetTenantIdAsync().Result;

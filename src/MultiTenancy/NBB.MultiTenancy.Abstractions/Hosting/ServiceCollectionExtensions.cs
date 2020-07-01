@@ -2,8 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Services;
 
 namespace NBB.MultiTenancy.Abstractions.Hosting
 {
@@ -24,13 +24,9 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
             services.AddSingleton<IHostedService, TenancyHostingValidator>();
             services.Configure<TenancyHostingOptions>(configurationSection);
 
-            addTenantAwareServices(tenancyOptions);
-        }
+            services.AddSingleton<ITenantContextAccessor, TenantContextAccessor>();
 
-        public static void AddTenantHostingConfigService<TTenantHostingConfigService>(this IServiceCollection services)
-            where TTenantHostingConfigService : class, ITenantHostingConfigService
-        {
-            services.AddSingleton<ITenantHostingConfigService, TTenantHostingConfigService>();
+            addTenantAwareServices(tenancyOptions);
         }
     }
 }
