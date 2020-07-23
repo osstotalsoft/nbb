@@ -9,12 +9,28 @@ type Command1(code) =
     interface ICommand
     member _.Code with get() : string = code
 
-type Command2(code) =
-    interface ICommand     
-    member _.Code with get() : string = code
-
 let handle1 (command: Command1) = effect { return Some () }
+let validate1 (command: Command1) = 
+    effect {
+        if command.Code = ""
+        then 
+            failwith "Empty code" |> ignore
+            return None
+        else
+            return Some command
+    }
+
+
+type Command2(id) =
+    interface ICommand     
+    member _.Id with get() : string = id
+
+
 let handle2 (command: Command2) = effect { return Some () }
+let validate2 (command: Command2) = 
+    effect {
+        return Some ()
+    }
 
 let logCommand: CommandMiddleware = 
     fun next command ->
@@ -34,34 +50,18 @@ let handleCommandExceptions: CommandMiddleware =
             return result
         }
 
-//let dispatchCommand: CommandHandler<ICommand> =  
-//    fun command -> 
-//        match command with
-//            | :? Command1 -> handle1 (command:?> Command1)
-//            | :? Command2 -> handle2 (command:?> Command2)
-//            | _ -> effect{ failwith "Invalid command" }
-
-
-            
 
 module WriteApplication = 
-    //let commandHandler: CommandHandler<ICommand> = 
-    //    handleCommandExceptions 
-    //    << logCommand 
-    //    << logCommand 
-    //    <| dispatchCommand
     let commandPipeline = 
         handleCommandExceptions
         << logCommand
-        << choose [
-            handle1 |> liftCommandHandler |> When typeof<Command1>
-            logCommand << (handle2 |> liftCommandHandler) |> When typeof<Command2>
-            choose [
-                logCommand << (handle2 |> liftCommandHandler) |> When typeof<Command2>
-            ] |> When typeof<Command2>
+        << handlers [
+            validate1 >=> handle1 |> CommandHandler.upCast
+            handle2 |> CommandHandler.upCast
         ]
 
-    let sendCommand (cmd: 'TCommand) = runCommand commandPipeline cmd
+    let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
+    let eff = sendCommand (Command1 "code")
      
 
 
