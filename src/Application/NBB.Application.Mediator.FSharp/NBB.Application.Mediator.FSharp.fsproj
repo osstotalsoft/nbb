@@ -5,7 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Core.fs" />
+    <Compile Include="RequestPipeline.fs" />
+    <Compile Include="CommandPipeline.fs" />
+    <Compile Include="QueryPipeline.fs" />
+    <Compile Include="EventPipeline.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,20 +1,13 @@
-﻿[<AutoOpen>]
-module NBB.Application.Mediator.FSharp.Core
+﻿namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
-open NBB.Core.Abstractions
 open System
 
-type EventHandler<'TEvent when 'TEvent :> IEvent> = 'TEvent -> Effect<unit option>
-type EventMiddleware<'TEvent when 'TEvent :> IEvent> = EventHandler<'TEvent> -> EventHandler<'TEvent>
+
 type RequestHandler<'TRequest, 'TResponse> = 'TRequest -> Effect<'TResponse option>
-type CommandHandler<'TCommand when 'TCommand :> ICommand> = RequestHandler<'TCommand, unit>
 type RequestMiddleware<'TRequest, 'TResponse> = RequestHandler<'TRequest, 'TResponse> -> RequestHandler<'TRequest, 'TResponse>
-type CommandMiddleware = RequestMiddleware<ICommand, unit>
-type QueryMiddleware = RequestMiddleware<IQuery, obj>
 
-
-module Handler = 
+module RequestHandler = 
     let rec choose (handlers : RequestHandler<'i, 'o> list) : RequestHandler<'i, 'o> =
         fun (req : 'i) ->
             effect {
@@ -59,16 +52,7 @@ module Handler =
                 | Some b' -> return! h2 b'
             }
 
-
-module CommandHandler =
-    let upCast (commandHandler: CommandHandler<'TCommand>) : CommandHandler<ICommand> = 
-        fun cmd ->
-            match cmd with
-            | :? 'TCommand as cmd' -> commandHandler cmd'
-            | _ -> Effect.pure' None
-
-
-module Middleware =
+module RequestMiddleware =
     let lift (handler: RequestHandler<'TRequest, 'TResponse>) : RequestMiddleware<'TRequest, 'TResponse> =
         fun (next: RequestHandler<'TRequest, 'TResponse>) ->
             fun (request: 'TRequest) ->
@@ -81,16 +65,16 @@ module Middleware =
 
     let mapRequest (mapping1: 'TRequest -> 'TOtherRequest) (mapping2: 'TOtherRequest -> 'TRequest) (middleware: RequestMiddleware<'TRequest, 'TResponse>) : RequestMiddleware<'TOtherRequest, 'TResponse> =
         fun (next : RequestHandler<'TOtherRequest, 'TResponse>) ->
-            middleware (mapping1 >> next) |> Handler.contramap mapping2
+            middleware (mapping1 >> next) |> RequestHandler.contramap mapping2
 
     let choose (middlewares: RequestMiddleware<'TRequest, 'TResponse> list): RequestMiddleware<'TRequest, 'TResponse> =
         fun next ->
             let handlers = middlewares |> List.map (fun h -> h next)
             fun req ->
-                Handler.choose handlers req
+                RequestHandler.choose handlers req
 
     let handlers (hs: RequestHandler<'TRequest, 'TResponse> list): RequestMiddleware<'TRequest, 'TResponse> =
-        Handler.choose hs |> lift
+        RequestHandler.choose hs |> lift
 
     let cond (pred: 'TRequest -> bool) (middleware: RequestMiddleware<'TRequest, 'TResponse>): RequestMiddleware<'TRequest, 'TResponse> =
         fun next req ->
@@ -104,36 +88,29 @@ module Middleware =
 
     let castRequest (middleware: RequestMiddleware<'TRequest, 'TResponse>): RequestMiddleware<'TOtherRequest, 'TResponse> =
         fun next ->
-            let next' = Handler.castRequest next
+            let next' = RequestHandler.castRequest next
             let h = middleware next'
-            Handler.castRequest h
+            RequestHandler.castRequest h
 
     let cast (middleware: RequestMiddleware<'TRequest, 'TResponse>): RequestMiddleware<'TOtherRequest, 'TOtherResponse> =
         fun next ->
-            let next' = Handler.cast next
+            let next' = RequestHandler.cast next
             let h = middleware next'
-            Handler.cast h
+            RequestHandler.cast h
 
     let liftCast (handler:RequestHandler<'TRequest, 'TResponse>): RequestMiddleware<'TOtherRequest, 'TOtherResponse> = 
         handler |> lift |> cast
 
 
-    let run (middleware: RequestMiddleware<'TRequest, 'TResponse>) = middleware Handler.empty
-
-
-module CommandMiddleware =
-    let run (middleware: CommandMiddleware) (cmd: 'TCommand when 'TCommand :> ICommand) = cmd :> ICommand |> Middleware.run middleware
-
-module QueryMidleware =
-    let run (middleware: QueryMiddleware) (query: 'TQuery when 'TQuery :> IQuery<'TResponse>) = 
-        query :> IQuery |> Middleware.run middleware |> Effect.map (Option.map (fun x -> x :?> 'TResponse))
+    let run (middleware: RequestMiddleware<'TRequest, 'TResponse>) = middleware RequestHandler.empty
 
 [<AutoOpen>]
 module Core =
-    let lift = Middleware.lift
-    let choose = Middleware.choose
-    let handlers = Middleware.handlers
-    let (>=>) = Handler.compose
+    let lift = RequestMiddleware.lift
+    let cast = RequestMiddleware.cast
+    let choose = RequestMiddleware.choose
+    let handlers = RequestMiddleware.handlers
+    let (>=>) = RequestHandler.compose
 
 
     
