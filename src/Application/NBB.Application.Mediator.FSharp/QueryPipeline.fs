@@ -4,10 +4,12 @@ open NBB.Core.Abstractions
 open NBB.Core.Effects.FSharp
 
 type QueryHandler<'TQuery, 'TResponse when 'TQuery :> IQuery> = RequestHandler<'TQuery, 'TResponse>
-type QueryMiddleware = RequestMiddleware<IQuery, obj>
+type QueryHandler = QueryHandler<IQuery, obj>
+type QueryMiddleware<'TQuery, 'TResponse when 'TQuery :> IQuery> = RequestMiddleware<'TQuery, 'TResponse>
+type QueryMiddleware = QueryMiddleware<IQuery, obj>
 
 module QueryHandler =
-    let upCast (queryHandler: QueryHandler<'TQuery, 'TResponse>) : QueryHandler<IQuery, obj> = 
+    let upCast (queryHandler: QueryHandler<'TQuery, 'TResponse>) : QueryHandler = 
         fun query ->
             match query with
             | :? 'TQuery as query' -> query' |> queryHandler |> (Effect.map << Option.map) box

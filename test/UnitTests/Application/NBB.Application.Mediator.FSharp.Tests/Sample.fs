@@ -20,14 +20,14 @@ module Command1 =
         }
 
     let validate' (command: Command1) = 
-    effect {
-        if command.Code = ""
-        then 
-            failwith "Empty code" |> ignore
-            return None
-        else
-            return Some command
-    }
+        effect {
+            if command.Code = ""
+            then 
+                failwith "Empty code" |> ignore
+                return None
+            else
+                return Some command
+        }
 
 
 type Command2 =
@@ -82,6 +82,35 @@ module Query2 =
                 return None
         }
 
+type Event1 =
+    { Id: int; EventId: Guid }
+    interface NBB.Core.Abstractions.IEvent with
+        member this.EventId: Guid = this.EventId
+
+module Event1 = 
+    let handle (_: Event1) =
+        effect {
+            return () |> Some
+        }
+
+
+type Event2 =
+    { Id: int; EventId: Guid }
+    interface NBB.Core.Abstractions.IEvent with
+        member this.EventId: Guid = this.EventId
+        
+module Event2 = 
+    let handle1 (_: Event2) =
+        effect {
+            return () |> Some
+        }
+
+    let handle2 (_: Event2) =
+        effect {
+            return () |> Some
+        }
+   
+
 
 
 let handleExceptions =  
@@ -120,34 +149,75 @@ let logRequest =
         return result
     }
 
+let logEvent: EventMiddleware =
+    fun next (ev:IEvent) ->
+    effect {
+        Console.WriteLine "before"
+        let! result = next ev
+        Console.WriteLine "after"
+        return result
+    }
+
+let publishMessage =
+    fun _ ->
+    effect {
+        return Some ()
+    }
+
 
 module WriteApplication = 
+    open RequestMiddleware
+    open RequestHandler
+    open CommandHandler
+
     let private commandPipeline = 
         handleExceptions //generic middleware
         << logRequest //generic middleware
-        << lift validateTenantCmd//generic validator
-        << choose [
-            Command1.handle |> lift |> RequestMiddleware.cast
-        ]
+        << lift validateTenantCmd //generic validator
+       
         << handlers [
-            Command1.validate' >=> Command1.handle |> CommandHandler.upCast//just handler
-            lift Command2.validate Command2.handle |> CommandHandler.upCast //handler + validator
-            Command3.handle1 >=> Command3.handle2 |> CommandHandler.upCast //handler composition
+            Command1.handle |> upCast //just handler
+            Command1.validate' >=> Command1.handle |> upCast //handler + validator
+            lift Command2.validate Command2.handle |> upCast //handler + validator
+            Command3.handle1 >=> Command3.handle2  |> upCast //handler composition
         ]
+
+    open EventMiddleware
+    open EventHandler
+
+    let private eventPipeline: EventMiddleware =
+        handleExceptions //generic middleware
+        << logEvent //generic middleware
+        << handlers [
+            Event1.handle |> upCast //just handler
+            Event2.handle1 ++ Event2.handle2 |> upCast //append two handlers
+        ]
+        << lift publishMessage //generic handler
+        
 
     let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
+    let publishEvent (ev: 'TEvent) = EventMiddleware.run eventPipeline ev
 
 module ReadApplication = 
+    open RequestMiddleware
+    open QueryHandler
+
     let private queryPipeline = 
         handleExceptions
         << logRequest //generic validator
         << lift validateTenantQuery //generic validator
         << handlers [
-            Query1.handle |> QueryHandler.upCast
-            lift Query2.validate Query2.handle |> QueryHandler.upCast
+            Query1.handle |> upCast
+            lift Query2.validate Query2.handle |> upCast
         ]
 
+    let private commandPipeline = 
+        handleExceptions
+         << logRequest
+         << lift publishMessage
+
     let sendQuery (query: 'TQuery) = QueryMidleware.run queryPipeline query
+    let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
 
 
 

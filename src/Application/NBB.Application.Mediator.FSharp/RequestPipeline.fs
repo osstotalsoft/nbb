@@ -52,6 +52,8 @@ module RequestHandler =
                 | Some b' -> return! h2 b'
             }
 
+    let (>=>) = compose
+
 module RequestMiddleware =
     let lift (handler: RequestHandler<'TRequest, 'TResponse>) : RequestMiddleware<'TRequest, 'TResponse> =
         fun (next: RequestHandler<'TRequest, 'TResponse>) ->
@@ -104,13 +106,6 @@ module RequestMiddleware =
 
     let run (middleware: RequestMiddleware<'TRequest, 'TResponse>) = middleware RequestHandler.empty
 
-[<AutoOpen>]
-module Core =
-    let lift = RequestMiddleware.lift
-    let cast = RequestMiddleware.cast
-    let choose = RequestMiddleware.choose
-    let handlers = RequestMiddleware.handlers
-    let (>=>) = RequestHandler.compose
 
 
     
