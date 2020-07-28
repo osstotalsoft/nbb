@@ -56,7 +56,3 @@ module EventMiddleware =
 
     let run (middleware: EventMiddleware) (ev: 'TEvent) = ev :> IEvent |> middleware EventHandler.empty
 
-//[<AutoOpen>]
-//module EventPipeline = 
-//    //let lift = EventMiddleware.lift
-
