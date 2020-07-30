@@ -26,6 +26,12 @@ module EventHandler =
                     | None   -> return! choose tail ev
             }
 
+    let upCast (handler: EventHandler<'TEvent>) : EventHandler = 
+        fun ev ->
+            match ev with
+            | :? 'TEvent as ev' -> handler ev'
+            | _ -> Effect.pure' None
+
     let mappend (h1: EventHandler<'TEvent>) (h2: EventHandler<'TEvent>): EventHandler<'TEvent> =
         fun ev ->
             effect {
@@ -47,12 +53,6 @@ module EventMiddleware =
 
     let handlers (hs: EventHandler<'TEvent> list): EventMiddleware<'TEvent> =
         EventHandler.choose hs |> lift
-
-    let upCast (handler: EventHandler<'TEvent>) : EventHandler = 
-        fun ev ->
-            match ev with
-            | :? 'TEvent as ev' -> handler ev'
-            | _ -> Effect.pure' None
 
     let run (middleware: EventMiddleware) (ev: 'TEvent) = ev :> IEvent |> middleware EventHandler.empty
 

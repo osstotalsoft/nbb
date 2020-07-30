@@ -1,7 +1,6 @@
 ﻿namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
-open System
 
 
 type RequestHandler<'TRequest, 'TResponse> = 'TRequest -> Effect<'TResponse option>
