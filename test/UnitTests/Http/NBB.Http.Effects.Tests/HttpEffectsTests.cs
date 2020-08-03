@@ -55,16 +55,16 @@ namespace NBB.Http.Effects.Tests
     {
         private readonly List<HttpRequestMessage> _requests = new List<HttpRequestMessage>();
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
             _requests.Add(request);
 
-            return new HttpResponseMessage
+            return Task.FromResult(new HttpResponseMessage
             {
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent("my string, that needs to be returned")
-            };
+            });
         }
 
         public void Verify(Predicate<HttpRequestMessage> predicate)

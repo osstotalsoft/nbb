@@ -6,6 +6,7 @@ open NBB.Application.Mediator.FSharp
 open FsUnit.Xunit
 open NBB.Core.Effects.FSharp.Interpreter
 open Mox
+open FsCheck.Xunit
 
 type SomeRequest = { Code: string }
 
@@ -60,6 +61,44 @@ let ``RequestHandler.compose should call the second handler only if the first on
     handle1 |> wasCalled |> should be True
     handle2 |> wasCalled |> should be True
     handle3 |> wasCalled |> should be False
+
+[<Property>]
+let ``RequestHandler.compose left identity law `` (f: int->int option) (req: int) =
+    let f' = f >> Effect.pure'
+    let interpreter = createInterpreter()
+    let run h = 
+        req 
+        |> h 
+        |> Effect.interpret interpreter 
+        |> Async.RunSynchronously
+
+    run (identity >=> f') = run f'
+
+[<Property>]
+let ``RequestHandler.compose right identity law`` (f: int->int option) (req: int) =
+    let f' = f >> Effect.pure'
+    let interpreter = createInterpreter()
+    let run h = 
+        req 
+        |> h 
+        |> Effect.interpret interpreter 
+        |> Async.RunSynchronously
+
+    run (f' >=> identity) = run f'
+
+[<Property>]
+let ``RequestHandler.compose associativity law`` (f: int->int option) (g: int->int option) (h: int->int option) (req: int) =
+    let f' = f >> Effect.pure'
+    let g' = g >> Effect.pure'
+    let h' = h >> Effect.pure'
+    let interpreter = createInterpreter()
+    let run h = 
+        req 
+        |> h 
+        |> Effect.interpret interpreter 
+        |> Async.RunSynchronously
+
+    run ((f' >=> g') >=> h') = run (f' >=> (g' >=> h'))
 
 open RequestMiddleware
 

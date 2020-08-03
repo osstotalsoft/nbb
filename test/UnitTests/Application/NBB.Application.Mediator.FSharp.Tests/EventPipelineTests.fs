@@ -19,7 +19,7 @@ type SomeOtherEvent =
         member this.EventId = this.EventId
 
 open EventHandler
-
+open FsCheck.Xunit
 
 
 [<Fact>]
@@ -84,7 +84,7 @@ let ``EventHandler.upCast should not call the handler if types don't match`` () 
     handler |> wasCalled |> should be False
 
 [<Fact>]
-let ``EventHandler.mappend should call both handlers`` () =
+let ``EventHandler.append should call both handlers`` () =
     //arrange
     let handler1 = mock (fun (_:SomeEvent) -> effect { return Some () })
     let handler2 = mock (fun (_:SomeEvent) -> effect { return Some () })
@@ -101,6 +101,44 @@ let ``EventHandler.mappend should call both handlers`` () =
     //assert
     handler1 |> wasCalled |> should be True
     handler2 |> wasCalled |> should be True
+
+[<Property>]
+let ``EventHandler.append left identity law `` (f: SomeEvent->unit option) (req: SomeEvent) =
+    let f' = f >> Effect.pure'
+    let interpreter = createInterpreter()
+    let run h = 
+        req 
+        |> h 
+        |> Effect.interpret interpreter 
+        |> Async.RunSynchronously
+
+    run (empty ++ f') = run f'
+
+[<Property>]
+let ``RequestHandler.append right identity law`` (f: SomeEvent->unit option) (req: SomeEvent) =
+    let f' = f >> Effect.pure'
+    let interpreter = createInterpreter()
+    let run h = 
+        req 
+        |> h 
+        |> Effect.interpret interpreter 
+        |> Async.RunSynchronously
+
+    run (f' ++ empty) = run f'
+
+[<Property>]
+let ``RequestHandler.append associativity law`` (f: SomeEvent->unit option) (g: SomeEvent->unit option) (h: SomeEvent->unit option) (req: SomeEvent) =
+    let f' = f >> Effect.pure'
+    let g' = g >> Effect.pure'
+    let h' = h >> Effect.pure'
+    let interpreter = createInterpreter()
+    let run h = 
+        req 
+        |> h 
+        |> Effect.interpret interpreter 
+        |> Async.RunSynchronously
+
+    run ((f' ++ g') ++ h') = run (f' ++ (g' ++ h'))
 
 open EventMiddleware
 

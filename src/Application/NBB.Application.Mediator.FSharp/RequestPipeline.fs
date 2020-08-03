@@ -22,6 +22,9 @@ module RequestHandler =
     let empty : RequestHandler<'TRequest, 'TResponse> = 
         fun _ -> Effect.pure' None
 
+    let identity : RequestHandler<'TRequest, 'TRequest> =
+        fun req -> req |> Some |> Effect.pure'
+
     let compose (h1: RequestHandler<'a, 'b>) (h2: RequestHandler<'b, 'c>): RequestHandler<'a, 'c> =
         fun a ->
             effect {

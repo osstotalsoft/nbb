@@ -11,9 +11,6 @@ type EventMiddleware = EventMiddleware<IEvent>
 
 
 module EventHandler = 
-    let empty : EventHandler<'TEvent> = 
-        fun _ -> Effect.pure' None
-
     let rec choose (handlers : EventHandler<'TEvent> list) : EventHandler<'TEvent> =
         fun (ev : 'TEvent) ->
             effect {
@@ -32,7 +29,7 @@ module EventHandler =
             | :? 'TEvent as ev' -> handler ev'
             | _ -> Effect.pure' None
 
-    let mappend (h1: EventHandler<'TEvent>) (h2: EventHandler<'TEvent>): EventHandler<'TEvent> =
+    let append (h1: EventHandler<'TEvent>) (h2: EventHandler<'TEvent>): EventHandler<'TEvent> =
         fun ev ->
             effect {
                 let! r1 = h1 ev |> Effect.map Option.isSome
@@ -40,7 +37,10 @@ module EventHandler =
                 if r1 || r2 then return Some () else return None
             }
 
-    let (++) = mappend
+    let empty : EventHandler<'TEvent> = 
+        fun _ -> Effect.pure' None
+
+    let (++) = append
 
 module EventMiddleware =
     let lift (handler: EventHandler<'TEvent>) : EventMiddleware<'TEvent> =
