@@ -23,7 +23,7 @@ namespace NBB.Core.Effects
         public static IServiceCollection AddSideEffectHandler<TSideEffect, TOutput>(this IServiceCollection services, Func<TSideEffect, CancellationToken, Task<TOutput>> handlerFn)
             where TSideEffect : ISideEffect<TOutput>
         {
-            services.AddSingleton(new GenericSideEffectHandler<TSideEffect, TOutput>(handlerFn));
+            services.AddSingleton<ISideEffectHandler<TSideEffect, TOutput>>(new GenericSideEffectHandler<TSideEffect, TOutput>(handlerFn));
             return services;
         }
 
@@ -35,7 +35,7 @@ namespace NBB.Core.Effects
                 return Task.FromResult(handlerFn(sideEffect));
             }
 
-            services.AddSingleton(new GenericSideEffectHandler<TSideEffect, TOutput>(HandlerFnAsync));
+            services.AddSingleton<ISideEffectHandler<TSideEffect, TOutput>>(new GenericSideEffectHandler<TSideEffect, TOutput>(HandlerFnAsync));
             return services;
         }
     }
