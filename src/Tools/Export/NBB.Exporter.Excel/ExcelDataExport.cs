@@ -27,7 +27,7 @@ namespace NBB.Exporter.Excel
         public Stream Export(List<T> exportData, Dictionary<string, string> properties = null, List<string> headers = null)
         {
             if (exportData == null)
-                throw new ArgumentNullException("exportData");
+                throw new ArgumentNullException(nameof(exportData));
 
             var types = new List<string>();
             var excelHeaders = headers ?? new List<string>();
@@ -83,7 +83,7 @@ namespace NBB.Exporter.Excel
             if (columnTypes == null)
                 throw new ArgumentNullException("columnTypes");
 
-            if (columnTypes == null)
+            if (headers == null)
                 throw new ArgumentNullException("headers");
 
             var sheetName = properties != null && properties.ContainsKey("SheetName") ? properties["SheetName"] : DefaultSheetName;

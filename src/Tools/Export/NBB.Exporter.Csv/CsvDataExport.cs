@@ -10,39 +10,72 @@ namespace NBB.Exporter.Csv
 {
     public class CsvDataExport<T> : IAbstractDataExport<T> where T : class
     {
+        /// <summary>
+        /// Exports a list of objects as csv.
+        /// </summary>
+        /// <param name="exportData">The data to be exported.</param>
+        /// <param name="headers">The header name for each column.</param>
+        /// <param name="properties">Additional Excel sheet properties.</param>
+        /// <returns></returns>
         public Stream Export(List<T> exportData, Dictionary<string, string> properties = null, List<string> headers = null)
         {
             if (exportData == null)
                 throw new ArgumentNullException("exportData");
 
+            var newLine = Environment.NewLine;
+            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            var exportDataList = new List<List<object>>();
+
+            headers = headers ?? props.Select(x => Regex.Replace(x.Name, "([A-Z])", " $1").Trim()).ToList();
+            for (var i = 0; i < exportData.Count; i++)
+            {
+                var exportDataItem = new List<object>();
+                var item = exportData[i];
+                for (var j = 0; j < headers.Count; j++)
+                {
+                    var prop = props[j];
+                    var value = prop.GetValue(item) ?? string.Empty;
+                    exportDataItem.Add(value);
+                }
+
+                exportDataList.Add(exportDataItem);
+            }
+
+            return ExportFromListOfObjects(exportDataList, headers, properties);
+        }
+
+        /// <summary>
+        /// Exports a list of basic objects as csv.
+        /// </summary>
+        /// <param name="exportData">The data to be exported.</param>
+        /// <param name="headers">The header name for each column.</param>
+        /// <param name="properties">Additional Excel sheet properties.</param>
+        /// <returns></returns>
+        public Stream ExportFromListOfObjects(List<List<object>> exportData, List<string> headers, Dictionary<string, string> properties = null)
+        {
+            if (exportData == null)
+                throw new ArgumentNullException("exportData");
+
+            if (headers == null)
+                throw new ArgumentNullException("headers");
+
+            var newLine = Environment.NewLine;
             var separator = ",";
             if (properties != null && properties.ContainsKey("Separator"))
                 separator = properties["Separator"];
             
-            var newLine = Environment.NewLine;
-            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            string csvHeaderRow;
-            if (headers != null && headers.Any())
-            {
-                csvHeaderRow = string.Join(",", headers.ToArray<string>()) + newLine;
-            }
-            else
-            {
-                csvHeaderRow = string.Join(separator, props.Select(x => Regex.Replace(x.Name, "([A-Z])", " $1").Trim() ).ToArray()) + newLine;
-            }
-
+            string csvHeaderRow = string.Join(separator, headers.ToArray<string>()) + newLine;
             var csvRows = new StringBuilder();
-            var lastProp = props[props.Length - 1];
 
-            foreach (var item in exportData)
+            for (var i = 0; i < exportData.Count; i++)
             {
-                for (var i = 0; i < props.Length - 1; i++)
+                var lastValue = exportData[i][exportData[i].Count - 1].ToString();
+                for (var j = 0; j < exportData[i].Count - 1; j++)
                 {
-                    var prop = props[i];
-                    csvRows.Append(prop.GetValue(item) + ",");
+                    var value = exportData[i][j];
+                    csvRows.Append(value.ToString() + separator);
                 }
-                csvRows.Append(lastProp.GetValue(item) + newLine);
+                csvRows.Append(lastValue + newLine);
             }
 
             var csv = csvHeaderRow + csvRows;
