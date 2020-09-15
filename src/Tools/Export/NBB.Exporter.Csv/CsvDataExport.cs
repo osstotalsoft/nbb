@@ -64,18 +64,12 @@ namespace NBB.Exporter.Csv
             if (properties != null && properties.ContainsKey("Separator"))
                 separator = properties["Separator"];
             
-            string csvHeaderRow = string.Join(separator, headers.ToArray<string>()) + newLine;
+            string csvHeaderRow = string.Join(separator, headers) + newLine;
             var csvRows = new StringBuilder();
 
-            for (var i = 0; i < exportData.Count; i++)
+            foreach (var lineData in exportData)
             {
-                var lastValue = exportData[i][exportData[i].Count - 1].ToString();
-                for (var j = 0; j < exportData[i].Count - 1; j++)
-                {
-                    var value = exportData[i][j];
-                    csvRows.Append(value.ToString() + separator);
-                }
-                csvRows.Append(lastValue + newLine);
+                csvRows.AppendJoin(separator, lineData).Append(newLine);
             }
 
             var csv = csvHeaderRow + csvRows;
