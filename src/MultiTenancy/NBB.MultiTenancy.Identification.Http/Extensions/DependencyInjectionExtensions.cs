@@ -13,7 +13,7 @@ namespace NBB.MultiTenancy.Identification.Http.Extensions
         public static IServiceCollection AddDefaultHttpTenantIdentification(this IServiceCollection services)
         {
             
-            services.AddTenantService()
+            services.AddTenantIdentificationService()
                 .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder => builder
                     .AddTenantTokenResolver<TenantIdHeaderHttpTokenResolver>(DefaultTenantHttpHeaderName)
                     .AddTenantTokenResolver<QueryStringTenantIdTokenResolver>(DefaultTenantQueryStringParamName)

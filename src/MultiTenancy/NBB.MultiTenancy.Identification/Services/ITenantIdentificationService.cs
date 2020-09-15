@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using NBB.MultiTenancy.Abstractions;
 
-namespace NBB.MultiTenancy.Abstractions.Services
+namespace NBB.MultiTenancy.Identification.Services
 {
-    public interface ITenantService
+    public interface ITenantIdentificationService
     {
         /// <summary>
         /// Gets current tenant id

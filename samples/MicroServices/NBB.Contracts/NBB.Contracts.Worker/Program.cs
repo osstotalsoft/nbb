@@ -23,6 +23,7 @@ using System.Threading.Tasks;
 using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Hosting;
+using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Messaging.Extensions;
 
 namespace NBB.Contracts.Worker
@@ -89,16 +90,16 @@ namespace NBB.Contracts.Worker
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
-                            //.UseTenantValidationMiddleware()
+                            //.UseTenantMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
                         );
 
                     services.AddMultitenancy(hostingContext.Configuration, _ =>
                     {
-                        services.AddTenantHostingConfigService<TenantHostingConfigService>();
                         services.AddMultiTenantMessaging()
-                            .AddDefaultMessagingTenantIdentification();
+                            .AddDefaultMessagingTenantIdentification()
+                            .AddTenantRepository<TenantRepositoryMock>();
                     });
                 });
 

@@ -5,7 +5,7 @@ namespace NBB.MultiTenancy.Identification.Extensions
 {
     public static class DependencyInjectionExtensions
     {
-        public static TenantServiceBuilder AddTenantService(this IServiceCollection services)
+        public static TenantServiceBuilder AddTenantIdentificationService(this IServiceCollection services)
         {
             return new TenantServiceBuilder(services);
         }

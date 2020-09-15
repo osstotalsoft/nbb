@@ -1,16 +1,15 @@
 ﻿using NBB.MultiTenancy.Abstractions;
-using NBB.MultiTenancy.Abstractions.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Identification.Services
 {
-    public class TenantService : ITenantService
+    public class DefaultTenantIdentificationService : ITenantIdentificationService
     {
         private readonly IEnumerable<TenantIdentificationStrategy> _tenantIdentificationStrategies;
 
-        public TenantService(IEnumerable<TenantIdentificationStrategy> tenantIdentificationStrategies)
+        public DefaultTenantIdentificationService(IEnumerable<TenantIdentificationStrategy> tenantIdentificationStrategies)
         {
             _tenantIdentificationStrategies = tenantIdentificationStrategies;
         }

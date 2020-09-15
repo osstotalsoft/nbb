@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="RequestPipeline.fs" />
+    <Compile Include="CommandPipeline.fs" />
+    <Compile Include="QueryPipeline.fs" />
+    <Compile Include="EventPipeline.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Core\NBB.Core.Effects.FSharp\NBB.Core.Effects.FSharp.fsproj" />
+  </ItemGroup>
+
+</Project>

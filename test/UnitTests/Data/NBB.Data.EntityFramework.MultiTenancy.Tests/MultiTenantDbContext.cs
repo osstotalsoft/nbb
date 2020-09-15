@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NBB.MultiTenancy.Abstractions.Services;
+using NBB.MultiTenancy.Abstractions.Context;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,9 +12,9 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         private readonly Guid _tenantId;
 
 
-        public MultiTenantDbContext(DbContextOptions<MultiTenantDbContext> options, ITenantService tenantService) : base(options)
+        public MultiTenantDbContext(DbContextOptions<MultiTenantDbContext> options, ITenantContextAccessor tenantService) : base(options)
         {
-            _tenantId = tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
+            _tenantId = tenantService.TenantContext.GetTenantId();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

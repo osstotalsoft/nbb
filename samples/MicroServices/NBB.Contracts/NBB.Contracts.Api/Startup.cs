@@ -10,6 +10,8 @@ using NBB.Correlation.AspNet;
 using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
 using NBB.MultiTenancy.Abstractions.Hosting;
+using NBB.MultiTenancy.Abstractions.Repositories;
+using NBB.MultiTenancy.AspNet;
 using NBB.MultiTenancy.Identification.Http.Extensions;
 
 namespace NBB.Contracts.Api
@@ -37,14 +39,14 @@ namespace NBB.Contracts.Api
 
             services.AddMultitenancy(Configuration, _ =>
             {
+                services.AddTenantRepository<TenantRepositoryMock>();
                 services.AddMultiTenantMessaging();
-                services.AddTenantHostingConfigService<TenantHostingConfigService>();
                 services.AddDefaultHttpTenantIdentification();
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env/*, TenancyHostingValidator tenancyHostingValidator*/)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseCorrelation();
 
@@ -52,6 +54,8 @@ namespace NBB.Contracts.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            //app.UseTenantMiddleware();
 
             app.UseMvc();
         }
