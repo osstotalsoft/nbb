@@ -83,7 +83,7 @@ namespace NBB.Exporter.Excel
             if (columnTypes == null)
                 throw new ArgumentNullException("columnTypes");
 
-            if (columnTypes == null)
+            if (headers == null)
                 throw new ArgumentNullException("headers");
 
             var sheetName = properties != null && properties.ContainsKey("SheetName") ? properties["SheetName"] : DefaultSheetName;
