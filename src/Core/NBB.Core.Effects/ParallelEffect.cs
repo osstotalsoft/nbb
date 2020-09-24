@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
@@ -15,20 +17,18 @@ namespace NBB.Core.Effects
             Next = next;
         }
 
-        public static ParallelEffect<T1, T2, T> From(IEffect<T1> leftEffect, IEffect<T2> rightEffect, Func<T1, T2, T> selector)
-        {
-            return new ParallelEffect<T1, T2, T>(leftEffect, rightEffect, (t1, t2) => new PureEffect<T>(selector(t1, t2)));
-        }
+        public static ParallelEffect<T1, T2, T> From(IEffect<T1> leftEffect, IEffect<T2> rightEffect,
+            Func<T1, T2, T> selector)
+            => new ParallelEffect<T1, T2, T>(leftEffect, rightEffect, (t1, t2) => new PureEffect<T>(selector(t1, t2)));
 
 
         public IEffect<TResult> Map<TResult>(Func<T, TResult> selector)
-        {
-            return new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Map(selector));
-        }
+            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Map(selector));
 
         public IEffect<TResult> Bind<TResult>(Func<T, IEffect<TResult>> computation)
-        {
-            return new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind(computation));
-        }
+            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind(computation));
+
+        public Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
+            => v.Visit(this, cancellationToken);
     }
 }

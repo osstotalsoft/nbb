@@ -31,7 +31,7 @@ namespace NBB.Core.Effects
 
         public static IEffect ToUnit<T>(this IEffect<T> effect)
         {
-            return new UnitEffect<T>(effect);
+            return new UnitEffect(effect.Map(_=> Unit.Value));
         }
 
         public static IEffect<TResult> Select<T, TResult>(this IEffect<T> effect, Func<T, TResult> selector)

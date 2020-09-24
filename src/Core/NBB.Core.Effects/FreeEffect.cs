@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
@@ -14,13 +16,13 @@ namespace NBB.Core.Effects
         }
 
         public IEffect<TResult> Bind<TResult>(Func<T, IEffect<TResult>> computation)
-        {
-            return new FreeEffect<TOutput, TResult>(SideEffect, response => Next(response).Bind(computation));
-        }
+            => new FreeEffect<TOutput, TResult>(SideEffect, response => Next(response).Bind(computation));
+
 
         public IEffect<TResult> Map<TResult>(Func<T, TResult> selector)
-        {
-            return new FreeEffect<TOutput, TResult>(SideEffect, response => Next(response).Map(selector));
-        }
+            => new FreeEffect<TOutput, TResult>(SideEffect, response => Next(response).Map(selector));
+
+        public Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
+            => v.Visit(this, cancellationToken);
     }
 }
