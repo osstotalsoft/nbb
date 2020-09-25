@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <PackageReference Include="Foq" Version="1.8.0" />
-    <PackageReference Include="FSharpPlus" Version="1.1.0-RC3" />
     <PackageReference Include="FsUnit.xUnit" Version="3.8.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="Moq" Version="4.13.1" />

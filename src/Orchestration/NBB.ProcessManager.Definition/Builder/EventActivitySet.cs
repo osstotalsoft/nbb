@@ -33,7 +33,7 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public void AddEffectHandler(EffectFunc<TEvent, TData> func)
         {
-            IEffect NewFunc(IEvent @event, InstanceData<TData> data)
+            Effect<Unit> NewFunc(IEvent @event, InstanceData<TData> data)
             {
                 if (_starterPredicate != null && !_starterPredicate((TEvent) @event, data))
                     return Effect.Pure();

@@ -55,7 +55,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <param name="messageHandler">A handler that receives the message payload and returns an effect.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseEffectMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder, Func<object, IEffect> messageHandler)
+        public static IPipelineBuilder<MessagingEnvelope> UseEffectMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder, Func<object, Effect<Unit>> messageHandler)
             => pipelineBuilder.Use(async (envelope, token, next) =>
             {
                 var interpreter = pipelineBuilder.ServiceProvider.GetRequiredService<IInterpreter>();

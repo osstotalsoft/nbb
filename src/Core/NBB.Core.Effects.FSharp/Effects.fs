@@ -3,43 +3,31 @@
 open System
 open NBB.Core.Effects
 
-
-type Effect<'T> = Effect of IEffect<'T>
+type Effect<'a> = NBB.Core.Effects.Effect<'a>
 
 [<RequireQualifiedAccess>]
 module Effect = 
-    let wrap eff = Effect eff
-    let unWrap (Effect eff) = eff
+    let map func eff = Effect.Map(Func<'a, 'b>(func), eff)
 
-    let map func (Effect eff) = Effect.Map(Func<'a, 'b>(func), eff)|> wrap
+    let bind func eff = Effect.Bind(eff, Func<'a, Effect<'b>>(func))
 
-    let bind func (Effect eff) =
-        Effect.Bind(eff, Func<'a, IEffect<'b>>(fun a -> func a |> unWrap)) |> wrap
+    let apply (func:Effect<'a->'b>) (eff:Effect<'a>) = Effect.Apply(func |> map(fun f -> Func<'a, 'b>(f)), eff)
 
-    let apply (func:Effect<'a->'b>) (eff:Effect<'a>) = bind (fun a -> func |> map (fun fn -> fn a)) eff
-
-    let pure' x = Effect.Pure x |> wrap
+    let pure' x = Effect.Pure x
 
     let return' = pure'
 
-    let from (func: unit -> 'a) = 
-        let func' = Func<'a>(func)
-        Effect.From func' |> wrap
+    let from (func: unit -> 'a) = Effect.From (Func<'a>(func))
 
     let ignore eff = map (fun _ -> ()) eff
 
     let composeK f g x = bind g (f x)
+
     let lift2 f = map f >> apply
 
     let flatten eff = bind id eff
 
-    let interpret<'a> (interpreter:IInterpreter) (Effect eff) = interpreter.Interpret<'a>(eff) |> Async.AwaitTask
-
-type Effect<'T> with
-    static member Map (x, f) = Effect.map  f x
-    static member Return (x) = Effect.return' x
-    static member (>>=) (x,f) = Effect.bind f x
-    static member (<*>) (f,x) = Effect.apply f x
+    let interpret (interpreter:IInterpreter) eff = interpreter.Interpret eff |> Async.AwaitTask
 
 module EffectBuilder =
     type EffectBuilder() =
@@ -49,8 +37,6 @@ module EffectBuilder =
         member _.Combine(eff1, eff2) = Effect.bind (fun _ -> eff2) eff1
         member _.Zero() = Effect.pure' ()
         member _.Delay(f) = f |> Effect.from |> Effect.flatten
-        //member _.Run(f) = Effect.flatten f
-
 
 [<AutoOpen>]
 module Effects =
@@ -80,3 +66,5 @@ module Effects =
                 | Ok v -> Effect.map Ok (f v)
 
         let sequenceEffect result = traverseEffect id result
+
+

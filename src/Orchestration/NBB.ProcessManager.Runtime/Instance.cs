@@ -16,11 +16,11 @@ namespace NBB.ProcessManager.Runtime
         public object InstanceId { get; private set; }
 
         private readonly List<IEvent> _changes = new List<IEvent>();
-        private readonly List<IEffect> _effects = new List<IEffect>();
+        private readonly List<Effect<Unit>> _effects = new List<Effect<Unit>>();
         public int Version { get; internal set; }
 
         public IEnumerable<object> GetUncommittedChanges() => _changes;
-        public IEnumerable<IEffect> GetUncommittedEffects() => _effects;
+        public IEnumerable<Effect<Unit>> GetUncommittedEffects() => _effects;
 
         public Instance(IDefinition<TData> definition)
         {

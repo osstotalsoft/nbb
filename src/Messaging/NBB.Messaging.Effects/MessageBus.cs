@@ -4,6 +4,6 @@ namespace NBB.Messaging.Effects
 {
     public static class MessageBus
     {
-        public static IEffect Publish(object message) => Effect.Of(new PublishMessage.SideEffect(message)).ToUnit();
+        public static Effect<Unit> Publish(object message) => Effect.Of(new PublishMessage.SideEffect(message));
     }
 }

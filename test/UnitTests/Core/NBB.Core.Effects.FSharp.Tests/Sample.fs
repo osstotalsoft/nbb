@@ -2,7 +2,6 @@
 
 open System
 open NBB.Core.Effects.FSharp
-open FSharpPlus
 
 module Domain =
     type AggRoot = AggRoot of int
@@ -25,11 +24,11 @@ module Application =
             do! save agg'
         }
 
-    let handler' (IncrementCommand id) = id |> loadById |> map increment >>= save
+    let handler' (IncrementCommand id) = id |> loadById |> Effect.map increment >>= save
 
     let handler'' (IncrementCommand id) = 
-        let handle = loadById >> map increment >> bind save
+        let handle = loadById >> Effect.map increment >> Effect.bind save
         handle id
 
-    let listHandler (commandList: _ list) = traverse handler commandList |> Effect.ignore
+    let listHandler (commandList: _ list) = List.traverseEffect handler commandList |> Effect.ignore
 

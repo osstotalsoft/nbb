@@ -5,10 +5,10 @@ namespace NBB.ProcessManager.Definition.SideEffects
 {
     public static class Timeout
     {
-        public static IEffect Request<TMessage>(string instanceId, TimeSpan timeSpan, TMessage message)
-            => Effect.Of(new RequestTimeout<TMessage>(instanceId, timeSpan, message)).ToUnit();
+        public static Effect<Unit> Request<TMessage>(string instanceId, TimeSpan timeSpan, TMessage message)
+            => Effect.Of(new RequestTimeout<TMessage>(instanceId, timeSpan, message));
 
-        public static IEffect Cancel(string instanceId)
-            => Effect.Of(new CancelTimeouts(instanceId)).ToUnit();
+        public static Effect<Unit> Cancel(string instanceId)
+            => Effect.Of(new CancelTimeouts(instanceId));
     }
 }
