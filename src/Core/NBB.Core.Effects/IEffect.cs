@@ -10,8 +10,4 @@ namespace NBB.Core.Effects
         IEffect<TResult> Bind<TResult>(Func<T, IEffect<TResult>> computation);
         Task<TResult> Accept<TResult>(IEffectVisitor<T,TResult> v, CancellationToken cancellationToken);
     }
-
-    public interface IEffect : IEffect<Unit>
-    {
-    }
 }

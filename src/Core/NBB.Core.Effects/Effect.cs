@@ -16,31 +16,31 @@ namespace NBB.Core.Effects
             return new PureEffect<T>(value);
         }
 
-        public static IEffect Pure()
+        public static IEffect<Unit> Pure()
         {
-            return new PureEffect<Unit>(Unit.Value).ToUnit();
+            return new PureEffect<Unit>(Unit.Value);
         }
 
         public static IEffect<T> From<T>(Func<CancellationToken, Task<T>> impure)
             => Of(Thunk.From(impure));
 
-        public static IEffect From(Func<CancellationToken, Task> impure)
-            => Of(Thunk.From(impure)).ToUnit();
+        public static IEffect<Unit> From(Func<CancellationToken, Task> impure)
+            => Of(Thunk.From(impure));
 
         public static IEffect<TOutput> From<TOutput>(Func<TOutput> impure)
             => Of(Thunk.From(impure));
 
-        public static IEffect From(Action impure)
-            => Of(Thunk.From(impure)).ToUnit();
+        public static IEffect<Unit> From(Action impure)
+            => Of(Thunk.From(impure));
 
         public static IEffect<(T1, T2)> Parallel<T1, T2>(IEffect<T1> e1, IEffect<T2> e2)
         {
             return ParallelEffect<T1, T2, (T1, T2)>.From(e1, e2, (t1, t2) => (t1, t2));
         }
 
-        public static IEffect Parallel(IEffect e1, IEffect e2)
+        public static IEffect<Unit> Parallel(IEffect<Unit> e1, IEffect<Unit> e2)
         {
-            return ParallelEffect<Unit, Unit, Unit>.From(e1, e2, (_, __) => Unit.Value).ToUnit();
+            return ParallelEffect<Unit, Unit, Unit>.From(e1, e2, (_, __) => Unit.Value);
         }
 
         public static IEffect<TResult> Bind<T, TResult>(IEffect<T> effect, Func<T, IEffect<TResult>> computation)

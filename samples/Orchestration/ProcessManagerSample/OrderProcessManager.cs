@@ -62,7 +62,7 @@ namespace ProcessManagerSample
                 .Complete();
         }
 
-        private static IEffect OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
+        private static IEffect<Unit> OrderCreatedHandler(OrderCreated orderCreated, InstanceData<OrderProcessManagerData> state)
         {
             return MessageBus.Publish(new DoPayment());
         }

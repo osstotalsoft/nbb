@@ -14,24 +14,24 @@ namespace NBB.Core.Effects
             return effect.Bind(computation);
         }
 
-        public static IEffect Then<T>(this IEffect<T> effect, Func<T, IEffect> computation)
+        public static IEffect<Unit> Then<T>(this IEffect<T> effect, Func<T, IEffect<Unit>> computation)
         {
-            return effect.Bind(computation).ToUnit();
+            return effect.Bind(computation);
         }
 
-        public static IEffect<TResult> Then<TResult>(this IEffect effect, IEffect<TResult> next)
+        public static IEffect<TResult> Then<TResult>(this IEffect<Unit> effect, IEffect<TResult> next)
         {
             return effect.Bind(_ => next);
         }
 
-        public static IEffect Then(this IEffect effect, IEffect next)
+        public static IEffect<Unit> Then(this IEffect<Unit> effect, IEffect<Unit> next)
         {
-            return effect.Bind(_ => next).ToUnit();
+            return effect.Bind(_ => next);
         }
 
-        public static IEffect ToUnit<T>(this IEffect<T> effect)
+        public static IEffect<Unit> ToUnit<T>(this IEffect<T> effect)
         {
-            return new UnitEffect(effect.Map(_=> Unit.Value));
+            return effect.Map(_ => Unit.Value);
         }
 
         public static IEffect<TResult> Select<T, TResult>(this IEffect<T> effect, Func<T, TResult> selector)

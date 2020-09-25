@@ -32,10 +32,5 @@ namespace NBB.Core.Effects
             var nextEffect = eff.Next(t1.Result, t2.Result);
             return (nextEffect, default);
         }
-
-        public Task<(IEffect<T>, T)> Visit(UnitEffect eff, CancellationToken cancellationToken)
-        {
-            return Task.FromResult<(IEffect<T>, T)>((eff.InnerEffect.Map(unit => (T) (object) unit), default));
-        }
     }
 }
