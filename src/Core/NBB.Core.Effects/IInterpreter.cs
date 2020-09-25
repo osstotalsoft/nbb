@@ -5,6 +5,6 @@ namespace NBB.Core.Effects
 {
     public interface IInterpreter
     {
-        Task<T> Interpret<T>(IEffect<T> effect, CancellationToken cancellationToken = default);
+        Task<T> Interpret<T>(Effect<T> effect, CancellationToken cancellationToken = default);
     }
 }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
-    public class IterativeInterpreterVisitor<T> : IEffectVisitor<T, (IEffect<T>,T)>
+    public class IterativeInterpreterVisitor<T> : IEffectVisitor<T, (Effect<T>,T)>
     {
         private readonly ISideEffectMediator _sideEffectMediator;
         private readonly IInterpreter _interpreter;
@@ -14,17 +14,17 @@ namespace NBB.Core.Effects
             _interpreter = interpreter;
         }
 
-        public Task<(IEffect<T>, T)> Visit(PureEffect<T> eff, CancellationToken cancellationToken)
-            => Task.FromResult<(IEffect<T>, T)>((null, eff.Value));
+        public Task<(Effect<T>, T)> Visit(PureEffect<T> eff, CancellationToken cancellationToken)
+            => Task.FromResult<(Effect<T>, T)>((null, eff.Value));
 
-        public async Task<(IEffect<T>,T)> Visit<TOutput>(FreeEffect<TOutput, T> eff, CancellationToken cancellationToken)
+        public async Task<(Effect<T>,T)> Visit<TOutput>(FreeEffect<TOutput, T> eff, CancellationToken cancellationToken)
         {
             var sideEffectResult = await _sideEffectMediator.Run(eff.SideEffect, cancellationToken);
             var nextEffect = eff.Next(sideEffectResult);
             return (nextEffect, default);
         }
 
-        public async Task<(IEffect<T>, T)> Visit<T1, T2>(ParallelEffect<T1, T2, T> eff, CancellationToken cancellationToken)
+        public async Task<(Effect<T>, T)> Visit<T1, T2>(ParallelEffect<T1, T2, T> eff, CancellationToken cancellationToken)
         {
             var t1 = _interpreter.Interpret(eff.LeftEffect, cancellationToken);
             var t2 = _interpreter.Interpret(eff.RightEffect, cancellationToken);

@@ -12,7 +12,7 @@ namespace NBB.Core.Effects
             _sideEffectMediator = sideEffectMediator;
         }
 
-        public async Task<T> Interpret<T>(IEffect<T> effect, CancellationToken cancellationToken = default)
+        public async Task<T> Interpret<T>(Effect<T> effect, CancellationToken cancellationToken = default)
         {
             var v = new IterativeInterpreterVisitor<T>(_sideEffectMediator, this);
             var nextEffect = effect;

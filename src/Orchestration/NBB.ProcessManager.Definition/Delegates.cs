@@ -3,7 +3,7 @@ using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Definition
 {
-    public delegate IEffect<Unit> EffectFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
+    public delegate Effect<Unit> EffectFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
 
     public delegate TData SetStateFunc<in TEvent, TData>(TEvent @event, InstanceData<TData> data) where TData : struct;
 
@@ -12,7 +12,7 @@ namespace NBB.ProcessManager.Definition
     public static class EffectFuncs
     {
         public static EffectFunc<TEvent, TData> Aggregate<TEvent, TData>(EffectFunc<TEvent, TData> func1, EffectFunc<TEvent, TData> func2,
-            Func<IEffect<Unit>, IEffect<Unit>, IEffect<Unit>> accumulator)
+            Func<Effect<Unit>, Effect<Unit>, Effect<Unit>> accumulator)
             where TData : struct
         {
             return (@event, data) =>
