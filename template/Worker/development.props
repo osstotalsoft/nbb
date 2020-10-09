@@ -1,9 +1,4 @@
 ﻿<Project>
-  <PropertyGroup Label="PackageVersionOverrides">
-    <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
-    <MicrosoftEntityFrameworkPackagesVersion>2.2.0</MicrosoftEntityFrameworkPackagesVersion>
-    <MicrosoftAspNetCoreAppPackageVersion>2.2.0</MicrosoftAspNetCoreAppPackageVersion>
-  </PropertyGroup>
   <PropertyGroup Label="Development">
     <Develop>true</Develop>
 
