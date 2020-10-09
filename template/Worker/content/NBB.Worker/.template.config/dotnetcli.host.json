@@ -31,23 +31,14 @@
       "SqlLoggingConnectionString": {
         "longName": "sql-logging-connection-string"
       },
-      "FluentValidation": {
-        "longName": "fluent-validation"
-      },
-      "AutoMapper": {
-        "longName": "auto-mapper"
-      },
-      "MediatR": {
-        "longName": "mediat-r"
-      },
-      "AddSamples": {
-        "longName": "add-samples"
-      },
       "MessagingTransport": {
         "longName": "messaging-transport"
       },
       "SkipRestore": {
         "longName": "no-restore"
+      },
+      "OpenTracing": {
+        "longName": "open-tracing"
       }
     }
 }

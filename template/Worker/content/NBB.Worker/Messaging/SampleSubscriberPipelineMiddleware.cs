@@ -1,5 +1,4 @@
-﻿#if AddSamples
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBB.Core.Pipeline;
 using NBB.Messaging.DataContracts;
 using System;
@@ -24,4 +23,3 @@ namespace NBB.Worker.Messaging
         }
     }
 }
-#endif

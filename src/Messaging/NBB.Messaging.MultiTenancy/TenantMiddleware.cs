@@ -33,6 +33,12 @@ namespace NBB.Messaging.MultiTenancy
 
         public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
+            if (_tenancyOptions.Value.TenancyType == TenancyType.None)
+            {
+                await next();
+                return;
+            }
+
             var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
 
             if (!message.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
@@ -71,14 +77,14 @@ namespace NBB.Messaging.MultiTenancy
                 throw new ApplicationException(
                     $"Received a message for premium tenant {messageTenantIdHeader} in a MultiTenant (shared) context");
             }
-            
+
             if (_tenantContextAccessor.TenantContext != null)
             {
                 throw new ApplicationException("Tenant context is already set");
             }
 
             _tenantContextAccessor.TenantContext = new TenantContext(tenant);
-            
+
             await next();
         }
     }

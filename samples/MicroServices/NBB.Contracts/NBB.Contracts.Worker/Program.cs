@@ -90,7 +90,7 @@ namespace NBB.Contracts.Worker
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
-                            //.UseTenantMiddleware()
+                            .UseTenantMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
                         );

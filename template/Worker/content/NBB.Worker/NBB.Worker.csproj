@@ -1,8 +1,12 @@
 ﻿<Project>
   <Sdk Name="Microsoft.NET.Sdk" Condition="'$(AspNetApp)' == 'false'" />
   <Sdk Name="Microsoft.NET.Sdk.Web" Condition="'$(AspNetApp)' == 'true'" />
+  
+  <!-- remove to use dependecies.props defined at solution level-->
+  <Import Project="dependencies.props" />
+  
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <DockerTargetOS>Linux</DockerTargetOS>
     <LangVersion>latest</LangVersion>
     <OutputType Condition="'$(AspNetApp)' == 'false'">Exe</OutputType>
@@ -23,35 +27,39 @@
     <Copyright>Copyright © PROJECT-AUTHOR-XML. All rights Reserved</Copyright>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="PlaceholderTypes\**" />
+    <Content Remove="PlaceholderTypes\**" />
+    <EmbeddedResource Remove="PlaceholderTypes\**" />
+    <None Remove="PlaceholderTypes\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="appsettings.json" />
     <None Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" Condition="'$(AspNetApp)' == 'true'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="$(MicrosoftAspNetCoreAppPackageVersion)" Condition="'$(HealthCheck)' == 'true'" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="$(HealthChecksVersion)" Condition="'$(HealthCheck)' == 'true'" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI" Version="2.2.35" Condition="'$(HealthCheck)' == 'true'" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" Condition="'$(HealthCheck)' == 'true'" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" Condition="'$(AspNetApp)' == 'true'" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00777" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" Condition="'$(SqlLogging)' == 'true'" />
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="4.1.0" Condition="'$(MediatR)' == 'true'" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" Condition="'$(AutoMapper)' == 'true'" />
-    <PackageReference Include="FluentValidation" Version="7.5.2" Condition="'$(FluentValidation)' == 'true'" />
-    <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" Condition="'$(OpenTracing)' == 'true'"  />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="4.1.0" />
+    <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" Condition="'$(OpenTracing)' == 'true'" />
     <PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" Condition="'$(OpenTracing)' == 'true'" />
   </ItemGroup>
   <ItemGroup Condition="'$(LocalNBB)' == 'false'">
-    <PackageReference Include="NBB.Application.DataContracts" Version="$(NBBPackagesVersion)" />
     <PackageReference Include="NBB.Messaging.Host" Version="$(NBBPackagesVersion)" />
     <PackageReference Include="NBB.Messaging.Nats" Version="$(NBBPackagesVersion)" Condition="'$(NatsMessagingTransport)' == 'true'" />
     <PackageReference Include="NBB.Messaging.Kafka" Version="$(NBBPackagesVersion)" Condition="'$(KafkaMessagingTransport)' == 'true'" />
-    <PackageReference Include="NBB.Messaging.InProcessMessaging" Version="$(NBBPackagesVersion)" />
+    
     <PackageReference Include="NBB.Correlation" Version="$(NBBPackagesVersion)" />
     <PackageReference Include="NBB.Correlation.Serilog" Version="$(NBBPackagesVersion)" />
     <PackageReference Include="NBB.Messaging.Abstractions" Version="$(NBBPackagesVersion)" />
@@ -67,7 +75,7 @@
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation\NBB.Correlation.csproj" />
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj" Condition="'$(OpenTracing)' == 'true'"/>
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" Condition="'$(OpenTracing)' == 'true'"/>
+    <ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj" Condition="'$(OpenTracing)' == 'true'" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" Condition="'$(OpenTracing)' == 'true'" />
   </ItemGroup>
 </Project>
