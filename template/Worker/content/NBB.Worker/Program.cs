@@ -68,7 +68,7 @@ namespace NBB.Worker
                     ConfigureSerilog(hostBuilderContext.Configuration);
                     loggingBuilder.AddSerilog();
                 })
-                .ConfigureServices((hostingContext, services) => services.AddWorkerServices(Configuration))
+                .ConfigureServices((hostingContext, services) => services.AddWorkerServices(hostingContext.Configuration))
                 .UseConsoleLifetime()
                 .Build();
 #endif

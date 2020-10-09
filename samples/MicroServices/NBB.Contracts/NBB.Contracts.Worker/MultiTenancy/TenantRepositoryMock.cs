@@ -10,19 +10,13 @@ namespace NBB.Contracts.Worker.MultiTenancy
 {
     public class TenantRepositoryMock : ITenantRepository
     {
-        private readonly IOptions<TenancyHostingOptions> _tenancyHostingOptions;
-
-        public TenantRepositoryMock(IOptions<TenancyHostingOptions> tenancyHostingOptions)
+        public TenantRepositoryMock()
         {
-            _tenancyHostingOptions = tenancyHostingOptions;
         }
 
         public Task<Tenant> Get(Guid id, CancellationToken token = default)
         {
-            var isMonoTenant = _tenancyHostingOptions.Value.TenancyType == TenancyType.MonoTenant &&
-                               id == _tenancyHostingOptions.Value.TenantId;
-
-            var tenant = new Tenant(id, id.ToString(), !isMonoTenant);
+            var tenant = new Tenant(id, id.ToString(), true);
             return Task.FromResult(tenant);
         }
 

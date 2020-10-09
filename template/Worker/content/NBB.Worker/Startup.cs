@@ -30,9 +30,9 @@ namespace NBB.Worker
             services.AddHealthChecks() // Registers health checks services
                 // Add a health check for a SQL database
                 .AddCheck("SQL database",
-                    new SqlConnectionHealthCheck("Log_Database", Configuration["ConnectionStrings:Log_Database"]));
-
-            services.AddSingleton<IHealthCheck, GCInfoHealthCheck>();
+                    new SqlConnectionHealthCheck("Log_Database", Configuration["ConnectionStrings:Log_Database"]))
+                .AddCheck<GCInfoHealthCheck>("GC");
+            
 #endif
         }
 

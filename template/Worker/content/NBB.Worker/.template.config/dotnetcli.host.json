@@ -48,6 +48,9 @@
       },
       "SkipRestore": {
         "longName": "no-restore"
+      },
+      "OpenTracing": {
+        "longName": "open-tracing"
       }
     }
 }

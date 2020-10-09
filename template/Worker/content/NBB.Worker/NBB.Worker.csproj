@@ -2,7 +2,7 @@
   <Sdk Name="Microsoft.NET.Sdk" Condition="'$(AspNetApp)' == 'false'" />
   <Sdk Name="Microsoft.NET.Sdk.Web" Condition="'$(AspNetApp)' == 'true'" />
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <DockerTargetOS>Linux</DockerTargetOS>
     <LangVersion>latest</LangVersion>
     <OutputType Condition="'$(AspNetApp)' == 'false'">Exe</OutputType>
@@ -29,13 +29,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" Condition="'$(AspNetApp)' == 'true'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="$(MicrosoftAspNetCoreAppPackageVersion)" Condition="'$(HealthCheck)' == 'true'" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" Condition="'$(AspNetApp)' == 'true'" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00777" />

@@ -125,6 +125,12 @@
         "defaultValue": "true",
         "description": "Add MediatR support."
       },
+      "OpenTracing": {
+        "type": "parameter",
+        "datatype": "bool",
+        "defaultValue": "true",
+        "description": "Add Jaeger / OpenTracing support"
+      },
       "AddSamples": {
         "type": "parameter",
         "datatype": "bool",
