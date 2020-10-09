@@ -15,11 +15,7 @@
     <SqlLogging>false</SqlLogging>
     <HealthCheck>false</HealthCheck>
     <Resiliency>true</Resiliency>
-    <FluentValidation>true</FluentValidation>
-    <AutoMapper>true</AutoMapper>
-    <MediatR>true</MediatR>
     <OpenTracing>true</OpenTracing>
-    <AddSamples>true</AddSamples>
 
     <AspNetApp>$(HealthCheck)</AspNetApp>   
 
@@ -29,10 +25,6 @@
     <ConditionalCompilationSymbols Condition="$(AspNetApp)">$(ConditionalCompilationSymbols);AspNetApp</ConditionalCompilationSymbols>
     <ConditionalCompilationSymbols Condition="$(SqlLogging)">$(ConditionalCompilationSymbols);SqlLogging</ConditionalCompilationSymbols>
     <ConditionalCompilationSymbols Condition="$(Resiliency)">$(ConditionalCompilationSymbols);Resiliency</ConditionalCompilationSymbols>
-    <ConditionalCompilationSymbols Condition="$(FluentValidation)">$(ConditionalCompilationSymbols);FluentValidation</ConditionalCompilationSymbols>
-    <ConditionalCompilationSymbols Condition="$(AutoMapper)">$(ConditionalCompilationSymbols);AutoMapper</ConditionalCompilationSymbols>
-    <ConditionalCompilationSymbols Condition="$(MediatR)">$(ConditionalCompilationSymbols);MediatR</ConditionalCompilationSymbols>
     <ConditionalCompilationSymbols Condition="$(OpenTracing)">$(ConditionalCompilationSymbols);OpenTracing</ConditionalCompilationSymbols>
-    <ConditionalCompilationSymbols Condition="$(AddSamples)">$(ConditionalCompilationSymbols);AddSamples</ConditionalCompilationSymbols>
   </PropertyGroup>
 </Project>

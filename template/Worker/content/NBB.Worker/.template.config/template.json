@@ -18,7 +18,7 @@
     ],
     "sources": [
       {
-        "exclude": ["PlaceholderTypes/*", ".template.config/*"],
+        "exclude": [".template.config/*"],
         "modifiers": [
           {
             "condition": "(!HealthCheck)",
@@ -107,35 +107,11 @@
         "replaces": "SQL_LOG_CONNECTION_STRING",
         "description": "The connection string to the sql server database."
       },
-      "FluentValidation": {
-        "type": "parameter",
-        "datatype": "bool",
-        "defaultValue": "true",
-        "description": "Register fluent validators in IoC container."
-      },
-      "AutoMapper": {
-        "type": "parameter",
-        "datatype": "bool",
-        "defaultValue": "true",
-        "description": "Register AutoMapper profilers in IoC container."
-      },
-      "MediatR": {
-        "type": "parameter",
-        "datatype": "bool",
-        "defaultValue": "true",
-        "description": "Add MediatR support."
-      },
       "OpenTracing": {
         "type": "parameter",
         "datatype": "bool",
         "defaultValue": "true",
         "description": "Add Jaeger / OpenTracing support"
-      },
-      "AddSamples": {
-        "type": "parameter",
-        "datatype": "bool",
-        "defaultValue": "true",
-        "description": "Add sample files like a subscriber pipeline middleware or a publisher decorator."
       },
       "MessagingTransport": {
         "type": "parameter",
