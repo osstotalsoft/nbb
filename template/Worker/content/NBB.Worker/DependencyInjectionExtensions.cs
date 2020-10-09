@@ -7,6 +7,7 @@ using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Worker.Messaging;
 using NBB.Messaging.Abstractions;
+using NBB.Worker.Application;
 #if NatsMessagingTransport
 using NBB.Messaging.Nats;
 using System.Reflection;
@@ -21,7 +22,6 @@ using Jaeger.Samplers;
 using Jaeger.Reporters;
 using Jaeger.Senders;
 using OpenTracing.Util;
-using NBB.Worker.Application;
 #endif
 #elif KafkaMessagingTransport
 using NBB.Messaging.Kafka;

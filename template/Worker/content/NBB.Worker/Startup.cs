@@ -2,7 +2,7 @@
 #if HealthCheck 
 using NBB.Worker.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 #endif
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,9 +40,9 @@ namespace NBB.Worker
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 #if HealthCheck
-            app.UseHealthChecks("/healthz", options: new HealthCheckOptions()
+            app.UseHealthChecks("/health", options: new HealthCheckOptions()
             {
-                ResponseWriter = HealthCheckWriter.WriteResponse
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 #endif
         }
