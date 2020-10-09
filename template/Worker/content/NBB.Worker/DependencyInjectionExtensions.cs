@@ -2,12 +2,12 @@
 using MediatR.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.Worker.Messaging;
+using NBB.Worker.Application;
 using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Worker.Messaging;
 using NBB.Messaging.Abstractions;
-using NBB.Worker.Application;
 #if NatsMessagingTransport
 using NBB.Messaging.Nats;
 using System.Reflection;
