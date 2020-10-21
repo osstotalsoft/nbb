@@ -21,6 +21,12 @@ namespace NBB.MultiTenancy.AspNet
         public async Task Invoke(HttpContext context, ITenantIdentificationService tenantIdentificationService,
             ITenantContextAccessor tenantContextAccessor, ITenantRepository tenantRepository,  IOptions<TenancyHostingOptions> tenancyOptions)
         {
+            if (tenancyOptions.Value.TenancyType == TenancyType.None)
+            {
+                await _next(context);
+                return;
+            }
+
             if (tenantContextAccessor.TenantContext != null)
             {
                 throw new ApplicationException("Tenant context is already set");
