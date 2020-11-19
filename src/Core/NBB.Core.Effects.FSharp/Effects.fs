@@ -30,7 +30,7 @@ module Effect =
     let interpret (interpreter:IInterpreter) eff = interpreter.Interpret eff |> Async.AwaitTask
 
 module EffectBuilder =
-    type EffectBuilder() =
+    type LazyEffectBuilder() =
         member _.Bind(eff, func) = Effect.bind func eff
         member _.Return(value) = Effect.pure' value
         member _.ReturnFrom(value) = value
@@ -38,9 +38,19 @@ module EffectBuilder =
         member _.Zero() = Effect.pure' ()
         member _.Delay(f) = f |> Effect.from |> Effect.flatten
 
+    type StrictEffectBuilder() =
+        member _.Bind(eff, func) = Effect.bind func eff
+        member _.Return(value) = Effect.pure' value
+        member _.ReturnFrom(value) = value
+        member _.Combine(eff1, eff2Fn) = Effect.bind eff2Fn eff1
+        member _.Zero() = Effect.pure' ()
+        member _.Delay(f) = f 
+        member _.Run(f) = f ()
+        
 [<AutoOpen>]
 module Effects =
-    let effect = new EffectBuilder.EffectBuilder()
+    let effect = new EffectBuilder.StrictEffectBuilder()
+    let effect' = new EffectBuilder.LazyEffectBuilder()
 
     let (<!>) = Effect.map
     let (<*>) = Effect.apply

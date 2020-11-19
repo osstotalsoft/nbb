@@ -27,7 +27,7 @@ let ``Effect computations are lazy evaluated`` () =
         printfnWasCalled <- true
 
     let eff = 
-        effect {
+        effect' {
             printfn "Execute side effect"
         }
 
