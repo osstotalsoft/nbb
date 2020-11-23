@@ -175,6 +175,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Contracts.WriteModel.Data", "samples\MicroServices\NBB.Contracts\NBB.Contracts.WriteModel.Data\NBB.Contracts.WriteModel.Data.csproj", "{AA04B90E-5182-413C-BF93-1D48AB8286D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serverless", "Serverless", "{BDF9FDE1-C65A-430A-91D6-8C2CB0775BCA}"
+	ProjectSection(SolutionItems) = preProject
+		NuGet.config = NuGet.config
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mediator", "Mediator", "{1B3FE502-8F2D-4CD5-9381-11F3978FB3C4}"
 EndProject
@@ -362,9 +365,11 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Core.FSharp", "src\Core
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.AspNet", "src\MultiTenancy\NBB.MultiTenancy.AspNet\NBB.MultiTenancy.AspNet.csproj", "{64EDD4BF-5BFB-45DE-B066-A232B277090B}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NBB.Application.Mediator.FSharp", "src\Application\NBB.Application.Mediator.FSharp\NBB.Application.Mediator.FSharp.fsproj", "{1C636C6F-12F4-47BF-B681-004706DB7D74}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Application.Mediator.FSharp", "src\Application\NBB.Application.Mediator.FSharp\NBB.Application.Mediator.FSharp.fsproj", "{1C636C6F-12F4-47BF-B681-004706DB7D74}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NBB.Application.Mediator.FSharp.Tests", "test\UnitTests\Application\NBB.Application.Mediator.FSharp.Tests\NBB.Application.Mediator.FSharp.Tests.fsproj", "{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Application.Mediator.FSharp.Tests", "test\UnitTests\Application\NBB.Application.Mediator.FSharp.Tests\NBB.Application.Mediator.FSharp.Tests.fsproj", "{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "EffectsBenchmarks", "test\Benchmarks\EffectsBenchmarks\EffectsBenchmarks\EffectsBenchmarks.fsproj", "{FFC30800-0595-4F67-9497-4A818C87CA00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -862,6 +867,10 @@ Global
 		{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFC30800-0595-4F67-9497-4A818C87CA00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFC30800-0595-4F67-9497-4A818C87CA00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFC30800-0595-4F67-9497-4A818C87CA00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFC30800-0595-4F67-9497-4A818C87CA00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1032,6 +1041,7 @@ Global
 		{64EDD4BF-5BFB-45DE-B066-A232B277090B} = {F170EE3D-296D-487B-9498-CCD8541BAFB2}
 		{1C636C6F-12F4-47BF-B681-004706DB7D74} = {4DCC0E0D-52D8-4F97-9B26-C3F9CB76F16F}
 		{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF} = {404998FD-60A3-414E-A30F-FAE46AE28158}
+		{FFC30800-0595-4F67-9497-4A818C87CA00} = {BE777108-64EF-4E35-93DD-A90B93A631B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

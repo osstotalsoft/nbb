@@ -1,0 +1,1 @@
+﻿dotnet run EffectsBenchmarks -c Release
