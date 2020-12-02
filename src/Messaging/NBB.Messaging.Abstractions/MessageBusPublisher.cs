@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using NBB.Correlation;
 
 namespace NBB.Messaging.Abstractions
 {
@@ -59,7 +60,7 @@ namespace NBB.Messaging.Abstractions
 
             customizer?.Invoke(outgoingEnvelope);
 
-            outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId, Guid.NewGuid().ToString());
+            outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId, (CorrelationManager.GetCorrelationId() ?? Guid.NewGuid()).ToString());
 
             return outgoingEnvelope;
         }
