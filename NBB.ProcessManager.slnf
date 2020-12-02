@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "NBB.sln",
+    "projects": [
+      "samples\\Orchestration\\ProcessManagerSample\\ProcessManagerSample.csproj",
+      "src\\Orchestration\\NBB.ProcessManager.Definition\\NBB.ProcessManager.Definition.csproj",
+      "src\\Orchestration\\NBB.ProcessManager.Runtime\\NBB.ProcessManager.Runtime.csproj",
+      "test\\UnitTests\\Orchestration\\NBB.ProcessManager.Tests\\NBB.ProcessManager.Tests.csproj"
+    ]
+  }
+}

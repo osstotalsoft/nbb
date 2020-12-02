@@ -1,9 +1,0 @@
-﻿{
-  "author": "totalsoft",
-  "classifications": [ "C#", "Unit Test", "Moq", "FluentAssertion" ],
-  "name": "NBB Unit Test Project",
-  "identity": "NBB.UnitTest",
-  "shortName": "NbbUnitTest",
-  "sourceName": "NBB.UnitTestProject",
-  "preferNameDirectory": true
-}
