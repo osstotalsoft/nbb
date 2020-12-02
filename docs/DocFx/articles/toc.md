@@ -7,8 +7,4 @@
 #[Read models](read_models.md)
 #[Messaging](messaging.md)
 #[~~Web apis~~](intro.md)
-#[Project templates](project_templates.md)
-#[Expression evaluator](expression_evaluator.md)
-#[Excel exporter](excel_exporter.md)
-#[CSV exporter](csv_exporter.md)
 #[Debugging](debugging.md)
