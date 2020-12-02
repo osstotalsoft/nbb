@@ -79,5 +79,3 @@ Foreach ($templateNuspecFilePath in $templatesNuspecFilePaths)
 	nuget pack $scriptDir$templateNuspecFilePath
 	dotnet nuget push .\$packageName.$packageVersion.nupkg -k $nugetApiKey -s $nugetSource
 }
-
-
