@@ -299,6 +299,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orchestration", "Orchestrat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessManagerSample", "samples\Orchestration\ProcessManagerSample\ProcessManagerSample.csproj", "{A2A174AF-8612-4796-B5FA-E2F9EB3AB68F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{EF374BA2-61FC-41FB-8229-5187DCBAA63A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Tools.Serilog.OpenTracingSink", "src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj", "{A5826A9E-7E96-4A52-8A06-2B6DC9855954}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -735,6 +739,10 @@ Global
 		{A2A174AF-8612-4796-B5FA-E2F9EB3AB68F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2A174AF-8612-4796-B5FA-E2F9EB3AB68F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2A174AF-8612-4796-B5FA-E2F9EB3AB68F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5826A9E-7E96-4A52-8A06-2B6DC9855954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5826A9E-7E96-4A52-8A06-2B6DC9855954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5826A9E-7E96-4A52-8A06-2B6DC9855954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5826A9E-7E96-4A52-8A06-2B6DC9855954}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -878,6 +886,8 @@ Global
 		{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF} = {404998FD-60A3-414E-A30F-FAE46AE28158}
 		{74583BC7-B9BC-4D27-B9E9-5DB136A8E41C} = {D28298B7-63A2-4751-BEB9-C3C30F2E7107}
 		{A2A174AF-8612-4796-B5FA-E2F9EB3AB68F} = {74583BC7-B9BC-4D27-B9E9-5DB136A8E41C}
+		{EF374BA2-61FC-41FB-8229-5187DCBAA63A} = {7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}
+		{A5826A9E-7E96-4A52-8A06-2B6DC9855954} = {EF374BA2-61FC-41FB-8229-5187DCBAA63A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
