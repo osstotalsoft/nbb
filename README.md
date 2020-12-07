@@ -1,6 +1,6 @@
 # nbb
 
-[![Build status](https://dev.azure.com/totalsoft//NBB/_apis/build/status/NBB-CI-GitHub)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=35)
+[![Build status](https://dev.azure.com/totalsoft/NBB/_apis/build/status/NBB-GitHub_support-v4.x)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=348)
 
 .Net Building Blocks
 
