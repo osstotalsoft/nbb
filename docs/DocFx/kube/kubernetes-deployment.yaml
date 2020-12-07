@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nbb-docfx
+  name: nbb-docfx-v4
 spec:
   replicas: 1
   selector: 
     matchLabels:
-      app: nbb-docfx
+      app: nbb-docfx-v4
   template:
     metadata:
       labels:
-        app: nbb-docfx
+        app: nbb-docfx-v4
     spec:
       containers:
       - name: nbb-docfx
