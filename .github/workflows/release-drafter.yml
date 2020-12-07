@@ -1,5 +1,5 @@
 
-name: Release Drafter Support 4.x
+name: Release Drafter
 
 on:
   push:
