@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - support/4.x
+      - 'support/4.x'
 
 jobs:
   update_release_draft:
