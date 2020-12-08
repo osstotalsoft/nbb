@@ -14,7 +14,7 @@ namespace NBB.Payments.Data
 
             services.AddEfCrudRepository<Payable, PaymentsDbContext>();
 
-            services.AddEntityFrameworkSqlServer().AddDbContextPool<PaymentsDbContext>(
+            services.AddDbContextPool<PaymentsDbContext>(
                 (serviceProvider, options) =>
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();
@@ -29,7 +29,7 @@ namespace NBB.Payments.Data
 
             services.AddEfQuery<Payable, PaymentsDbContext>();
 
-            services.AddEntityFrameworkSqlServer().AddDbContextPool<PaymentsDbContext>(
+            services.AddDbContextPool<PaymentsDbContext>(
                 (serviceProvider, options) =>
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();
@@ -45,7 +45,7 @@ namespace NBB.Payments.Data
             services.AddEfCrudRepository<Payable, PaymentsDbContext>();
             services.AddEfQuery<Payable, PaymentsDbContext>();
 
-            services.AddEntityFrameworkSqlServer().AddDbContext<PaymentsDbContext>(
+            services.AddDbContext<PaymentsDbContext>(
                 (serviceProvider, options) =>
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();

@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>NBB_EventStoreIntegrationTests_1b7f48bb-0e9a-4219-b794-1788abaf788e</UserSecretsId>
   </PropertyGroup>
 

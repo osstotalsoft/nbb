@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Extensions.Internal;
 
 namespace NBB.Data.EntityFramework
 {
@@ -28,10 +28,13 @@ namespace NBB.Data.EntityFramework
 
         public IQueryProvider Provider => _q.Provider;
 
+        
+
         public IEnumerator<TEntity> GetEnumerator() => _q.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => _q.GetEnumerator();
 
-        IAsyncEnumerator<TEntity> IAsyncEnumerable<TEntity>.GetEnumerator() => _q.AsAsyncEnumerable().GetEnumerator();
+        public IAsyncEnumerator<TEntity> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+            => _q.AsAsyncEnumerable().GetAsyncEnumerator(cancellationToken);
     }
 }

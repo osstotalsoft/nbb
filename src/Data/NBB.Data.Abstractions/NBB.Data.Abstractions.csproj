@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Interactive.Async" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
   </ItemGroup>
 

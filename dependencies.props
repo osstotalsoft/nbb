@@ -4,13 +4,12 @@
     <MediatRPackageVersion>4.1.0</MediatRPackageVersion>
     <ScrutorPackageVersion>3.1.0</ScrutorPackageVersion>
     <BenchmarkDotNetPackageVersion>0.10.14</BenchmarkDotNetPackageVersion>
-    <MoqPackageVersion>4.8.2</MoqPackageVersion>
+    <MoqPackageVersion>4.15.1</MoqPackageVersion>
     <XunitPackageVersion>2.3.1</XunitPackageVersion>
     <XunitRunnerVisualStudioPackageVersion>2.4.0-beta.1.build3958</XunitRunnerVisualStudioPackageVersion>
     <FluentAssertionsPackageVersion>5.10.0</FluentAssertionsPackageVersion>
-    <MicrosoftExtensionsPackagesVersion>2.2.0</MicrosoftExtensionsPackagesVersion>
-    <MicrosoftEntityFrameworkPackagesVersion>2.1.4</MicrosoftEntityFrameworkPackagesVersion>
-    <MicrosoftAspNetCoreAppPackageVersion>2.1.5</MicrosoftAspNetCoreAppPackageVersion>
+    <MicrosoftExtensionsPackagesVersion>5.0.0</MicrosoftExtensionsPackagesVersion>
+    <MicrosoftEntityFrameworkPackagesVersion>5.0.0</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.6.0</MicrosoftCSharpPackageVersion>
     <SerilogPackageVersion>2.7.1</SerilogPackageVersion>
     <SerilogExtensionsLoggingPackageVersion>2.0.2</SerilogExtensionsLoggingPackageVersion>

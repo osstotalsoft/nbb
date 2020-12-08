@@ -24,9 +24,9 @@ namespace NBB.Data.EntityFramework
             c.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.TrackAll;
         }
 
-        public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
-            return _c.Set<TEntity>().AddAsync(entity, cancellationToken);
+            await _c.Set<TEntity>().AddAsync(entity, cancellationToken);
         }
 
         public async Task Update(TEntity entity, CancellationToken cancellationToken = default)

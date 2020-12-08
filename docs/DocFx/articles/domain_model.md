@@ -286,7 +286,7 @@ If you want to use an EventStore for Audit you can hook the *EventedCrudReposito
                 .AddScoped<ICrudRepository<Invoice>, EfCrudRepository<Invoice, InvoicesDbContext>>()
                 .Decorate<ICrudRepository<Invoice>, EventedCrudRepositoryDecorator<Invoice>>();
 
-            services.AddEntityFrameworkSqlServer().AddDbContext<InvoicesDbContext>(
+            services.AddDbContext<InvoicesDbContext>(
                 (serviceProvider, options) =>
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();

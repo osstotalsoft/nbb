@@ -57,7 +57,12 @@ namespace NBB.Contracts.Api
 
             //app.UseTenantMiddleware();
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+
+            });
         }
     }
 }
