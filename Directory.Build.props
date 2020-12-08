@@ -5,7 +5,7 @@
     <Authors>Totalsoft</Authors>
     <Company>Totalsoft</Company>
     <PackageTags>totalsoft nbb</PackageTags>
-
+    <LangVersion>latest</LangVersion>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

@@ -10,7 +10,6 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Description>This package contains a modest implementation of an event store.</Description>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

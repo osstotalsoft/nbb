@@ -13,13 +13,13 @@ namespace NBB.Messaging.Nats.Internal
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<StanConnectionProvider> _logger;
-        private readonly IApplicationLifetime _applicationLifetime;
+        private readonly IHostApplicationLifetime _applicationLifetime;
         private IStanConnection _connection;
         private Exception _unrecoverableException;
         private readonly Lazy<IStanConnection> _lazyConnection;
 
         public StanConnectionProvider(IConfiguration configuration, ILogger<StanConnectionProvider> logger,
-            IApplicationLifetime applicationLifetime)
+            IHostApplicationLifetime applicationLifetime)
         {
             _configuration = configuration;
             _logger = logger;

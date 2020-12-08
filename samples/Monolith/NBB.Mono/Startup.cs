@@ -22,7 +22,7 @@ using NBB.Core.DependencyInjection;
 using NBB.Domain;
 using NBB.Messaging.Host;
 using NBB.Resiliency;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
 
@@ -82,7 +82,7 @@ namespace NBB.Mono
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCorrelation();
 
