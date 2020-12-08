@@ -90,7 +90,7 @@ namespace NBB.Core.Pipeline.Tests
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
 
             IData receivedData1 = null, receivedData2 = null;
-            CancellationToken receivedCancellationToken1, receivedCancellationToken2;
+            CancellationToken receivedCancellationToken1 = default, receivedCancellationToken2 = default;
 
             var pipeline = new PipelineBuilder<IData>(mockedServiceProvider)
                 .Use(async (data, cancellationToken, next) =>

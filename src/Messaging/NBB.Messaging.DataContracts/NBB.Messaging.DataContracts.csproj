@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>A few lightweight messaging data contracts. You should reference this package from published language.</Description>
   </PropertyGroup>
 

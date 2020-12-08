@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>InProcessMessaging provides in process comunication for Monolithic applications composed from decoupled bounded contexts</Description>
   </PropertyGroup>
 
