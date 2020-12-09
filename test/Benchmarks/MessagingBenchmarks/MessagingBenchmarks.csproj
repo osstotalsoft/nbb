@@ -10,6 +10,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <LangVersion></LangVersion>
     <UserSecretsId>NBB_MessagingBenchmarks_c3fc62ed-cf03-4ca1-a622-354e743be0c5</UserSecretsId>
   </PropertyGroup>
 

@@ -67,7 +67,7 @@ namespace NBB.Messaging.Host.Tests
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
             Mock.Get(services).Setup(x => x.GetEnumerator())
                 .Returns(new List<ServiceDescriptor> {
-                    new ServiceDescriptor(typeof(IRequestHandler<CommandMessage>), new CommandHandler())
+                    new ServiceDescriptor(typeof(IRequestHandler<CommandMessage, Unit>), new CommandHandler())
                 }.GetEnumerator());
 
             //Act
@@ -185,7 +185,7 @@ namespace NBB.Messaging.Host.Tests
 
         public class CommandHandler : IRequestHandler<CommandMessage>
         {
-            public Task Handle(CommandMessage request, CancellationToken cancellationToken)
+            public Task<Unit> Handle(CommandMessage request, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }

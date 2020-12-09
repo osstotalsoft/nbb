@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Attributes.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Abstractions;
@@ -13,10 +12,8 @@ using System.Linq;
 using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing;
 using NBB.Domain;
-using MediatR;
-using BenchmarkDotNet.Attributes.Exporters;
-using BenchmarkDotNet.Attributes.Columns;
 using System.Reflection;
+using MediatR;
 
 namespace TheBenchmarks
 {
@@ -247,12 +244,11 @@ namespace TheBenchmarks
 
             var configuration = configurationBuilder.Build();
 
-
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
-            services.AddMediatR();
+            services.AddMediatR(typeof(Program).Assembly);
 
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()

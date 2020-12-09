@@ -12,9 +12,11 @@ namespace NBB.Messaging.Host.Builder
     /// </summary>
     public static class MediatorMessagingHostBuilderExtensions
     {
-        private static readonly Type eventType = typeof(INotificationHandler<>);
-        private static readonly Type commandType = typeof(IRequestHandler<>);
-        private static readonly Type queryType = typeof(IRequestHandler<,>);
+        private record TypeInfo(Type GenericTypeDef, Func<Type[], bool> Condition);
+
+        private static readonly TypeInfo eventType = new TypeInfo(typeof(INotificationHandler<>), _ => true);
+        private static readonly TypeInfo commandType = new TypeInfo(typeof(IRequestHandler<,>), types => types[1] == typeof(Unit));
+        private static readonly TypeInfo queryType = new TypeInfo(typeof(IRequestHandler<,>), types => types[1] != typeof(Unit));
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled messages types (commands, queries and events).
@@ -23,7 +25,7 @@ namespace NBB.Messaging.Host.Builder
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledMessages(
             this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] {eventType, commandType, queryType});
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { eventType, commandType, queryType });
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled events.
@@ -31,15 +33,15 @@ namespace NBB.Messaging.Host.Builder
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledEvents(this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] {eventType});
-        
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { eventType });
+
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled commands.
         /// </summary>
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledCommands(this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] {commandType});
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { commandType });
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled queries.
@@ -47,15 +49,18 @@ namespace NBB.Messaging.Host.Builder
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledQueries(this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] {queryType});
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { queryType });
 
         private static IImplementationTypeSelector FromMediatRHandledMessagesInternal(
-            ITypeSourceSelector typeSourceSelector, IEnumerable<Type> handlerTypes)
+            ITypeSourceSelector typeSourceSelector, IEnumerable<TypeInfo> handlerTypes)
         {
-           
             var handlers = ((IServiceCollectionProvider)typeSourceSelector).ServiceCollection
                 .Select(sd => sd.ServiceType)
-                .Where(t => t.IsGenericType && handlerTypes.Contains(t.GetGenericTypeDefinition()));
+                .Where(t =>
+                    t.IsGenericType &&
+                    handlerTypes.Any(typeInfo =>
+                        typeInfo.GenericTypeDef == t.GetGenericTypeDefinition() &&
+                        typeInfo.Condition.Invoke(t.GetGenericArguments())));
 
             var integrationEventTypes = handlers
                 .Select(t => t.GetGenericArguments()[0]).ToList();

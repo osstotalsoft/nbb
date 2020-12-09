@@ -308,6 +308,15 @@ namespace NBB.Data.EventSourcing.Tests
             return Task.CompletedTask;
         }
 
+        public Task<object> Send(object request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Publish(object notification, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class TestEventStore : IEventStore

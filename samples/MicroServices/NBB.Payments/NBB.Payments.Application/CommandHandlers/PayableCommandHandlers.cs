@@ -17,7 +17,7 @@ namespace NBB.Payments.Application.CommandHandlers
         }
 
 
-        public async Task Handle(PayPayable command, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(PayPayable command, CancellationToken cancellationToken)
         {
             var payable = await _repository.GetByIdAsync(command.PayableId, cancellationToken);
             if (payable != null)
@@ -25,6 +25,8 @@ namespace NBB.Payments.Application.CommandHandlers
                 payable.Pay();
                 await _repository.SaveChangesAsync(cancellationToken);
             }
+
+            return Unit.Value;
         }
     }
 }
