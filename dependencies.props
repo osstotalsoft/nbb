@@ -11,14 +11,13 @@
     <MicrosoftExtensionsPackagesVersion>5.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>5.0.0</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.6.0</MicrosoftCSharpPackageVersion>
-    <SerilogPackageVersion>2.7.1</SerilogPackageVersion>
-    <SerilogExtensionsLoggingPackageVersion>2.0.2</SerilogExtensionsLoggingPackageVersion>
+    <SerilogPackageVersion>2.9.0</SerilogPackageVersion>
+    <SerilogExtensionsLoggingPackageVersion>3.0.1</SerilogExtensionsLoggingPackageVersion>
     <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
-    <SerilogAspNetCorePackageVersion>2.1.1</SerilogAspNetCorePackageVersion>
+    <SerilogAspNetCorePackageVersion>3.4.0</SerilogAspNetCorePackageVersion>
     <AutoMapperPackageVersion>8.0.0</AutoMapperPackageVersion>
     <OpenTracingPackageVersion>0.12.0</OpenTracingPackageVersion>
     <OpenTracingContribPackageVersion>0.5.0</OpenTracingContribPackageVersion>
     <JaegerPackageVersion>0.2.2</JaegerPackageVersion>
-    <NBBPackagesVersion>5.0.0</NBBPackagesVersion>
   </PropertyGroup>
 </Project>
