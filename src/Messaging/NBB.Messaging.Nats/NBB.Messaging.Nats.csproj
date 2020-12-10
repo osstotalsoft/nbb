@@ -22,9 +22,9 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
-    <PackageReference Include="NATS.Client" Version="0.8.1" />
+    <PackageReference Include="NATS.Client" Version="0.11.0" />
     <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-    <PackageReference Include="STAN.Client" Version="0.1.5" />
+    <PackageReference Include="STAN.Client" Version="0.3.0" />
   </ItemGroup>
 
   <ItemGroup>

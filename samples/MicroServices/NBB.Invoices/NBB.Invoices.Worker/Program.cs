@@ -20,6 +20,7 @@ using NBB.Messaging.Nats;
 using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ namespace NBB.Invoices.Worker
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, "Logs", autoCreateSqlTable: true)
+                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);

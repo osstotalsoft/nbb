@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Serilog.Sinks.MSSqlServer;
 using System.Linq;
+using System.Data;
 
 namespace NBB.Correlation.Serilog.SqlServer
 {
@@ -41,7 +42,7 @@ namespace NBB.Correlation.Serilog.SqlServer
           bool autoCreateSqlTable = false,
           ColumnOptions columnOptions = null,
           string schemaName = "dbo",
-          Dictionary<string, Type> additionalColumns = null
+          Dictionary<string, SqlDbType> additionalColumns = null
           )
         {
             if (columnOptions == null)
@@ -49,37 +50,41 @@ namespace NBB.Correlation.Serilog.SqlServer
                 columnOptions = new ColumnOptions();
             }
 
-            if (columnOptions.AdditionalDataColumns == null)
+            if (columnOptions.AdditionalColumns == null)
             {
-                columnOptions.AdditionalDataColumns = new List<System.Data.DataColumn>();
+                columnOptions.AdditionalColumns = new List<SqlColumn>();
             }
 
             if (additionalColumns != null)
             {
                 foreach (var columnName in additionalColumns.Keys)
                 {
-                    if (columnOptions.AdditionalDataColumns.Any(x => x.ColumnName.Equals(columnName)))
+                    if (columnOptions.AdditionalColumns.Any(x => x.ColumnName.Equals(columnName)))
                     {
                         continue;
                     }
-                    columnOptions.AdditionalDataColumns.Add(
-                        new System.Data.DataColumn
+                    columnOptions.AdditionalColumns.Add(
+                        new SqlColumn
                         {
                             ColumnName = columnName,
                             DataType = additionalColumns[columnName]
                         });
                 }
-            }           
+            }
 
-            return loggerConfiguration.MSSqlServer(connectionString,
-                tableName,
+            return loggerConfiguration.MSSqlServer(
+                connectionString,
+                new MSSqlServerSinkOptions
+                {
+                    TableName = tableName,
+                    BatchPostingLimit = batchPostingLimit,
+                    BatchPeriod = period ?? TimeSpan.FromSeconds(5),
+                    AutoCreateSqlTable = autoCreateSqlTable,
+                    SchemaName = schemaName,
+                }, null, null,
                 restrictedToMinimumLevel,
-                batchPostingLimit,
-                period,
                 formatProvider,
-                autoCreateSqlTable,
-                columnOptions,
-                schemaName);
+                columnOptions);
         }
 
         /// <summary>
@@ -115,7 +120,7 @@ namespace NBB.Correlation.Serilog.SqlServer
           ColumnOptions columnOptions = null,
           string schemaName = "dbo",
           string correlationId = "CorrelationId",
-          Type correlationIdType = null
+          SqlDbType? correlationIdType = null
           )
         {
             if (columnOptions == null)
@@ -123,30 +128,34 @@ namespace NBB.Correlation.Serilog.SqlServer
                 columnOptions = new ColumnOptions();
             }
 
-            if (columnOptions.AdditionalDataColumns == null)
+            if (columnOptions.AdditionalColumns == null)
             {
-                columnOptions.AdditionalDataColumns = new List<System.Data.DataColumn>();
-            }            
+                columnOptions.AdditionalColumns = new List<SqlColumn>();
+            }
 
-            if (!columnOptions.AdditionalDataColumns.Any(x => x.ColumnName.Equals(correlationId)))
+            if (!columnOptions.AdditionalColumns.Any(x => x.ColumnName.Equals(correlationId)))
             {
-                columnOptions.AdditionalDataColumns.Add(
-                    new System.Data.DataColumn
+                columnOptions.AdditionalColumns.Add(
+                    new SqlColumn
                     {
                         ColumnName = correlationId,
-                        DataType = correlationIdType ?? typeof(Guid)
+                        DataType = correlationIdType ?? SqlDbType.UniqueIdentifier
                     });
             }
 
-            return loggerConfiguration.MSSqlServer(connectionString,
-                tableName,
+            return loggerConfiguration.MSSqlServer(
+                connectionString,
+                new MSSqlServerSinkOptions
+                {
+                    TableName = tableName,
+                    BatchPostingLimit = batchPostingLimit,
+                    BatchPeriod = period ?? TimeSpan.FromSeconds(5),
+                    AutoCreateSqlTable = autoCreateSqlTable,
+                    SchemaName = schemaName,
+                }, null, null,
                 restrictedToMinimumLevel,
-                batchPostingLimit,
-                period,
                 formatProvider,
-                autoCreateSqlTable,
-                columnOptions,
-                schemaName);
+                columnOptions);
         }
     }
 }

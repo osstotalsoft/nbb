@@ -25,6 +25,7 @@ using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Messaging.Extensions;
+using Serilog.Sinks.MSSqlServer;
 
 namespace NBB.Contracts.Worker
 {
@@ -59,7 +60,7 @@ namespace NBB.Contracts.Worker
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, "Logs", autoCreateSqlTable: true)
+                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -78,7 +79,7 @@ namespace NBB.Contracts.Worker
 
 
                     services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                        .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
 
                     services.AddResiliency();

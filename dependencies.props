@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup Label="Package Versions">
-    <NewtonsoftJsonPackageVersion>11.0.2</NewtonsoftJsonPackageVersion>
+    <NewtonsoftJsonPackageVersion>12.0.3</NewtonsoftJsonPackageVersion>
     <MediatRPackageVersion>9.0.0</MediatRPackageVersion>
     <ScrutorPackageVersion>3.1.0</ScrutorPackageVersion>
     <BenchmarkDotNetPackageVersion>0.12.1</BenchmarkDotNetPackageVersion>
@@ -10,14 +10,12 @@
     <FluentAssertionsPackageVersion>5.10.3</FluentAssertionsPackageVersion>
     <MicrosoftExtensionsPackagesVersion>5.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>5.0.0</MicrosoftEntityFrameworkPackagesVersion>
-    <MicrosoftCSharpPackageVersion>4.6.0</MicrosoftCSharpPackageVersion>
-    <SerilogPackageVersion>2.9.0</SerilogPackageVersion>
+    <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
+    <SerilogPackageVersion>2.10.0</SerilogPackageVersion>
     <SerilogExtensionsLoggingPackageVersion>3.0.1</SerilogExtensionsLoggingPackageVersion>
-    <SerilogSinksMSSqlServerPackageVersion>5.1.2</SerilogSinksMSSqlServerPackageVersion>
+    <SerilogSinksMSSqlServerPackageVersion>5.6.0</SerilogSinksMSSqlServerPackageVersion>
     <SerilogAspNetCorePackageVersion>3.4.0</SerilogAspNetCorePackageVersion>
-    <AutoMapperPackageVersion>8.0.0</AutoMapperPackageVersion>
+    <AutoMapperPackageVersion>10.1.1</AutoMapperPackageVersion>
     <OpenTracingPackageVersion>0.12.0</OpenTracingPackageVersion>
-    <OpenTracingContribPackageVersion>0.5.0</OpenTracingContribPackageVersion>
-    <JaegerPackageVersion>0.2.2</JaegerPackageVersion>
   </PropertyGroup>
 </Project>

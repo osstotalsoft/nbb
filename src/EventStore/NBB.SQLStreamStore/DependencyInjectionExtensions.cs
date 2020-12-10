@@ -21,9 +21,9 @@ namespace NBB.SQLStreamStore
                 var configuration = sp.GetService<IConfiguration>();
                 var connectionString = configuration["EventStore:SqlStreamStore:ConnectionString"];
 
-                return new MsSqlStreamStoreSettings(connectionString);
+                return new MsSqlStreamStoreV3Settings(connectionString);
             });
-            services.AddScoped<IStreamStore, MsSqlStreamStore>();
+            services.AddScoped<IStreamStore, MsSqlStreamStoreV3>();
 
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using NBB.Correlation.Serilog;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 
 namespace NBB.Mono
 {
@@ -26,7 +27,7 @@ namespace NBB.Mono
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, "Logs", autoCreateSqlTable: true)
+                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
 
