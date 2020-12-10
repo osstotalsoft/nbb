@@ -50,7 +50,6 @@
     <ProjectReference Include="..\..\..\src\EventStore\NBB.SQLStreamStore\NBB.SQLStreamStore.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj" />
-    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Kafka\NBB.Messaging.Kafka.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
   </ItemGroup>
 

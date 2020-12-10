@@ -1,0 +1,1 @@
+﻿dotnet run EventStoreBenchmarks -c Release

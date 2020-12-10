@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Abstractions;
@@ -27,6 +28,13 @@ namespace NBB.Data.EntityFramework
             where TContext : DbContext
         {
             services.AddScoped<IReadOnlyRepository<TEntity>, EfReadOnlyRepository<TEntity, TContext>>();
+        }
+
+        public static void AddEfAsyncEnumerable<TEntity, TContext>(this IServiceCollection services)
+            where TEntity : class
+            where TContext : DbContext
+        {
+            services.AddScoped<IAsyncEnumerable<TEntity>, EfQuery<TEntity, TContext>>();
         }
 
         public static void AddEfQuery<TEntity, TContext>(this IServiceCollection services)

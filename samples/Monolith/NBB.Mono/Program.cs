@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using NBB.Correlation.Serilog;
 using Serilog;
 using Serilog.Events;
@@ -12,15 +13,14 @@ namespace NBB.Mono
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            CreateHostBuilder(args).Build().Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, logging) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .ConfigureLogging((hostingContext, logging) =>
                 {
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
-
 
                     Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Debug()
@@ -36,8 +36,9 @@ namespace NBB.Mono
                     //logging.AddDebug();
                     //logging.AddSerilog(dispose: true);
                 })
-                .UseStartup<Startup>()
-                //.UseSerilog()
-                .Build();
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

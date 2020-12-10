@@ -52,10 +52,12 @@ namespace NBB.Mono
             services.AddContractsWriteModelDataAccess();
             services.AddContractsReadModelDataAccess();
             services.AddInvoicesDataAccess();
+            services.AddInvoicesWriteDataAccess();
             services.AddPaymentsDataAccess();
+            services.AddPaymentsWriteDataAccess();
 
             services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository();
 
             services.AddResiliency();
@@ -73,11 +75,11 @@ namespace NBB.Mono
                     .UseMediatRMiddleware()
                 );
 
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>), 
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>),
                 serviceType => typeof(IEventedAggregateRoot).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(MediatorUowDecorator<>), 
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(MediatorUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventStoreUowDecorator<>), 
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventStoreUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]) && typeof(IIdentifiedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
         }
 

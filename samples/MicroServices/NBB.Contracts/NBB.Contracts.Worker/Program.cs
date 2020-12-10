@@ -31,12 +31,7 @@ namespace NBB.Contracts.Worker
 {
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            MainAsync(args).GetAwaiter().GetResult();
-        }
-
-        public static async Task MainAsync(string[] args)
+        public static async Task Main(string[] _args)
         {
             var builder = new HostBuilder()
                 .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })

@@ -5,8 +5,8 @@ namespace TheBenchmarks
     {
         static void Main(string[] args)
         {
-            //var summary = BenchmarkRunner.Run<EventStoreBenchmark>();
-            var summary = BenchmarkRunner.Run<EventSourcedRepositoryBenchmark>();
+            var summary = BenchmarkRunner.Run<EventStoreBenchmark>();
+            //var summary = BenchmarkRunner.Run<EventSourcedRepositoryBenchmark>();
 
             //var benchmark = new EventSourcedRepositoryBenchmark();
             //benchmark.NumberOfEvents = 1;

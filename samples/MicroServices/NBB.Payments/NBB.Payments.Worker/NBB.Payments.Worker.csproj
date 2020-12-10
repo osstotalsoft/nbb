@@ -40,7 +40,6 @@
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore\NBB.EventStore.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Kafka\NBB.Messaging.Kafka.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\NBB.Payments.Application\NBB.Payments.Application.csproj" />
   </ItemGroup>

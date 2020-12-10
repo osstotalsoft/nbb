@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="appsettings.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -41,7 +37,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Kafka\NBB.Messaging.Kafka.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\NBB.Payments.Application.Commands\NBB.Payments.Application.Commands.csproj" />
     <ProjectReference Include="..\NBB.Payments.Data\NBB.Payments.Data.csproj" />

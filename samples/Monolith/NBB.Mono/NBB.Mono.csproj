@@ -26,10 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\NBB.Core.DependencyInjection\NBB.Core.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
     <ProjectReference Include="..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />

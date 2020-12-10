@@ -44,7 +44,7 @@ namespace NBB.Invoices.Data
         {
             services.AddEntityFrameworkDataAccess();
 
-            services.AddEfQuery<Invoice, InvoicesDbContext>();
+            services.AddEfAsyncEnumerable<Invoice, InvoicesDbContext>();
             services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
 
             services.AddDbContext<InvoicesDbContext>(
