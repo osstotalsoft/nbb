@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>This package contains the building blocks needed to lift an event store in a topic/queue on the default messaging.</Description>
   </PropertyGroup>
 

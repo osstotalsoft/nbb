@@ -5,7 +5,7 @@ namespace NBB.Resiliency
 {
     public interface IResiliencyPolicyProvider
     {
-        Policy GetOutOfOrderPolicy(Action<int> onRetry);
-        Policy GetConcurencyExceptionPolicy(Action<Exception> onRetry);
+        AsyncPolicy GetOutOfOrderPolicy(Action<int> onRetry);
+        AsyncPolicy GetConcurencyExceptionPolicy(Action<Exception> onRetry);
     }
 }

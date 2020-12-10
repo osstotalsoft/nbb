@@ -15,11 +15,11 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
         private readonly ILogger<TenancyHostingValidator> _logger;
-        private readonly IApplicationLifetime _applicationLifetime;
+        private readonly IHostApplicationLifetime _applicationLifetime;
 
         public TenancyHostingValidator(IServiceScopeFactory scopeFactory,
             IOptions<TenancyHostingOptions> tenancyOptions, ILogger<TenancyHostingValidator> logger,
-            IApplicationLifetime applicationLifetime)
+            IHostApplicationLifetime applicationLifetime)
         {
             _scopeFactory = scopeFactory;
             _tenancyOptions = tenancyOptions;

@@ -22,7 +22,7 @@ using NBB.Core.DependencyInjection;
 using NBB.Domain;
 using NBB.Messaging.Host;
 using NBB.Resiliency;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
 
@@ -52,10 +52,12 @@ namespace NBB.Mono
             services.AddContractsWriteModelDataAccess();
             services.AddContractsReadModelDataAccess();
             services.AddInvoicesDataAccess();
+            services.AddInvoicesWriteDataAccess();
             services.AddPaymentsDataAccess();
+            services.AddPaymentsWriteDataAccess();
 
             services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository();
 
             services.AddResiliency();
@@ -73,16 +75,16 @@ namespace NBB.Mono
                     .UseMediatRMiddleware()
                 );
 
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>), 
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>),
                 serviceType => typeof(IEventedAggregateRoot).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(MediatorUowDecorator<>), 
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(MediatorUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventStoreUowDecorator<>), 
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventStoreUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]) && typeof(IIdentifiedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseCorrelation();
 
@@ -91,7 +93,12 @@ namespace NBB.Mono
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+
+            });
         }
     }
 }

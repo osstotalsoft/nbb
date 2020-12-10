@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Description>Data contracts for CQ(R)S applications.</Description>
   </PropertyGroup>
 
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NJsonSchema" Version="9.13.15" />
+    <PackageReference Include="NJsonSchema" Version="10.3.1" />
   </ItemGroup>
 
   <ItemGroup>

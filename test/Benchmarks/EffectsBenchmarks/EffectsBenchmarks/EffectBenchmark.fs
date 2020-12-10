@@ -3,7 +3,6 @@
 open BenchmarkDotNet.Attributes
 open NBB.Core.Effects.FSharp
 open NBB.Core.Effects.FSharp.Interpreter
-open BenchmarkDotNet.Attributes.Jobs
 
 [<SimpleJob (launchCount= 1, warmupCount= 0, targetCount= 10)>]
 type Benchmark() =

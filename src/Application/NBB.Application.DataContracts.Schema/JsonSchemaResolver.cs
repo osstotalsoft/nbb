@@ -16,7 +16,7 @@ namespace NBB.Application.DataContracts.Schema
                 .GetTypes().Where(t => baseType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
                 .Select(e =>
                 {
-                    var schema = JsonSchema4.FromTypeAsync(e).GetAwaiter().GetResult();
+                    var schema = JsonSchema.FromType(e);
                     var jsonSchema = schema.ToJson();
                     var topic = topicResolver != null ? topicResolver(e) : string.Empty;
 

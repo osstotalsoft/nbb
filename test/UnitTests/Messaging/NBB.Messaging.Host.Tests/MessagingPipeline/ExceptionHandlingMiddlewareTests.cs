@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using NBB.Messaging.DataContracts;
 using NBB.Messaging.Host.MessagingPipeline;
@@ -74,8 +73,8 @@ namespace NBB.Messaging.Host.Tests.Pipeline
         private void VerifyLog(ILogger<ExceptionHandlingMiddleware> mockedLogger, LogLevel logLevel, string containedString)
         {
             Mock.Get(mockedLogger).Verify(x => x.Log(logLevel, It.IsAny<EventId>(),
-                It.Is<FormattedLogValues>(v => v.ToString().Contains(containedString)),
-                It.IsAny<Exception>(), It.IsAny<Func<object, Exception, string>>()));
+                It.Is<It.IsAnyType>((v, _) => v.ToString().Contains(containedString)),
+                null, It.IsAny<Func<It.IsAnyType, Exception, string>>()));
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Primitives;
+using System;
 
 namespace NBB.Correlation.AspNet
 {

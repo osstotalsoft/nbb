@@ -20,6 +20,7 @@ using NBB.Payments.Data;
 using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,12 +29,7 @@ namespace NBB.Payments.Worker
 {
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            MainAsync(args).GetAwaiter().GetResult();
-        }
-
-        public static async Task MainAsync(string[] args)
+        public static async Task Main(string[] _args)
         {
             var builder = new HostBuilder()
                 .ConfigureHostConfiguration(config =>
@@ -60,7 +56,7 @@ namespace NBB.Payments.Worker
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, "Logs", autoCreateSqlTable: true)
+                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);

@@ -6,7 +6,7 @@ namespace NBB.Resiliency
 {
     public class ResiliencyPolicyProvider : IResiliencyPolicyProvider
     {
-        public Policy GetOutOfOrderPolicy(Action<int> onRetry)
+        public AsyncPolicy GetOutOfOrderPolicy(Action<int> onRetry)
         {
             var policy = Policy
                 .Handle<OutOfOrderMessageException>()
@@ -19,7 +19,7 @@ namespace NBB.Resiliency
             return policy;
         }
 
-        public Policy GetConcurencyExceptionPolicy(Action<Exception> onRetry)
+        public AsyncPolicy GetConcurencyExceptionPolicy(Action<Exception> onRetry)
         {
             var policy = Policy
                 .Handle<ConcurrencyException>()

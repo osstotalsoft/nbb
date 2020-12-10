@@ -13,7 +13,7 @@ namespace NBB.SQLStreamStore.Migrations
         public async Task MigrateDatabaseToLatestVersion(CancellationToken cancellationToken = default)
         {
             var store = GetStore();
-            await store.CreateSchema(cancellationToken);
+            await store.CreateSchemaIfNotExists(cancellationToken);
         }
 
         public async Task EnsureDatabaseDeleted(CancellationToken cancellationToken = default)
@@ -29,7 +29,7 @@ namespace NBB.SQLStreamStore.Migrations
             }
         }
 
-        private MsSqlStreamStore GetStore()
+        private MsSqlStreamStoreV3 GetStore()
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -45,8 +45,8 @@ namespace NBB.SQLStreamStore.Migrations
 
             var configuration = configurationBuilder.Build();
             var connectionString = configuration["EventStore:SqlStreamStore:ConnectionString"];
-            var settings = new MsSqlStreamStoreSettings(connectionString);
-            var store = new MsSqlStreamStore(settings);
+            var settings = new MsSqlStreamStoreV3Settings(connectionString);
+            var store = new MsSqlStreamStoreV3(settings);
 
             return store;
         }
