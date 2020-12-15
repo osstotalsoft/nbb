@@ -115,7 +115,7 @@ let ``EventHandler.append left identity law `` (f: SomeEvent->unit option) (req:
     run (empty ++ f') = run f'
 
 [<Property>]
-let ``RequestHandler.append right identity law`` (f: SomeEvent->unit option) (req: SomeEvent) =
+let ``EventHandler.append right identity law`` (f: SomeEvent->unit option) (req: SomeEvent) =
     let f' = f >> Effect.pure'
     let interpreter = createInterpreter()
     let run h = 
@@ -127,7 +127,7 @@ let ``RequestHandler.append right identity law`` (f: SomeEvent->unit option) (re
     run (f' ++ empty) = run f'
 
 [<Property>]
-let ``RequestHandler.append associativity law`` (f: SomeEvent->unit option) (g: SomeEvent->unit option) (h: SomeEvent->unit option) (req: SomeEvent) =
+let ``EventHandler.append associativity law`` (f: SomeEvent->unit option) (g: SomeEvent->unit option) (h: SomeEvent->unit option) (req: SomeEvent) =
     let f' = f >> Effect.pure'
     let g' = g >> Effect.pure'
     let h' = h >> Effect.pure'
