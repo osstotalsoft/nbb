@@ -14,20 +14,13 @@ type Benchmark() =
 
     [<Benchmark>]
     member this.RunLazy() =
-        let eff = 
+        let mapper crt =    
             effect' {
-                let mapper crt =    
-                    effect' { 
-                        crt + 1 |> ignore
-                        let! x = Effect.pure' 1
-                        let! y = Effect.pure' 2
-                        return x + y + crt
-                    }
-                let effects = [1..this.N] |> List.map mapper
-                let! vals = List.sequenceEffect effects
-         
-                return vals
+                let! x = Effect.from (fun _ -> 1)
+                let! y = Effect.from (fun _ -> 2)
+                return x + y + crt
             }
+        let eff = [1..this.N] |> List.map mapper |> List.sequenceEffect
 
         eff 
             |> Effect.interpret interpreter
@@ -35,20 +28,13 @@ type Benchmark() =
 
     [<Benchmark>]
     member this.RunStrict() =
-        let eff = 
-            effect {
-                let mapper crt =    
-                    effect { 
-                        crt + 1 |> ignore
-                        let! x = Effect.pure' 1
-                        let! y = Effect.pure' 2
-                        return x + y + crt
-                    }
-                let effects = [1..this.N] |> List.map mapper
-                let! vals = List.sequenceEffect effects
-         
-                return vals
+        let mapper crt =    
+            effect { 
+                let! x = Effect.from (fun _ -> 1)
+                let! y = Effect.from (fun _ -> 2)
+                return x + y + crt
             }
+        let eff = [1..this.N] |> List.map mapper |> List.sequenceEffect
 
         eff 
             |> Effect.interpret interpreter

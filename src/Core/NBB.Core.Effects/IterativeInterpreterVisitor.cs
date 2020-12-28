@@ -20,7 +20,7 @@ namespace NBB.Core.Effects
         public async Task<(Effect<T>,T)> Visit<TOutput>(FreeEffect<TOutput, T> eff, CancellationToken cancellationToken)
         {
             var sideEffectResult = await _sideEffectMediator.Run(eff.SideEffect, cancellationToken);
-            var nextEffect = eff.Next(sideEffectResult);
+            var nextEffect = eff.Continuations.Apply(sideEffectResult);
             return (nextEffect, default);
         }
 

@@ -6,7 +6,8 @@ namespace NBB.Core.Effects
 {
     public abstract class Effect<T>
     { 
-        public abstract Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> computation);
+        public abstract Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation);
+        public abstract Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations);
 
         public abstract Task<TResult> Accept<TResult>(IEffectVisitor<T,TResult> v, CancellationToken cancellationToken);
     }
@@ -20,29 +21,39 @@ namespace NBB.Core.Effects
             Value = value;
         }
 
-        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> computation)
-            => computation(Value);
+        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
+            => continuation(Value);
+
+        public override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
+            => continuations.Apply(Value);
 
         public override Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
             => v.Visit(this, cancellationToken);
+
+        
     }
 
     public class FreeEffect<TOutput, T> : Effect<T>
     {
         public ISideEffect<TOutput> SideEffect { get; }
-        public Func<TOutput, Effect<T>> Next { get; }
+        public EffectFnSeq<TOutput, T> Continuations { get; }
 
-        public FreeEffect(ISideEffect<TOutput> sideEffect, Func<TOutput, Effect<T>> next)
+        public FreeEffect(ISideEffect<TOutput> sideEffect, EffectFnSeq<TOutput, T> continuations)
         {
             SideEffect = sideEffect;
-            Next = next;
+            Continuations = continuations;
         }
 
-        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> computation)
-            => new FreeEffect<TOutput, TResult>(SideEffect, response => Next(response).Bind(computation));
+        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
+            => new FreeEffect<TOutput, TResult>(SideEffect, Continuations.Append(continuation));
+        
+        public override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
+            => new FreeEffect<TOutput, TResult>(SideEffect, Continuations.AppendMany(continuations));
 
         public override Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
             => v.Visit(this, cancellationToken);
+
+        
     }
 
     public class ParallelEffect<T1, T2, T> : Effect<T>
@@ -58,17 +69,22 @@ namespace NBB.Core.Effects
             Next = next;
         }
 
-        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> computation)
-            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind(computation));
+        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
+            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind(continuation));
+        
+        public override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuation)
+            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind2(continuation));
 
         public override Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
             => v.Visit(this, cancellationToken);
+
+        
     }
 
     public static class Effect
     {
         public static Effect<T> Of<T>(ISideEffect<T> sideEffect)
-            => new FreeEffect<T, T>(sideEffect, Pure);
+            => new FreeEffect<T, T>(sideEffect, new EffectFnSeq<T, T>.Leaf(Pure));
 
         public static Effect<T> Pure<T>(T value)
             => new PureEffect<T>(value);
@@ -102,6 +118,9 @@ namespace NBB.Core.Effects
 
         public static Effect<TResult> Apply<T, TResult>(Effect<Func<T, TResult>> fn, Effect<T> effect)
             => effect.Bind(x => fn.Map(f => f(x)));
+        
+        public static Func<T1, Effect<T3>> ComposeK<T1, T2, T3>(Func<T1, Effect<T2>> f, Func<T2, Effect<T3>> g) =>
+            x => f(x).Bind(g);
 
     }
 }
