@@ -14,7 +14,7 @@ namespace NBB.Core.Effects.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddEffects();
-            using var container = services.BuildServiceProvider();
+            await using var container = services.BuildServiceProvider();
             var interpreter = container.GetRequiredService<IInterpreter>();
 
             

@@ -40,20 +40,3 @@ let ``Effect computations are lazy evaluated`` () =
         |> should equal ()
 
     printfnWasCalled |> should equal true
-
-[<Fact>]
-let ``Effect perf`` () =
-    let interpreter = createInterpreter()
-    let n = 5000
-    let mapper crt =    
-        effect { 
-            crt + 1 |> ignore
-            let! x = Effect.from (fun _ -> 1)
-            let! y = Effect.from (fun _ -> 2)
-            return x + y + crt
-        }
-    let eff = [1..n] |> List.map mapper |> List.sequenceEffect
-
-    eff 
-        |> Effect.interpret interpreter
-        |> Async.RunSynchronously

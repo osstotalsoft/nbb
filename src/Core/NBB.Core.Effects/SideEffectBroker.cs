@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
-    public class SideEffectMediator : ISideEffectMediator
+    public class SideEffectBroker : ISideEffectBroker
     {
         private static readonly ConcurrentDictionary<Type, Type> Cache = new ConcurrentDictionary<Type, Type>();
         private readonly IServiceProvider _serviceProvider;
 
-        public SideEffectMediator(IServiceProvider serviceProvider)
+        public SideEffectBroker(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }

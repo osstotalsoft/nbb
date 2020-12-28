@@ -6,7 +6,7 @@ using Xunit;
 
 namespace NBB.Core.Effects.Tests
 {
-    public class SideEffectMediatorTests
+    public class SideEffectBrokerTests
     {
         [Fact]
         public async Task Should_handle_simple_side_effect()
@@ -14,8 +14,8 @@ namespace NBB.Core.Effects.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped<ISideEffectHandler<Simple.SideEffect, int>, Simple.Handler>();
-            using var container = services.BuildServiceProvider();
-            var sut = new SideEffectMediator(container);
+            await using var container = services.BuildServiceProvider();
+            var sut = new SideEffectBroker(container);
 
             //Act
             var result = await sut.Run(new Simple.SideEffect(10));
@@ -30,8 +30,8 @@ namespace NBB.Core.Effects.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped<ISideEffectHandler<VoidReturning.SideEffect>, VoidReturning.Handler>();
-            using var container = services.BuildServiceProvider();
-            var sut = new SideEffectMediator(container);
+            await using var container = services.BuildServiceProvider();
+            var sut = new SideEffectBroker(container);
 
             //Act
             var sideEffectHandlerType = await sut.Run(new VoidReturning.SideEffect());
@@ -46,8 +46,8 @@ namespace NBB.Core.Effects.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddScoped(typeof(Generic.Handler<>));
-            using var container = services.BuildServiceProvider();
-            var sut = new SideEffectMediator(container);
+            await using var container = services.BuildServiceProvider();
+            var sut = new SideEffectBroker(container);
 
             //Act
             var sideEffectHandler = await sut.Run(new Generic.SideEffect<int>());

@@ -19,8 +19,8 @@ namespace NBB.ProcessManager.Tests
                 .BuildServiceProvider();
 
             var logger = serviceProvider.GetRequiredService<ILogger<EventStore.EventStore>>();
-            var sideEffectMediator = Mock.Of<ISideEffectMediator>();
-            var interpreter = new Interpreter(sideEffectMediator);
+            var sideEffectBroker = Mock.Of<ISideEffectBroker>();
+            var interpreter = new Interpreter(sideEffectBroker);
 
             Repository = new InstanceDataRepository(
                 new EventStore.EventStore(new InMemoryRepository(), new NewtonsoftJsonEventStoreSerDes(), logger),

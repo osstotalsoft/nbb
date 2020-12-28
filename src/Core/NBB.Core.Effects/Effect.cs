@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 namespace NBB.Core.Effects
 {
     public abstract class Effect<T>
-    { 
+    {
         public abstract Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation);
-        public abstract Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations);
-
-        public abstract Task<TResult> Accept<TResult>(IEffectVisitor<T,TResult> v, CancellationToken cancellationToken);
+        internal abstract Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations);
+        internal abstract Task<(Effect<T>, T)> Run(ISideEffectBroker sideEffectBroker, CancellationToken cancellationToken);
     }
 
     public class PureEffect<T> : Effect<T>
@@ -24,67 +23,42 @@ namespace NBB.Core.Effects
         public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
             => continuation(Value);
 
-        public override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
+        internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
             => continuations.Apply(Value);
 
-        public override Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
-            => v.Visit(this, cancellationToken);
-
-        
+        internal override Task<(Effect<T>, T)> Run(ISideEffectBroker sideEffectBroker, CancellationToken cancellationToken)
+            => Task.FromResult<(Effect<T>, T)>((null, Value));
     }
 
-    public class FreeEffect<TOutput, T> : Effect<T>
+    public class ImpureEffect<TOutput, T> : Effect<T>
     {
         public ISideEffect<TOutput> SideEffect { get; }
         public EffectFnSeq<TOutput, T> Continuations { get; }
 
-        public FreeEffect(ISideEffect<TOutput> sideEffect, EffectFnSeq<TOutput, T> continuations)
+        public ImpureEffect(ISideEffect<TOutput> sideEffect, EffectFnSeq<TOutput, T> continuations)
         {
             SideEffect = sideEffect;
             Continuations = continuations;
         }
 
         public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
-            => new FreeEffect<TOutput, TResult>(SideEffect, Continuations.Append(continuation));
-        
-        public override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
-            => new FreeEffect<TOutput, TResult>(SideEffect, Continuations.AppendMany(continuations));
+            => new ImpureEffect<TOutput, TResult>(SideEffect, Continuations.Append(continuation));
 
-        public override Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
-            => v.Visit(this, cancellationToken);
+        internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
+            => new ImpureEffect<TOutput, TResult>(SideEffect, Continuations.AppendMany(continuations));
 
-        
-    }
-
-    public class ParallelEffect<T1, T2, T> : Effect<T>
-    {
-        public Effect<T1> LeftEffect { get; }
-        public Effect<T2> RightEffect { get; }
-        public Func<T1, T2, Effect<T>> Next { get; }
-
-        public ParallelEffect(Effect<T1> leftEffect, Effect<T2> rightEffect, Func<T1, T2, Effect<T>> next)
+        internal override async Task<(Effect<T>, T)> Run(ISideEffectBroker sideEffectBroker, CancellationToken cancellationToken)
         {
-            LeftEffect = leftEffect;
-            RightEffect = rightEffect;
-            Next = next;
+            var sideEffectResult = await sideEffectBroker.Run(this.SideEffect, cancellationToken);
+            var nextEffect = this.Continuations.Apply(sideEffectResult);
+            return (nextEffect, default);
         }
-
-        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
-            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind(continuation));
-        
-        public override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuation)
-            => new ParallelEffect<T1, T2, TResult>(LeftEffect, RightEffect, (t1, t2) => Next(t1, t2).Bind2(continuation));
-
-        public override Task<TResult> Accept<TResult>(IEffectVisitor<T, TResult> v, CancellationToken cancellationToken)
-            => v.Visit(this, cancellationToken);
-
-        
     }
 
     public static class Effect
     {
         public static Effect<T> Of<T>(ISideEffect<T> sideEffect)
-            => new FreeEffect<T, T>(sideEffect, new EffectFnSeq<T, T>.Leaf(Pure));
+            => new ImpureEffect<T, T>(sideEffect, new EffectFnSeq<T, T>.Leaf(Pure));
 
         public static Effect<T> Pure<T>(T value)
             => new PureEffect<T>(value);
@@ -105,10 +79,10 @@ namespace NBB.Core.Effects
             => Of(Thunk.From(impure));
 
         public static Effect<(T1, T2)> Parallel<T1, T2>(Effect<T1> e1, Effect<T2> e2)
-            => new ParallelEffect<T1, T2, (T1, T2)>(e1, e2, (t1, t2) => Pure((t1, t2)));
+            => Of(Effects.Parallel.From(e1, e2));
 
         public static Effect<Unit> Parallel(Effect<Unit> e1, Effect<Unit> e2)
-            => new ParallelEffect<Unit, Unit, Unit>(e1, e2, (_, __) => Pure());
+            => Of(Effects.Parallel.From(e1, e2)).Map(_ => Unit.Value);
 
         public static Effect<TResult> Bind<T, TResult>(Effect<T> effect, Func<T, Effect<TResult>> computation)
             => effect.Bind(computation);
@@ -118,7 +92,7 @@ namespace NBB.Core.Effects
 
         public static Effect<TResult> Apply<T, TResult>(Effect<Func<T, TResult>> fn, Effect<T> effect)
             => effect.Bind(x => fn.Map(f => f(x)));
-        
+
         public static Func<T1, Effect<T3>> ComposeK<T1, T2, T3>(Func<T1, Effect<T2>> f, Func<T2, Effect<T3>> g) =>
             x => f(x).Bind(g);
 

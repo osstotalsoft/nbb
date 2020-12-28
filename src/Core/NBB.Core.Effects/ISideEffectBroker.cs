@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
-    public interface ISideEffectMediator
+    public interface ISideEffectBroker
     {
         Task<T> Run<T>(ISideEffect<T> sideEffect, CancellationToken cancellationToken = default);
     }

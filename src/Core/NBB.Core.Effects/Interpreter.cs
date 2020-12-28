@@ -5,26 +5,25 @@ namespace NBB.Core.Effects
 {
     public class Interpreter : IInterpreter
     {
-        private readonly ISideEffectMediator _sideEffectMediator;
+        private readonly ISideEffectBroker _sideEffectBroker;
 
-        public Interpreter(ISideEffectMediator sideEffectMediator)
+        public Interpreter(ISideEffectBroker sideEffectBroker)
         {
-            _sideEffectMediator = sideEffectMediator;
+            _sideEffectBroker = sideEffectBroker;
         }
 
         public async Task<T> Interpret<T>(Effect<T> effect, CancellationToken cancellationToken = default)
         {
-            var v = new IterativeInterpreterVisitor<T>(_sideEffectMediator, this);
             var nextEffect = effect;
             T result;
             do
             {
-                (nextEffect, result) = await nextEffect.Accept(v, cancellationToken);
+                (nextEffect, result) = await nextEffect.Run(_sideEffectBroker, cancellationToken);
             } while (nextEffect != null);
 
             return result;
         }
 
-       
+
     }
 }
