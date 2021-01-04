@@ -9,7 +9,6 @@ namespace NBB.Messaging.MultiTenancy
     {
         private readonly ITopicRegistry _innerTopicRegistry;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
-        private const string SharedTopicPrefix = "Shared";
         private const string TenantTopicPrefix = "Tenant";
 
         public MultiTenancyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IOptions<TenancyHostingOptions> tenancyOptions)
@@ -48,7 +47,7 @@ namespace NBB.Messaging.MultiTenancy
             switch (_tenancyOptions.Value.TenancyType)
             {
                 case TenancyType.MultiTenant:
-                    return $"{baseTopicPrefix}{TenantTopicPrefix}_{SharedTopicPrefix}.";
+                    return baseTopicPrefix;
                 case TenancyType.MonoTenant when _tenancyOptions.Value.TenantId.HasValue:
                 {
                     //var tenantId = _tenantService.GetTenantIdAsync().GetAwaiter().GetResult();
