@@ -11,6 +11,7 @@ namespace NBB.Core.Effects
             => new EffectFnSeq<TA, TC>.Node<TB>(this, continuations);
 
         public abstract LeftEffectFnSeq<TA, TB> ToLeft();
+
         internal abstract LeftEffectFnSeq<TA, TC> Go<TC>(EffectFnSeq<TB, TC> continuations);
 
         public Effect<TB> Apply(TA a)
@@ -36,7 +37,7 @@ namespace NBB.Core.Effects
 
             public override int GetCount() => 1;
 
-            
+
         }
 
         internal class Node<TX> : EffectFnSeq<TA, TB>
@@ -88,7 +89,7 @@ namespace NBB.Core.Effects
                 Head = head;
                 Tail = tail;
             }
-            
+
             public override Effect<TB> Apply(TA a)
              => Head(a).Bind2(Tail);
         }

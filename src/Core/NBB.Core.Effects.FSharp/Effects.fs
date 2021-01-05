@@ -29,6 +29,51 @@ module Effect =
 
     let interpret (interpreter:IInterpreter) eff = interpreter.Interpret eff |> Async.AwaitTask
 
+type EffectList<'a> = Effect<list<'a>>
+
+[<RequireQualifiedAccess>]
+module EffectList =
+    [<RequireQualifiedAccess>]
+    module private List =
+        let flatten (listOfLists: list<list<'a>>): list<'a> = listOfLists |> List.collect id
+
+    let map (func: 'a -> 'b) (effectList: EffectList<'a>): EffectList<'b> =
+        effectList |> Effect.map (List.map func)
+
+    let sequence (list: Effect<'a> list) = list |> List.toSeq |> Effect.Sequence |> Effect.map Seq.toList
+    let traverse f list = list |> List.map f |> sequence
+
+
+    let bind (func: 'a -> EffectList<'b>) (elemList: EffectList<'a>): EffectList<'b> =
+        elemList
+        |> Effect.bind
+            ((List.map func)
+             >> sequence
+             >> Effect.map List.flatten)
+
+    let return' (x: 'a): EffectList<'a> = Effect.return' [ x ]
+
+    let hoist (list: 'a list): EffectList<'a> = Effect.return' list
+    let lift (elem: Effect<'a>): EffectList<'a> = elem |> Effect.map (fun x -> [ x ])
+
+    let filter (predicate: 'a -> bool) (coll: EffectList<'a>): EffectList<'a> =
+        coll |> Effect.map (List.filter predicate)
+
+    let filterEffect (predicate: 'a -> Effect<bool>) (coll: EffectList<'a>): EffectList<'a> =
+        let (<*>) = Effect.apply
+        let return' = Effect.return'
+        let initState = hoist []
+        let consIf cond head tail = if cond then head :: tail else tail
+
+        let folder (head: 'a) (tail: EffectList<'a>) =
+            return' consIf
+            <*> (predicate head)
+            <*> (return' head)
+            <*> tail
+
+        coll
+        |> Effect.bind (fun list -> List.foldBack folder list initState)
+
 module EffectBuilder =
     type LazyEffectBuilder() =
         member _.Bind(eff, func) = Effect.bind func eff
@@ -36,7 +81,11 @@ module EffectBuilder =
         member _.ReturnFrom(value) = value
         member _.Combine(eff1, eff2) = Effect.bind (fun _ -> eff2) eff1
         member _.Zero() = Effect.pure' ()
+        member _.For(coll, f) = coll |> EffectList.bind f
+        member _.Yield(value) = EffectList.return' value
+        member _.YieldFrom(x) = EffectList.lift x
         member _.Delay(f) = f |> Effect.from |> Effect.flatten
+       
 
     type StrictEffectBuilder() =
         member _.Bind(eff, func) = Effect.bind func eff
@@ -44,8 +93,12 @@ module EffectBuilder =
         member _.ReturnFrom(value) = value
         member _.Combine(eff1, eff2Fn) = Effect.bind eff2Fn eff1
         member _.Zero() = Effect.pure' ()
+        member _.For(coll, f) = coll |> EffectList.bind f
+        member _.Yield(value) = EffectList.return' value
+        member _.YieldFrom(x) = EffectList.lift x
         member _.Delay(f) = f 
         member _.Run(f) = f ()
+        
         
 [<AutoOpen>]
 module Effects =
@@ -60,13 +113,9 @@ module Effects =
 
     [<RequireQualifiedAccess>]
     module List =
-        let traverseEffect f list =
-            let cons head tail = head :: tail      
-            let initState = Effect.pure' []
-            let folder head tail = Effect.pure' cons <*> (f head) <*> tail
-            List.foldBack folder list initState
+        let traverseEffect  = EffectList.traverse
 
-        let sequenceEffect list = traverseEffect id list
+        let sequenceEffect = EffectList.sequence
 
     [<RequireQualifiedAccess>]
     module Result = 

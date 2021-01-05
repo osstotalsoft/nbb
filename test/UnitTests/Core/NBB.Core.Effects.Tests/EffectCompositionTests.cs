@@ -49,13 +49,12 @@ namespace NBB.Core.Effects.Tests
                     Effect.Pure(6).Then(Double))
                 .Then(((int first, int second) t) => t.first + t.second);
 
-            var services = new ServiceCollection();
-            services.AddEffects();
-            await using var container = services.BuildServiceProvider();
-            var interpreter = container.GetRequiredService<IInterpreter>();
+            await using var interpreter = Interpreter.CreateDefault();
             
             var actual = await interpreter.Interpret(effect);
             actual.Should().Be(Add1(5)+Double(6));
         }
+        
+
     }
 }

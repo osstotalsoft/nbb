@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -82,7 +83,13 @@ namespace NBB.Core.Effects
             => Of(Effects.Parallel.From(e1, e2));
 
         public static Effect<Unit> Parallel(Effect<Unit> e1, Effect<Unit> e2)
-            => Of(Effects.Parallel.From(e1, e2)).Map(_ => Unit.Value);
+            => Parallel<Unit, Unit>(e1, e2).ToUnit();
+        
+        public static Effect<IEnumerable<T>> Sequence<T>(IEnumerable<Effect<T>> effectList)
+            => Of(Effects.Sequenced.From(effectList));
+
+        public static Effect<Unit> Sequence(IEnumerable<Effect<Unit>> effectList)
+            => Sequence<Unit>(effectList).ToUnit();
 
         public static Effect<TResult> Bind<T, TResult>(Effect<T> effect, Func<T, Effect<TResult>> computation)
             => effect.Bind(computation);
@@ -91,7 +98,8 @@ namespace NBB.Core.Effects
          => effect.Map(selector);
 
         public static Effect<TResult> Apply<T, TResult>(Effect<Func<T, TResult>> fn, Effect<T> effect)
-            => effect.Bind(x => fn.Map(f => f(x)));
+            //=> effect.Bind(x => fn.Map(f => f(x)));
+            => Parallel(fn, effect).Map(pair => pair.Item1(pair.Item2));
 
         public static Func<T1, Effect<T3>> ComposeK<T1, T2, T3>(Func<T1, Effect<T2>> f, Func<T2, Effect<T3>> g) =>
             x => f(x).Bind(g);

@@ -3,25 +3,29 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace NBB.Core.Effects.Tests
 {
     public class ThunkSideEffectTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public ThunkSideEffectTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public async Task Interpret_Thunk_SideEffect()
         {
             //Arrange
-            var services = new ServiceCollection();
-            services.AddEffects();
-            await using var container = services.BuildServiceProvider();
-            var interpreter = container.GetRequiredService<IInterpreter>();
+            await using var interpreter = Interpreter.CreateDefault();
 
-            
             var sideEffectExecuted = false;
             var eff = Effect.From(() =>
             {
-                Console.WriteLine("Effect executed");
+                _testOutputHelper.WriteLine("Effect executed");
                 sideEffectExecuted = true;
             });
             //Act

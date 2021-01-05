@@ -20,7 +20,7 @@ type Benchmark() =
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
             }
-        let eff = [1..this.N] |> List.map mapper |> List.sequenceEffect
+        let eff = [1..this.N] |> List.traverseEffect mapper
 
         eff 
             |> Effect.interpret interpreter
@@ -34,8 +34,12 @@ type Benchmark() =
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
             }
-        let eff = [1..this.N] |> List.map mapper |> List.sequenceEffect
+        let eff = [1..this.N] |> List.traverseEffect mapper
 
         eff 
             |> Effect.interpret interpreter
             |> Async.RunSynchronously
+
+    [<GlobalCleanup>]
+    member _.GlobalCleanup() =
+        interpreter.Dispose()
