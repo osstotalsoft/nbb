@@ -4,6 +4,7 @@ using Microsoft.SqlServer.Server;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
+using NBB.MultiTenancy.Abstractions.Context;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -20,7 +21,7 @@ namespace NBB.EventStore.AdoNet
         private readonly Scripts _scripts;
         private readonly ILogger<AdoNetEventRepository> _logger;
         private readonly IOptions<EventStoreOptions> _eventstoreOptions;
-
+        private readonly ITenantContextAccessor _tenantContextAccessor;
         private readonly SqlMetaData[] _appendEventsMetadata = new List<SqlMetaData>
         {
             new SqlMetaData("OrderNo", SqlDbType.Int, true, false, SortOrder.Unspecified, -1),
@@ -30,10 +31,11 @@ namespace NBB.EventStore.AdoNet
             new SqlMetaData("CorrelationId", SqlDbType.UniqueIdentifier),
         }.ToArray();
 
-        public AdoNetEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptions<EventStoreOptions> eventstoreOptions)
+        public AdoNetEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptions<EventStoreOptions> eventstoreOptions, ITenantContextAccessor tenantContextAccessor)
         {
             _scripts = scripts;
             _eventstoreOptions = eventstoreOptions;
+            _tenantContextAccessor = tenantContextAccessor;
             _logger = logger;
         }
 
@@ -42,18 +44,20 @@ namespace NBB.EventStore.AdoNet
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
+            var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
+
             if (expectedVersion.HasValue)
             {
-                await AppendEventsToStreamExpectedVersionAsync(streamId, eventDescriptors, expectedVersion.Value,
+                await AppendEventsToStreamExpectedVersionAsync(tenantId, streamId, eventDescriptors, expectedVersion.Value,
                     cancellationToken);
             }
             else
             {
-                await AppendEventsToStreamExpectedVersionAnyAsync(streamId, eventDescriptors, cancellationToken);
+                await AppendEventsToStreamExpectedVersionAnyAsync(tenantId, streamId, eventDescriptors, cancellationToken);
             }
 
             stopWatch.Stop();
-            _logger.LogDebug("AdoNetEventRepository.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms.", streamId, stopWatch.ElapsedMilliseconds);
+            _logger.LogDebug("AdoNetEventRepository.AppendEventsToStreamAsync for tenant {Tenant}, stream {Stream} took {ElapsedMilliseconds} ms.", tenantId, streamId, stopWatch.ElapsedMilliseconds);
         }
 
         public async Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
@@ -62,12 +66,14 @@ namespace NBB.EventStore.AdoNet
             stopWatch.Start();
 
             var eventDescriptors = new List<EventDescriptor>();
+            var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
 
             using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.GetEventsFromStream, cnx);
+                cmd.Parameters.Add(new SqlParameter("@TenantId", SqlDbType.UniqueIdentifier) { Value = tenantId });
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200) { Value = stream });
                 cmd.Parameters.Add(new SqlParameter("@MinStreamVersion", SqlDbType.Int) { Value = (object)startFromVersion ?? DBNull.Value });
                 cmd.Parameters.Add(new SqlParameter("@MaxStreamVersion", SqlDbType.Int) { Value = DBNull.Value }); // To be implemented for loading aggregate at a specific version
@@ -89,7 +95,7 @@ namespace NBB.EventStore.AdoNet
         }
 
 
-        private async Task AppendEventsToStreamExpectedVersionAsync(string streamId, IList<EventDescriptor> eventDescriptors, int expectedVersion, CancellationToken cancellationToken = default)
+        private async Task AppendEventsToStreamExpectedVersionAsync(Guid tenantId, string streamId, IList<EventDescriptor> eventDescriptors, int expectedVersion, CancellationToken cancellationToken = default)
         {
             if (!eventDescriptors.Any())
                 return;
@@ -101,6 +107,10 @@ namespace NBB.EventStore.AdoNet
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.AppendEventsToStreamExpectedVersion, cnx);
+                cmd.Parameters.Add(new SqlParameter("@TenantId", SqlDbType.UniqueIdentifier)
+                {
+                    Value = tenantId
+                });
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
                 {
                     Value = streamId
@@ -135,7 +145,7 @@ namespace NBB.EventStore.AdoNet
             }
         }
 
-        private async Task AppendEventsToStreamExpectedVersionAnyAsync(string streamId, IList<EventDescriptor> eventDescriptors, CancellationToken cancellationToken = default)
+        private async Task AppendEventsToStreamExpectedVersionAnyAsync(Guid tenantId, string streamId, IList<EventDescriptor> eventDescriptors, CancellationToken cancellationToken = default)
         {
             if (!eventDescriptors.Any())
                 return;
@@ -147,6 +157,10 @@ namespace NBB.EventStore.AdoNet
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.AppendEventsToStreamExpectedVersionAny, cnx);
+                cmd.Parameters.Add(new SqlParameter("@TenantId", SqlDbType.UniqueIdentifier)
+                {
+                    Value = tenantId
+                });
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
                 {
                     Value = streamId

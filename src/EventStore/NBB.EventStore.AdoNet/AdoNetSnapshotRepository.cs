@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
+using NBB.MultiTenancy.Abstractions.Context;
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -18,13 +19,15 @@ namespace NBB.EventStore.AdoNet
         private readonly Scripts _scripts;
         private readonly ILogger<AdoNetSnapshotRepository> _logger;
         private readonly IOptions<EventStoreOptions> _eventstoreOptions;
+        private readonly ITenantContextAccessor _tenantContextAccessor;
 
         public AdoNetSnapshotRepository(Scripts scripts,
-            ILogger<AdoNetSnapshotRepository> logger, IOptions<EventStoreOptions> eventstoreOptions)
+            ILogger<AdoNetSnapshotRepository> logger, IOptions<EventStoreOptions> eventstoreOptions, ITenantContextAccessor tenantContextAccessor)
         {
             _scripts = scripts;
             _logger = logger;
             _eventstoreOptions = eventstoreOptions;
+            _tenantContextAccessor = tenantContextAccessor;
         }
 
         public async Task<SnapshotDescriptor> LoadSnapshotAsync(string stream, CancellationToken cancellationToken = default)
@@ -33,12 +36,16 @@ namespace NBB.EventStore.AdoNet
             stopWatch.Start();
 
             SnapshotDescriptor snapshotDescriptor = null;
+            var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
 
             using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.GetSnapshotForStream, cnx);
+                cmd.Parameters.Add(new SqlParameter("@TenantId", SqlDbType.UniqueIdentifier)
+                { Value = tenantId });
+
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
                 { Value = stream });
 
@@ -70,6 +77,8 @@ namespace NBB.EventStore.AdoNet
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
+            var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
+
             using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
@@ -88,6 +97,9 @@ namespace NBB.EventStore.AdoNet
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
                 { Value = stream });
 
+                cmd.Parameters.Add(new SqlParameter("@TenantId", SqlDbType.UniqueIdentifier)
+                { Value = tenantId });
+
                 try
                 {
                     await cmd.ExecuteNonQueryAsync(cancellationToken);
@@ -104,8 +116,8 @@ namespace NBB.EventStore.AdoNet
             }
 
             stopWatch.Stop();
-            _logger.LogDebug("AdoNetSnapshotRepository.StoreSnapshotAsync for {Stream} took {ElapsedMilliseconds} ms.",
-                stream, stopWatch.ElapsedMilliseconds);
+            _logger.LogDebug("AdoNetSnapshotRepository.StoreSnapshotAsync for tenant {Tenant}, stream {Stream} took {ElapsedMilliseconds} ms.",
+                tenantId, stream, stopWatch.ElapsedMilliseconds);
         }
     }
 }

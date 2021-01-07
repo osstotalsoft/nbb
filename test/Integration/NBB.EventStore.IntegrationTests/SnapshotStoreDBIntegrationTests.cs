@@ -1,10 +1,13 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
+using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Context;
 using System;
 using System.IO;
 using System.Reflection;
@@ -151,6 +154,9 @@ namespace NBB.EventStore.IntegrationTests
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
+
+            services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
 
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()

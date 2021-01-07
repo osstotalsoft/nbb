@@ -6,7 +6,7 @@ begin
 end
 
 declare @ActualVersion int
-select @ActualVersion = count(*) from EventStoreEvents where StreamId = @StreamId
+select @ActualVersion = count(*) from EventStoreEvents where TenantId = @TenantId and StreamId = @StreamId
 
 if @ActualVersion <> @ExpectedVersion
 BEGIN
@@ -17,8 +17,8 @@ END
 
 
 BEGIN TRY
-	insert into EventStoreEvents(EventId, EventData, EventType, CorrelationId, StreamId, StreamVersion)
-	select EventId, EventData, EventType, CorrelationId, @StreamId, @ExpectedVersion + OrderNo
+	insert into EventStoreEvents(EventId, EventData, EventType, CorrelationId, StreamId, StreamVersion, TenantId)
+	select EventId, EventData, EventType, CorrelationId, @StreamId, @ExpectedVersion + OrderNo, @TenantId
 	from @NewEvents
 END TRY
 BEGIN CATCH

@@ -1,10 +1,13 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
+using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Context;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -70,7 +73,7 @@ namespace NBB.EventStore.IntegrationTests
         public void EventStore_AppendEventsToStreamAsync_with_expected_version_any_should_be_thread_safe()
         {
             PrepareDb();
-            var container = BuildAdoRepoServiceProvider();
+            var container = BuildAdoRepoServiceProvider();  
             var stream = Guid.NewGuid().ToString();
             var threadCount = 10;
             var threads = new List<Thread>();
@@ -123,6 +126,8 @@ namespace NBB.EventStore.IntegrationTests
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
+            services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
 
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()
