@@ -63,8 +63,8 @@ namespace NBB.Messaging.Abstractions
             catch (Exception ex)
             {
                 _logger.LogError(
-                    "MessageBusSubscriber encountered an error when deserializing a message from topic {TopicName}.\n {Error}",
-                    _topicName, ex);
+                    "MessageBusSubscriber encountered an error when deserializing a message from topic {TopicName}.\n {Error} \n Message: {Message}",
+                    _topicName, ex, msg);
                 //TODO: push to DLQ
             }
 
