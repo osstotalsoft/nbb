@@ -5,67 +5,71 @@ using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
+    
+    
     public abstract class Effect<T>
     {
         public abstract Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation);
         internal abstract Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations);
-        internal abstract Task<(Effect<T>, T)> Run(ISideEffectBroker sideEffectBroker, CancellationToken cancellationToken);
-    }
-
-    public class PureEffect<T> : Effect<T>
-    {
-        public T Value { get; }
-
-        public PureEffect(T value)
+        public abstract Task<TResult> Accept<TResult>(IVisitor<TResult> v, CancellationToken cancellationToken);
+        
+        public class Pure : Effect<T>
         {
-            Value = value;
+            public T Value { get; }
+
+            public Pure(T value)
+            {
+                Value = value;
+            }
+
+            public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
+                => continuation(Value);
+
+            internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
+                => continuations.Apply(Value);
+
+            public override Task<TResult> Accept<TResult>(IVisitor<TResult> v, CancellationToken cancellationToken)
+                => v.Visit(this, cancellationToken);
         }
-
-        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
-            => continuation(Value);
-
-        internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
-            => continuations.Apply(Value);
-
-        internal override Task<(Effect<T>, T)> Run(ISideEffectBroker sideEffectBroker, CancellationToken cancellationToken)
-            => Task.FromResult<(Effect<T>, T)>((null, Value));
-    }
-
-    public class ImpureEffect<TOutput, T> : Effect<T>
-    {
-        public ISideEffect<TOutput> SideEffect { get; }
-        public EffectFnSeq<TOutput, T> Continuations { get; }
-
-        public ImpureEffect(ISideEffect<TOutput> sideEffect, EffectFnSeq<TOutput, T> continuations)
+        
+        public class Impure<TOutput> : Effect<T>
         {
-            SideEffect = sideEffect;
-            Continuations = continuations;
+            public ISideEffect<TOutput> SideEffect { get; }
+            public EffectFnSeq<TOutput, T> Continuations { get; }
+
+            public Impure(ISideEffect<TOutput> sideEffect, EffectFnSeq<TOutput, T> continuations)
+            {
+                SideEffect = sideEffect;
+                Continuations = continuations;
+            }
+
+            public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
+                => new Effect<TResult>.Impure<TOutput>(SideEffect, Continuations.Append(continuation));
+
+            internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
+                => new Effect<TResult>.Impure<TOutput>(SideEffect, Continuations.AppendMany(continuations));
+
+            public override Task<TResult> Accept<TResult>(IVisitor<TResult> v, CancellationToken cancellationToken)
+                => v.Visit(this, cancellationToken);
         }
-
-        public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
-            => new ImpureEffect<TOutput, TResult>(SideEffect, Continuations.Append(continuation));
-
-        internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
-            => new ImpureEffect<TOutput, TResult>(SideEffect, Continuations.AppendMany(continuations));
-
-        internal override async Task<(Effect<T>, T)> Run(ISideEffectBroker sideEffectBroker, CancellationToken cancellationToken)
+        
+        public interface IVisitor<TResult>
         {
-            var sideEffectResult = await sideEffectBroker.Run(this.SideEffect, cancellationToken);
-            var nextEffect = this.Continuations.Apply(sideEffectResult);
-            return (nextEffect, default);
+            Task<TResult> Visit(Pure eff, CancellationToken cancellationToken);
+            Task<TResult> Visit<T1>(Impure<T1> eff, CancellationToken cancellationToken);
         }
     }
 
     public static class Effect
     {
         public static Effect<T> Of<T>(ISideEffect<T> sideEffect)
-            => new ImpureEffect<T, T>(sideEffect, new EffectFnSeq<T, T>.Leaf(Pure));
+            => new Effect<T>.Impure<T>(sideEffect, new EffectFnSeq<T, T>.Leaf(Pure));
 
         public static Effect<T> Pure<T>(T value)
-            => new PureEffect<T>(value);
+            => new Effect<T>.Pure(value);
 
         public static Effect<Unit> Pure()
-            => new PureEffect<Unit>(Unit.Value);
+            => new Effect<Unit>.Pure(Unit.Value);
 
         public static Effect<T> From<T>(Func<CancellationToken, Task<T>> impure)
             => Of(Thunk.From(impure));

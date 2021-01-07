@@ -16,7 +16,7 @@ namespace NBB.Core.Effects.Tests
             var sideEffectHandlerFactory = new Mock<ISideEffectBroker>();
             var sut = new Interpreter(sideEffectHandlerFactory.Object);
             var value = "test";
-            var effect = new PureEffect<string>(value);
+            var effect = Effect.Pure(value);
 
             //Act
             var result = await sut.Interpret(effect);
@@ -36,7 +36,7 @@ namespace NBB.Core.Effects.Tests
 
             var expectedInt = 5;
             var expectedString = "test";
-            var effect = Effect.Parallel(new PureEffect<int>(expectedInt), new PureEffect<string>(expectedString));
+            var effect = Effect.Parallel(Effect.Pure(expectedInt), Effect.Pure(expectedString));
 
             //Act
             var (receivedInt, receivedString) = await sut.Interpret(effect);
@@ -69,7 +69,7 @@ namespace NBB.Core.Effects.Tests
             var sideEffectBroker = new Mock<ISideEffectBroker>();
             var sut = new Interpreter(sideEffectBroker.Object);
             var value = "test";
-            var effect = new PureEffect<string>(value).ToUnit();
+            var effect = Effect.Pure(value).ToUnit();
 
             //Act
             var result = await sut.Interpret(effect);

@@ -5,6 +5,26 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace NBB.Core.Effects
 {
+    internal class IterativeInterpreterVisitor<T> : Effect<T>.IVisitor<(Effect<T>,T)>
+    {
+        private readonly ISideEffectBroker _sideEffectBroker;
+
+        public IterativeInterpreterVisitor(ISideEffectBroker sideEffectBroker)
+        {
+            _sideEffectBroker = sideEffectBroker;
+        }
+
+        public Task<(Effect<T>, T)> Visit(Effect<T>.Pure eff, CancellationToken cancellationToken)
+            => Task.FromResult<(Effect<T>, T)>((null, eff.Value));
+
+        public async Task<(Effect<T>,T)> Visit<TOutput>(Effect<T>.Impure<TOutput> eff, CancellationToken cancellationToken)
+        {
+            var sideEffectResult = await _sideEffectBroker.Run(eff.SideEffect, cancellationToken);
+            var nextEffect = eff.Continuations.Apply(sideEffectResult);
+            return (nextEffect, default);
+        }
+    }
+    
     public class Interpreter : IInterpreter
     {
         private readonly ISideEffectBroker _sideEffectBroker;
@@ -16,11 +36,12 @@ namespace NBB.Core.Effects
 
         public async Task<T> Interpret<T>(Effect<T> effect, CancellationToken cancellationToken = default)
         {
+            var v = new IterativeInterpreterVisitor<T>(_sideEffectBroker);
             var nextEffect = effect;
             T result;
             do
             {
-                (nextEffect, result) = await nextEffect.Run(_sideEffectBroker, cancellationToken);
+                (nextEffect, result) = await nextEffect.Accept(v, cancellationToken);
             } while (nextEffect != null);
 
             return result;
@@ -29,6 +50,8 @@ namespace NBB.Core.Effects
         public static DisposableInterpreter CreateDefault()
             => new();
     }
+    
+    
 
     public class DisposableInterpreter : IInterpreter, IDisposable, IAsyncDisposable
     {
