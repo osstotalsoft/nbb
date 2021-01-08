@@ -41,7 +41,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NBB.EventStore\NBB.EventStore.csproj" />
+    <ProjectReference Include="..\..\MultiTenancy\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj" />
+    <ProjectReference Include="..\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
   </ItemGroup>
 
 </Project>

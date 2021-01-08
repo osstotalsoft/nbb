@@ -6,8 +6,11 @@ using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
+using NBB.EventStore.AdoNet.Multitenancy;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Hosting;
+using NBB.MultiTenancy.Abstractions.Repositories;
 using System;
 using System.IO;
 using System.Reflection;
@@ -155,12 +158,16 @@ namespace NBB.EventStore.IntegrationTests
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
-            services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
-
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
+
+            services.AddMultitenancy(configuration, _ =>
+                    {
+                        services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                            x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
+                        services.WithMultiTenantAdoNetEventRepository();
+                    });
 
             var container = services.BuildServiceProvider();
             return container;

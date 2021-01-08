@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Migrations\NBB.EventStore.AdoNet.Migrations.csproj" />
-    <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
+    <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Multitenancy\NBB.EventStore.AdoNet.Multitenancy.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.Host\NBB.EventStore.Host.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.InMemory\NBB.EventStore.InMemory.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.MessagingExtensions\NBB.EventStore.MessagingExtensions.csproj" />

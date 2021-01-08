@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using NBB.EventStore.AdoNet.Internal;
+using NBB.MultiTenancy.Abstractions.Options;
 using System;
 using System.Data.SqlClient;
 using System.IO;
@@ -12,9 +12,9 @@ namespace NBB.EventStore.AdoNet.Migrations
     public class AdoNetEventStoreDatabaseMigrator
     {
         private readonly string _connectionString;
-        private readonly Scripts _scripts;
+        private readonly Internal.Scripts _scripts;
 
-        public AdoNetEventStoreDatabaseMigrator()
+        public AdoNetEventStoreDatabaseMigrator(bool forceMultiTenant = false)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -31,7 +31,16 @@ namespace NBB.EventStore.AdoNet.Migrations
 
             var configuration = configurationBuilder.Build();
             _connectionString = configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
-            _scripts = new Scripts();
+            var tenancySection = configuration.GetSection("MultiTenancy");
+            var tenancyOptions = tenancySection.Get<TenancyHostingOptions>();
+            if ((tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None) && !forceMultiTenant)
+            {
+                _scripts = new Internal.Scripts();
+            }
+            else
+            {
+                _scripts = new Multitenancy.Internal.Scripts();
+            }            
         }
 
         public async Task ReCreateDatabaseObjects(string[] args, CancellationToken cancellationToken = default)

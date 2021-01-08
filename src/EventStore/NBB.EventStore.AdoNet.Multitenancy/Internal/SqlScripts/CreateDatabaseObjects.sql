@@ -4,15 +4,16 @@
 	[EventType] [varchar](300) NOT NULL,
 	[CorrelationId] [uniqueidentifier] NULL,
 	[StreamId] [varchar](200) NOT NULL,
-	[StreamVersion] int NOT NULL
+	[StreamVersion] int NOT NULL,
+	[TenantId] [uniqueidentifier] NOT NULL,
  CONSTRAINT [PK_EventStoreEvents] PRIMARY KEY NONCLUSTERED([EventId] ASC)
 );
 
-CREATE CLUSTERED INDEX [IX_EventStoreEvents_StreamId] 
-	ON [dbo].[EventStoreEvents](StreamId);
+CREATE CLUSTERED INDEX [IX_EventStoreEvents_TenantId_StreamId] 
+	ON [dbo].[EventStoreEvents](TenantId, StreamId);
 
 CREATE UNIQUE NONCLUSTERED INDEX [IX_EventStoreEvents_StreamId_StreamVersion] 
-	ON [dbo].[EventStoreEvents](StreamId, StreamVersion); 
+	ON [dbo].[EventStoreEvents](TenantId, StreamId, StreamVersion); 
 
 
 CREATE TYPE dbo.NewEventStoreEvents AS TABLE (
@@ -27,6 +28,7 @@ CREATE TABLE [dbo].[EventStoreSnapshots](
 	[SnapshotData] [nvarchar](max) NOT NULL,
 	[SnapshotType] [varchar](300) NOT NULL,
 	[StreamId] [varchar](200) NOT NULL,
-	[StreamVersion] int NOT NULL
+	[StreamVersion] int NOT NULL,
+	[TenantId] [uniqueidentifier] NOT NULL,
  CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([StreamId], [StreamVersion] ASC)
 );

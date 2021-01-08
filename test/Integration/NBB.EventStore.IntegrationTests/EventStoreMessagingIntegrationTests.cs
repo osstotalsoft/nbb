@@ -85,9 +85,6 @@ namespace NBB.EventStore.IntegrationTests
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
             
-            services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
-
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithInMemoryEventRepository()

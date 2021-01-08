@@ -6,7 +6,11 @@ using NBB.EventStore;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
+using NBB.EventStore.AdoNet.Multitenancy;
 using NBB.GetEventStore;
+using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.SQLStreamStore;
 using NBB.SQLStreamStore.Migrations;
 using System;
@@ -42,12 +46,25 @@ namespace TheBenchmarks
         [GlobalSetup(Target = nameof(NBBEventStoreSave))]
         public void GlobalSetupNBBEventStoreSave()
         {
-            MigrateNBBEventStore();
+            MigrateNBBEventStore(false);
 
-            _container = BuildServiceProvider(services =>
+            _container = BuildServiceProvider((services, _) =>
                 services.AddEventStore()
                     .WithNewtownsoftJsonEventStoreSeserializer()
                     .WithAdoNetEventRepository());
+        }
+
+        [GlobalSetup(Target = nameof(NBBMultiTenantEventStoreSave))]
+        public void GlobalSetupNBBMultiTenantEventStoreSave()
+        {
+            MigrateNBBEventStore(true);
+
+            _container = BuildServiceProvider((services, configuration) =>
+                services.AddEventStore()
+                    .WithNewtownsoftJsonEventStoreSeserializer()
+                    .AddSingleton<ITenantContextAccessor, TenantContextAccessorMock>()
+                    .WithMultiTenantAdoNetEventRepository());
+         
         }
 
         [GlobalSetup(Target = nameof(SqlStreamStoreSave))]
@@ -55,14 +72,14 @@ namespace TheBenchmarks
         {
             MigrateSqlStreamStore();
 
-            _container = BuildServiceProvider(services =>
+            _container = BuildServiceProvider((services, _) =>
                 services.AddSqlStreamStore());
         }
 
         [GlobalSetup(Target = nameof(GetEventStoreSave))]
         public void GlobalSetupGetEventStoreSave()
         {
-            _container = BuildServiceProvider(services =>
+            _container = BuildServiceProvider((services, _) =>
                 services.AddGetEventStore());
         }
 
@@ -71,6 +88,13 @@ namespace TheBenchmarks
         public void GlobalSetupNBBEventStoreLoad()
         {
             GlobalSetupNBBEventStoreSave();
+            SeedEventRepository(_loadTestStream);
+        }
+
+        [GlobalSetup(Target = nameof(NBBMultiTenantEventStoreLoad))]
+        public void GlobalMultiTenantSetupNBBEventStoreLoad()
+        {
+            GlobalSetupNBBMultiTenantEventStoreSave();
             SeedEventRepository(_loadTestStream);
         }
 
@@ -88,10 +112,14 @@ namespace TheBenchmarks
             SeedEventRepository(_loadTestStream);
         }
 
-
-
         [Benchmark]
         public void NBBEventStoreSave()
+        {
+            EventStoreSave();
+        }
+
+        [Benchmark]
+        public void NBBMultiTenantEventStoreSave()
         {
             EventStoreSave();
         }
@@ -115,6 +143,12 @@ namespace TheBenchmarks
         }
 
         [Benchmark]
+        public void NBBMultiTenantEventStoreLoad()
+        {
+            EventStoreLoad();
+        }
+
+        [Benchmark]
         public void SqlStreamStoreLoad()
         {
             EventStoreLoad();
@@ -128,14 +162,12 @@ namespace TheBenchmarks
         }
 
 
-
-
         public void EventStoreSave()
         {
             using (var scope = _container.CreateScope())
             {
                 var eventStore = scope.ServiceProvider.GetService<IEventStore>();
-                eventStore.AppendEventsToStreamAsync(Guid.NewGuid().ToString(), new List<IEvent> { GetATestEvent() }, 0, CancellationToken.None).Wait();
+                eventStore.AppendEventsToStreamAsync(Guid.NewGuid().ToString(), new List<IEvent> { GetATestEvent() }, null, CancellationToken.None).Wait();
             }
         }
 
@@ -163,9 +195,9 @@ namespace TheBenchmarks
 
 
 
-        private static void MigrateNBBEventStore()
+        private static void MigrateNBBEventStore(bool forceMultiTenant)
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(default).Wait();
+            new AdoNetEventStoreDatabaseMigrator(forceMultiTenant).ReCreateDatabaseObjects(default).Wait();
         }
 
         private static void MigrateSqlStreamStore()
@@ -184,7 +216,7 @@ namespace TheBenchmarks
             };
         }
 
-        private static IServiceProvider BuildServiceProvider(Action<ServiceCollection> addEventStoreAction)
+        private static IServiceProvider BuildServiceProvider(Action<ServiceCollection, IConfiguration> addEventStoreAction)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -205,11 +237,22 @@ namespace TheBenchmarks
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
-            addEventStoreAction(services);
+            addEventStoreAction(services, configuration);
 
             var container = services.BuildServiceProvider();
             return container;
         }
 
+
+        private class TenantContextAccessorMock : ITenantContextAccessor
+        {
+            private readonly TenantContext _tenantContext = new TenantContext(new Tenant(Guid.NewGuid(), null, false));
+            public TenantContext TenantContext { get => _tenantContext; set => throw new NotImplementedException(); }
+
+            public TenantContextFlow ChangeTenantContext(TenantContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

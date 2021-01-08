@@ -6,8 +6,10 @@ using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
+using NBB.EventStore.AdoNet.Multitenancy;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +46,7 @@ namespace NBB.EventStore.IntegrationTests
                         try
                         {
                             eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] {new TestEvent {EventId = Guid.NewGuid()}}, streamVersion,
+                                    new[] { new TestEvent { EventId = Guid.NewGuid() } }, streamVersion,
                                     CancellationToken.None)
                                 .Wait();
                         }
@@ -73,7 +75,7 @@ namespace NBB.EventStore.IntegrationTests
         public void EventStore_AppendEventsToStreamAsync_with_expected_version_any_should_be_thread_safe()
         {
             PrepareDb();
-            var container = BuildAdoRepoServiceProvider();  
+            var container = BuildAdoRepoServiceProvider();
             var stream = Guid.NewGuid().ToString();
             var threadCount = 10;
             var threads = new List<Thread>();
@@ -88,7 +90,7 @@ namespace NBB.EventStore.IntegrationTests
                     var t = new Thread(() =>
                     {
                         eventStore.AppendEventsToStreamAsync(stream,
-                            new[] {new TestEvent {EventId = Guid.NewGuid()}}, null, CancellationToken.None).Wait();
+                            new[] { new TestEvent { EventId = Guid.NewGuid() } }, null, CancellationToken.None).Wait();
                     });
                     t.Start();
                     threads.Add(t);
@@ -126,12 +128,19 @@ namespace NBB.EventStore.IntegrationTests
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
-            services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
+
 
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
+
+            services.AddMultitenancy(configuration, _ =>
+                {
+                    services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                        x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
+                    services.WithMultiTenantAdoNetEventRepository();
+                });
+
 
             var container = services.BuildServiceProvider();
             return container;
