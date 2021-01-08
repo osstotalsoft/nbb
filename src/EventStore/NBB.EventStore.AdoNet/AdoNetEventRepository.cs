@@ -20,7 +20,6 @@ namespace NBB.EventStore.AdoNet
         private readonly Scripts _scripts;
         private readonly ILogger<AdoNetEventRepository> _logger;
         private readonly IOptions<EventStoreOptions> _eventstoreOptions;
-
         private readonly SqlMetaData[] _appendEventsMetadata = new List<SqlMetaData>
         {
             new SqlMetaData("OrderNo", SqlDbType.Int, true, false, SortOrder.Unspecified, -1),
@@ -42,6 +41,7 @@ namespace NBB.EventStore.AdoNet
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
+
             if (expectedVersion.HasValue)
             {
                 await AppendEventsToStreamExpectedVersionAsync(streamId, eventDescriptors, expectedVersion.Value,
@@ -53,7 +53,7 @@ namespace NBB.EventStore.AdoNet
             }
 
             stopWatch.Stop();
-            _logger.LogDebug("AdoNetEventRepository.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms.", streamId, stopWatch.ElapsedMilliseconds);
+            _logger.LogDebug("AdoNetEventRepository.AppendEventsToStreamAsync for stream {Stream} took {ElapsedMilliseconds} ms.", streamId, stopWatch.ElapsedMilliseconds);
         }
 
         public async Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
@@ -71,6 +71,10 @@ namespace NBB.EventStore.AdoNet
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200) { Value = stream });
                 cmd.Parameters.Add(new SqlParameter("@MinStreamVersion", SqlDbType.Int) { Value = (object)startFromVersion ?? DBNull.Value });
                 cmd.Parameters.Add(new SqlParameter("@MaxStreamVersion", SqlDbType.Int) { Value = DBNull.Value }); // To be implemented for loading aggregate at a specific version
+                foreach (var param in GetGlobalFilterParams())
+                {
+                    cmd.Parameters.Add(param);
+                }
 
                 using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
                 {
@@ -88,6 +92,10 @@ namespace NBB.EventStore.AdoNet
             return eventDescriptors;
         }
 
+        protected virtual IEnumerable<SqlParameter> GetGlobalFilterParams()
+        {
+            yield break;
+        }
 
         private async Task AppendEventsToStreamExpectedVersionAsync(string streamId, IList<EventDescriptor> eventDescriptors, int expectedVersion, CancellationToken cancellationToken = default)
         {
@@ -109,6 +117,11 @@ namespace NBB.EventStore.AdoNet
                 {
                     Value = expectedVersion
                 });
+                foreach (var param in GetGlobalFilterParams())
+                {
+                    cmd.Parameters.Add(param);
+                }
+
 
                 var eventsParam = CreateNewEventsSqlParameter(sqlDataRecords);
                 cmd.Parameters.Add(eventsParam);
@@ -151,6 +164,10 @@ namespace NBB.EventStore.AdoNet
                 {
                     Value = streamId
                 });
+                foreach (var param in GetGlobalFilterParams())
+                {
+                    cmd.Parameters.Add(param);
+                }
 
                 var eventsParam = CreateNewEventsSqlParameter(sqlDataRecords);
                 cmd.Parameters.Add(eventsParam);

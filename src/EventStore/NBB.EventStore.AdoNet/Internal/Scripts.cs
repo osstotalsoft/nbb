@@ -7,9 +7,21 @@ namespace NBB.EventStore.AdoNet.Internal
 {
     public class Scripts
     {
-
         private readonly ConcurrentDictionary<string, string> _scripts
             = new ConcurrentDictionary<string, string>();
+        private readonly Assembly scriptsAssembly;
+        private readonly string scriptsResourcePath;
+
+        public Scripts()
+            : this(typeof(Scripts).Assembly, "NBB.EventStore.AdoNet.Internal.SqlScripts")
+        {
+        }
+
+        protected Scripts(Assembly scriptsAssembly, string scriptsResourcePath)
+        {
+            this.scriptsAssembly = scriptsAssembly;
+            this.scriptsResourcePath = scriptsResourcePath;
+        }
 
         public string AppendEventsToStreamExpectedVersion => GetScript(nameof(AppendEventsToStreamExpectedVersion));
         public string AppendEventsToStreamExpectedVersionAny => GetScript(nameof(AppendEventsToStreamExpectedVersionAny));
@@ -24,7 +36,7 @@ namespace NBB.EventStore.AdoNet.Internal
             return _scripts.GetOrAdd(name,
                 key =>
                 {
-                    using (Stream stream = typeof(Scripts).GetTypeInfo().Assembly.GetManifestResourceStream("NBB.EventStore.AdoNet.Internal.SqlScripts." + key + ".sql"))
+                    using (Stream stream = scriptsAssembly.GetManifestResourceStream($"{scriptsResourcePath}.{key}.sql"))
                     {
                         if (stream == null)
                         {

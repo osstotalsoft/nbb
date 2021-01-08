@@ -4,6 +4,7 @@ using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -39,11 +40,17 @@ namespace NBB.EventStore.AdoNet
                 cnx.Open();
 
                 var cmd = new SqlCommand(_scripts.GetSnapshotForStream, cnx);
+
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
                 { Value = stream });
 
                 cmd.Parameters.Add(new SqlParameter("@MaxStreamVersion", SqlDbType.Int)
                 { Value = DBNull.Value }); // To be implemented for loading aggregate at a specific version
+
+                foreach (var param in GetGlobalFilterParams())
+                {
+                    cmd.Parameters.Add(param);
+                }
 
                 using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
                 {
@@ -70,6 +77,7 @@ namespace NBB.EventStore.AdoNet
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
+
             using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
             using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
@@ -88,6 +96,11 @@ namespace NBB.EventStore.AdoNet
                 cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
                 { Value = stream });
 
+                foreach (var param in GetGlobalFilterParams())
+                {
+                    cmd.Parameters.Add(param);
+                }
+
                 try
                 {
                     await cmd.ExecuteNonQueryAsync(cancellationToken);
@@ -104,8 +117,13 @@ namespace NBB.EventStore.AdoNet
             }
 
             stopWatch.Stop();
-            _logger.LogDebug("AdoNetSnapshotRepository.StoreSnapshotAsync for {Stream} took {ElapsedMilliseconds} ms.",
+            _logger.LogDebug("AdoNetSnapshotRepository.StoreSnapshotAsync for stream {Stream} took {ElapsedMilliseconds} ms.",
                 stream, stopWatch.ElapsedMilliseconds);
+        }
+
+        protected virtual IEnumerable<SqlParameter> GetGlobalFilterParams()
+        {
+            yield break;
         }
     }
 }

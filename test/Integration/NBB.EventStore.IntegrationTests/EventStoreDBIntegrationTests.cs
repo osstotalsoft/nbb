@@ -1,10 +1,15 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
+using NBB.EventStore.AdoNet.Multitenancy;
+using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,7 +46,7 @@ namespace NBB.EventStore.IntegrationTests
                         try
                         {
                             eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] {new TestEvent {EventId = Guid.NewGuid()}}, streamVersion,
+                                    new[] { new TestEvent { EventId = Guid.NewGuid() } }, streamVersion,
                                     CancellationToken.None)
                                 .Wait();
                         }
@@ -85,7 +90,7 @@ namespace NBB.EventStore.IntegrationTests
                     var t = new Thread(() =>
                     {
                         eventStore.AppendEventsToStreamAsync(stream,
-                            new[] {new TestEvent {EventId = Guid.NewGuid()}}, null, CancellationToken.None).Wait();
+                            new[] { new TestEvent { EventId = Guid.NewGuid() } }, null, CancellationToken.None).Wait();
                     });
                     t.Start();
                     threads.Add(t);
@@ -124,9 +129,18 @@ namespace NBB.EventStore.IntegrationTests
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
+
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
+
+            services.AddMultitenancy(configuration, _ =>
+                {
+                    services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                        x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
+                    services.WithMultiTenantAdoNetEventRepository();
+                });
+
 
             var container = services.BuildServiceProvider();
             return container;

@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NBB.EventStore.AdoNet.Multitenancy\NBB.EventStore.AdoNet.MultiTenancy.csproj" />
     <ProjectReference Include="..\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
   </ItemGroup>
 
