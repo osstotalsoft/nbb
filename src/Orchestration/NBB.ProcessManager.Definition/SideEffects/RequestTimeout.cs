@@ -3,7 +3,7 @@ using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Definition.SideEffects
 {
-    public interface IRequestTimeoutHandler<TMessage> : ISideEffectHandler
+    public interface IRequestTimeoutHandler<TMessage>
     {
     }
 

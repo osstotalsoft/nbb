@@ -17,9 +17,10 @@ namespace NBB.Core.Effects
         public Task<(Effect<T>, T)> Visit(Effect<T>.Pure eff, CancellationToken cancellationToken)
             => Task.FromResult<(Effect<T>, T)>((null, eff.Value));
 
-        public async Task<(Effect<T>,T)> Visit<TOutput>(Effect<T>.Impure<TOutput> eff, CancellationToken cancellationToken)
+        public async Task<(Effect<T>,T)> Visit<TSideEffect, TSideEffectResult>(Effect<T>.Impure<TSideEffect, TSideEffectResult> eff, CancellationToken cancellationToken)
+            where TSideEffect : ISideEffect<TSideEffectResult>
         {
-            var sideEffectResult = await _sideEffectBroker.Run(eff.SideEffect, cancellationToken);
+            var sideEffectResult = await _sideEffectBroker.Run<TSideEffect, TSideEffectResult>(eff.SideEffect, cancellationToken);
             var nextEffect = eff.Continuations.Apply(sideEffectResult);
             return (nextEffect, default);
         }

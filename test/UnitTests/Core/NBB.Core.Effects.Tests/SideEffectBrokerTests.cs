@@ -18,7 +18,7 @@ namespace NBB.Core.Effects.Tests
             var sut = new SideEffectBroker(container);
 
             //Act
-            var result = await sut.Run(new Simple.SideEffect(10));
+            var result = await sut.Run<Simple.SideEffect, int>(new Simple.SideEffect(10));
 
             //Assert
             result.Should().Be(10);
@@ -29,12 +29,12 @@ namespace NBB.Core.Effects.Tests
         {
             //Arrange
             var services = new ServiceCollection();
-            services.AddScoped<ISideEffectHandler<VoidReturning.SideEffect>, VoidReturning.Handler>();
+            services.AddScoped<ISideEffectHandler<VoidReturning.SideEffect, Unit>, VoidReturning.Handler>();
             await using var container = services.BuildServiceProvider();
             var sut = new SideEffectBroker(container);
 
             //Act
-            var sideEffectHandlerType = await sut.Run(new VoidReturning.SideEffect());
+            var sideEffectHandlerType = await sut.Run<VoidReturning.SideEffect, Unit>(new VoidReturning.SideEffect());
 
             //Assert
             sideEffectHandlerType.Should().Be(Unit.Value);
@@ -50,7 +50,7 @@ namespace NBB.Core.Effects.Tests
             var sut = new SideEffectBroker(container);
 
             //Act
-            var sideEffectHandler = await sut.Run(new Generic.SideEffect<int>());
+            var sideEffectHandler = await sut.Run<Generic.SideEffect<int>, int>(new Generic.SideEffect<int>());
 
 
             //Assert
@@ -100,11 +100,11 @@ namespace NBB.Core.Effects.Tests
         {
         }
 
-        public class Handler : ISideEffectHandler<SideEffect>
+        public class Handler : ISideEffectHandler<SideEffect, Unit>
         {
-            public Task Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
+            public Task<Unit> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
-                return Task.CompletedTask;
+                return Unit.Task;
             }
         }
     }

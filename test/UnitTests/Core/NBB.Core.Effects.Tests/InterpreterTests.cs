@@ -50,16 +50,17 @@ namespace NBB.Core.Effects.Tests
         public async Task Interpret_impure_effect_should_execute_side_effect_broker()
         {
             //Arrange
-            var sideEffect = Mock.Of<ISideEffect<int>>();
+            var sideEffect = Thunk.From(() => 3);
+                //Mock.Of<ISideEffect<int>>();
             var sideEffectBroker = new Mock<ISideEffectBroker>();
             var sut = new Interpreter(sideEffectBroker.Object);
-            var effect = Effect.Of(sideEffect);
+            var effect = Effect.Of<Thunk.SideEffect<int>, int>(sideEffect);
 
             //Act
             var result = await sut.Interpret(effect);
 
             //Assert
-            sideEffectBroker.Verify(x=> x.Run(sideEffect, default), Times.Once);
+            sideEffectBroker.Verify(x=> x.Run<Thunk.SideEffect<int>, int>(sideEffect, default), Times.Once);
         }
 
         [Fact]

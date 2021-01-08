@@ -5,14 +5,14 @@ using System.Threading.Tasks;
 
 namespace NBB.Core.Effects
 {
-    
-    
+
+
     public abstract class Effect<T>
     {
         public abstract Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation);
         internal abstract Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations);
         public abstract Task<TResult> Accept<TResult>(IVisitor<TResult> v, CancellationToken cancellationToken);
-        
+
         public class Pure : Effect<T>
         {
             public T Value { get; }
@@ -31,39 +31,42 @@ namespace NBB.Core.Effects
             public override Task<TResult> Accept<TResult>(IVisitor<TResult> v, CancellationToken cancellationToken)
                 => v.Visit(this, cancellationToken);
         }
-        
-        public class Impure<TOutput> : Effect<T>
-        {
-            public ISideEffect<TOutput> SideEffect { get; }
-            public EffectFnSeq<TOutput, T> Continuations { get; }
 
-            public Impure(ISideEffect<TOutput> sideEffect, EffectFnSeq<TOutput, T> continuations)
+        public class Impure<TSideEffect, TSideEffectResult> : Effect<T>
+            where TSideEffect : ISideEffect<TSideEffectResult>
+        {
+            public TSideEffect SideEffect { get; }
+            public EffectFnSeq<TSideEffectResult, T> Continuations { get; }
+
+            public Impure(TSideEffect sideEffect, EffectFnSeq<TSideEffectResult, T> continuations)
             {
                 SideEffect = sideEffect;
                 Continuations = continuations;
             }
 
             public override Effect<TResult> Bind<TResult>(Func<T, Effect<TResult>> continuation)
-                => new Effect<TResult>.Impure<TOutput>(SideEffect, Continuations.Append(continuation));
+                => new Effect<TResult>.Impure<TSideEffect, TSideEffectResult>(SideEffect, Continuations.Append(continuation));
 
             internal override Effect<TResult> Bind2<TResult>(EffectFnSeq<T, TResult> continuations)
-                => new Effect<TResult>.Impure<TOutput>(SideEffect, Continuations.AppendMany(continuations));
+                => new Effect<TResult>.Impure<TSideEffect, TSideEffectResult>(SideEffect, Continuations.AppendMany(continuations));
 
             public override Task<TResult> Accept<TResult>(IVisitor<TResult> v, CancellationToken cancellationToken)
                 => v.Visit(this, cancellationToken);
         }
-        
+
         public interface IVisitor<TResult>
         {
             Task<TResult> Visit(Pure eff, CancellationToken cancellationToken);
-            Task<TResult> Visit<T1>(Impure<T1> eff, CancellationToken cancellationToken);
+            Task<TResult> Visit<TSideEffect, TSideEffectResult>(Impure<TSideEffect, TSideEffectResult> eff, CancellationToken cancellationToken) 
+                where TSideEffect : ISideEffect<TSideEffectResult>;
         }
     }
 
     public static class Effect
     {
-        public static Effect<T> Of<T>(ISideEffect<T> sideEffect)
-            => new Effect<T>.Impure<T>(sideEffect, new EffectFnSeq<T, T>.Leaf(Pure));
+        public static Effect<TSideEffectResult> Of<TSideEffect, TSideEffectResult>(TSideEffect sideEffect)
+            where TSideEffect : ISideEffect<TSideEffectResult>
+            => new Effect<TSideEffectResult>.Impure<TSideEffect, TSideEffectResult>(sideEffect, new EffectFnSeq<TSideEffectResult, TSideEffectResult>.Leaf(Pure));
 
         public static Effect<T> Pure<T>(T value)
             => new Effect<T>.Pure(value);
@@ -72,25 +75,25 @@ namespace NBB.Core.Effects
             => new Effect<Unit>.Pure(Unit.Value);
 
         public static Effect<T> From<T>(Func<CancellationToken, Task<T>> impure)
-            => Of(Thunk.From(impure));
+            => Of<Thunk.SideEffect<T>, T>(Thunk.From(impure));
 
         public static Effect<Unit> From(Func<CancellationToken, Task> impure)
-            => Of(Thunk.From(impure));
+            => Of<Thunk.SideEffect<Unit>, Unit>(Thunk.From(impure));
 
-        public static Effect<TOutput> From<TOutput>(Func<TOutput> impure)
-            => Of(Thunk.From(impure));
+        public static Effect<T> From<T>(Func<T> impure)
+            => Of<Thunk.SideEffect<T>, T>(Thunk.From(impure));
 
         public static Effect<Unit> From(Action impure)
-            => Of(Thunk.From(impure));
+            => Of<Thunk.SideEffect<Unit>, Unit>(Thunk.From(impure));
 
         public static Effect<(T1, T2)> Parallel<T1, T2>(Effect<T1> e1, Effect<T2> e2)
-            => Of(Effects.Parallel.From(e1, e2));
+            => Of<Parallel.SideEffect<T1, T2>, (T1, T2)>(Effects.Parallel.From(e1, e2));
 
         public static Effect<Unit> Parallel(Effect<Unit> e1, Effect<Unit> e2)
             => Parallel<Unit, Unit>(e1, e2).ToUnit();
-        
+
         public static Effect<IEnumerable<T>> Sequence<T>(IEnumerable<Effect<T>> effectList)
-            => Of(Effects.Sequenced.From(effectList));
+            => Of<Sequenced.SideEffect<T>, IEnumerable<T>>(Effects.Sequenced.From(effectList));
 
         public static Effect<Unit> Sequence(IEnumerable<Effect<Unit>> effectList)
             => Sequence<Unit>(effectList).ToUnit();

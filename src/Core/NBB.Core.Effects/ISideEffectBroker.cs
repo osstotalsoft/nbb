@@ -5,6 +5,7 @@ namespace NBB.Core.Effects
 {
     public interface ISideEffectBroker
     {
-        Task<T> Run<T>(ISideEffect<T> sideEffect, CancellationToken cancellationToken = default);
+        Task<TSideEffectResult> Run<TSideEffect, TSideEffectResult>(TSideEffect sideEffect, CancellationToken cancellationToken = default)
+            where TSideEffect : ISideEffect<TSideEffectResult>;
     }
 }

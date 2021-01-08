@@ -30,7 +30,7 @@ namespace NBB.ProcessManager.Runtime
             services.AddSingleton<TimeoutsManager>();
             services.AddSingleton<ITimeoutsRepository, InMemoryTimeoutRepository>();
             services.AddSingleton<Func<DateTime>>(provider => () => DateTime.UtcNow);
-            services.AddSingleton<ISideEffectHandler<CancelTimeouts>, CancelTimeoutsHandler>();
+            services.AddSingleton<ISideEffectHandler<CancelTimeouts, Unit>, CancelTimeoutsHandler>();
             services.AddSingleton(typeof(IRequestTimeoutHandler<>), typeof(RequestTimeoutHandler<>));
         }
     }

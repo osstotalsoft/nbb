@@ -9,7 +9,7 @@ namespace NBB.Core.Effects
 {
     public class SideEffectBroker : ISideEffectBroker
     {
-        private static readonly ConcurrentDictionary<Type, Type> Cache = new ConcurrentDictionary<Type, Type>();
+        private static readonly ConcurrentDictionary<Type, Type> Cache = new();
         private readonly IServiceProvider _serviceProvider;
 
         public SideEffectBroker(IServiceProvider serviceProvider)
@@ -17,55 +17,39 @@ namespace NBB.Core.Effects
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<T> Run<T>(ISideEffect<T> sideEffect, CancellationToken cancellationToken = default)
+        public async Task<TSideEffectResult> Run<TSideEffect, TSideEffectResult>(TSideEffect sideEffect, CancellationToken cancellationToken = default)
+            where TSideEffect : ISideEffect<TSideEffectResult>
         {
-            var sideEffectHandlerType = GetSideEffectHandlerTypeFor(sideEffect.GetType());
-            var sideEffectHandler = _serviceProvider.GetRequiredService(sideEffectHandlerType) as ISideEffectHandler;
-            if (sideEffectHandler == null)
+            var sideEffectHandlerType = GetSideEffectHandlerTypeFor<TSideEffect, TSideEffectResult>();
+            if (_serviceProvider.GetRequiredService(sideEffectHandlerType) is not ISideEffectHandler<TSideEffect, TSideEffectResult> sideEffectHandler)
             {
-                throw new Exception($"Could not create a side effect handler for type {sideEffectHandlerType.Name}");
+                throw new Exception($"Could not create a side effect handler for type {typeof(TSideEffect).Name}");
             }
-            var mi = sideEffectHandler.GetType().GetMethod("Handle");
-            var task = mi.Invoke(sideEffectHandler, new object[] { sideEffect, cancellationToken }) as Task;
-            //var task = sideEffectHandler.AsDynamic().Handle((sideEffect as dynamic), cancellationToken);
-            if (typeof(T) == typeof(Unit))
-            {
-                await task;
-                return Unit.Value as dynamic;
-            }
-            else
-            {
-                var x = await (task as Task<T>);
-                return x;
-            }
+
+            var result = await sideEffectHandler.Handle(sideEffect, cancellationToken);
+            return result;
         }
 
 
-        private Type GetSideEffectHandlerTypeFor(Type sideEffectType)
+        private static Type GetSideEffectHandlerTypeFor<TSideEffect, TSideEffectResult>()
+            where TSideEffect : ISideEffect<TSideEffectResult>
         {
-            var handlerType = Cache.GetOrAdd(sideEffectType, sideEffType =>
-            {
-                if (TypeImplementsOpenGenericInterface(sideEffType, typeof(IAmHandledBy<>)))
-                {
-                    return GetFirstTypeParamForOpenGenericInterface(sideEffType, typeof(IAmHandledBy<>));
-                }
-
-                var outputType = GetFirstTypeParamForOpenGenericInterface(sideEffectType, typeof(ISideEffect<>));
-                return outputType == typeof(Unit)
-                    ? typeof(ISideEffectHandler<>).MakeGenericType(sideEffType)
-                    : typeof(ISideEffectHandler<,>).MakeGenericType(sideEffType, outputType);
-            });
+            var handlerType = Cache.GetOrAdd(
+                typeof(TSideEffect),
+                sideEffType => TypeImplementsOpenGenericInterface(sideEffType, typeof(IAmHandledBy<>))
+                    ? GetFirstTypeParamForOpenGenericInterface(sideEffType, typeof(IAmHandledBy<>))
+                    : typeof(ISideEffectHandler<TSideEffect, TSideEffectResult>));
 
             return handlerType;
         }
 
-        private bool TypeImplementsOpenGenericInterface(Type t, Type openGenericInterfaceType)
+        private static bool TypeImplementsOpenGenericInterface(Type t, Type openGenericInterfaceType)
         {
             return t.GetInterfaces()
                 .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == openGenericInterfaceType);
         }
 
-        private Type GetFirstTypeParamForOpenGenericInterface(Type genericType, Type openGenericInterfaceType)
+        private static Type GetFirstTypeParamForOpenGenericInterface(Type genericType, Type openGenericInterfaceType)
         {
             var closedGenericIntf = genericType.GetInterfaces().SingleOrDefault(i =>
                 i.IsGenericType && i.GetGenericTypeDefinition() == openGenericInterfaceType);
