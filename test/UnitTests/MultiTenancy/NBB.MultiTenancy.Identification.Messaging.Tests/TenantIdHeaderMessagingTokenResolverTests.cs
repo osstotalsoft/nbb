@@ -16,7 +16,7 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
             _mockMessagingContextAccessor = new MessagingContextAccessor();
             _headers = new Dictionary<string, string>();
             var mockMessagingEnvelope = new MessagingEnvelope(_headers, new object());
-            var mockMessagingContext = new MessagingContext(mockMessagingEnvelope);
+            var mockMessagingContext = new MessagingContext(mockMessagingEnvelope, typeof(object), "topicName");
 
             _mockMessagingContextAccessor.MessagingContext = mockMessagingContext;
         }

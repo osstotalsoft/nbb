@@ -1,4 +1,8 @@
-﻿namespace NBB.Messaging.Abstractions
+﻿using NBB.Messaging.DataContracts;
+using System;
+using System.Collections.Generic;
+
+namespace NBB.Messaging.Abstractions
 {
     public class MessagingSubscriberOptions
     {

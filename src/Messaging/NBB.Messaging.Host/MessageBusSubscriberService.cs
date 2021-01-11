@@ -18,20 +18,22 @@ namespace NBB.Messaging.Host
         private readonly IServiceProvider _serviceProvider;
         private readonly MessagingContextAccessor _messagingContextAccessor;
         private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
+        private readonly ITopicRegistry _topicRegistry;
 
         public MessageBusSubscriberService(
-            IMessageBusSubscriber<TMessage> messageBusSubscriber, 
+            IMessageBusSubscriber<TMessage> messageBusSubscriber,
             IServiceProvider serviceProvider,
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<TMessage>> logger,
-            MessagingSubscriberOptions subscriberOptions = null
-            )
+            MessagingSubscriberOptions subscriberOptions = null, 
+            ITopicRegistry topicRegistry = null)
         {
             _subscriberOptions = subscriberOptions;
             _messageBusSubscriber = messageBusSubscriber;
             _serviceProvider = serviceProvider;
             _messagingContextAccessor = messagingContextAccessor;
             _logger = logger;
+            _topicRegistry = topicRegistry;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
@@ -53,7 +55,8 @@ namespace NBB.Messaging.Host
             using (var scope = _serviceProvider.CreateScope())
             {
                 var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<MessagingEnvelope>>();
-                _messagingContextAccessor.MessagingContext = new MessagingContext(message);
+                var topicName = _topicRegistry.GetTopicForMessageType(typeof(TMessage));
+                _messagingContextAccessor.MessagingContext = new MessagingContext(message, typeof(TMessage), topicName);//todo: add topic name
                 await pipeline(message, cancellationToken);
             }
         }

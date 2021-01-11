@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.Abstractions
 {
-    public class MessageBusSubscriber<TMessage> : IMessageBusSubscriber<TMessage> 
+    public class MessageBusSubscriber<TMessage> : IMessageBusSubscriber<TMessage>
     {
         private readonly ITopicRegistry _topicRegistry;
         private readonly List<Func<MessagingEnvelope<TMessage>, Task>> _handlers = new List<Func<MessagingEnvelope<TMessage>, Task>>();
@@ -58,7 +58,7 @@ namespace NBB.Messaging.Abstractions
             MessagingEnvelope<TMessage> deserializedMessage = null;
             try
             {
-                 deserializedMessage = _messageSerDes.DeserializeMessageEnvelope<TMessage>(msg, _subscriberOptions?.SerDes);
+                deserializedMessage = _messageSerDes.DeserializeMessageEnvelope<TMessage>(msg, new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
             }
             catch (Exception ex)
             {
@@ -67,7 +67,6 @@ namespace NBB.Messaging.Abstractions
                     _topicName, ex);
                 //TODO: push to DLQ
             }
-
 
             if (deserializedMessage != null)
             {

@@ -59,19 +59,21 @@ namespace NBB.Messaging.Host
             MessagingEnvelope messageEnvelope = null;
             try
             {
-                messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(message, _subscriberOptions?.SerDes);
+                //messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(message, _subscriberOptions?.SerDes);
+                messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(message,  new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(
-                    "MessagingTopicSubscriberService encountered an error when deserializing a message from topic {TopicName}.\n {Error}",
-                    _topic, ex);
+                    "MessagingTopicSubscriberService encountered an error when deserializing a message from topic {TopicName}.\n {Error} \n {Message}",
+                    _topic, ex, message);
             }
 
             using (var scope = _serviceProvider.CreateScope())
             {
                 var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<MessagingEnvelope>>();
-                _messagingContextAccessor.MessagingContext = new MessagingContext(messageEnvelope);
+                _messagingContextAccessor.MessagingContext = new MessagingContext(messageEnvelope, typeof(object), _topic);
                 await pipeline(messageEnvelope, cancellationToken);
             }
         }
