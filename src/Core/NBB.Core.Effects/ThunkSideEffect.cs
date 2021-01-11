@@ -6,11 +6,11 @@ namespace NBB.Core.Effects
 {
     public class Thunk
     {
-        public class SideEffect<TOutput> : ISideEffect<TOutput>, IAmHandledBy<Handler<TOutput>>
+        public class SideEffect<TResult> : ISideEffect<TResult>, IAmHandledBy<Handler<TResult>>
         {
-            public Func<CancellationToken, Task<TOutput>> ImpureFn { get; }
+            public Func<CancellationToken, Task<TResult>> ImpureFn { get; }
 
-            public SideEffect(Func<CancellationToken, Task<TOutput>> impureFn)
+            public SideEffect(Func<CancellationToken, Task<TResult>> impureFn)
             {
                 ImpureFn = impureFn;
             }
@@ -18,27 +18,27 @@ namespace NBB.Core.Effects
 
         }
 
-        public class Handler<TOutput> : ISideEffectHandler<SideEffect<TOutput>, TOutput>
+        public class Handler<TResult> : ISideEffectHandler<SideEffect<TResult>, TResult>
         {
-            public Task<TOutput> Handle(SideEffect<TOutput> sideEffect, CancellationToken cancellationToken = default)
+            public Task<TResult> Handle(SideEffect<TResult> sideEffect, CancellationToken cancellationToken = default)
             {
                 return sideEffect.ImpureFn(cancellationToken);
             }
         }
 
-        public static SideEffect<TOutput> From<TOutput>(Func<CancellationToken, Task<TOutput>> impureFn)
+        public static SideEffect<TResult> From<TResult>(Func<CancellationToken, Task<TResult>> impureFn)
         {
-            return new SideEffect<TOutput>(impureFn);
+            return new(impureFn);
         }
 
-        public static SideEffect<TOutput> From<TOutput>(Func<TOutput> impureFn)
+        public static SideEffect<TResult> From<TResult>(Func<TResult> impureFn)
         {
-            return new SideEffect<TOutput>(ct => Task.FromResult(impureFn()));
+            return new(ct => Task.FromResult(impureFn()));
         }
 
         public static SideEffect<Unit> From(Func<CancellationToken, Task> impureFn)
         {
-            return new SideEffect<Unit>(async ct =>
+            return new(async ct =>
             {
                 await impureFn(ct);
                 return Unit.Value;
@@ -47,7 +47,7 @@ namespace NBB.Core.Effects
 
         public static SideEffect<Unit> From(Action impureFn)
         {
-            return new SideEffect<Unit>(ct =>
+            return new(ct =>
             {
                 impureFn();
                 return Task.FromResult(Unit.Value);

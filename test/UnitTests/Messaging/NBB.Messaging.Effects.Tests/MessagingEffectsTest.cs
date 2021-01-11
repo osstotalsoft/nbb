@@ -23,7 +23,7 @@ namespace NBB.Messaging.Effects.Tests
 
             //Assert
             using var container = services.BuildServiceProvider();
-            var handler = container.GetService<ISideEffectHandler<PublishMessage.SideEffect>>();
+            var handler = container.GetService<ISideEffectHandler<PublishMessage.SideEffect, Unit>>();
             handler.Should().NotBeNull();
         }
 

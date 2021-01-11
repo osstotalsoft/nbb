@@ -7,7 +7,7 @@ using NBB.ProcessManager.Runtime.Timeouts;
 
 namespace NBB.ProcessManager.Runtime.SideEffectHandlers
 {
-    public class RequestTimeoutHandler<TMessage> :  ISideEffectHandler<RequestTimeout<TMessage>>, IRequestTimeoutHandler<TMessage>
+    public class RequestTimeoutHandler<TMessage> :  ISideEffectHandler<RequestTimeout<TMessage>, Unit>, IRequestTimeoutHandler<TMessage>
     {
         private readonly TimeoutsManager _timeoutsManager;
         private readonly ITimeoutsRepository _timeoutsRepository;
@@ -21,11 +21,12 @@ namespace NBB.ProcessManager.Runtime.SideEffectHandlers
             _currentTimeProvider = currentTimeProvider;
         }
 
-        public Task Handle(RequestTimeout<TMessage> sideEffect, CancellationToken cancellationToken = default)
+        public async Task<Unit> Handle(RequestTimeout<TMessage> sideEffect, CancellationToken cancellationToken = default)
         {
             var dueDate = _currentTimeProvider().Add(sideEffect.TimeSpan);
             _timeoutsManager.NewTimeoutRegistered(dueDate);
-            return _timeoutsRepository.Add(new TimeoutRecord(sideEffect.InstanceId, dueDate, sideEffect.Message, typeof(TMessage)));
+            await _timeoutsRepository.Add(new TimeoutRecord(sideEffect.InstanceId, dueDate, sideEffect.Message, typeof(TMessage)));
+            return Unit.Value;
         }
     }
 }

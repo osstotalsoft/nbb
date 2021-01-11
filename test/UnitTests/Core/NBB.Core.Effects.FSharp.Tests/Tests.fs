@@ -40,3 +40,40 @@ let ``Effect computations are lazy evaluated`` () =
         |> should equal ()
 
     printfnWasCalled |> should equal true
+
+[<Fact>]
+let ``Sequenced effect computations`` () =
+    let mapper crt =    
+        effect {
+            let! x = Effect.from (fun _ -> 1)
+            let! y = Effect.from (fun _ -> 2)
+            return x + y + crt
+        }
+    let eff = [1..5000] |> List.traverseEffect mapper
+
+    use interpreter = createInterpreter()
+
+    let result = 
+        eff 
+        |> Effect.interpret interpreter
+        |> Async.RunSynchronously
+
+    result.Length |> should equal 5000
+
+[<Fact>]
+let ``Sequenced effect computations with CE`` () =
+
+    let eff = 
+        effect' {
+            for x in effect' { return [1..5000] } do
+            yield x+1
+        }
+
+    use interpreter = createInterpreter()
+
+    let result = 
+        eff 
+        |> Effect.interpret interpreter
+        |> Async.RunSynchronously
+
+    result.Length |> should equal 5000

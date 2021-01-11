@@ -1,0 +1,24 @@
+{
+  "solution": {
+    "path": "NBB.sln",
+    "projects": [
+      "src\\Application\\NBB.Application.Effects\\NBB.Application.Effects.csproj",
+      "src\\Application\\NBB.Application.Mediator.FSharp\\NBB.Application.Mediator.FSharp.fsproj",
+      "src\\Core\\NBB.Core.Effects.FSharp\\NBB.Core.Effects.FSharp.fsproj",
+      "src\\Core\\NBB.Core.Effects\\NBB.Core.Effects.csproj",
+      "src\\Core\\NBB.Core.Pipeline\\NBB.Core.Pipeline.csproj",
+      "src\\Http\\NBB.Http.Effects\\NBB.Http.Effects.csproj",
+      "src\\Messaging\\NBB.Messaging.Effects\\NBB.Messaging.Effects.csproj",
+      "src\\Orchestration\\NBB.ProcessManager.Definition\\NBB.ProcessManager.Definition.csproj",
+      "src\\Orchestration\\NBB.ProcessManager.Runtime\\NBB.ProcessManager.Runtime.csproj",
+      "test\\Benchmarks\\EffectsBenchmarks\\EffectsBenchmarks\\EffectsBenchmarks.fsproj",
+      "test\\UnitTests\\Application\\NBB.Application.Effects.Tests\\NBB.Application.Effects.Tests.csproj",
+      "test\\UnitTests\\Application\\NBB.Application.Mediator.FSharp.Tests\\NBB.Application.Mediator.FSharp.Tests.fsproj",
+      "test\\UnitTests\\Core\\NBB.Core.Effects.FSharp.Tests\\NBB.Core.Effects.FSharp.Tests.fsproj",
+      "test\\UnitTests\\Core\\NBB.Core.Effects.Tests\\NBB.Core.Effects.Tests.csproj",
+      "test\\UnitTests\\Http\\NBB.Http.Effects.Tests\\NBB.Http.Effects.Tests.csproj",
+      "test\\UnitTests\\Messaging\\NBB.Messaging.Effects.Tests\\NBB.Messaging.Effects.Tests.csproj",
+      "test\\UnitTests\\Orchestration\\NBB.ProcessManager.Tests\\NBB.ProcessManager.Tests.csproj"
+    ]
+  }
+}

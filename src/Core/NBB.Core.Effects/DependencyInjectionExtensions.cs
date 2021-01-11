@@ -10,7 +10,9 @@ namespace NBB.Core.Effects
         public static void AddEffects(this IServiceCollection services)
         {
             services.AddSingleton(typeof(Thunk.Handler<>));
-            services.AddScoped<ISideEffectMediator, SideEffectMediator>();
+            services.AddSingleton(typeof(Parallel.Handler<,>));
+            services.AddSingleton(typeof(Sequenced.Handler<>));
+            services.AddScoped<ISideEffectBroker, SideEffectBroker>();
             services.AddScoped<IInterpreter, Interpreter>();
         }
 
@@ -30,7 +32,7 @@ namespace NBB.Core.Effects
         public static IServiceCollection AddSideEffectHandler<TSideEffect, TOutput>(this IServiceCollection services, Func<TSideEffect, TOutput> handlerFn)
             where TSideEffect : ISideEffect<TOutput>
         {
-            Task<TOutput> HandlerFnAsync(TSideEffect sideEffect, CancellationToken _cancellationToken)
+            Task<TOutput> HandlerFnAsync(TSideEffect sideEffect, CancellationToken cancellationToken)
             {
                 return Task.FromResult(handlerFn(sideEffect));
             }

@@ -6,7 +6,7 @@ using NBB.ProcessManager.Runtime.Timeouts;
 
 namespace NBB.ProcessManager.Runtime.SideEffectHandlers
 {
-    public class CancelTimeoutsHandler : ISideEffectHandler<CancelTimeouts>
+    public class CancelTimeoutsHandler : ISideEffectHandler<CancelTimeouts, Unit>
     {
         private readonly ITimeoutsRepository _timeoutsRepository;
 
@@ -15,9 +15,10 @@ namespace NBB.ProcessManager.Runtime.SideEffectHandlers
             _timeoutsRepository = timeoutsRepository;
         }
 
-        public Task Handle(CancelTimeouts sideEffect, CancellationToken cancellationToken = default)
+        public async Task<Unit> Handle(CancelTimeouts sideEffect, CancellationToken cancellationToken = default)
         {
-            return _timeoutsRepository.RemoveTimeoutBy(sideEffect.InstanceId);
+            await _timeoutsRepository.RemoveTimeoutBy(sideEffect.InstanceId);
+            return Unit.Value;
         }
     }
 }
