@@ -40,7 +40,7 @@ namespace NBB.Messaging.Host
         {
             _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is starting", typeof(TMessage).GetPrettyName());
 
-            Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, cancellationToken);
+            Task HandleMsg(MessagingEnvelope msg) => Handle(msg, cancellationToken);
 
             await _messageBusSubscriber.SubscribeAsync(HandleMsg, cancellationToken, null, _subscriberOptions);
             await cancellationToken.WhenCanceled();
@@ -50,13 +50,13 @@ namespace NBB.Messaging.Host
         }
 
 
-        private async Task Handle(MessagingEnvelope<TMessage> message, CancellationToken cancellationToken)
+        private async Task Handle(MessagingEnvelope message, CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<MessagingEnvelope>>();
                 var topicName = _topicRegistry.GetTopicForMessageType(typeof(TMessage));
-                _messagingContextAccessor.MessagingContext = new MessagingContext(message, typeof(TMessage), topicName);//todo: add topic name
+                _messagingContextAccessor.MessagingContext = new MessagingContext(message, typeof(TMessage), topicName, _subscriberOptions?.SerDes);
                 await pipeline(message, cancellationToken);
             }
         }

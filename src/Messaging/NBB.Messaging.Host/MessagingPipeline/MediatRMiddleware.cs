@@ -17,23 +17,22 @@ namespace NBB.Messaging.Host.MessagingPipeline
     {
         private readonly IMediator _mediator;
         private readonly MessagingContextAccessor _messagingContextAccessor;
-        private MessagingSubscriberOptions _subscriberOptions;
+        private readonly IMessageSerDes _messageSerDes;
 
-        public MediatRMiddleware(IMediator mediator, MessagingContextAccessor messagingContextAccessor, MessagingSubscriberOptions subscriberOptions)
+        public MediatRMiddleware(IMediator mediator, MessagingContextAccessor messagingContextAccessor, IMessageSerDes messageSerDes)
         {
             _mediator = mediator;
             _messagingContextAccessor = messagingContextAccessor;
-            _subscriberOptions = subscriberOptions;
+            _messageSerDes = messageSerDes;
         }
 
         public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
-            var payload = _subscriberOptions.SerDes.DeserializationType == DeserializationType.HeadersOnly
-                ? message.Payload.ToString()
-                : ((JObject)message.Payload).ToObject(_messagingContextAccessor.MessagingContext.PayloadType);
+            var payload = _messageSerDes.CompleteDeserialization(message, _messagingContextAccessor.MessagingContext.PayloadType, _messagingContextAccessor.MessagingContext.serDesOptions);
 
             // maybe
-            _messagingContextAccessor.MessagingContext = new MessagingContext(new MessagingEnvelope(message.Headers, payload), _messagingContextAccessor.MessagingContext.PayloadType, _messagingContextAccessor.MessagingContext.TopicName);
+            _messagingContextAccessor.MessagingContext = 
+                _messagingContextAccessor.MessagingContext with { ReceivedMessageEnvelope = new MessagingEnvelope(message.Headers, payload) };
 
             if (payload is INotification @event)
             {

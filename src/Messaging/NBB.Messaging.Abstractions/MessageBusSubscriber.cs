@@ -11,7 +11,7 @@ namespace NBB.Messaging.Abstractions
     public class MessageBusSubscriber<TMessage> : IMessageBusSubscriber<TMessage>
     {
         private readonly ITopicRegistry _topicRegistry;
-        private readonly List<Func<MessagingEnvelope<TMessage>, Task>> _handlers = new List<Func<MessagingEnvelope<TMessage>, Task>>();
+        private readonly List<Func<MessagingEnvelope, Task>> _handlers = new List<Func<MessagingEnvelope, Task>>();
         private readonly IMessageSerDes _messageSerDes;
         private bool _subscribedToTopic;
         private readonly IMessagingTopicSubscriber _topicSubscriber;
@@ -30,7 +30,7 @@ namespace NBB.Messaging.Abstractions
             _logger = logger;
         }
 
-        public Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default, string topicName = null, MessagingSubscriberOptions options = null)
+        public Task SubscribeAsync(Func<MessagingEnvelope, Task> handler, CancellationToken cancellationToken = default, string topicName = null, MessagingSubscriberOptions options = null)
         {
             _handlers.Add(handler);
 
@@ -55,10 +55,10 @@ namespace NBB.Messaging.Abstractions
 
         async Task HandleMessage(string msg)
         {
-            MessagingEnvelope<TMessage> deserializedMessage = null;
+            MessagingEnvelope deserializedMessage = null;
             try
             {
-                deserializedMessage = _messageSerDes.DeserializeMessageEnvelope<TMessage>(msg, new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
+                deserializedMessage = _messageSerDes.DeserializePartialMessageEnvelope(msg);
             }
             catch (Exception ex)
             {
@@ -77,7 +77,7 @@ namespace NBB.Messaging.Abstractions
             }
         }
 
-        public async Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default)
+        public async Task UnSubscribeAsync(Func<MessagingEnvelope, Task> handler, CancellationToken cancellationToken = default)
         {
             _handlers.Remove(handler);
             if (_handlers.Count == 0)

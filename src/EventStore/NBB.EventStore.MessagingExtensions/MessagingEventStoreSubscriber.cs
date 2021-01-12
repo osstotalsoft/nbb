@@ -29,7 +29,7 @@ namespace NBB.EventStore.MessagingExtensions
             {
                 using (CorrelationManager.NewCorrelationId(envelope.GetCorrelationId()))
                 {
-                    await handler(envelope.Payload);
+                    await handler(envelope.Payload as IEvent);
                 }
             }, cancellationToken, _messagingTopicResolver.ResolveTopicName(), _subscriberOptions);
         }

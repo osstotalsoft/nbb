@@ -73,7 +73,7 @@ namespace NBB.Messaging.Host
             using (var scope = _serviceProvider.CreateScope())
             {
                 var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<MessagingEnvelope>>();
-                _messagingContextAccessor.MessagingContext = new MessagingContext(messageEnvelope, typeof(object), _topic);
+                _messagingContextAccessor.MessagingContext = new MessagingContext(messageEnvelope, typeof(object), _topic, _subscriberOptions?.SerDes);
                 await pipeline(messageEnvelope, cancellationToken);
             }
         }
