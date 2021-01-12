@@ -10,9 +10,7 @@ using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.InProcessMessaging.Extensions;
-using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Runtime;
-using NBB.ProcessManager.Runtime.Timeouts;
 using NBB.Resiliency;
 using ProcessManagerSample.MessageMiddlewares;
 using ProcessManagerSample.Queries;
@@ -32,9 +30,7 @@ namespace ProcessManagerSample
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
             //services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
 
-            services.AddProcessManagerDefinition(Assembly.GetEntryAssembly());
-            services.AddProcessManagerRuntime();
-            services.AddNotificationHandlers(typeof(ProcessManagerNotificationHandler<,,>));
+            services.AddProcessManager(Assembly.GetEntryAssembly());
 
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer()
