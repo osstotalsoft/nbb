@@ -5,7 +5,6 @@ namespace NBB.Invoices.Data
 {
     public class InvoicesDbContext : DbContext
     {
-
         public DbSet<Invoice> Invoices { get; set; }
 
 
@@ -18,9 +17,15 @@ namespace NBB.Invoices.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Invoice>()
-                .ToTable("Invoices")
-                .HasKey(c => c.InvoiceId);
+            modelBuilder.Entity<Invoice>(builder =>
+            {
+                builder.ToTable("Invoices")
+                    .HasKey(c => c.InvoiceId);
+
+                builder
+                    .Property(c => c.InvoiceId)
+                    .ValueGeneratedNever();
+            });
         }
     }
 }
