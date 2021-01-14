@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.Effects\NBB.Application.Effects.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
   </ItemGroup>
 
 </Project>

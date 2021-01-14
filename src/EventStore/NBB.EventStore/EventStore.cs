@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.Internal;
 using CorrelationManager = NBB.Correlation.CorrelationManager;
@@ -26,7 +25,7 @@ namespace NBB.EventStore
         }
 
 
-        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion,
+        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion,
             CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
@@ -42,7 +41,7 @@ namespace NBB.EventStore
 
         // collect all processed events for given aggregate and return them as a list
         // used to build up an aggregate from its history (Domain.LoadsFromHistory)
-        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
+        public async Task<List<object>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -63,12 +62,12 @@ namespace NBB.EventStore
             return result;
         }
 
-        private List<IEvent> DeserializeEvents(string stream, List<EventDescriptor> eventDescriptors)
+        private List<object> DeserializeEvents(string stream, List<EventDescriptor> eventDescriptors)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var results = eventDescriptors.Select(desc => _eventStoreSerDes.Deserialize(desc.EventData, Type.GetType(desc.EventType)) as IEvent).ToList();
+            var results = eventDescriptors.Select(desc => _eventStoreSerDes.Deserialize(desc.EventData, Type.GetType(desc.EventType))).ToList();
 
             stopWatch.Stop();
             _logger.LogDebug("EventStore.DeserializeEvents for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
@@ -76,7 +75,7 @@ namespace NBB.EventStore
             return results;
         }
 
-        private IList<EventDescriptor> SerializeEvents(string streamId, IEnumerable<IEvent> events)
+        private IList<EventDescriptor> SerializeEvents(string streamId, IEnumerable<object> events)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -84,7 +83,7 @@ namespace NBB.EventStore
             var results = new List<EventDescriptor>();
             foreach (var @event in events)
             {
-                var eventDescriptor = new EventDescriptor(@event.EventId, GetFullTypeName(@event.GetType()), _eventStoreSerDes.Serialize(@event), streamId, CorrelationManager.GetCorrelationId());
+                var eventDescriptor = new EventDescriptor(Guid.NewGuid(), GetFullTypeName(@event.GetType()), _eventStoreSerDes.Serialize(@event), streamId, CorrelationManager.GetCorrelationId());
                 results.Add(eventDescriptor);
             }
 

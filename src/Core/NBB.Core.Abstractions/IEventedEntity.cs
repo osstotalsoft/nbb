@@ -4,7 +4,7 @@ namespace NBB.Core.Abstractions
 {
     public interface IEventedEntity
     {
-        IEnumerable<IEvent> GetUncommittedChanges();
+        IEnumerable<object> GetUncommittedChanges();
         void MarkChangesAsCommitted();
     }
 }

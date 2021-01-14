@@ -41,7 +41,7 @@ namespace NBB.Data.EventSourcing.Tests
 
             public virtual int? SnapshotVersionFrequency => null;
 
-            public virtual IEnumerable<IEvent> GetUncommittedChanges() => _domainEvents;
+            public virtual IEnumerable<object> GetUncommittedChanges() => _domainEvents;
 
             public void LoadFromHistory(IEnumerable<IDomainEvent> history)
             {
@@ -323,13 +323,13 @@ namespace NBB.Data.EventSourcing.Tests
     {
         public int AppendEventsToStreamAsyncCallsCount { get; private set; }
 
-        public Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default)
+        public Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             AppendEventsToStreamAsyncCallsCount++;
             return Task.CompletedTask;
         }
 
-        public Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
+        public Task<List<object>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

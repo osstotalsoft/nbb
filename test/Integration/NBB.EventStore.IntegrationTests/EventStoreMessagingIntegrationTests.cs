@@ -29,10 +29,10 @@ namespace NBB.EventStore.IntegrationTests
         public async Task EventStore_Messaging_Publish_Subscribe()
         {
             Guid eventId = Guid.NewGuid();
-            IEvent hostMessageReceived = null;
+            object hostMessageReceived = null;
             var hostMessageReceivedEvent = new ManualResetEventSlim();
 
-            void HostMessageReceived(IEvent @event)
+            void HostMessageReceived(object @event)
             {
                 hostMessageReceived = @event;
                 hostMessageReceivedEvent.Set();
@@ -49,7 +49,7 @@ namespace NBB.EventStore.IntegrationTests
                     await host.StartAsync(CancellationToken.None);
 
                     var eventStore = scope.ServiceProvider.GetService<IEventStore>();
-                    eventStore.AppendEventsToStreamAsync(stream, new[] {new TestEvent {EventId = eventId}}, null,
+                    eventStore.AppendEventsToStreamAsync(stream, new[] {new TestEvent(eventId)}, null,
                         CancellationToken.None).Wait();
 
                     hostMessageReceivedEvent.Wait(5000);
@@ -61,10 +61,10 @@ namespace NBB.EventStore.IntegrationTests
             }
 
             hostMessageReceived.Should().NotBeNull();
-            hostMessageReceived.EventId.Should().Be(eventId);
+            ((TestEvent)hostMessageReceived).EventId.Should().Be(eventId);
         }
 
-        private static IServiceProvider BuildMessagingServiceProvider(Action<IEvent> hostMessageReceived = null)
+        private static IServiceProvider BuildMessagingServiceProvider(Action<object> hostMessageReceived = null)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -113,11 +113,5 @@ namespace NBB.EventStore.IntegrationTests
         }
     }
 
-    public class TestEventMessaging : IEvent
-    {
-        public Guid EventId { get; set; }
-        public Guid? CorrelationId { get; set; }
-
-        public Dictionary<string, object> Metadata { get; set; }
-    }
+    public record TestEventMessaging;
 }

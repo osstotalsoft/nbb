@@ -1,20 +1,11 @@
 ﻿using System;
-using NBB.Application.DataContracts;
+using MediatR;
 
 namespace NBB.ProcessManager.Tests.Events
 {
-    public class OrderPaymentExpired : Event
-    {
-        public Guid OrderId { get; }
-        public int DocumentId { get; }
-        public int SiteId { get; }
-
-        public OrderPaymentExpired(Guid orderId, int documentId, int siteId, EventMetadata metadata = null)
-            : base(metadata)
-        {
-            OrderId = orderId;
-            DocumentId = documentId;
-            SiteId = siteId;
-        }
-    }
+    public record OrderPaymentExpired (
+        Guid OrderId,
+        int DocumentId,
+        int SiteId
+    ) : INotification;
 }

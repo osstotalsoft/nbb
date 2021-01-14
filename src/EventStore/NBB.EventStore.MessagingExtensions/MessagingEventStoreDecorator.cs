@@ -22,7 +22,7 @@ namespace NBB.EventStore.MessagingExtensions
             _messagingTopicResolver = messagingTopicResolver;
         }
 
-        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion,
+        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion,
             CancellationToken cancellationToken = default)
         {
             var eventList = events.ToList();
@@ -34,7 +34,7 @@ namespace NBB.EventStore.MessagingExtensions
             }
         }
 
-        public Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
+        public Task<List<object>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             return _innerEventStore.GetEventsFromStreamAsync(stream, startFromVersion, cancellationToken);
         }

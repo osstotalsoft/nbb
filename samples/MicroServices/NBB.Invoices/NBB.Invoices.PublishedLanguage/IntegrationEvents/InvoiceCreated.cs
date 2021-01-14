@@ -1,22 +1,12 @@
-﻿using NBB.Application.DataContracts;
-using System;
+﻿using System;
+using MediatR;
 
 namespace NBB.Invoices.PublishedLanguage.IntegrationEvents
 {
-    public class InvoiceCreated : Event
-    {
-        public Guid InvoiceId { get; }
-        public decimal Amount { get; }
-        public Guid ClientId { get; }
-        public Guid? ContractId { get; }
-
-        public InvoiceCreated(Guid invoiceId, decimal amount, Guid clientId, Guid? contractId, EventMetadata metadata = null)
-            : base(metadata)
-        {
-            InvoiceId = invoiceId;
-            Amount = amount;
-            ClientId = clientId;
-            ContractId = contractId;
-        }
-    }
+    public record InvoiceCreated (
+        Guid InvoiceId,
+        decimal Amount,
+        Guid ClientId,
+        Guid? ContractId
+    ) : INotification;
 }

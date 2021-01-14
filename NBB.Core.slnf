@@ -3,8 +3,8 @@
     "path": "NBB.sln",
     "projects": [
       "src\\Application\\NBB.Application.DataContracts.Schema\\NBB.Application.DataContracts.Schema.csproj",
-      "src\\Application\\NBB.Application.DataContracts\\NBB.Application.DataContracts.csproj",
-      "src\\Application\\NBB.Application.Effects\\NBB.Application.Effects.csproj",
+      "src\\Application\\NBB.Application.MediatR\\NBB.Application.MediatR.csproj",
+      "src\\Application\\NBB.Application.MediatR.Effects\\NBB.Application.MediatR.Effects.csproj",
       "src\\Application\\NBB.Application.Mediator.FSharp\\NBB.Application.Mediator.FSharp.fsproj",
       "src\\Core\\NBB.Core.Abstractions\\NBB.Core.Abstractions.csproj",
       "src\\Core\\NBB.Core.DependencyInjection\\NBB.Core.DependencyInjection.csproj",

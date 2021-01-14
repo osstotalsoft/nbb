@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Domain", "src\Domain\NB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{4DCC0E0D-52D8-4F97-9B26-C3F9CB76F16F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.DataContracts", "src\Application\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj", "{3A9676F0-9B5E-44DB-99A5-644200971512}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.MediatR", "src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj", "{3A9676F0-9B5E-44DB-99A5-644200971512}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D28298B7-63A2-4751-BEB9-C3C30F2E7107}"
 EndProject
@@ -87,8 +87,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{83E383BB-C9D9-4F5F-BAAF-FF1ADFF0B151}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{90E022FB-CA1B-49DD-9BEA-CE7F8E74E8BB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.DataContracts.Tests", "test\UnitTests\Application\NBB.Application.DataContracts.Tests\NBB.Application.DataContracts.Tests.csproj", "{C611867E-4771-4DA2-9DE3-9F706CB36C74}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Data.EntityFramework.Tests", "test\UnitTests\Data\NBB.Data.EntityFramework.Tests\NBB.Data.EntityFramework.Tests.csproj", "{D90FF66E-13B2-4541-9794-10005B207F8E}"
 EndProject
@@ -237,7 +235,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Effects", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Effects.Tests", "test\UnitTests\Messaging\NBB.Messaging.Effects.Tests\NBB.Messaging.Effects.Tests.csproj", "{8A3A8F57-7457-44D8-804D-CA7B2B18F8E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.Effects", "src\Application\NBB.Application.Effects\NBB.Application.Effects.csproj", "{6A926E2D-4AA9-4D4D-97B9-06761C8CAE85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.MediatR.Effects", "src\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj", "{6A926E2D-4AA9-4D4D-97B9-06761C8CAE85}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.Effects.Tests", "test\UnitTests\Application\NBB.Application.Effects.Tests\NBB.Application.Effects.Tests.csproj", "{B9B2B7F6-9891-4380-94DE-27A94C7B6279}"
 EndProject
@@ -411,10 +409,6 @@ Global
 		{45B7B244-6AC4-41E4-8CA9-269DDC3C5835}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45B7B244-6AC4-41E4-8CA9-269DDC3C5835}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45B7B244-6AC4-41E4-8CA9-269DDC3C5835}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C611867E-4771-4DA2-9DE3-9F706CB36C74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C611867E-4771-4DA2-9DE3-9F706CB36C74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C611867E-4771-4DA2-9DE3-9F706CB36C74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C611867E-4771-4DA2-9DE3-9F706CB36C74}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D90FF66E-13B2-4541-9794-10005B207F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D90FF66E-13B2-4541-9794-10005B207F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D90FF66E-13B2-4541-9794-10005B207F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -777,7 +771,6 @@ Global
 		{E3C793D0-F5C5-4E0C-9B72-48C9B16A3CC4} = {508F9587-A3CD-41EF-A5A3-36BE04BB6D1B}
 		{45B7B244-6AC4-41E4-8CA9-269DDC3C5835} = {508F9587-A3CD-41EF-A5A3-36BE04BB6D1B}
 		{90E022FB-CA1B-49DD-9BEA-CE7F8E74E8BB} = {83E383BB-C9D9-4F5F-BAAF-FF1ADFF0B151}
-		{C611867E-4771-4DA2-9DE3-9F706CB36C74} = {404998FD-60A3-414E-A30F-FAE46AE28158}
 		{D90FF66E-13B2-4541-9794-10005B207F8E} = {834777FF-8E4B-4872-9C41-3A712EABAF86}
 		{A3AD803D-EE27-40F7-A835-DA1BD5C7BD49} = {834777FF-8E4B-4872-9C41-3A712EABAF86}
 		{50F9866B-D6A0-46D1-AAF2-36244698400F} = {0407911F-89FC-4138-BD4D-D4CFCFBB5DC1}

@@ -1,17 +1,9 @@
-﻿using NBB.Application.DataContracts;
-using System;
+﻿using System;
+using MediatR;
 
 namespace NBB.Contracts.Application.Commands
 {
-    public class CreateContract : Command
-    {
-        public Guid ClientId { get; }
-
-        public CreateContract(Guid clientId, CommandMetadata metadata = null)
-            : base(metadata)
-        {
-            ClientId = clientId;
-        }
-
-    }
+    public record CreateContract(
+        Guid ClientId
+    ) : IRequest;
 }

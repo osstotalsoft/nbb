@@ -53,8 +53,7 @@ module Command3 =
 
 type Query1 = 
     { Code: string }
-    interface IQuery<bool> with
-        member _.GetResponseType(): Type = typeof<bool>
+    interface IQuery<bool> 
 
 module Query1 =
     let handle (q: Query1) =
@@ -64,8 +63,7 @@ module Query1 =
 
 type Query2 = 
     { Code: string }
-    interface IQuery<bool> with
-        member _.GetResponseType(): Type = typeof<bool>
+    interface IQuery<bool>
 
 module Query2 =
     let handle (_: Query2) =
@@ -84,8 +82,8 @@ module Query2 =
 
 type Event1 =
     { Id: int; EventId: Guid }
-    interface NBB.Core.Abstractions.IEvent with
-        member this.EventId: Guid = this.EventId
+    interface IEvent
+        
 
 module Event1 = 
     let handle (_: Event1) =
@@ -96,8 +94,8 @@ module Event1 =
 
 type Event2 =
     { Id: int; EventId: Guid }
-    interface NBB.Core.Abstractions.IEvent with
-        member this.EventId: Guid = this.EventId
+    interface IEvent
+        
         
 module Event2 = 
     let handle1 (_: Event2) =

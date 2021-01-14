@@ -2,7 +2,7 @@
 using NBB.ProcessManager.Runtime.Persistence;
 using NBB.ProcessManager.Runtime.Timeouts;
 using System;
-using NBB.Application.Effects;
+using NBB.Application.MediatR.Effects;
 using NBB.Core.Effects;
 using NBB.Http.Effects;
 using NBB.Messaging.Effects;

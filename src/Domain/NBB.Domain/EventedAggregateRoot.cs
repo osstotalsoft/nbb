@@ -15,7 +15,7 @@ namespace NBB.Domain
         }
 
 
-        public IEnumerable<IEvent> GetUncommittedChanges()
+        public IEnumerable<object> GetUncommittedChanges()
         {
             return _changes;
         }

@@ -1,23 +1,12 @@
-﻿using NBB.Application.DataContracts;
-using System;
+﻿using System;
+using MediatR;
 
 namespace NBB.Payments.PublishedLanguage.IntegrationEvents
 {
-    public class PaymentReceived : Event
-    {
-        public Guid PayableId { get; }
-        public Guid PaymentId { get; }
-        public Guid? InvoiceId { get; }
-        public DateTime PaymentDate { get; }
-
-
-        public PaymentReceived(Guid payableId, Guid paymentId, Guid? invoiceId, DateTime paymentDate, EventMetadata metadata = null)
-            : base(metadata)
-        {
-            PayableId = payableId;
-            PaymentId = paymentId;
-            InvoiceId = invoiceId;
-            PaymentDate = paymentDate;
-        }
-    }
+    public record PaymentReceived(
+        Guid PayableId,
+        Guid PaymentId,
+        Guid? InvoiceId,
+        DateTime PaymentDate
+    ) : INotification;
 }

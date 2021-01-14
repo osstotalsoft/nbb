@@ -1,6 +1,6 @@
-﻿namespace NBB.ProcessManager.Tests.Commands
+﻿using MediatR;
+
+namespace NBB.ProcessManager.Tests.Commands
 {
-    public class DoPayment
-    {
-    }
+    public record DoPayment : IRequest;
 }

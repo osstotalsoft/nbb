@@ -1,8 +1,8 @@
 ﻿namespace NBB.Application.Mediator.FSharp
 
-open NBB.Core.Abstractions
 open NBB.Core.Effects.FSharp
 
+type IEvent = interface end
 
 type EventHandler<'TEvent when 'TEvent :> IEvent> = 'TEvent -> Effect<unit option>
 type EventHandler = EventHandler<IEvent>

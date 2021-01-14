@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
@@ -15,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using MediatR;
 using Xunit;
 
 namespace NBB.EventStore.IntegrationTests
@@ -46,7 +46,7 @@ namespace NBB.EventStore.IntegrationTests
                         try
                         {
                             eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] { new TestEvent { EventId = Guid.NewGuid() } }, streamVersion,
+                                    new[] { new TestEvent(Guid.NewGuid()) }, streamVersion,
                                     CancellationToken.None)
                                 .Wait();
                         }
@@ -90,7 +90,7 @@ namespace NBB.EventStore.IntegrationTests
                     var t = new Thread(() =>
                     {
                         eventStore.AppendEventsToStreamAsync(stream,
-                            new[] { new TestEvent { EventId = Guid.NewGuid() } }, null, CancellationToken.None).Wait();
+                            new[] { new TestEvent(Guid.NewGuid()) }, null, CancellationToken.None).Wait();
                     });
                     t.Start();
                     threads.Add(t);
@@ -152,11 +152,7 @@ namespace NBB.EventStore.IntegrationTests
         }
     }
 
-    public class TestEvent : IEvent
-    {
-        public Guid EventId { get; set; }
-        public Guid? CorrelationId { get; set; }
-
-        public Dictionary<string, object> Metadata { get; set; }
-    }
+    public record TestEvent(
+        Guid EventId
+    ) : INotification;
 }

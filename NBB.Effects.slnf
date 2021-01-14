@@ -2,7 +2,7 @@
   "solution": {
     "path": "NBB.sln",
     "projects": [
-      "src\\Application\\NBB.Application.Effects\\NBB.Application.Effects.csproj",
+      "src\\Application\\NBB.Application.MediatR.Effects\\NBB.Application.MediatR.Effects.csproj",
       "src\\Application\\NBB.Application.Mediator.FSharp\\NBB.Application.Mediator.FSharp.fsproj",
       "src\\Core\\NBB.Core.Effects.FSharp\\NBB.Core.Effects.FSharp.fsproj",
       "src\\Core\\NBB.Core.Effects\\NBB.Core.Effects.csproj",

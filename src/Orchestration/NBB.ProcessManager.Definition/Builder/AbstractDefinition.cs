@@ -1,5 +1,4 @@
-﻿using NBB.Core.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using NBB.Core.Effects;
@@ -10,11 +9,10 @@ namespace NBB.ProcessManager.Definition.Builder
         where TData : struct
     {
         private readonly List<IEventActivitySet<TData>> _eventActivities = new List<IEventActivitySet<TData>>();
-        private readonly Dictionary<Type, EventCorrelation<IEvent, TData>> _eventCorrelations = new Dictionary<Type, EventCorrelation<IEvent, TData>>();
+        private readonly Dictionary<Type, EventCorrelation<object, TData>> _eventCorrelations = new Dictionary<Type, EventCorrelation<object, TData>>();
 
 
         public EventActivitySetBuilder<TEvent, TData> StartWith<TEvent>(EventPredicate<TEvent, TData> predicate = null)
-            where TEvent : IEvent
         {
             var ea = new EventActivitySet<TEvent, TData>(true, predicate);
             _eventActivities.Add(ea);
@@ -22,7 +20,6 @@ namespace NBB.ProcessManager.Definition.Builder
         }
 
         public EventActivitySetBuilder<TEvent, TData> When<TEvent>(EventPredicate<TEvent, TData> predicate = null)
-            where TEvent : IEvent
         {
             var ea = new EventActivitySet<TEvent, TData>(false, predicate);
             _eventActivities.Add(ea);
@@ -36,7 +33,7 @@ namespace NBB.ProcessManager.Definition.Builder
             var configurator = new EventCorrelationBuilder<TEvent, TData>();
             configureEventCorrelation(configurator);
             var correl = configurator.Build();
-            _eventCorrelations.Add(typeof(TEvent), new EventCorrelation<IEvent, TData>(@event => correl.CorrelationFilter((TEvent) @event)));
+            _eventCorrelations.Add(typeof(TEvent), new EventCorrelation<object, TData>(@event => correl.CorrelationFilter((TEvent) @event)));
         }
 
         Func<TEvent, object> IDefinition<TData>.GetCorrelationFilter<TEvent>()
@@ -44,7 +41,7 @@ namespace NBB.ProcessManager.Definition.Builder
             if (_eventCorrelations.ContainsKey(typeof(TEvent)))
             {
                 var func = _eventCorrelations[typeof(TEvent)];
-                return @event => func.CorrelationFilter((IEvent) @event);
+                return @event => func.CorrelationFilter(@event);
             }
 
             return null;
@@ -60,7 +57,7 @@ namespace NBB.ProcessManager.Definition.Builder
                 .DefaultIfEmpty()
                 .Aggregate(EffectFuncs.Sequential);
 
-            return (@event, data) => func?.Invoke((IEvent) @event, data) ?? Effect.Pure();
+            return (@event, data) => func?.Invoke(@event, data) ?? Effect.Pure();
         }
 
         SetStateFunc<TEvent, TData> IDefinition<TData>.GetSetStateFunc<TEvent>()
@@ -76,7 +73,7 @@ namespace NBB.ProcessManager.Definition.Builder
                     }
                 );
 
-            return (@event, data) => func?.Invoke((IEvent) @event, data) ?? data.Data;
+            return (@event, data) => func?.Invoke(@event, data) ?? data.Data;
         }
 
         EventPredicate<TEvent, TData> IDefinition<TData>.GetStarterPredicate<TEvent>()
@@ -85,7 +82,7 @@ namespace NBB.ProcessManager.Definition.Builder
             if (act == null)
                 return (@event, data) => false;
 
-            return (@event, data) => act.StarterPredicate?.Invoke((IEvent) @event, data) ?? true;
+            return (@event, data) => act.StarterPredicate?.Invoke(@event, data) ?? true;
         }
 
         EventPredicate<TEvent, TData> IDefinition<TData>.GetCompletionPredicate<TEvent>()
@@ -101,7 +98,7 @@ namespace NBB.ProcessManager.Definition.Builder
                 .DefaultIfEmpty()
                 .Aggregate((func1, func2) => (@event, data) => func2(@event, data));
 
-            return (@event, data) => func?.Invoke((IEvent) @event, data) ?? true;
+            return (@event, data) => func?.Invoke(@event, data) ?? true;
         }
     }
 }

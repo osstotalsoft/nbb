@@ -2,7 +2,6 @@ module QueryPipelineTests
 
 open Xunit
 open NBB.Core.Effects.FSharp
-open NBB.Core.Abstractions
 open NBB.Application.Mediator.FSharp
 open FsUnit.Xunit
 open NBB.Core.Effects.FSharp.Interpreter
@@ -11,15 +10,12 @@ open QueryHandler
 
 type SomeQuery = 
     { Code: string } 
-    interface IQuery<bool> with
-        member _.GetResponseType() = typeof<bool>
+    interface IQuery<bool>
+        
 
 type SomeOtherQuery = 
     { Name: string } 
-    interface IQuery<bool> with
-        member _.GetResponseType() = typeof<bool>
-
-
+    interface IQuery<bool>
 
 
 [<Fact>]

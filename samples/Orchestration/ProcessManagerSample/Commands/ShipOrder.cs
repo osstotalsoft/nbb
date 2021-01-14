@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
 
 namespace ProcessManagerSample.Commands
 {
-    public class ShipOrder
-    {
-    }
+    public record ShipOrder : IRequest;
 }

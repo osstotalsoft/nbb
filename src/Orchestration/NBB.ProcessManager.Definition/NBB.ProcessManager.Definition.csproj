@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Application\NBB.Application.Effects\NBB.Application.Effects.csproj" />
+    <ProjectReference Include="..\..\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.Effects\NBB.Core.Effects.csproj" />
     <ProjectReference Include="..\..\EventStore\NBB.EventStore.Abstractions\NBB.EventStore.Abstractions.csproj" />
     <ProjectReference Include="..\..\Http\NBB.Http.Effects\NBB.Http.Effects.csproj" />

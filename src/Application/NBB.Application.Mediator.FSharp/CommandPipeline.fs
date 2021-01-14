@@ -1,8 +1,9 @@
 ﻿
 namespace NBB.Application.Mediator.FSharp
 
-open NBB.Core.Abstractions
 open NBB.Core.Effects.FSharp
+
+type ICommand = interface end
 
 type CommandHandler<'TCommand when 'TCommand :> ICommand> = RequestHandler<'TCommand, unit>
 type CommandHandler = CommandHandler<ICommand>

@@ -1,8 +1,6 @@
-﻿using NBB.Application.DataContracts;
+﻿using MediatR;
 
 namespace ProcessManagerSample.Commands
 {
-    public class DoPayment : Command
-    {
-    }
+    public record DoPayment : IRequest;
 }

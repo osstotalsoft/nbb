@@ -3,14 +3,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Moq;
-using NBB.Core.Abstractions;
 using NBB.Messaging.DataContracts;
 using NBB.Messaging.Host.MessagingPipeline;
 using Xunit;
 
 namespace NBB.Messaging.Host.Tests.MessagingPipeline
 {
-
     public class MediatRMiddlewareTests
     {
         [Fact]
@@ -20,7 +18,9 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var mockedMediator = Mock.Of<IMediator>();
             var mediatRMiddleware = new MediatRMiddleware(mockedMediator);
             var sentMessage = Mock.Of<IMockingEventMessage>();
-            var envelope = new MessagingEnvelope<IMockingEventMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var envelope =
+                new MessagingEnvelope<IMockingEventMessage>(new System.Collections.Generic.Dictionary<string, string>(),
+                    sentMessage);
 
             Task Next() => Task.CompletedTask;
 
@@ -38,7 +38,9 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var mockedMediator = Mock.Of<IMediator>();
             var mediatRMiddleware = new MediatRMiddleware(mockedMediator);
             var sentMessage = Mock.Of<IMockingCommandMessage>();
-            var envelope = new MessagingEnvelope<IMockingCommandMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var envelope =
+                new MessagingEnvelope<IMockingCommandMessage>(
+                    new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task Next() => Task.CompletedTask;
 
@@ -55,7 +57,8 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Arrange
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());
             var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(),
+                sentMessage);
 
 
             Task Next() => Task.CompletedTask;
@@ -64,8 +67,8 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Action() => mediatRMiddleware.Invoke(envelope, default, Next);
 
             //Assert
-            
-            ((Func<Task>)Action).Should().Throw<ApplicationException>();
+
+            ((Func<Task>) Action).Should().Throw<ApplicationException>();
         }
 
         [Fact]
@@ -75,9 +78,15 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());
             var sentMessage = Mock.Of<IMockingEventMessage>();
             var isNextMiddlewareCalled = false;
-            var envelope = new MessagingEnvelope<IMockingEventMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var envelope =
+                new MessagingEnvelope<IMockingEventMessage>(new System.Collections.Generic.Dictionary<string, string>(),
+                    sentMessage);
 
-            Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
+            Task Next()
+            {
+                isNextMiddlewareCalled = true;
+                return Task.CompletedTask;
+            }
 
             //Act
             await mediatRMiddleware.Invoke(envelope, default, Next);
@@ -86,8 +95,16 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             isNextMiddlewareCalled.Should().BeTrue();
         }
 
-        public interface IMockingEventMessage : IMessage, IEvent, INotification { }
-        public interface IMockingCommandMessage : IMessage, ICommand, IRequest { }
-        public interface IMockingQueryMessage : IMessage, IQuery<string>, IRequest<string> { }
+        public interface IMockingEventMessage : IMessage, INotification
+        {
+        }
+
+        public interface IMockingCommandMessage : IMessage, IRequest
+        {
+        }
+
+        public interface IMockingQueryMessage : IMessage, IRequest<string>
+        {
+        }
     }
 }

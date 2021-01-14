@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Application\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj" />
-    <ProjectReference Include="..\..\..\src\Application\NBB.Application.Effects\NBB.Application.Effects.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
     <ProjectReference Include="..\..\..\src\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.Abstractions\NBB.EventStore.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />

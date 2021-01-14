@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
 using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
@@ -96,7 +95,7 @@ namespace NBB.Data.EventSourcing
         }
 
 
-        private async Task PublishEventsAsync(List<IEvent> events, CancellationToken cancellationToken = default)
+        private async Task PublishEventsAsync(List<object> events, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

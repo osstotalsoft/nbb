@@ -1,6 +1,5 @@
 ﻿using EventStore.ClientAPI;
 using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.GetEventStore.Internal;
 using System;
@@ -24,7 +23,7 @@ namespace NBB.GetEventStore
             _logger = logger;
         }
 
-        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default)
+        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -34,7 +33,7 @@ namespace NBB.GetEventStore
             {
                 var metadata = _serDes.Serialize(new EventMetadata(e.GetType(), CorrelationManager.GetCorrelationId()));
                 var data = _serDes.Serialize(e);
-                var ge = new EventData(e.EventId, GetFullTypeName(e.GetType()), true, data, metadata);
+                var ge = new EventData(Guid.NewGuid(), GetFullTypeName(e.GetType()), true, data, metadata);
                 gregsEvents.Add(ge);
             }
 
@@ -47,12 +46,12 @@ namespace NBB.GetEventStore
             _logger.LogDebug("GetEventStoreClient.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
+        public async Task<List<object>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var result = new List<IEvent>();
+            var result = new List<object>();
             var gregsEvents = new List<ResolvedEvent>();
 
             using (var connection = await GetConnectionAsync())
@@ -73,7 +72,7 @@ namespace NBB.GetEventStore
             {
                 var metadata = _serDes.Deserialize<EventMetadata>(resolvedEvent.Event.Metadata);
                 var eventType = metadata.GetEventType();
-                var @event = _serDes.Deserialize(resolvedEvent.Event.Data, eventType) as IEvent;
+                var @event = _serDes.Deserialize(resolvedEvent.Event.Data, eventType);
                 result.Add(@event);
             }
 

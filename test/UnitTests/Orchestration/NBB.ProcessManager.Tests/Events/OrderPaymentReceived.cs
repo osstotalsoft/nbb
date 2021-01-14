@@ -1,16 +1,11 @@
 ﻿using System;
-using NBB.Application.DataContracts;
+using MediatR;
 
 namespace NBB.ProcessManager.Tests.Events
 {
-    public class OrderPaymentReceived : Event
-    {
-        public Guid ContractOrderId { get; }
-
-        public OrderPaymentReceived(Guid contractOrderId)
-        {
-            ContractOrderId = contractOrderId;
-        }
-
-    }
+    public record OrderPaymentReceived(
+        Guid OrderId,
+        int DocumentId,
+        int SiteId
+    ) : INotification;
 }

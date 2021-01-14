@@ -1,14 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using NBB.Application.DataContracts;
 
 namespace ProcessManagerSample.Queries
 {
-    public class GetPartnerQuery : Query<Partner>
-    {
-      
-    }
+    public record GetPartnerQuery : IRequest<Partner>;
 
     public class GetPartnerQueryHandler : IRequestHandler<GetPartnerQuery, Partner>
     {
@@ -18,15 +14,5 @@ namespace ProcessManagerSample.Queries
         }
     }
 
-    public class Partner
-    {
-        public Partner(string partnerName, string partnerCode)
-        {
-            PartnerName = partnerName;
-            PartnerCode = partnerCode;
-        }
-
-        public string PartnerName { get; set; }
-        public string PartnerCode { get; set; }
-    }
+    public record Partner(string PartnerName, string PartnerCode);
 }

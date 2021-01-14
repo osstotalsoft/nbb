@@ -34,11 +34,11 @@ namespace NBB.EventStore.Host
         }
 
 
-        private async Task Handle(IEvent @event, CancellationToken cancellationToken)
+        private async Task Handle(object @event, CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<IEvent>>();
+                var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<object>>();
 
                 await pipeline(@event, cancellationToken);
             }

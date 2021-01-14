@@ -21,7 +21,7 @@ namespace NBB.GetEventStore
             _logger = logger;
         }
 
-        public async Task SubscribeToAllAsync(Func<IEvent, Task> handler, CancellationToken cancellationToken = default)
+        public async Task SubscribeToAllAsync(Func<object, Task> handler, CancellationToken cancellationToken = default)
         {
             using (var connection = await GetConnectionAsync())
             {
@@ -56,7 +56,7 @@ namespace NBB.GetEventStore
 
                     _logger.LogDebug("GetEventStore subscriber received message of type {EventType}", eventType.FullName);
 
-                    var @event = _serDes.Deserialize(re.Event.Data, eventType) as IEvent;
+                    var @event = _serDes.Deserialize(re.Event.Data, eventType);
                     var res = handler(@event);
 
                     return res;

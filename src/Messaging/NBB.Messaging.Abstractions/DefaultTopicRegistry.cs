@@ -17,28 +17,8 @@ namespace NBB.Messaging.Abstractions
 
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
         {
-            var topic = GetTopicNameFromAttribute(messageType);
-            if (topic == null)
-            {
-                if (typeof(ICommand).IsAssignableFrom(messageType))
-                {
-                    topic = $"ch.commands.{messageType.GetLongPrettyName()}";
-                }
-                else if (typeof(IEvent).IsAssignableFrom(messageType))
-                {
-                    topic = $"ch.events.{messageType.GetLongPrettyName()}";
-                }
-                else if (typeof(IQuery).IsAssignableFrom(messageType))
-                {
-                    topic = $"ch.queries.{messageType.GetLongPrettyName()}";
-                }
-                else
-                {
-                    topic = $"ch.messages.{messageType.GetLongPrettyName()}";
-                }
-            }
+            var topic = GetTopicNameFromAttribute(messageType) ?? $"ch.messages.{messageType.GetLongPrettyName()}";
 
-            
             topic = GetTopicForName(topic, includePrefix);
 
             return topic;

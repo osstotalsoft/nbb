@@ -5,7 +5,7 @@ using NBB.Domain.Abstractions;
 
 namespace NBB.Domain
 {
-    public abstract class DomainEvent : IDomainEvent, INotification, IMetadataProvider<DomainEventMetadata>
+    public abstract class DomainEvent : IDomainEvent, INotification
     {
         public DomainEventMetadata Metadata { get; }
 
@@ -14,6 +14,6 @@ namespace NBB.Domain
             Metadata = metadata ?? DomainEventMetadata.Default();
         }
 
-        Guid IEvent.EventId => Metadata.EventId;
+        Guid IDomainEvent.EventId => Metadata.EventId;
     }
 }

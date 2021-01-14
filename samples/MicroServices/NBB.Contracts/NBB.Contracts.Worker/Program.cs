@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Application.DataContracts;
 using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
@@ -81,7 +80,7 @@ namespace NBB.Contracts.Worker
 
                     services.AddMessagingHost()
                         .AddSubscriberServices(config =>
-                            config.FromMediatRHandledCommands().AddClassesAssignableTo<Command>())
+                            config.FromMediatRHandledCommands().AddAllClasses())
                         .WithOptions(config => config.Options.ConsumerType = MessagingConsumerType.CompetingConsumer)
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
