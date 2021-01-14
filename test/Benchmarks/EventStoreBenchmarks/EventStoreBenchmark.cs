@@ -23,10 +23,7 @@ using MediatR;
 
 namespace TheBenchmarks
 {
-    public record TestEvent (
-        Guid EventId,
-        Guid? CorrelationId
-    ) : INotification;
+    public record TestEvent (Guid EventId, Guid? CorrelationId) : INotification;
 
 
     [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 10)]

@@ -20,7 +20,7 @@ namespace NBB.Invoices.Application.DomainEventHandlers
         public Task Handle(InvoiceCreated domainEvent, CancellationToken cancellationToken)
         {
             return _messageBusPublisher.PublishAsync(
-                new PublishedLanguage.IntegrationEvents.InvoiceCreated(
+                new PublishedLanguage.InvoiceCreated(
                     domainEvent.InvoiceId, domainEvent.Amount, domainEvent.ClientId, domainEvent.ContractId),
                 cancellationToken);
         }

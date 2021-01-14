@@ -152,7 +152,5 @@ namespace NBB.EventStore.IntegrationTests
         }
     }
 
-    public record TestEvent(
-        Guid EventId
-    ) : INotification;
+    public record TestEvent(Guid EventId) : INotification;
 }

@@ -13,11 +13,7 @@ namespace NBB.Messaging.Abstractions.Tests
         interface ITestInterface { }
         interface IWrongInterface { }
 
-        public record TestMessage(
-            long ContractId,
-            long PartnerId,
-            string Details
-        ) : ITestInterface;
+        public record TestMessage(long ContractId, long PartnerId, string Details) : ITestInterface;
 
         [Fact]
         public void Should_deserialize_messages_using_constructor_with_optional_params()

@@ -14,8 +14,5 @@ namespace ProcessManagerSample.Queries
         }
     }
 
-    public record Client(
-        string ClientName,
-        string ClientCode
-    );
+    public record Client(string ClientName, string ClientCode);
 }

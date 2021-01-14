@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using NBB.Contracts.PublishedLanguage.IntegrationEvents;
+using NBB.Contracts.PublishedLanguage;
 using NBB.Data.Abstractions;
 using NBB.Invoices.Domain.InvoiceAggregate;
 using System.Threading;

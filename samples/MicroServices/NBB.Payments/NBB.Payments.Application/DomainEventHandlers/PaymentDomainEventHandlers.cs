@@ -19,7 +19,7 @@ namespace NBB.Payments.Application.DomainEventHandlers
         public Task Handle(PaymentReceived domainEvent, CancellationToken cancellationToken)
         {
             return _messageBusPublisher.PublishAsync(
-                new PublishedLanguage.IntegrationEvents.PaymentReceived(domainEvent.PayableId, domainEvent.PaymentId,
+                new PublishedLanguage.PaymentReceived(domainEvent.PayableId, domainEvent.PaymentId,
                     domainEvent.InvoiceId,
                     domainEvent.PaymentDate), cancellationToken);
         }

@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NBB.Core.Abstractions;
 using NBB.GetEventStore.Internal;
 using System;
 using System.Collections.Generic;
@@ -10,16 +9,8 @@ using System.Threading.Tasks;
 
 namespace NBB.GetEventStore.Tests
 {
-    public record TestEvent1(
-        int SequenceNumber,
-        Guid EventId,
-        DateTime CreationDate
-    );
-    public record TestEvent2(
-        int SequenceNumber,
-        Guid EventId,
-        DateTime CreationDate
-    );
+    public record TestEvent1(int SequenceNumber, Guid EventId, DateTime CreationDate);
+    public record TestEvent2(int SequenceNumber, Guid EventId, DateTime CreationDate);
 
     public class GetEventStoreSubscriberTests
     {
