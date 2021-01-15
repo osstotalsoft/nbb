@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using NBB.Data.Abstractions;
-using NBB.Invoices.PublishedLanguage.IntegrationEvents;
+using NBB.Invoices.PublishedLanguage;
 using NBB.Payments.Domain.PayableAggregate;
 using System.Threading;
 using System.Threading.Tasks;

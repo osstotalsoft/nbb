@@ -19,7 +19,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
         public Task Handle(ContractValidated domainEvent, CancellationToken cancellationToken)
         {
             return _messageBusPublisher.PublishAsync(
-                new PublishedLanguage.IntegrationEvents.ContractValidated(domainEvent.ContractId, domainEvent.ClientId, domainEvent.Amount), cancellationToken);
+                new PublishedLanguage.ContractValidated(domainEvent.ContractId, domainEvent.ClientId, domainEvent.Amount), cancellationToken);
         }
     }
 }

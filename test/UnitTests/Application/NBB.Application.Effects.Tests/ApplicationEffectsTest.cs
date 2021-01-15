@@ -1,12 +1,11 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NBB.Application.MediatR.Effects;
 using Xunit;
-using NBB.Core.Abstractions;
 
 namespace NBB.Application.Effects.Tests
 {
@@ -50,11 +49,5 @@ namespace NBB.Application.Effects.Tests
     {
     }
 
-    public class TestQuery : IQuery<TestResponse>, IRequest<TestResponse>
-    {
-        public Type GetResponseType()
-        {
-            return typeof(TestResponse);
-        }
-    }
+    public record TestQuery : IRequest<TestResponse>;
 }

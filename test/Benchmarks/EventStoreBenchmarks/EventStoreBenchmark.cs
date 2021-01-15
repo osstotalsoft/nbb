@@ -19,21 +19,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using MediatR;
 
 namespace TheBenchmarks
 {
-    public class TestEvent : IEvent
-    {
-        public Guid EventId { get; set; }
-
-        public Guid? CorrelationId { get; set; }
-        public Dictionary<string, object> Metadata { get; set; }
-
-        public void SetCorrelationId(Guid correlationId)
-        {
-            CorrelationId = correlationId;
-        }
-    }
+    public record TestEvent (Guid EventId, Guid? CorrelationId) : INotification;
 
 
     [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 10)]
@@ -167,7 +157,7 @@ namespace TheBenchmarks
             using (var scope = _container.CreateScope())
             {
                 var eventStore = scope.ServiceProvider.GetService<IEventStore>();
-                eventStore.AppendEventsToStreamAsync(Guid.NewGuid().ToString(), new List<IEvent> { GetATestEvent() }, null, CancellationToken.None).Wait();
+                eventStore.AppendEventsToStreamAsync(Guid.NewGuid().ToString(), new List<object> { GetATestEvent() }, null, CancellationToken.None).Wait();
             }
         }
 
@@ -209,11 +199,7 @@ namespace TheBenchmarks
 
         private static TestEvent GetATestEvent()
         {
-            return new TestEvent
-            {
-                EventId = Guid.NewGuid(),
-                CorrelationId = Guid.NewGuid()
-            };
+            return new TestEvent(Guid.NewGuid(), Guid.NewGuid());
         }
 
         private static IServiceProvider BuildServiceProvider(Action<ServiceCollection, IConfiguration> addEventStoreAction)

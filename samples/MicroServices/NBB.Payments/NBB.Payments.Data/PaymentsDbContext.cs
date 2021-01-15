@@ -17,19 +17,30 @@ namespace NBB.Payments.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Payment>(builder =>
+            {
+                builder
+                    .ToTable("Payments")
+                    .HasKey(c => c.PaymentId);
 
-            modelBuilder.Entity<Payable>()
-                .ToTable("Payables")
-                .HasKey(c => c.PayableId);
+                builder
+                    .Property(c => c.PaymentId)
+                    .ValueGeneratedNever();
+            });
 
-            modelBuilder.Entity<Payment>()
-                .ToTable("Payments")
-                .HasKey(c => c.PaymentId);
-
-            modelBuilder.Entity<Payable>()
-                .HasOne(payable => payable.Payment)
-                .WithOne()
-                .HasForeignKey<Payment>(payment => payment.PayableId);
+            modelBuilder.Entity<Payable>(builder =>
+            {
+                builder
+                    .ToTable("Payables")
+                    .HasKey(c => c.PayableId);
+                builder
+                    .HasOne(payable => payable.Payment)
+                    .WithOne()
+                    .HasForeignKey<Payment>(payment => payment.PayableId);
+                builder
+                    .Property(c => c.PayableId)
+                    .ValueGeneratedNever();
+            });
         }
     }
 }

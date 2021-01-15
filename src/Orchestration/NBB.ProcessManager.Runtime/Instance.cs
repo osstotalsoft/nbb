@@ -1,5 +1,4 @@
-﻿using NBB.Core.Abstractions;
-using NBB.ProcessManager.Definition;
+﻿using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Runtime.Events;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ namespace NBB.ProcessManager.Runtime
         public InstanceStates State { get; private set; }
         public object InstanceId { get; private set; }
 
-        private readonly List<IEvent> _changes = new List<IEvent>();
+        private readonly List<object> _changes = new List<object>();
         private readonly List<Effect<Unit>> _effects = new List<Effect<Unit>>();
         public int Version { get; internal set; }
 
@@ -28,7 +27,6 @@ namespace NBB.ProcessManager.Runtime
         }
 
         private void StartProcess<TEvent>(TEvent @event)
-            where TEvent : IEvent
         {
             var eventType = typeof(TEvent);
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
@@ -47,7 +45,6 @@ namespace NBB.ProcessManager.Runtime
         }
 
         public void ProcessEvent<TEvent>(TEvent @event)
-            where TEvent : IEvent
         {
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
 
@@ -100,7 +97,7 @@ namespace NBB.ProcessManager.Runtime
                 Version++;
         }
 
-        private void Emit(IEvent @event)
+        private void Emit(object @event)
         {
             ApplyChanges(@event, true);
         }
@@ -127,8 +124,6 @@ namespace NBB.ProcessManager.Runtime
         {
             return new InstanceData<TData>(InstanceId, Data);
         }
-
-
 
         public void MarkChangesAsCommitted()
         {

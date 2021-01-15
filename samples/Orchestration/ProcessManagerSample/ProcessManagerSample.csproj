@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>NBB_ProcessManager_6573f87d-2175-4be0-9a42-31cb73bc8e19</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
@@ -21,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Application\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj" />
-    <ProjectReference Include="..\..\..\src\Application\NBB.Application.Effects\NBB.Application.Effects.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
     <ProjectReference Include="..\..\..\src\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.Abstractions\NBB.EventStore.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />

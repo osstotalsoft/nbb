@@ -16,11 +16,11 @@ namespace NBB.EventStore.Host
             AddSubscriberService();
         }
 
-        public EventStoreHostBuilder UsePipeline(Action<IPipelineBuilder<IEvent>> configurePipeline)
+        public EventStoreHostBuilder UsePipeline(Action<IPipelineBuilder<object>> configurePipeline)
         {
             ServiceCollection.AddScoped(serviceProvider =>
             {
-                var pipelineBuilder = new PipelineBuilder<IEvent>(serviceProvider);
+                var pipelineBuilder = new PipelineBuilder<object>(serviceProvider);
 
                 configurePipeline(pipelineBuilder);
 

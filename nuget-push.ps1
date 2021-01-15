@@ -5,7 +5,7 @@ $packageVersion = "3.2.1"
 $config = "Release"
 
 $projectFilePaths = @(
-    ("\src\Application\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj"),
+    ("\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj"),
 
 	("\src\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj"),
 	("\src\Core\NBB.Core.DependencyInjection\NBB.Core.DependencyInjection.csproj"),

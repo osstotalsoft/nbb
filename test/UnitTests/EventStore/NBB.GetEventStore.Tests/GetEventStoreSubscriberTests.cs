@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NBB.Core.Abstractions;
 using NBB.GetEventStore.Internal;
 using System;
 using System.Collections.Generic;
@@ -10,40 +9,9 @@ using System.Threading.Tasks;
 
 namespace NBB.GetEventStore.Tests
 {
-    public class TestEvent1 : IEvent
-    {
-        public int SequenceNumber { get; set; }
+    public record TestEvent1(int SequenceNumber, Guid EventId, DateTime CreationDate);
+    public record TestEvent2(int SequenceNumber, Guid EventId, DateTime CreationDate);
 
-        public Guid EventId { get; set; }
-
-        public DateTime CreationDate { get; set; }
-
-        public Guid? CorrelationId { get; set; }
-
-        public Dictionary<string, object> Metadata { get; set; }
-
-        public void SetCorrelationId(Guid correlationId)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class TestEvent2 : IEvent
-    {
-        public int SequenceNumber { get; set; }
-
-        public Guid EventId { get; set; }
-
-        public DateTime CreationDate { get; set; }
-
-        public Guid? CorrelationId { get; set; }
-
-        public Dictionary<string, object> Metadata { get; set; }
-
-        public void SetCorrelationId(Guid correlationId)
-        {
-            throw new NotImplementedException();
-        }
-    }
     public class GetEventStoreSubscriberTests
     {
 
@@ -54,29 +22,26 @@ namespace NBB.GetEventStore.Tests
             var serDes = new SerDes();
             var stream1 = "teststream-1";
             var stream2 = "teststream-2";
-            var events1 = new List<IEvent>
+            var events1 = new List<object>
             {
-                new TestEvent1
-                {
-                    CreationDate = DateTime.Now,
-                    EventId = Guid.NewGuid(),
-                    SequenceNumber = 0
-                },
-                new TestEvent1
-                {
-                    CreationDate = DateTime.Now,
-                    EventId = Guid.NewGuid(),
-                    SequenceNumber = 1
-                }
+                new TestEvent1(
+                    CreationDate: DateTime.Now,
+                    EventId: Guid.NewGuid(),
+                    SequenceNumber: 0
+                ),
+                new TestEvent1(
+                    CreationDate: DateTime.Now,
+                    EventId: Guid.NewGuid(),
+                    SequenceNumber: 1
+                )
             };
-            var events2 = new List<IEvent>
+            var events2 = new List<object>
             {
-                new TestEvent2
-                {
-                    CreationDate = DateTime.Now,
-                    EventId = Guid.NewGuid(),
-                    SequenceNumber = 0
-                }
+                new TestEvent2(
+                    CreationDate: DateTime.Now,
+                    EventId: Guid.NewGuid(),
+                    SequenceNumber: 0
+                )
             };
 
             var totalEventsCount = events1.Count + events2.Count;
@@ -90,7 +55,7 @@ namespace NBB.GetEventStore.Tests
             await sut.SubscribeToAllAsync(message =>
             {
                 messagesReceived++;
-                if(messagesReceived >= totalEventsCount)
+                if (messagesReceived >= totalEventsCount)
                     cts.Cancel();
                 return Task.CompletedTask;
             }, cts.Token);

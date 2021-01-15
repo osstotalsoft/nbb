@@ -10,13 +10,12 @@ open Mox
 
 type SomeEvent =
     { Code: string; EventId: System.Guid }
-    interface IEvent with
-        member this.EventId = this.EventId
+    interface IEvent
+        
 
 type SomeOtherEvent =
     { Name: string; EventId: System.Guid }
-    interface IEvent with
-        member this.EventId = this.EventId
+    interface IEvent
 
 open EventHandler
 open FsCheck.Xunit

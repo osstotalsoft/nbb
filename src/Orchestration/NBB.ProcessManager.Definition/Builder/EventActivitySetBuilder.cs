@@ -1,5 +1,4 @@
-﻿using NBB.Core.Abstractions;
-using System;
+﻿using System;
 using NBB.Core.Effects;
 using NBB.Messaging.Effects;
 using NBB.ProcessManager.Definition.SideEffects;
@@ -7,7 +6,6 @@ using NBB.ProcessManager.Definition.SideEffects;
 namespace NBB.ProcessManager.Definition.Builder
 {
     public class EventActivitySetBuilder<TEvent, TData>
-        where TEvent : IEvent
         where TData : struct
     {
         private readonly EventActivitySet<TEvent, TData> _eventActivitySet;
@@ -40,7 +38,6 @@ namespace NBB.ProcessManager.Definition.Builder
         }
 
         public EventActivitySetBuilder<TEvent, TData> SendCommand<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null)
-            where T : ICommand
         {
             Then((whenEvent, state) =>
             {
@@ -52,14 +49,12 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, Func<TEvent, InstanceData<TData>, T> messageFactory,
             EventPredicate<TEvent, TData> predicate = null)
-            where T : IEvent
         {
             Then((whenEvent, state) => Timeout.Request(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state)), predicate);
             return this;
         }
 
         public EventActivitySetBuilder<TEvent, TData> PublishEvent<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null)
-            where T : IEvent
         {
             Then((whenEvent, state) =>
             {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NBB.EventStore.Host.Pipeline
 {
-    public class MediatRMiddleware : IPipelineMiddleware<IEvent>
+    public class MediatRMiddleware : IPipelineMiddleware<object>
     {
         private readonly IMediator _mediator;
 
@@ -16,7 +16,7 @@ namespace NBB.EventStore.Host.Pipeline
             _mediator = mediator;
         }
 
-        public async Task Invoke(IEvent @event, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(object @event, CancellationToken cancellationToken, Func<Task> next)
         {
             if (@event is INotification notification)
             {

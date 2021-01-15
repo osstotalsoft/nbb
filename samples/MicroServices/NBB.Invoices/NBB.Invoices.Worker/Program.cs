@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Application.DataContracts;
+using NBB.Application.MediatR;
 using NBB.Core.Abstractions;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
@@ -77,8 +77,8 @@ namespace NBB.Invoices.Worker
 
                 services.AddMessagingHost()
                     .AddSubscriberServices(config => config
-                        .FromMediatRHandledCommands().AddClassesAssignableTo<Command>()
-                        .FromMediatRHandledEvents().AddClassesAssignableTo<Event>()
+                        .FromMediatRHandledCommands().AddAllClasses()
+                        .FromMediatRHandledEvents().AddAllClasses()
                     )
                     .WithDefaultOptions()
                     .UsePipeline(pipelineBuilder => pipelineBuilder

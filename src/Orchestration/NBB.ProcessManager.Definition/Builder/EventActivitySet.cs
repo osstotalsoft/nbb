@@ -1,24 +1,22 @@
-﻿using NBB.Core.Abstractions;
-using System;
+﻿using System;
 using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
 
     public class EventActivitySet<TEvent, TData> : IEventActivitySet<TData>
-        where TEvent : IEvent
         where TData : struct
     {
-        public EffectFunc<IEvent, TData> EffectFunc { get; set; }
-        public SetStateFunc<IEvent, TData> SetStateFunc { get; set; }
+        public EffectFunc<object, TData> EffectFunc { get; set; }
+        public SetStateFunc<object, TData> SetStateFunc { get; set; }
         public bool StartsProcess { get; set; }
         public bool CompletesProcess { get; set; }
 
         private readonly EventPredicate<TEvent, TData> _starterPredicate;
         private EventPredicate<TEvent, TData> _completionPredicate;
 
-        private static readonly SetStateFunc<IEvent, TData> NoSetStateFunc = (@event, data) => data.Data;
-        private static readonly EffectFunc<IEvent, TData> NoEffectFunc = (@event, data) => Effect.Pure();
+        private static readonly SetStateFunc<object, TData> NoSetStateFunc = (@event, data) => data.Data;
+        private static readonly EffectFunc<object, TData> NoEffectFunc = (@event, data) => Effect.Pure();
 
 
         public EventActivitySet(bool startsProcess, EventPredicate<TEvent, TData> starterPredicate = null)
@@ -33,7 +31,7 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public void AddEffectHandler(EffectFunc<TEvent, TData> func)
         {
-            Effect<Unit> NewFunc(IEvent @event, InstanceData<TData> data)
+            Effect<Unit> NewFunc(object @event, InstanceData<TData> data)
             {
                 if (_starterPredicate != null && !_starterPredicate((TEvent) @event, data))
                     return Effect.Pure();
@@ -55,7 +53,7 @@ namespace NBB.ProcessManager.Definition.Builder
             };
         }
 
-        public EventPredicate<IEvent, TData> StarterPredicate
+        public EventPredicate<object, TData> StarterPredicate
         {
             get
             {
@@ -65,7 +63,7 @@ namespace NBB.ProcessManager.Definition.Builder
             }
         }
 
-        public EventPredicate<IEvent, TData> CompletionPredicate
+        public EventPredicate<object, TData> CompletionPredicate
         {
             get
             {
@@ -97,9 +95,9 @@ namespace NBB.ProcessManager.Definition.Builder
         Type EventType { get; }
         bool CompletesProcess { get; }
         bool StartsProcess { get; }
-        EventPredicate<IEvent, TData> StarterPredicate { get; }
-        EventPredicate<IEvent, TData> CompletionPredicate { get; }
-        EffectFunc<IEvent, TData> EffectFunc { get; }
-        SetStateFunc<IEvent, TData> SetStateFunc { get; }
+        EventPredicate<object, TData> StarterPredicate { get; }
+        EventPredicate<object, TData> CompletionPredicate { get; }
+        EffectFunc<object, TData> EffectFunc { get; }
+        SetStateFunc<object, TData> SetStateFunc { get; }
     }
 }

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Application\NBB.Application.Effects\NBB.Application.Effects.csproj" />
+    <ProjectReference Include="..\..\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.Effects\NBB.Core.Effects.csproj" />
   </ItemGroup>
 

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Application.Effects;
+using NBB.Application.MediatR.Effects;
 using NBB.Core.Effects;
 using NBB.Http.Effects;
 using NBB.Messaging.Effects;

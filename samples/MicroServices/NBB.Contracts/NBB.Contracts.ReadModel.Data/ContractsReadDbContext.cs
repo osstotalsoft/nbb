@@ -15,20 +15,31 @@ namespace NBB.Contracts.ReadModel.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ContractReadModel>(builder =>
+            {
+                builder
+                    .ToTable("Contracts")
+                    .HasKey(c => c.ContractId);
 
-            modelBuilder.Entity<ContractReadModel>()
-                .ToTable("Contracts")
-                .HasKey(c => c.ContractId);
+                builder.HasMany(c => c.ContractLines)
+                    .WithOne()
+                    .HasForeignKey(cl => cl.ContractId);
 
-            modelBuilder.Entity<ContractReadModel>()
-                .HasMany(c => c.ContractLines)
-                .WithOne()
-                .HasForeignKey(cl => cl.ContractId);
+                builder
+                    .Property(x => x.ContractId)
+                    .ValueGeneratedNever();
+            });
 
-            modelBuilder.Entity<ContractLineReadModel>()
-                .ToTable("ContractLines")
-                .HasKey(c => c.ContractLineId);
+            modelBuilder.Entity<ContractLineReadModel>(builder =>
+            {
+                builder
+                    .ToTable("ContractLines")
+                    .HasKey(c => c.ContractLineId);
 
+                builder
+                    .Property(x => x.ContractLineId)
+                    .ValueGeneratedNever();
+            });
         }
     }
 }

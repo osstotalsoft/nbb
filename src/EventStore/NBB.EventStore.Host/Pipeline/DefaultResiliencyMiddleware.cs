@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace NBB.EventStore.Host.Pipeline
 {
-    public class DefaultResiliencyMiddleware : IPipelineMiddleware<IEvent>
+    public class DefaultResiliencyMiddleware : IPipelineMiddleware<object>
     {
         private readonly IResiliencyPolicyProvider _resiliencyPolicyProvider;
         private readonly ILogger<DefaultResiliencyMiddleware> _logger;
@@ -22,7 +22,7 @@ namespace NBB.EventStore.Host.Pipeline
             _logger = logger;
         }
 
-        public async Task Invoke(IEvent @event, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(object @event, CancellationToken cancellationToken, Func<Task> next)
         {
             var outOfOrderPolicy = _resiliencyPolicyProvider.GetOutOfOrderPolicy(retryCount => _logger.LogWarning(
                 "Event of type {EventType} could not be processed due to OutOfOrderMessageException. Retry count is {RetryCount}.",

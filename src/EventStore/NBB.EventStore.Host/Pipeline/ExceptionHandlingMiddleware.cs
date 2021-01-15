@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NBB.EventStore.Host.Pipeline
 {
-    public class ExceptionHandlingMiddleware : IPipelineMiddleware<IEvent>
+    public class ExceptionHandlingMiddleware : IPipelineMiddleware<object>
     {
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
@@ -17,7 +17,7 @@ namespace NBB.EventStore.Host.Pipeline
             _logger = logger;
         }
 
-        public async Task Invoke(IEvent @event, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(object @event, CancellationToken cancellationToken, Func<Task> next)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

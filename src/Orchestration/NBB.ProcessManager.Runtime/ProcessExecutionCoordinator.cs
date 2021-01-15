@@ -1,5 +1,4 @@
-﻿using NBB.Core.Abstractions;
-using NBB.ProcessManager.Definition;
+﻿using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Runtime.Persistence;
 using System;
 using System.Collections.Generic;
@@ -23,7 +22,6 @@ namespace NBB.ProcessManager.Runtime
         public async Task Invoke<TDefinition, TData, TEvent>(TEvent @event, CancellationToken cancellationToken = default)
             where TDefinition : IDefinition<TData>
             where TData : struct
-            where TEvent : IEvent
         {
             var definition = _definitions.OfType<TDefinition>().SingleOrDefault();
             if (definition == null)

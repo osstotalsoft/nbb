@@ -1,8 +1,9 @@
-﻿using NBB.Core.Abstractions;
+﻿using System;
 
 namespace NBB.Domain.Abstractions
 {
-    public interface IDomainEvent : IEvent
+    public interface IDomainEvent
     {
+        Guid EventId { get; }
     }
 }

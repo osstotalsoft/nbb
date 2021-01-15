@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using NBB.Core.Abstractions;
 using NBB.ProcessManager.Definition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +8,7 @@ namespace NBB.ProcessManager.Runtime
     public class ProcessManagerNotificationHandler<TDefinition, TData, TEvent> : INotificationHandler<TEvent>
         where TDefinition : IDefinition<TData>
         where TData : struct
-        where TEvent : INotification, IEvent
+        where TEvent : INotification
     {
         private readonly ProcessExecutionCoordinator _pec;
 

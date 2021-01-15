@@ -25,7 +25,7 @@ namespace NBB.SQLStreamStore
             _logger = logger;
         }
 
-        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<IEvent> events, int? expectedVersion, CancellationToken cancellationToken = default)
+        public async Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -35,7 +35,7 @@ namespace NBB.SQLStreamStore
             {
                 var metadata = _serDes.Serialize(new EventMetadata(e.GetType(), Correlation.CorrelationManager.GetCorrelationId()));
                 var data = _serDes.Serialize(e);
-                var ae = new NewStreamMessage(e.EventId, GetFullTypeName(e.GetType()), data, metadata);
+                var ae = new NewStreamMessage(Guid.NewGuid(), GetFullTypeName(e.GetType()), data, metadata);
                 adaptedEvents.Add(ae);
             }
 
@@ -45,7 +45,7 @@ namespace NBB.SQLStreamStore
             _logger.LogDebug("SqlStreamStore.AppendEventsToStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
         }
 
-        public async Task<List<IEvent>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
+        public async Task<List<object>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -60,13 +60,13 @@ namespace NBB.SQLStreamStore
                 messages.AddRange(page.Messages);
             }
 
-            var result = new List<IEvent>();
+            var result = new List<object>();
             foreach (var sm in messages)
             {
                 var metadata = _serDes.Deserialize<EventMetadata>(sm.JsonMetadata);
                 var eventType = metadata.GetEventType();
                 var data = await sm.GetJsonData(cancellationToken);
-                var @event = _serDes.Deserialize(data, eventType) as IEvent;
+                var @event = _serDes.Deserialize(data, eventType);
                 result.Add(@event);
             }
 

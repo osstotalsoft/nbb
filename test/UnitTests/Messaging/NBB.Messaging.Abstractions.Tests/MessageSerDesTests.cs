@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentAssertions;
 using Moq;
-using NBB.Application.DataContracts;
-using NBB.Core.Abstractions;
 using NBB.Messaging.DataContracts;
 using Xunit;
 
@@ -12,24 +10,10 @@ namespace NBB.Messaging.Abstractions.Tests
 {
     public class MessageSerDesTests
     {
-        public class TestMessage : Event
-        {
-            public Guid EventId { get; private set; }
-            public DateTime CreationDate { get; private set; }
-            public long ContractId { get; private set; }
-            public long PartnerId { get; private set; }
-            public string Details { get; private set; }
-            public int SequenceNumber { get; set; }
+        interface ITestInterface { }
+        interface IWrongInterface { }
 
-            public bool ConstructedWithPrivateConstructor() => false;
-
-            public TestMessage(long partnerId, long contractId, string details, EventMetadata metadata = null) : base(metadata)
-            {
-                PartnerId = partnerId;
-                ContractId = contractId;
-                Details = details;
-            }
-        }
+        public record TestMessage(long ContractId, long PartnerId, string Details) : ITestInterface;
 
         [Fact]
         public void Should_deserialize_messages_using_constructor_with_optional_params()
@@ -54,7 +38,7 @@ namespace NBB.Messaging.Abstractions.Tests
         {
             //Arrange
             var sut = new NewtonsoftJsonMessageSerDes(
-                Mock.Of<IMessageTypeRegistry>(x => 
+                Mock.Of<IMessageTypeRegistry>(x =>
                     x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage) &&
                     x.GetTypeId(It.IsAny<Type>()) == "TestMessage"));
 
@@ -71,7 +55,7 @@ namespace NBB.Messaging.Abstractions.Tests
                 new MessageSerDesOptions()
                 {
                     DeserializationType = DeserializationType.Dynamic,
-                    DynamicDeserializationScannedAssemblies = new[] {Assembly.GetExecutingAssembly()}
+                    DynamicDeserializationScannedAssemblies = new[] { Assembly.GetExecutingAssembly() }
                 });
 
             //Assert
@@ -94,7 +78,7 @@ namespace NBB.Messaging.Abstractions.Tests
             var json = sut.SerializeMessageEnvelope(envelope);
 
             //Act
-            void Action() => sut.DeserializeMessageEnvelope<ICommand>(json);
+            void Action() => sut.DeserializeMessageEnvelope<IWrongInterface>(json);
 
             //Assert
             ((Action)Action).Should().Throw<Exception>();
@@ -110,14 +94,13 @@ namespace NBB.Messaging.Abstractions.Tests
                     x.GetTypeId(It.IsAny<Type>()) == "TestMessage"));
 
             var @event = new TestMessage(11232, 1122312, "something");
-            var iEvent = (IEvent) @event;
-            var envelope = new MessagingEnvelope(new Dictionary<string, string>()
-           , iEvent);
+            var iEvent = (ITestInterface)@event;
+            var envelope = new MessagingEnvelope(new Dictionary<string, string>(), iEvent);
 
             var json = sut.SerializeMessageEnvelope(envelope);
 
             //Act
-            var deserialized = sut.DeserializeMessageEnvelope<IEvent>(json, new MessageSerDesOptions()
+            var deserialized = sut.DeserializeMessageEnvelope<ITestInterface>(json, new MessageSerDesOptions()
             {
                 DeserializationType = DeserializationType.Dynamic,
                 DynamicDeserializationScannedAssemblies = new[] { Assembly.GetExecutingAssembly() }
@@ -143,7 +126,7 @@ namespace NBB.Messaging.Abstractions.Tests
 
             //Act
             var deserialized = sut.DeserializeMessageEnvelope(json,
-                new MessageSerDesOptions {DeserializationType = DeserializationType.HeadersOnly});
+                new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
 
             //Assert
             deserialized.Should().NotBeNull();
@@ -165,7 +148,7 @@ namespace NBB.Messaging.Abstractions.Tests
             var json = sut.SerializeMessageEnvelope(envelope);
 
             //Act
-            void Action() => sut.DeserializeMessageEnvelope<MessagingEnvelope<TestMessage>>(json, new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly});
+            void Action() => sut.DeserializeMessageEnvelope<MessagingEnvelope<TestMessage>>(json, new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
 
             //Assert
 
@@ -186,7 +169,7 @@ namespace NBB.Messaging.Abstractions.Tests
             var json = sut.SerializeMessageEnvelope(envelope);
 
             //Act
-            void Action() => sut.DeserializeMessageEnvelope(json, new MessageSerDesOptions {DeserializationType = DeserializationType.TypeSafe});
+            void Action() => sut.DeserializeMessageEnvelope(json, new MessageSerDesOptions { DeserializationType = DeserializationType.TypeSafe });
 
             //Assert
 

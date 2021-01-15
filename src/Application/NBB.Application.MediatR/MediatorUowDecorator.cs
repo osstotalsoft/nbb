@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using MediatR;
 using NBB.Core.Abstractions;
 
-namespace NBB.Application.DataContracts
+namespace NBB.Application.MediatR
 {
     public class MediatorUowDecorator<TEntity> : IUow<TEntity>
         where TEntity : IEventedEntity
@@ -31,7 +31,7 @@ namespace NBB.Application.DataContracts
             await OnAfterSave(events, cancellationToken);
         }
 
-        private async Task OnAfterSave(List<IEvent> events, CancellationToken cancellationToken = default)
+        private async Task OnAfterSave(List<object> events, CancellationToken cancellationToken = default)
         {
             foreach (var @event in events.OfType<INotification>())
             {

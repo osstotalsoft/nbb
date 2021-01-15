@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Application.Effects
+namespace NBB.Application.MediatR.Effects
 {
     public static class DependencyInjectionExtensions
     {

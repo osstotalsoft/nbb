@@ -18,8 +18,8 @@ namespace NBB.EventStore.Tests
             var eventRepository = new Mock<IEventRepository>();
             var eventSerDes = new Mock<IEventStoreSerDes>();
             var sut = new NBB.EventStore.EventStore(eventRepository.Object, eventSerDes.Object, Mock.Of<ILogger<NBB.EventStore.EventStore>>());
-            var domainEvent = Mock.Of<IEvent>();
-            var domainEvents = new List<IEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var stream = "stream";
 
             //Act

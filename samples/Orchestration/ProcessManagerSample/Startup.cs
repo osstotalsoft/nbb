@@ -39,7 +39,7 @@ namespace ProcessManagerSample
             services.AddResiliency();
             services.AddMessagingHost()
                 .AddSubscriberServices(config => config
-                    .FromMediatRHandledCommands().AddClassesAssignableTo<ICommand>()
+                    .FromMediatRHandledCommands().AddAllClasses()
                     .FromMediatRHandledEvents().AddAllClasses())
                 .WithDefaultOptions()
                 .UsePipeline(builder => builder

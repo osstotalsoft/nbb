@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Effects\NBB.Core.Effects.csproj" />
-    <ProjectReference Include="..\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj" />
+    <ProjectReference Include="..\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
   </ItemGroup>
 
 </Project>

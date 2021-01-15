@@ -22,7 +22,7 @@ namespace NBB.ProcessManager.Runtime.Persistence
         public async Task Save<TData>(Instance<TData> instance, CancellationToken cancellationToken = default)
             where TData : struct
         {
-            var events = instance.GetUncommittedChanges().Cast<IEvent>().ToList();
+            var events = instance.GetUncommittedChanges().ToList();
             var effects = instance.GetUncommittedEffects().ToList();
             var streamId = instance.GetStream();
             var aggregateLoadedAtVersion = instance.Version;

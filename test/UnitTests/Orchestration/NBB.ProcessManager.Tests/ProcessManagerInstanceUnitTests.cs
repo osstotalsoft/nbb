@@ -58,7 +58,7 @@ namespace NBB.ProcessManager.Tests
                         newState.Amount = 100;
                         return newState;
                     })
-                    .PublishEvent((orderCreated, state) => new OrderCompleted(100, orderCreated.OrderId, 0, 0));
+                    .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0));
             }
         }
 
@@ -81,7 +81,7 @@ namespace NBB.ProcessManager.Tests
                 Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => Guid.NewGuid()));
 
                 StartWith<OrderCreated>()
-                    .PublishEvent((orderCreated, state) => new OrderCompleted(100, orderCreated.OrderId, 0, 0))
+                    .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0))
                     .SetState((orderCreated, state) =>
                     {
                         var newState = state.Data;
@@ -102,7 +102,7 @@ namespace NBB.ProcessManager.Tests
             instance.ProcessEvent(orderCreated);
             instance.Data.Amount.Should().Be(100);
 
-            var orderPaymentCreated = new OrderPaymentCreated(100, orderId, 0, 0);
+            var orderPaymentCreated = new OrderPaymentCreated(orderId, 100, 0, 0);
             instance.ProcessEvent(orderPaymentCreated);
             instance.Data.Amount.Should().Be(100);
             instance.Data.IsPaid.Should().BeTrue();
@@ -123,7 +123,7 @@ namespace NBB.ProcessManager.Tests
                         newState.OrderId = orderCreated.OrderId;
                         return newState;
                     })
-                    .PublishEvent((orderCreated, state) => new OrderCompleted(100, orderCreated.OrderId, 0, 0));
+                    .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0));
 
                 When<OrderPaymentCreated>()
                     .SetState((@event, data) =>
@@ -167,7 +167,7 @@ namespace NBB.ProcessManager.Tests
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
-            var orderPaymentCreated = new OrderPaymentCreated(100, orderId, 0, 0);
+            var orderPaymentCreated = new OrderPaymentCreated(orderId, 100, 0, 0);
             var definition = new OrderProcessManager5();
 
             var instance = new Instance<OrderProcessManagerData>(definition);
@@ -232,8 +232,8 @@ namespace NBB.ProcessManager.Tests
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
-            var orderCompleted = new OrderCompleted(100, orderId, 0, 0);
-            var orderPaymentCreated = new OrderPaymentCreated(100, orderId, 0, 0);
+            var orderCompleted = new OrderCompleted(orderId, 100, 0, 0);
+            var orderPaymentCreated = new OrderPaymentCreated(orderId, 100, 0, 0);
             var definition = new OrderProcessManager6();
 
             var instance = new Instance<OrderProcessManagerData>(definition);

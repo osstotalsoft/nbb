@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Application.DataContracts;
+using NBB.Application.MediatR;
 using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
@@ -64,8 +64,8 @@ namespace NBB.Mono
 
             services.AddMessagingHost()
                 .AddSubscriberServices(config => config
-                    .FromMediatRHandledCommands().AddClassesAssignableTo<Command>()
-                    .FromMediatRHandledEvents().AddClassesAssignableTo<Event>()
+                    .FromMediatRHandledCommands().AddAllClasses()
+                    .FromMediatRHandledEvents().AddAllClasses()
                 )
                 .WithDefaultOptions()
                 .UsePipeline(pipelineBuilder => pipelineBuilder

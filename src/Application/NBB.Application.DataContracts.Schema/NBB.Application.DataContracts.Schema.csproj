@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
-    <ProjectReference Include="..\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj" />
+    <ProjectReference Include="..\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
   </ItemGroup>
 
 </Project>

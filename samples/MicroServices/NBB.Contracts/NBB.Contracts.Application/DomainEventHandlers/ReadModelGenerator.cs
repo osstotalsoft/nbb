@@ -23,11 +23,11 @@ namespace NBB.Contracts.Application.DomainEventHandlers
 
         public async Task Handle(ContractCreated @event, CancellationToken cancellationToken)
         {
-
             var c = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
             if (c == null)
             {
-                await _contractReadModelRepository.AddAsync(new ContractReadModel(@event.ContractId, @event.ClientId, 0), cancellationToken);
+                await _contractReadModelRepository.AddAsync(
+                    new ContractReadModel(@event.ContractId, @event.ClientId, 0), cancellationToken);
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
             }
         }
@@ -45,19 +45,20 @@ namespace NBB.Contracts.Application.DomainEventHandlers
                 e.Version = e.Version + 1;
 
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
-
             }
         }
 
         public async Task Handle(ContractLineAdded @event, CancellationToken cancellationToken)
         {
-            var e = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken,nameof(ContractReadModel.ContractLines));
+            var e = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken,
+                nameof(ContractReadModel.ContractLines));
 
             if (e != null)
             {
                 if (e.ContractLines.All(cl => cl.ContractLineId != @event.ContractLineId))
                 {
-                    var contractLine = new ContractLineReadModel(@event.ContractLineId, @event.Product, @event.Price, @event.Quantity, @event.ContractId);
+                    var contractLine = new ContractLineReadModel(@event.ContractLineId, @event.Product, @event.Price,
+                        @event.Quantity, @event.ContractId);
                     e.ContractLines.Add(contractLine);
                     e.Version = e.Version + 1;
 
