@@ -72,8 +72,11 @@ namespace NBB.Domain.Tests
 
     public record TaskId : Identity<Guid>
     {
-        public TaskId(Guid? value = null)
-            :base(value ?? Guid.NewGuid())
+        private TaskId(Guid value) : base(value) {
+        }
+
+        public TaskId()
+            :this(Guid.NewGuid())
         {
             
         }
