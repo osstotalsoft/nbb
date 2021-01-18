@@ -260,16 +260,7 @@ namespace TheBenchmarks
             return container;
         }
 
-        public class TestEvent : DomainEvent
-        {
-            public string Prop { get; }
-
-            public TestEvent(string prop, DomainEventMetadata metadata = null)
-                : base(metadata)
-            {
-                Prop = prop;
-            }
-        }
+        public record TestEvent(string Prop);
 
         public class TestAggregate : EventSourcedAggregateRoot<Guid>
         {

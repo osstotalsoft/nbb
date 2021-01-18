@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NBB.Contracts.Domain.ContractAggregate.DomainEvents;
 using NBB.Contracts.Domain.ContractAggregate.Snapshots;
 using NBB.Domain;
 
@@ -54,10 +53,10 @@ namespace NBB.Contracts.Domain.ContractAggregate
             ClientId = memento.ClientId;
             ContractId = memento.ContractId;
             IsValidated = memento.IsValidated;
-            ContractLines = memento.ContractLines.Select(x => 
-                new ContractLine(
-                    new Product(x.Product.Name, x.Product.Price), 
-                    x.Quantity, x.ContractId))
+            ContractLines = memento.ContractLines.Select(x =>
+                    new ContractLine(
+                        new Product(x.Product.Name, x.Product.Price),
+                        x.Quantity, x.ContractId))
                 .ToList();
         }
 
@@ -105,7 +104,5 @@ namespace NBB.Contracts.Domain.ContractAggregate
         {
             this.IsValidated = true;
         }
-
-
     }
 }

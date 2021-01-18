@@ -83,7 +83,7 @@ namespace NBB.Data.EventSourcing
             var e = await _eventStore.GetEventsFromStreamAsync(streamId, aggregate.Version + 1, cancellationToken);
             if (e.Any())
             {
-                var events = e.Cast<IDomainEvent>();          
+                var events = e;          
                 aggregate.LoadFromHistory(events);
                 aggregateLoaded = true;
             }

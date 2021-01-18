@@ -1,6 +1,5 @@
 ﻿using System;
 using NBB.Domain;
-using NBB.Payments.Domain.PayableAggregate.DomainEvents;
 
 namespace NBB.Payments.Domain.PayableAggregate
 {

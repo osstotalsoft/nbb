@@ -5,7 +5,7 @@ namespace NBB.Domain.Abstractions
     public interface IEventSourcedAggregateRoot : IEventedAggregateRoot
     {
         int Version { get; }
-        void LoadFromHistory(IEnumerable<IDomainEvent> history);
+        void LoadFromHistory(IEnumerable<object> history);
 
     }
 

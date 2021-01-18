@@ -23,7 +23,7 @@ namespace NBB.Data.EventSourcing.Tests
 
             }
 
-            public TestEventSourcedAggregateRoot(Guid id, int version, List<IDomainEvent> domainEvents)
+            public TestEventSourcedAggregateRoot(Guid id, int version, List<object> domainEvents)
             {
                 Id = id;
                 Version = version;
@@ -33,7 +33,7 @@ namespace NBB.Data.EventSourcing.Tests
 
             public int Version { get; set; }
 
-            private readonly List<IDomainEvent> _domainEvents;
+            private readonly List<object> _domainEvents;
 
             public Guid Id { get; }
 
@@ -43,7 +43,7 @@ namespace NBB.Data.EventSourcing.Tests
 
             public virtual IEnumerable<object> GetUncommittedChanges() => _domainEvents;
 
-            public void LoadFromHistory(IEnumerable<IDomainEvent> history)
+            public void LoadFromHistory(IEnumerable<object> history)
             {
                 //throw new NotImplementedException();
             }
@@ -77,7 +77,7 @@ namespace NBB.Data.EventSourcing.Tests
             {
             }
 
-            public TestSnapshotAggregateRoot(Guid id, int version, int snapshotVersion, int? snapshotVersionFrequency, List<IDomainEvent> domainEvents)
+            public TestSnapshotAggregateRoot(Guid id, int version, int snapshotVersion, int? snapshotVersionFrequency, List<object> domainEvents)
                 : base(id, version, domainEvents)
             {
                 SnapshotVersion = snapshotVersion;
@@ -105,15 +105,15 @@ namespace NBB.Data.EventSourcing.Tests
             //var eventStoreMock = new Mock<IEventStore>();
             var eventStoreMock = new TestEventStore();
             var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock, Mock.Of<ISnapshotStore>(), Mock.Of<IMediator>(), new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestEventSourcedAggregateRoot(Guid.NewGuid(), 5, domainEvents);
 
             //Act
             await sut.SaveAsync(testAggregate, CancellationToken.None);
 
             //Assert
-            //eventStoreMock.Verify(es => es.AppendEventsToStreamAsync(It.IsAny<string>(), It.Is<IEnumerable<IDomainEvent>>(de=> de.Single() == domainEvent), null, It.IsAny<CancellationToken>()));
+            //eventStoreMock.Verify(es => es.AppendEventsToStreamAsync(It.IsAny<string>(), It.Is<IEnumerable<object>>(de=> de.Single() == domainEvent), null, It.IsAny<CancellationToken>()));
             eventStoreMock.AppendEventsToStreamAsyncCallsCount.Should().Be(1);
         }
 
@@ -124,8 +124,8 @@ namespace NBB.Data.EventSourcing.Tests
             var snapshotStore = Mock.Of<ISnapshotStore>();
             var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), new EventSourcingOptions { DefaultSnapshotVersionFrequency = 1 }, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 1000, 1, 10, domainEvents);
 
             //Act
@@ -146,8 +146,8 @@ namespace NBB.Data.EventSourcing.Tests
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 2};
             var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 2, 1, null, domainEvents);
 
             //Act
@@ -168,8 +168,8 @@ namespace NBB.Data.EventSourcing.Tests
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 2};
             var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 3, 1, null, domainEvents);
 
             //Act
@@ -190,8 +190,8 @@ namespace NBB.Data.EventSourcing.Tests
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 10};
             var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 2, 1, 2, domainEvents);
 
             //Act
@@ -212,8 +212,8 @@ namespace NBB.Data.EventSourcing.Tests
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 10};
             var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestSnapshotAggregateRoot(Guid.NewGuid(), 3, 1, 2, domainEvents);
 
             //Act
@@ -232,8 +232,8 @@ namespace NBB.Data.EventSourcing.Tests
             //Arrange
             var eventStoreMock = new Mock<IEventStore>();
             var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), Mock.Of<IMediator>(), new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
-            var domainEvent = Mock.Of<IDomainEvent>();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvent = Mock.Of<object>();
+            var domainEvents = new List<object> { domainEvent };
             var testAggregate = new Mock<TestEventSourcedAggregateRoot>();
             testAggregate.Setup(a => a.GetUncommittedChanges()).Returns(domainEvents);
 
@@ -266,7 +266,7 @@ namespace NBB.Data.EventSourcing.Tests
             var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), mediatorMock, new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
             var testAggregate = new Mock<TestEventSourcedAggregateRoot>();
             var domainEvent = new TestDomainEvent();
-            var domainEvents = new List<IDomainEvent> { domainEvent };
+            var domainEvents = new List<object> { domainEvent };
             testAggregate.Setup(a => a.GetUncommittedChanges()).Returns(domainEvents);
             //Act
             await sut.SaveAsync(testAggregate.Object, CancellationToken.None);
@@ -279,7 +279,7 @@ namespace NBB.Data.EventSourcing.Tests
         }
     }
 
-    public class TestDomainEvent : IDomainEvent, INotification
+    public class TestDomainEvent : object, INotification
     {
         public DateTime CreationDate => DateTime.Now;
         

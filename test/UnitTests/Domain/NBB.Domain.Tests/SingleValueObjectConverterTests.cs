@@ -8,7 +8,7 @@ namespace NBB.Domain.Tests
 {
     public class SingleValueObjectConverterTests
     {
-        public JsonSerializerSettings SerializerSettings => new JsonSerializerSettings()
+        public JsonSerializerSettings SerializerSettings => new()
         {
             Converters = new List<JsonConverter> {new SingleValueObjectConverter()}
         };
@@ -65,30 +65,19 @@ namespace NBB.Domain.Tests
             var identity = JsonConvert.DeserializeObject<StringId>(identityValueJson, SerializerSettings);
 
             //Assert
-            identity.Should().NotBeNull();
             identity.Value.Should().Be(null);
         }
     }
 
-    public class TaskId : Identity<Guid>
+
+    public record TaskId : Identity<Guid>
     {
-        [JsonConstructor]
-        private TaskId(Guid value)
-            : base(value)
+        public TaskId(Guid? value = null)
+            :base(value ?? Guid.NewGuid())
         {
+            
         }
+    };
 
-        public TaskId()
-            : this(Guid.NewGuid())
-        {
-        }
-    }
-
-    public class StringId : SingleValueObject<string>
-    {
-        public StringId(string value) : base(value)
-        {
-
-        }
-    }
+    public record StringId(string Value) : SingleValueObject<string>(Value);
 }
