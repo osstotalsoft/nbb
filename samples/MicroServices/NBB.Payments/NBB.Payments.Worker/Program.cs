@@ -17,7 +17,6 @@ using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Nats;
 using NBB.Payments.Application.CommandHandlers;
 using NBB.Payments.Data;
-using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
@@ -74,8 +73,6 @@ namespace NBB.Payments.Worker
                     services.AddEventStore()
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                         .WithAdoNetEventRepository();
-
-                    services.AddResiliency();
 
                     services.AddMessagingHost()
                         .AddSubscriberServices(config => config

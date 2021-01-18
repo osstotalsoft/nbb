@@ -2,7 +2,6 @@
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.Messaging.DataContracts;
-using NBB.Resiliency;
 using Polly;
 using System;
 using System.Runtime.ExceptionServices;
@@ -14,40 +13,54 @@ namespace NBB.Messaging.Host.MessagingPipeline
     /// <summary>
     /// A pipeline middleware that offers resiliency policies for "out of order" and concurrency exceptions.
     /// </summary>
-    /// <seealso cref="NBB.Core.Pipeline.IPipelineMiddleware{NBB.Messaging.DataContracts.MessagingEnvelope}" />
+    /// <seealso cref="NBB.Core.Pipeline.IPipelineMiddleware{MessagingEnvelope}" />
     public class DefaultResiliencyMiddleware : IPipelineMiddleware<MessagingEnvelope>
     {
-        private readonly IResiliencyPolicyProvider _resiliencyPolicyProvider;
         private readonly ILogger<DefaultResiliencyMiddleware> _logger;
 
-        public DefaultResiliencyMiddleware(IResiliencyPolicyProvider resiliencyPolicyProvider, ILogger<DefaultResiliencyMiddleware> logger)
+        public DefaultResiliencyMiddleware(ILogger<DefaultResiliencyMiddleware> logger)
         {
-            _resiliencyPolicyProvider = resiliencyPolicyProvider;
             _logger = logger;
         }
 
         public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
         {
-            var outOfOrderPolicy = _resiliencyPolicyProvider.GetOutOfOrderPolicy(retryCount => _logger.LogWarning(
-                  "Message of type {MessageType} could not be processed due to OutOfOrderMessageException. Retry count is {RetryCount}.",
-                  message.Payload.GetType().GetPrettyName(), retryCount));
+            var outOfOrderPolicy = GetOutOfOrderPolicy(retryCount => _logger.LogWarning(
+                "Message of type {MessageType} could not be processed due to OutOfOrderMessageException. Retry count is {RetryCount}.",
+                message.Payload.GetType().GetPrettyName(), retryCount));
 
-            var concurrencyException = _resiliencyPolicyProvider.GetConcurencyExceptionPolicy(ex =>
+            var concurrencyException = GetConcurrencyExceptionPolicy(_ =>
                 _logger.LogWarning(
                     "Message of type {MessageType} could not be processed due to concurrency exception. The system will automatically retry it.",
                     message.Payload.GetType().GetPrettyName()));
 
             var policies = Policy.WrapAsync(outOfOrderPolicy, concurrencyException);
 
-            var result = await policies.ExecuteAndCaptureAsync(async (_) =>
-            {
-                await next();
-            }, cancellationToken);
+            var result = await policies.ExecuteAndCaptureAsync(async (_) => { await next(); }, cancellationToken);
 
             if (result.Outcome == OutcomeType.Failure)
             {
                 ExceptionDispatchInfo.Capture(result.FinalException).Throw();
             }
+        }
+
+        private AsyncPolicy GetOutOfOrderPolicy(Action<int> onRetry)
+        {
+            var policy = Policy
+                .Handle<OutOfOrderMessageException>()
+                .WaitAndRetryAsync(3, i => TimeSpan.FromSeconds(Math.Pow(i, 2)),
+                    (_, _, retryCount, _) => { onRetry(retryCount); });
+
+            return policy;
+        }
+
+        private AsyncPolicy GetConcurrencyExceptionPolicy(Action<Exception> onRetry)
+        {
+            var policy = Policy
+                .Handle<ConcurrencyException>()
+                .RetryForeverAsync(onRetry);
+
+            return policy;
         }
     }
 }
