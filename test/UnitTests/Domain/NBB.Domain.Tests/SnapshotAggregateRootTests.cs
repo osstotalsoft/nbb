@@ -8,13 +8,7 @@ namespace NBB.Domain.Tests
 {
     public class SnapshotAggregateRootTests
     {
-        private class TestDomainEvent : DomainEvent
-        {
-            public TestDomainEvent()
-                : base(null)
-            {
-            }
-        }
+        private record TestDomainEvent;
         private class TestSnapshotAggregateRoot : EventSourcedAggregateRoot<Guid, TestSnapshot>
         {
             public Guid Id { get; private set; }

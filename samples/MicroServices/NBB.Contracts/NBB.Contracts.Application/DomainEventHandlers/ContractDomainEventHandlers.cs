@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using NBB.Contracts.Domain.ContractAggregate.DomainEvents;
+using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Messaging.Abstractions;
 
 namespace NBB.Contracts.Application.DomainEventHandlers

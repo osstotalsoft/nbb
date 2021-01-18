@@ -1,6 +1,5 @@
 ﻿using System;
 using NBB.Domain;
-using NBB.Invoices.Domain.InvoiceAggregate.DomainEvents;
 
 namespace NBB.Invoices.Domain.InvoiceAggregate
 {

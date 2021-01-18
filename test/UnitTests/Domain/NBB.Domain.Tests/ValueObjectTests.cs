@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Xunit;
@@ -8,30 +7,7 @@ namespace NBB.Domain.Tests
 {
     public class ValueObjectTests
     {
-        private class TestValueObject: ValueObject
-        {
-            public int A { get; }
-            public string B { get; }
-            public Guid C { get; }
-            public decimal D { get; }
-
-            protected override IEnumerable<object> GetAtomicValues()
-            {
-                yield return A;
-                yield return B;
-                yield return C;
-                yield return D;
-            }
-
-            public TestValueObject(int a, string b, Guid c, decimal d)
-            {
-                A = a;
-                B = b;
-                C = c;
-                D = d;
-            }
-        }
-
+        private record TestValueObject(int A, string B, Guid C, decimal D);
 
         [Fact]
         public void Should_be_equal_to_another_instance_with_the_same_properties()

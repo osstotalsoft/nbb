@@ -22,9 +22,13 @@ namespace NBB.Domain
             var parameterType = ConstructorArgumentTypes[objectType];
 
             var value = serializer.Deserialize(reader, parameterType);
-            return Activator.CreateInstance(objectType,
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, 
-                null, new[] {value}, CultureInfo.CurrentCulture);
+            var ci = objectType.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null, new[] {parameterType}, null);
+            if (ci == null)
+            {
+                throw new Exception($"No suitable constructor found for {objectType.Name} with parameter of type {parameterType.Name}");
+            }
+            return ci.Invoke(new[] {value});
         }
 
         public override bool CanConvert(Type objectType)

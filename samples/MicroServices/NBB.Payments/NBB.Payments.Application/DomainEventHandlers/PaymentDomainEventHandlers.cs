@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MediatR;
 using NBB.Messaging.Abstractions;
-using NBB.Payments.Domain.PayableAggregate.DomainEvents;
+using NBB.Payments.Domain.PayableAggregate;
 
 namespace NBB.Payments.Application.DomainEventHandlers
 {

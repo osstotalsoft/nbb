@@ -8,7 +8,7 @@ namespace NBB.Domain
 {
     public abstract class EventSourcedAggregateRoot<TIdentity> : EmitApplyAggregateRoot<TIdentity>, IEventSourcedAggregateRoot<TIdentity>
     {
-        public void LoadFromHistory(IEnumerable<IDomainEvent> history)
+        public void LoadFromHistory(IEnumerable<object> history)
         {
             foreach (var domainEvent in history)
             {

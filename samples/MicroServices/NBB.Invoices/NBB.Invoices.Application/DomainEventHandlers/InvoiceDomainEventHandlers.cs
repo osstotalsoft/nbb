@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using NBB.Invoices.Domain.InvoiceAggregate.DomainEvents;
+using NBB.Invoices.Domain.InvoiceAggregate;
 using NBB.Messaging.Abstractions;
 
 namespace NBB.Invoices.Application.DomainEventHandlers

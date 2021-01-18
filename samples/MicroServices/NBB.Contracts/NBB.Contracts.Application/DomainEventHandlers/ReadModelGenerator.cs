@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using NBB.Contracts.Domain.ContractAggregate.DomainEvents;
+using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Contracts.ReadModel;
 using NBB.Data.Abstractions;
 using System.Linq;
