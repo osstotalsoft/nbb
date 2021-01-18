@@ -10,7 +10,7 @@ namespace NBB.Messaging.InProcessMessaging.Tests
 {
     public class StorageTests
     {
-        public class TestMessage : IMessage
+        public class TestMessage
         {
             public IDictionary<string, string> Headers => new Dictionary<string, string>();
 

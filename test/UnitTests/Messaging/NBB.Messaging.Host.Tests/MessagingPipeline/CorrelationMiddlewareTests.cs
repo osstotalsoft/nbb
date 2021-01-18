@@ -70,5 +70,9 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();
         }
+
+        public interface IMessage
+        { 
+        }
     }
 }

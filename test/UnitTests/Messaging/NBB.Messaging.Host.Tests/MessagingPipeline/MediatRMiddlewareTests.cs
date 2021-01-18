@@ -95,16 +95,20 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             isNextMiddlewareCalled.Should().BeTrue();
         }
 
-        public interface IMockingEventMessage : IMessage, INotification
+        public interface IMockingEventMessage : INotification
         {
         }
 
-        public interface IMockingCommandMessage : IMessage, IRequest
+        public interface IMockingCommandMessage : IRequest
         {
         }
 
-        public interface IMockingQueryMessage : IMessage, IRequest<string>
+        public interface IMockingQueryMessage : IRequest<string>
         {
+        }
+
+        public interface IMessage
+        { 
         }
     }
 }

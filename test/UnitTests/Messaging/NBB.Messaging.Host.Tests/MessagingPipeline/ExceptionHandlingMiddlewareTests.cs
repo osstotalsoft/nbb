@@ -76,5 +76,9 @@ namespace NBB.Messaging.Host.Tests.Pipeline
                 It.Is<It.IsAnyType>((v, _) => v.ToString().Contains(containedString)),
                 null, It.IsAny<Func<It.IsAnyType, Exception, string>>()));
         }
+
+        public interface IMessage
+        { 
+        }
     }
 }

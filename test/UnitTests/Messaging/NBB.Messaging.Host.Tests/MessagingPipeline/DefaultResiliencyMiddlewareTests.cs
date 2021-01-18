@@ -152,5 +152,9 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Assert
             ((Func<Task>) Action).Should().Throw<ApplicationException>();
         }
+
+        public interface IMessage
+        { 
+        }
     }
 }
