@@ -14,7 +14,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using MediatR;
 using Xunit;
 
 namespace NBB.EventStore.IntegrationTests
@@ -36,7 +35,7 @@ namespace NBB.EventStore.IntegrationTests
 
             using (var scope = container.CreateScope())
             {
-                var eventStore = scope.ServiceProvider.GetService<IEventStore>();
+                var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
 
                 for (var i = 0; i < threadCount; i++)
                 {
@@ -46,7 +45,7 @@ namespace NBB.EventStore.IntegrationTests
                         try
                         {
                             eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] { new TestEvent(Guid.NewGuid()) }, streamVersion,
+                                    new[] {new TestEvent(Guid.NewGuid())}, streamVersion,
                                     CancellationToken.None)
                                 .Wait();
                         }
@@ -83,14 +82,14 @@ namespace NBB.EventStore.IntegrationTests
 
             using (var scope = container.CreateScope())
             {
-                var eventStore = scope.ServiceProvider.GetService<IEventStore>();
+                var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
 
                 for (var i = 0; i < threadCount; i++)
                 {
                     var t = new Thread(() =>
                     {
                         eventStore.AppendEventsToStreamAsync(stream,
-                            new[] { new TestEvent(Guid.NewGuid()) }, null, CancellationToken.None).Wait();
+                            new[] {new TestEvent(Guid.NewGuid())}, null, CancellationToken.None).Wait();
                     });
                     t.Start();
                     threads.Add(t);
@@ -106,7 +105,6 @@ namespace NBB.EventStore.IntegrationTests
                 events.Count.Should().Be(threadCount);
             }
         }
-
 
         private static IServiceProvider BuildAdoRepoServiceProvider()
         {
@@ -135,11 +133,11 @@ namespace NBB.EventStore.IntegrationTests
                 .WithAdoNetEventRepository();
 
             services.AddMultitenancy(configuration, _ =>
-                {
-                    services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                        x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
-                    services.WithMultiTenantAdoNetEventRepository();
-                });
+            {
+                services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
+                services.WithMultiTenantAdoNetEventRepository();
+            });
 
 
             var container = services.BuildServiceProvider();
@@ -152,5 +150,5 @@ namespace NBB.EventStore.IntegrationTests
         }
     }
 
-    public record TestEvent(Guid EventId) : INotification;
+    public record TestEvent(Guid EventId);
 }
