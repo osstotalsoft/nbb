@@ -56,9 +56,10 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         {
             //Arrange
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());
-            var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(),
-                sentMessage);
+            var sentMessage = new {Field = "value"};
+
+            var envelope =
+                new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
 
             Task Next() => Task.CompletedTask;
@@ -105,10 +106,6 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
 
         public interface IMockingQueryMessage : IRequest<string>
         {
-        }
-
-        public interface IMessage
-        { 
         }
     }
 }

@@ -21,9 +21,9 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(
                 Mock.Of<ILogger<DefaultResiliencyMiddleware>>());
 
-            var sentMessage = Mock.Of<IMessage>();
+            var sentMessage = new { Field = "value"};
             var isNextMiddlewareCalled = false;
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
@@ -44,8 +44,8 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(
                 mockedLogger);
 
-            var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var sentMessage = new { Field = "value"};
+            var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task Next() => throw new ApplicationException();
 
@@ -68,8 +68,8 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(
                 mockedLogger);
 
-            var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var sentMessage = new { Field = "value"};
+            var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task Next() => throw new ApplicationException();
 
@@ -81,10 +81,6 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
 
             //Assert
             ((Func<Task>) Action).Should().Throw<ApplicationException>();
-        }
-
-        public interface IMessage
-        { 
         }
     }
 }
