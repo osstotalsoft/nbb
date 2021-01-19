@@ -1,5 +1,5 @@
 ﻿using NBB.Core.Pipeline;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.OpenTracing.Subscriber
 {

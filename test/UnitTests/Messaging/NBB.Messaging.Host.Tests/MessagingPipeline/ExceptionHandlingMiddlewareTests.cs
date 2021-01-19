@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using System;
 using System.Threading.Tasks;
@@ -17,8 +17,8 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
             var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger);
-            var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var sentMessage = new { Field = "value"};
+            var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task next() => Task.CompletedTask;
 
@@ -35,8 +35,8 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
             var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger);
-            var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var sentMessage = new { Field = "value"};
+            var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task next() => throw new ApplicationException();
 
@@ -45,7 +45,10 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             {
                 await correlationMiddleWare.Invoke(envelope, default, next);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
             //Assert
             VerifyLog(mockedLogger, LogLevel.Error, nameof(ApplicationException));
@@ -56,9 +59,9 @@ namespace NBB.Messaging.Host.Tests.Pipeline
         {
             //Arrange
             var executionTimeMiddleware = new ExceptionHandlingMiddleware(Mock.Of<ILogger<ExceptionHandlingMiddleware>>());
-            var sentMessage = Mock.Of<IMessage>();
+            var sentMessage = new { Field = "value"};
             bool isNextMiddlewareCalled = false;
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
 
             Task next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }

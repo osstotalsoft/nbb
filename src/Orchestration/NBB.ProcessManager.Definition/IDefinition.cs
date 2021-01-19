@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace NBB.ProcessManager.Definition
 {
     public interface IDefinition<TData> : IDefinition
-        where TData : struct
     {
         EffectFunc<TEvent, TData> GetEffectFunc<TEvent>();
         SetStateFunc<TEvent, TData> GetSetStateFunc<TEvent>();

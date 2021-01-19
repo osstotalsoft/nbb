@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentAssertions;
 using Moq;
-using NBB.Messaging.DataContracts;
 using Xunit;
 
 namespace NBB.Messaging.Abstractions.Tests

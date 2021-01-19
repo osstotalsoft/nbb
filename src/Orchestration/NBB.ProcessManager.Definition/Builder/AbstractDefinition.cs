@@ -6,7 +6,6 @@ using NBB.Core.Effects;
 namespace NBB.ProcessManager.Definition.Builder
 {
     public abstract class AbstractDefinition<TData> : IDefinition<TData>
-        where TData : struct
     {
         private readonly List<IEventActivitySet<TData>> _eventActivities = new List<IEventActivitySet<TData>>();
         private readonly Dictionary<Type, EventCorrelation<object, TData>> _eventCorrelations = new Dictionary<Type, EventCorrelation<object, TData>>();
@@ -73,7 +72,7 @@ namespace NBB.ProcessManager.Definition.Builder
                     }
                 );
 
-            return (@event, data) => func?.Invoke(@event, data) ?? data.Data;
+            return (@event, data) => func == null ? data.Data : func.Invoke(@event, data);
         }
 
         EventPredicate<TEvent, TData> IDefinition<TData>.GetStarterPredicate<TEvent>()

@@ -1,6 +1,6 @@
 ﻿using Moq;
 using NBB.Core.Pipeline;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using System;
 using Xunit;

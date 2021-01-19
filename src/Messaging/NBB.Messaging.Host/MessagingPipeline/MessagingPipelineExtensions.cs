@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Effects;
 using NBB.Core.Pipeline;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.Host.MessagingPipeline
 {

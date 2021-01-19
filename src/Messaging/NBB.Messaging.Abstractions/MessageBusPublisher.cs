@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
-using NBB.Messaging.DataContracts;
+﻿using NBB.Core.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

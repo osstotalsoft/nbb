@@ -1,16 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Core.Abstractions;
 using NBB.EventStore;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
 using NBB.EventStore.AdoNet.Multitenancy;
-using NBB.GetEventStore;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.SQLStreamStore;
 using NBB.SQLStreamStore.Migrations;
 using System;
@@ -66,13 +63,6 @@ namespace TheBenchmarks
                 services.AddSqlStreamStore());
         }
 
-        [GlobalSetup(Target = nameof(GetEventStoreSave))]
-        public void GlobalSetupGetEventStoreSave()
-        {
-            _container = BuildServiceProvider((services, _) =>
-                services.AddGetEventStore());
-        }
-
 
         [GlobalSetup(Target = nameof(NBBEventStoreLoad))]
         public void GlobalSetupNBBEventStoreLoad()
@@ -95,13 +85,6 @@ namespace TheBenchmarks
             SeedEventRepository(_loadTestStream);
         }
 
-        [GlobalSetup(Target = nameof(GetEventStoreLoad))]
-        public void GlobalSetupGetEventStoreLoad()
-        {
-            GlobalSetupGetEventStoreSave();
-            SeedEventRepository(_loadTestStream);
-        }
-
         [Benchmark]
         public void NBBEventStoreSave()
         {
@@ -120,12 +103,6 @@ namespace TheBenchmarks
             EventStoreSave();
         }
 
-        //[Benchmark]
-        public void GetEventStoreSave()
-        {
-            EventStoreSave();
-        }
-
         [Benchmark]
         public void NBBEventStoreLoad()
         {
@@ -140,13 +117,6 @@ namespace TheBenchmarks
 
         [Benchmark]
         public void SqlStreamStoreLoad()
-        {
-            EventStoreLoad();
-        }
-
-
-        //[Benchmark]
-        public void GetEventStoreLoad()
         {
             EventStoreLoad();
         }

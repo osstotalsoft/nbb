@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using System;
 using System.Collections.Generic;
 using System.Threading;

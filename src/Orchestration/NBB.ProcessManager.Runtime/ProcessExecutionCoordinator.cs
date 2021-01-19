@@ -21,7 +21,7 @@ namespace NBB.ProcessManager.Runtime
 
         public async Task Invoke<TDefinition, TData, TEvent>(TEvent @event, CancellationToken cancellationToken = default)
             where TDefinition : IDefinition<TData>
-            where TData : struct
+            where TData: new()
         {
             var definition = _definitions.OfType<TDefinition>().SingleOrDefault();
             if (definition == null)

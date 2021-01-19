@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

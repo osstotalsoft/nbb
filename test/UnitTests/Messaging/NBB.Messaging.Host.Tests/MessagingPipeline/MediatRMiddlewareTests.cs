@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Moq;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using Xunit;
 
@@ -56,9 +56,10 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         {
             //Arrange
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());
-            var sentMessage = Mock.Of<IMessage>();
-            var envelope = new MessagingEnvelope<IMessage>(new System.Collections.Generic.Dictionary<string, string>(),
-                sentMessage);
+            var sentMessage = new {Field = "value"};
+
+            var envelope =
+                new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
 
             Task Next() => Task.CompletedTask;
@@ -95,15 +96,15 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             isNextMiddlewareCalled.Should().BeTrue();
         }
 
-        public interface IMockingEventMessage : IMessage, INotification
+        public interface IMockingEventMessage : INotification
         {
         }
 
-        public interface IMockingCommandMessage : IMessage, IRequest
+        public interface IMockingCommandMessage : IRequest
         {
         }
 
-        public interface IMockingQueryMessage : IMessage, IRequest<string>
+        public interface IMockingQueryMessage : IRequest<string>
         {
         }
     }

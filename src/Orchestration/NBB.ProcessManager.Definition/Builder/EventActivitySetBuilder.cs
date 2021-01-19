@@ -6,7 +6,6 @@ using NBB.ProcessManager.Definition.SideEffects;
 namespace NBB.ProcessManager.Definition.Builder
 {
     public class EventActivitySetBuilder<TEvent, TData>
-        where TData : struct
     {
         private readonly EventActivitySet<TEvent, TData> _eventActivitySet;
 

@@ -2,9 +2,9 @@
 
 namespace ProcessManagerSample
 {
-    public struct OrderProcessManagerData
+    public record OrderProcessManagerData
     {
-        public Guid OrderId { get; set; }
-        public bool IsPaid { get; set; }
+        public Guid OrderId { get; init; }
+        public bool IsPaid { get; init; }
     }
 }

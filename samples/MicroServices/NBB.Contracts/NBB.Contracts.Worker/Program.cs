@@ -14,7 +14,6 @@ using NBB.Messaging.Host;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Nats;
-using NBB.Resiliency;
 using Serilog;
 using Serilog.Events;
 using System.IO;
@@ -75,8 +74,6 @@ namespace NBB.Contracts.Worker
                     services.AddEventStore()
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
-
-                    services.AddResiliency();
 
                     services.AddMessagingHost()
                         .AddSubscriberServices(config =>

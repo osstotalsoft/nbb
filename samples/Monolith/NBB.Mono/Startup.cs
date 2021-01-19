@@ -21,7 +21,6 @@ using NBB.Payments.Data;
 using NBB.Core.DependencyInjection;
 using NBB.Domain;
 using NBB.Messaging.Host;
-using NBB.Resiliency;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
@@ -59,8 +58,6 @@ namespace NBB.Mono
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository();
-
-            services.AddResiliency();
 
             services.AddMessagingHost()
                 .AddSubscriberServices(config => config

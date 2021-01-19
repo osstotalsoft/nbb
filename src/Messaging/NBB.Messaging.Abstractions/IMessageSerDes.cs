@@ -1,6 +1,4 @@
-﻿using NBB.Messaging.DataContracts;
-
-namespace NBB.Messaging.Abstractions
+﻿namespace NBB.Messaging.Abstractions
 {
     public interface IMessageSerDes
     {

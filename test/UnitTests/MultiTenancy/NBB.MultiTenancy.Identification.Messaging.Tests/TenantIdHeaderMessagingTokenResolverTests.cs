@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Messaging.Tests

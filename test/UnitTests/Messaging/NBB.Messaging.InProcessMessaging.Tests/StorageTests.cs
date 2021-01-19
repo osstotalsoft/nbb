@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using NBB.Messaging.DataContracts;
 using NBB.Messaging.InProcessMessaging.Internal;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,7 +9,7 @@ namespace NBB.Messaging.InProcessMessaging.Tests
 {
     public class StorageTests
     {
-        public class TestMessage : IMessage
+        public class TestMessage
         {
             public IDictionary<string, string> Headers => new Dictionary<string, string>();
 

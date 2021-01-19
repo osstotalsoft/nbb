@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using FluentAssertions;
-using NBB.Messaging.DataContracts;
 using Xunit;
 
 namespace NBB.Messaging.Abstractions.Tests

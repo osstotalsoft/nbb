@@ -28,7 +28,8 @@ namespace NBB.ProcessManager.Tests
             var definition = new OrderProcessManager3();
 
             var instance = new Instance<OrderProcessManagerData>(definition);
-            var identitySelector = ((IDefinition<OrderProcessManagerData>) definition).GetCorrelationFilter<OrderCreated>();
+            var identitySelector =
+                ((IDefinition<OrderProcessManagerData>) definition).GetCorrelationFilter<OrderCreated>();
             if (identitySelector != null)
                 instance = await _fixture.Repository.Get(definition, identitySelector(@event), CancellationToken.None);
 
@@ -53,11 +54,10 @@ namespace NBB.ProcessManager.Tests
             {
                 StartWith<OrderCreated>()
                     .SetState((orderCreated, state) =>
-                    {
-                        var newState = state.Data;
-                        newState.Amount = 100;
-                        return newState;
-                    })
+                        state.Data with
+                        {
+                            Amount = 100
+                        })
                     .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0));
             }
         }
@@ -82,12 +82,13 @@ namespace NBB.ProcessManager.Tests
 
                 StartWith<OrderCreated>()
                     .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0))
-                    .SetState((orderCreated, state) =>
-                    {
-                        var newState = state.Data;
-                        newState.Amount = state.Data.Amount + 100;
-                        return newState;
-                    });
+                    .SetState((orderCreated, state
+                    ) =>
+                        state.Data with
+                        {
+                            Amount = state
+                    .Data.Amount + 100
+                        });
             }
         }
 
@@ -113,25 +114,20 @@ namespace NBB.ProcessManager.Tests
             public OrderProcessManager3()
             {
                 Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
-                Event<OrderPaymentCreated>(configurator => configurator.CorrelateById(paymentReceived => paymentReceived.OrderId));
+                Event<OrderPaymentCreated>(configurator =>
+                    configurator.CorrelateById(paymentReceived => paymentReceived.OrderId));
 
                 StartWith<OrderCreated>()
                     .SetState((orderCreated, state) =>
-                    {
-                        var newState = state.Data;
-                        newState.Amount = 100;
-                        newState.OrderId = orderCreated.OrderId;
-                        return newState;
-                    })
+                        state.Data with
+                        {
+                            Amount = 100,
+                            OrderId = orderCreated.OrderId
+                        })
                     .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0));
 
                 When<OrderPaymentCreated>()
-                    .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.IsPaid = true;
-                        return newState;
-                    })
+                    .SetState((@event, state) => state.Data with {IsPaid = true})
                     .Then((ev, state) =>
                     {
                         var effect = MessageBus.Publish(new DoPayment());
@@ -186,42 +182,31 @@ namespace NBB.ProcessManager.Tests
             public OrderProcessManager5()
             {
                 Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
-                Event<OrderPaymentCreated>(configurator => configurator.CorrelateById(orderPaymentCreated => orderPaymentCreated.OrderId));
+                Event<OrderPaymentCreated>(configurator =>
+                    configurator.CorrelateById(orderPaymentCreated => orderPaymentCreated.OrderId));
 
                 StartWith<OrderCreated>()
-                    .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.IsPaid = true;
-                        return newState;
-                    });
+                    .SetState((@event, data) => data.Data with {IsPaid = true});
 
                 When<OrderPaymentCreated>((@event, data) => true)
-                    .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.Amount = 100;
-                        return newState;
-                    });
+                    .SetState((@event, data) => data.Data with {Amount = 100});
 
                 When<OrderPaymentCreated>((@event, data) => data.Data.Amount < 100)
                     .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.Amount += 20;
-                        newState.IsPaid = false;
-                        return newState;
-                    })
+                        data.Data with
+                        {
+                            Amount = data.Data.Amount + 20,
+                            IsPaid = false
+                        })
                     .Complete((@event, data) => data.Data.IsPaid);
 
                 When<OrderPaymentCreated>((@event, data) => data.Data.Amount >= 100)
                     .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.Amount += 10;
-                        newState.IsPaid = false;
-                        return newState;
-                    })
+                        data.Data with
+                        {
+                            Amount = data.Data.Amount + 10,
+                            IsPaid = false
+                        })
                     .Complete((@event, data) => data.Data.IsPaid);
             }
         }
@@ -251,29 +236,20 @@ namespace NBB.ProcessManager.Tests
             public OrderProcessManager6()
             {
                 Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
-                Event<OrderCompleted>(configurator => configurator.CorrelateById(orderCompleted => orderCompleted.OrderId));
-                Event<OrderPaymentCreated>(configurator => configurator.CorrelateById(orderPaymentCreated => orderPaymentCreated.OrderId));
+                Event<OrderCompleted>(configurator =>
+                    configurator.CorrelateById(orderCompleted => orderCompleted.OrderId));
+                Event<OrderPaymentCreated>(configurator =>
+                    configurator.CorrelateById(orderPaymentCreated => orderPaymentCreated.OrderId));
 
                 StartWith<OrderCreated>()
-                    .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.OrderId = @event.OrderId;
-                        return newState;
-                    });
+                    .SetState((@event, data) => data.Data with {OrderId = @event.OrderId});
 
                 When<OrderCompleted>()
                     .Complete();
 
                 When<OrderPaymentCreated>()
-                    .SetState((@event, data) =>
-                    {
-                        var newState = data.Data;
-                        newState.IsPaid = true;
-                        return newState;
-                    })
+                    .SetState((@event, data) => data.Data with {IsPaid = true})
                     .Complete();
-
             }
         }
 
@@ -311,14 +287,14 @@ namespace NBB.ProcessManager.Tests
         }
     }
 
-    public struct OrderProcessManagerData
+    public record OrderProcessManagerData
     {
-        public Guid OrderId { get; set; }
-        public int SiteId { get; set; }
-        public int DocumentId { get; set; }
-        public int UserId { get; set; }
-        public decimal Amount { get; set; }
-        public bool IsPaid { get; set; }
-        public bool IsShipped { get; set; }
+        public Guid OrderId { get; init; }
+        public int SiteId { get; init; }
+        public int DocumentId { get; init; }
+        public int UserId { get; init; }
+        public decimal Amount { get; init; }
+        public bool IsPaid { get; init; }
+        public bool IsShipped { get; init; }
     }
 }
