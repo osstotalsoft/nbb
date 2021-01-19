@@ -2,8 +2,7 @@
 
 namespace NBB.ProcessManager.Definition.Builder
 {
-    public class EventCorrelationBuilder<TEvent, TData> 
-        where TData : struct
+    public class EventCorrelationBuilder<TEvent, TData>
     {
         private Func<TEvent, object> _correlationFilter;
 

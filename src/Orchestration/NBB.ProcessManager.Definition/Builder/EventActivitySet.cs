@@ -5,7 +5,6 @@ namespace NBB.ProcessManager.Definition.Builder
 {
 
     public class EventActivitySet<TEvent, TData> : IEventActivitySet<TData>
-        where TData : struct
     {
         public EffectFunc<object, TData> EffectFunc { get; set; }
         public SetStateFunc<object, TData> SetStateFunc { get; set; }
@@ -90,7 +89,6 @@ namespace NBB.ProcessManager.Definition.Builder
     }
 
     public interface IEventActivitySet<TData>
-        where TData : struct
     {
         Type EventType { get; }
         bool CompletesProcess { get; }

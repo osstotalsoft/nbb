@@ -6,8 +6,8 @@ using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Runtime
 {
-    public class Instance<TData>
-        where TData : struct
+    public class Instance<TData> 
+        where TData : new()
     {
         private readonly IDefinition<TData> _definition;
         public TData Data { get; private set; }
@@ -24,6 +24,7 @@ namespace NBB.ProcessManager.Runtime
         public Instance(IDefinition<TData> definition)
         {
             _definition = definition;
+            Data = new TData();
         }
 
         private void StartProcess<TEvent>(TEvent @event)

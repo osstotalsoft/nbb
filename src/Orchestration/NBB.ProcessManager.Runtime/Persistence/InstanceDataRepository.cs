@@ -20,7 +20,7 @@ namespace NBB.ProcessManager.Runtime.Persistence
         }
 
         public async Task Save<TData>(Instance<TData> instance, CancellationToken cancellationToken = default)
-            where TData : struct
+            where TData: new()
         {
             var events = instance.GetUncommittedChanges().ToList();
             var effects = instance.GetUncommittedEffects().ToList();
@@ -34,7 +34,7 @@ namespace NBB.ProcessManager.Runtime.Persistence
         }
 
         public async Task<Instance<TData>> Get<TData>(IDefinition<TData> definition, object identity, CancellationToken cancellationToken = default)
-            where TData : struct
+            where TData: new()
         {
             var instance = new Instance<TData>(definition);
             var streamId = instance.GetStreamFor(identity);

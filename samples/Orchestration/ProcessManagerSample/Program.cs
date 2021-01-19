@@ -32,7 +32,7 @@ namespace ProcessManagerSample
 
 
                     Console.ReadKey();
-                    var orderId = Guid.Empty;
+                    var orderId = Guid.NewGuid();
                     var pub = host.Services.GetRequiredService<IMessageBusPublisher>();
                     await pub.PublishAsync(new OrderCreated(orderId, 100, 0,0));
                     Console.ReadKey();

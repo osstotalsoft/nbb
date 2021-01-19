@@ -31,12 +31,7 @@ namespace ProcessManagerSample
                 .Then(OrderCreatedHandler);
 
             When<OrderPaymentCreated>()
-                .SetState((received, state) =>
-                {
-                    var newState = state.Data;
-                    newState.OrderId = Guid.NewGuid();
-                    return newState;
-                })
+                .SetState((received, state) => state.Data with {OrderId = Guid.NewGuid()})
                 .Then((orderCreated, data) =>
                 {
                     var q1 = Mediator.SendQuery(new GetClientQuery());

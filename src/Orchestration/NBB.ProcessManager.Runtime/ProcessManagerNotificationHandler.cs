@@ -7,7 +7,7 @@ namespace NBB.ProcessManager.Runtime
 {
     public class ProcessManagerNotificationHandler<TDefinition, TData, TEvent> : INotificationHandler<TEvent>
         where TDefinition : IDefinition<TData>
-        where TData : struct
+        where TData: new()
         where TEvent : INotification
     {
         private readonly ProcessExecutionCoordinator _pec;
