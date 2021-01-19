@@ -48,7 +48,6 @@
     <ProjectReference Include="..\..\..\src\EventStore\NBB.SQLStreamStore.Migrations\NBB.SQLStreamStore.Migrations.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.SQLStreamStore\NBB.SQLStreamStore.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
   </ItemGroup>
 

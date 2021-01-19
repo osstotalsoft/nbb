@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
 using Xunit;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Pipeline;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.Builder.TypeSelector;
 using System;
 

@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using NBB.Messaging.DataContracts;
 using NBB.Messaging.InProcessMessaging.Internal;
 using System.Collections.Generic;
 using System.Threading;

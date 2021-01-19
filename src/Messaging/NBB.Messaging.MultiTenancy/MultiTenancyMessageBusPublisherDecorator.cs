@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using NBB.MultiTenancy.Abstractions.Context;
 
 namespace NBB.Messaging.MultiTenancy

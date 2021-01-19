@@ -2,7 +2,6 @@
 using NBB.Core.Pipeline;
 using NBB.Correlation;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Tag;

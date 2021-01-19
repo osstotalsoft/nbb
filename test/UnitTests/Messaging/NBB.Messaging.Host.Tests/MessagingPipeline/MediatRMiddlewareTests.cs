@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Moq;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using Xunit;
 

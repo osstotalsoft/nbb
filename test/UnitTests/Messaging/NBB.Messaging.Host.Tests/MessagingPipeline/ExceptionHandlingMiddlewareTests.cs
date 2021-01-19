@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using System;
 using System.Threading.Tasks;

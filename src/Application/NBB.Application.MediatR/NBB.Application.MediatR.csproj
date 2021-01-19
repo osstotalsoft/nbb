@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
-    <ProjectReference Include="..\..\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj" />
   </ItemGroup>
 
 </Project>

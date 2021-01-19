@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
-using NBB.Messaging.DataContracts;
+using NBB.Messaging.Abstractions;
 using System;
 using System.Diagnostics;
 using System.Threading;

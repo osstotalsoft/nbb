@@ -4,7 +4,6 @@ using FluentAssertions;
 using Moq;
 using NBB.Correlation;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.DataContracts;
 using NBB.Messaging.Host.MessagingPipeline;
 using Xunit;
 

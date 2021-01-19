@@ -1,5 +1,4 @@
-﻿using NBB.Messaging.DataContracts;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 

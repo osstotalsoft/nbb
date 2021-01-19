@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NBB.Messaging.DataContracts
+namespace NBB.Messaging.Abstractions
 {
     public class MessageTypeIdAttribute : Attribute
     {

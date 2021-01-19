@@ -3,7 +3,6 @@
     "path": "NBB.sln",
     "projects": [
       "src\\Messaging\\NBB.Messaging.Abstractions\\NBB.Messaging.Abstractions.csproj",
-      "src\\Messaging\\NBB.Messaging.DataContracts\\NBB.Messaging.DataContracts.csproj",
       "src\\Messaging\\NBB.Messaging.Effects\\NBB.Messaging.Effects.csproj",
       "src\\Messaging\\NBB.Messaging.Host\\NBB.Messaging.Host.csproj",
       "src\\Messaging\\NBB.Messaging.InProcessMessaging\\NBB.Messaging.InProcessMessaging.csproj",
