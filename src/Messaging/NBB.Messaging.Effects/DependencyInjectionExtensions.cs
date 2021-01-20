@@ -5,9 +5,10 @@ namespace NBB.Messaging.Effects
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddMessagingEffects(this IServiceCollection services)
+        public static IServiceCollection AddMessagingEffects(this IServiceCollection services)
         {
             services.AddSingleton<ISideEffectHandler<PublishMessage.SideEffect, Unit>, PublishMessage.Handler>();
+            return services;
         }
     }
 }

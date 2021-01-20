@@ -48,8 +48,8 @@ namespace NBB.Core.Effects
             return result;
         }
 
-        public static DisposableInterpreter CreateDefault()
-            => new();
+        public static DisposableInterpreter CreateDefault(Action<IServiceCollection> configureServices = null)
+            => new(configureServices);
     }
     
     
@@ -58,10 +58,11 @@ namespace NBB.Core.Effects
     {
         private readonly ServiceProvider _sp;
         private readonly IInterpreter _interpreter;
-        public DisposableInterpreter()
+        public DisposableInterpreter(Action<IServiceCollection> configureServices = null)
         {
             var services = new ServiceCollection();
             services.AddEffects();
+            configureServices?.Invoke(services);
             _sp = services.BuildServiceProvider();
             _interpreter = _sp.GetRequiredService<IInterpreter>();
         }
