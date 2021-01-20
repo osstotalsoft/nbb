@@ -6,10 +6,11 @@ namespace NBB.Http.Effects
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddHttpEffects(this IServiceCollection services)
+        public static IServiceCollection AddHttpEffects(this IServiceCollection services)
         {
             services.AddHttpClient();
             services.AddSingleton<ISideEffectHandler<HttpGet.SideEffect, HttpResponseMessage>, HttpGet.Handler>();
+            return services;
         }
     }
 }

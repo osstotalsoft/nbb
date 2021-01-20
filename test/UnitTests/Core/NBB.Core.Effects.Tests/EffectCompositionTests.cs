@@ -49,7 +49,7 @@ namespace NBB.Core.Effects.Tests
                     Effect.Pure(6).Then(Double))
                 .Then(((int first, int second) t) => t.first + t.second);
 
-            await using var interpreter = Interpreter.CreateDefault();
+            await using var interpreter = Interpreter.CreateDefault(services=> services.AddEffects());
             
             var actual = await interpreter.Interpret(effect);
             actual.Should().Be(Add1(5)+Double(6));

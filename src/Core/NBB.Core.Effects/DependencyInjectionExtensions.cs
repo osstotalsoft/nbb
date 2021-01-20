@@ -7,13 +7,14 @@ namespace NBB.Core.Effects
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddEffects(this IServiceCollection services)
+        public static IServiceCollection AddEffects(this IServiceCollection services)
         {
             services.AddSingleton(typeof(Thunk.Handler<>));
             services.AddSingleton(typeof(Parallel.Handler<,>));
             services.AddSingleton(typeof(Sequenced.Handler<>));
             services.AddScoped<ISideEffectBroker, SideEffectBroker>();
             services.AddScoped<IInterpreter, Interpreter>();
+            return services;
         }
 
         public static IServiceCollection AddSideEffectHandler<TOutput>(this IServiceCollection services, ISideEffectHandler<ISideEffect<TOutput>, TOutput> handler)
