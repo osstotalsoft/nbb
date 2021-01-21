@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
+    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
   </ItemGroup>
 
 </Project>

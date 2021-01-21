@@ -27,12 +27,11 @@ namespace NBB.Messaging.Abstractions
         public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
         {
             var outgoingEnvelope = PrepareMessageEnvelope(message, envelopeCustomizer);
-            var key = (message as IKeyProvider)?.Key;
             var value = _messageSerDes.SerializeMessageEnvelope(outgoingEnvelope);
             var newTopicName = _topicRegistry.GetTopicForName(topicName) ??
                                _topicRegistry.GetTopicForMessageType(message.GetType());
 
-            await _topicPublisher.PublishAsync(newTopicName, key, value, cancellationToken);
+            await _topicPublisher.PublishAsync(newTopicName, value, cancellationToken);
 
             await Task.Yield();
         }

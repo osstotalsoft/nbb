@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
     <ProjectReference Include="..\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
   </ItemGroup>
 

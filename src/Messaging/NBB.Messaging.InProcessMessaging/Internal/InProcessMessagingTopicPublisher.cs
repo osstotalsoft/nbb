@@ -17,7 +17,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             _logger = logger;
         }
 
-        public Task PublishAsync(string topic, string key, string message, CancellationToken cancellationToken = default)
+        public Task PublishAsync(string topic, string message, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();

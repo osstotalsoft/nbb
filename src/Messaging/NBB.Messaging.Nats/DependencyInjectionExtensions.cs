@@ -8,14 +8,9 @@ namespace NBB.Messaging.Nats
     {
         public static void AddNatsMessaging(this IServiceCollection services)
         {
+            services.AddMessagingDefaults();
             services.AddSingleton<StanConnectionProvider>();
-            services.AddSingleton<IMessageBusPublisher, MessageBusPublisher>();
-            services.AddSingleton(typeof(IMessageBusSubscriber<>), typeof(MessageBusSubscriber<>));
-            services.AddTransient<IMessagingTopicSubscriber, NatsMessagingTopicSubscriber>();
-            services.AddTransient<IMessagingTopicPublisher, NatsMessagingTopicPublisher>();
-            services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();
-            services.AddSingleton<IMessageSerDes, NewtonsoftJsonMessageSerDes>();
-            services.AddSingleton<IMessageTypeRegistry, DefaultMessageTypeRegistry>();
+            services.AddSingleton<IMessagingTransport, StanMessagingTransport>();
         }
     }
 }
