@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NATS.Client;
 using STAN.Client;
 using System;
@@ -11,17 +11,17 @@ namespace NBB.Messaging.Nats.Internal
 {
     public class StanConnectionProvider : IDisposable
     {
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<NatsOptions> _natsOptions;
         private readonly ILogger<StanConnectionProvider> _logger;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private IStanConnection _connection;
         private Exception _unrecoverableException;
         private readonly Lazy<IStanConnection> _lazyConnection;
 
-        public StanConnectionProvider(IConfiguration configuration, ILogger<StanConnectionProvider> logger,
+        public StanConnectionProvider(IOptions<NatsOptions> natsOptions, ILogger<StanConnectionProvider> logger,
             IHostApplicationLifetime applicationLifetime)
         {
-            _configuration = configuration;
+            _natsOptions = natsOptions;
             _logger = logger;
             _applicationLifetime = applicationLifetime;
             _lazyConnection = new Lazy<IStanConnection>(GetConnection);
@@ -74,14 +74,11 @@ namespace NBB.Messaging.Nats.Internal
 
         private IStanConnection GetConnection()
         {
-            var natsUrl = _configuration.GetSection("Messaging").GetSection("Nats")["natsUrl"];
-            var cluster = _configuration.GetSection("Messaging").GetSection("Nats")["cluster"];
-            var clientId = _configuration.GetSection("Messaging").GetSection("Nats")["clientId"]
-                ?.Replace(".", "_");
+            var clientId = _natsOptions.Value.ClientId?.Replace(".", "_");
             var options = StanOptions.GetDefaultOptions();
-            options.NatsURL = natsUrl;
+            options.NatsURL = _natsOptions.Value.NatsUrl;
 
-            options.ConnectionLostEventHandler = (obj, args) =>
+            options.ConnectionLostEventHandler = (_, args) =>
             {
                 SetUnrecoverableState(args.ConnectionException ?? new Exception("NATS connection was lost"));
             };
@@ -90,7 +87,7 @@ namespace NBB.Messaging.Nats.Internal
             options.PubAckWait = 30000;
 
             var cf = new StanConnectionFactory();
-            _connection = cf.CreateConnection(cluster, clientId + Guid.NewGuid(), options);
+            _connection = cf.CreateConnection(_natsOptions.Value.Cluster, clientId + Guid.NewGuid(), options);
 
             return _connection;
         }
@@ -121,26 +118,20 @@ namespace NBB.Messaging.Nats.Internal
             }
         }
 
-        private static bool IsUnrecoverableException(Exception ex)
-        {
-            return
-                ex is NATSConnectionClosedException ||
-                ex is StanConnectionClosedException ||
-                ex is NATSConnectionException ||
-                ex is StanConnectionException ||
-                ex is NATSBadSubscriptionException ||
-                ex is StanBadSubscriptionException ||
-                ex is StanTimeoutException ||
-                ex is NATSTimeoutException ||
-                ex is NATSStaleConnectionException ||
-                ex is NATSNoServersException ||
-                ex is StanConnectRequestException ||
-                ex is StanMaxPingsException;
-        }
+        private static bool IsUnrecoverableException(Exception ex) =>
+            ex is NATSConnectionClosedException ||
+            ex is StanConnectionClosedException ||
+            ex is NATSConnectionException ||
+            ex is StanConnectionException ||
+            ex is NATSBadSubscriptionException ||
+            ex is StanBadSubscriptionException ||
+            ex is StanTimeoutException ||
+            ex is NATSTimeoutException ||
+            ex is NATSStaleConnectionException ||
+            ex is NATSNoServersException ||
+            ex is StanConnectRequestException ||
+            ex is StanMaxPingsException;
 
-        public void Dispose()
-        {
-            _connection?.Dispose();
-        }
+        public void Dispose() => _connection?.Dispose();
     }
 }

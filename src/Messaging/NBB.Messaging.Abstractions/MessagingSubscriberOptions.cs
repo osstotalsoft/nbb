@@ -10,22 +10,7 @@
         /// </value>
         public MessagingConsumerType ConsumerType { get; set; } = MessagingConsumerType.CompetingConsumer;
 
-        /// <summary>
-        /// Opions for message acknowledgment.
-        /// </summary>
-        /// <value>
-        /// The acknowledgment strategy.
-        /// </value>
-        public MessagingAcknowledgeStrategy AcknowledgeStrategy { get; set; } = MessagingAcknowledgeStrategy.Auto;
-
-        /// <summary>
-        /// Opions for message handling.
-        /// </summary>
-        /// <value>
-        /// The handler strategy.
-        /// </value>
-        public MessagingHandlerStrategy HandlerStrategy { get; set; } = MessagingHandlerStrategy.Serial;
-
+    
         /// <summary>
         /// Maximum number of messages received at time for a topic (default 1). 
         /// Increase the value when using the parallel HandlerStrategy

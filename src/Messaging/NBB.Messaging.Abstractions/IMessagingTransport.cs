@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +14,8 @@ namespace NBB.Messaging.Abstractions
         /// <param name="options">Subscription options</param>
         /// <param name="cancellationToken"></param>
         /// <returns>An object that when disposed unsubscribes the handler from the topic</returns>
-        Task<IDisposable> SubscribeAsync(string topic, Func<byte[], Task> handler, SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default);
+        Task<IDisposable> SubscribeAsync(string topic, Func<byte[], Task> handler,
+            SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Publishes a message to a topic
@@ -26,18 +24,5 @@ namespace NBB.Messaging.Abstractions
         /// <param name="message">The message</param>
         /// <param name="cancellationToken"></param>
         Task PublishAsync(string topic, byte[] message, CancellationToken cancellationToken = default);
-    }
-
-    public class SubscriptionTransportOptions
-    {
-        public bool IsDurable { get; set; } = true;
-        public bool UseGroup { get; set; } = true;
-        public bool UseManualAck { get; set; } = true;
-
-        public bool UseBlockingHandler { get; set; } = true;
-
-        public int MaxParallelMessages { get; set; } = 1;
-
-        public static SubscriptionTransportOptions Default => new SubscriptionTransportOptions();
     }
 }

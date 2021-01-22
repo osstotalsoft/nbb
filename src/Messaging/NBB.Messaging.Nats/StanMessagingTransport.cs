@@ -1,22 +1,22 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats.Internal;
 using STAN.Client;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Messaging.Nats
 {
     public class StanMessagingTransport : IMessagingTransport
     {
         private readonly StanConnectionProvider _stanConnectionManager;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<NatsOptions> _natsOptions;
 
-        public StanMessagingTransport(StanConnectionProvider stanConnectionManager, IConfiguration configuration)
+        public StanMessagingTransport(StanConnectionProvider stanConnectionManager, IOptions<NatsOptions> natsOptions)
         {
             _stanConnectionManager = stanConnectionManager;
-            _configuration = configuration;
+            _natsOptions = natsOptions;
         }
 
         public Task<IDisposable> SubscribeAsync(string topic, Func<byte[], Task> handler,
@@ -27,43 +27,31 @@ namespace NBB.Messaging.Nats
             var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
             if (subscriberOptions.IsDurable)
             {
-                opts.DurableName = _configuration.GetSection("Messaging").GetSection("Nats")["durableName"];
+                opts.DurableName = _natsOptions.Value.DurableName;
             }
 
-            var qGroup = _configuration.GetSection("Messaging").GetSection("Nats")["qGroup"];
+            if (!subscriberOptions.DeliverNewMessagesOnly)
+            {
+                opts.DeliverAllAvailable();
+            }
 
             // https://github.com/nats-io/stan.go#subscriber-rate-limiting
-            opts.MaxInflight = subscriberOptions.UseBlockingHandler ? 1 : subscriberOptions.MaxParallelMessages;
-            opts.AckWait = _configuration.GetSection("Messaging").GetSection("Nats").GetValue<int?>("ackWait") ?? 50000;
-            opts.ManualAcks = subscriberOptions.UseManualAck;
+            opts.MaxInflight = subscriberOptions.MaxConcurrentMessages;
+            opts.AckWait = subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000;
+            opts.ManualAcks = true;
+            opts.DeliverAllAvailable();
 
-            void StanMsgHandler(object obj, StanMsgHandlerArgs args)
+            async void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
-                async Task Handler()
-                {
-                    await handler(args.Message.Data);
-
-                    if (subscriberOptions.UseManualAck)
-                    {
-                        args.Message.Ack();
-                    }
-                }
-
-                if (subscriberOptions.UseBlockingHandler)
-                {
-                    Handler().Wait(cancellationToken);
-                }
-                else
-                {
-                    Task.Run(Handler, cancellationToken);
-                }
+                await handler(args.Message.Data);
+                args.Message.Ack();
             }
 
             IDisposable subscription = null;
             _stanConnectionManager.Execute(stanConnection =>
             {
                 subscription = subscriberOptions.UseGroup
-                    ? stanConnection.Subscribe(topic, qGroup, opts, StanMsgHandler)
+                    ? stanConnection.Subscribe(topic, _natsOptions.Value.QGroup, opts, StanMsgHandler)
                     : stanConnection.Subscribe(topic, opts, StanMsgHandler);
             });
 
@@ -72,8 +60,8 @@ namespace NBB.Messaging.Nats
 
         public Task PublishAsync(string topic, byte[] message, CancellationToken cancellationToken = default)
         {
-            return _stanConnectionManager.ExecuteAsync(async connection =>
-                await connection.PublishAsync(topic, message));
+            return _stanConnectionManager.ExecuteAsync(
+                async connection => await connection.PublishAsync(topic, message));
         }
     }
 }

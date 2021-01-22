@@ -46,13 +46,10 @@ namespace NBB.Messaging.Abstractions
             MessagingSubscriberOptions options = null, CancellationToken cancellationToken = default)
         {
             var subscriberOptions = options ?? new MessagingSubscriberOptions();
-            var transportOptions = SubscriptionTransportOptions.Default;
-            transportOptions.UseGroup = true;
-            transportOptions.IsDurable = true;
-            transportOptions.MaxParallelMessages = subscriberOptions.MaxInFlight;
-            transportOptions.UseBlockingHandler = subscriberOptions.HandlerStrategy == MessagingHandlerStrategy.Serial;
-            transportOptions.UseManualAck =
-                subscriberOptions.AcknowledgeStrategy == MessagingAcknowledgeStrategy.Manual;
+            var transportOptions = SubscriptionTransportOptions.StreamProcessor with
+            {
+                MaxConcurrentMessages = subscriberOptions.MaxInFlight
+            };
 
             async Task MsgHandler(byte[] messageData)
             {
