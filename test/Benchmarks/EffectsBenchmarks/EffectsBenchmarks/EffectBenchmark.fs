@@ -20,7 +20,7 @@ type Benchmark() =
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
             }
-        let eff = [1..this.N] |> List.traverseEffect mapper
+        let eff = [1..this.N] |> List.traverse mapper
 
         eff 
             |> Effect.interpret interpreter
@@ -34,7 +34,7 @@ type Benchmark() =
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
             }
-        let eff = [1..this.N] |> List.traverseEffect mapper
+        let eff = [1..this.N] |> List.traverse mapper
 
         eff 
             |> Effect.interpret interpreter

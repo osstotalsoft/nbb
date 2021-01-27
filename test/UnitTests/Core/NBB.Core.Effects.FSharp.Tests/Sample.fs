@@ -30,5 +30,5 @@ module Application =
         let handle = loadById >> Effect.map increment >> Effect.bind save
         handle id
 
-    let listHandler (commandList: _ list) = List.traverseEffect handler commandList |> Effect.ignore
+    let listHandler (commandList: _ list) = List.traverse handler commandList |> Effect.ignore
 

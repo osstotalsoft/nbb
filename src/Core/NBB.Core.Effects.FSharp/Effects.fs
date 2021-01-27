@@ -113,17 +113,19 @@ module Effects =
 
     [<RequireQualifiedAccess>]
     module List =
-        let traverseEffect  = EffectList.traverse
+        let traverse  = EffectList.traverse
+        let traverse_ f list  = traverse f list |> Effect.ignore
 
-        let sequenceEffect = EffectList.sequence
+        let sequence = EffectList.sequence
+        let sequence_ list = sequence list |> Effect.ignore
 
     [<RequireQualifiedAccess>]
     module Result = 
-        let traverseEffect (f: 'a-> Effect<'c>) (result:Result<'a,'e>) : Effect<Result<'c, 'e>> = 
+        let traverse (f: 'a-> Effect<'c>) (result:Result<'a,'e>) : Effect<Result<'c, 'e>> = 
             match result with
                 | Error err -> Effect.pure' (Error err)
                 | Ok v -> Effect.map Ok (f v)
 
-        let sequenceEffect result = traverseEffect id result
+        let sequence result = traverse id result
 
 
