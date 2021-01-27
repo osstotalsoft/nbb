@@ -49,7 +49,7 @@ let ``Sequenced effect computations`` () =
             let! y = Effect.from (fun _ -> 2)
             return x + y + crt
         }
-    let eff = [1..5000] |> List.traverseEffect mapper
+    let eff = [1..5000] |> List.traverse mapper
 
     use interpreter = createInterpreter()
 
