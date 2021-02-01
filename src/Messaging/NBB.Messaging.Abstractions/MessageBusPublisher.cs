@@ -14,29 +14,32 @@ namespace NBB.Messaging.Abstractions
         private readonly ITopicRegistry _topicRegistry;
         private readonly IMessageSerDes _messageSerDes;
         private readonly IConfiguration _configuration;
-        private readonly IMessagingTopicPublisher _topicPublisher;
-        public MessageBusPublisher(IMessagingTopicPublisher topicPublisher, ITopicRegistry topicRegistry,
+        private readonly IMessagingTransport _messagingTransport;
+
+        public MessageBusPublisher(IMessagingTransport messagingTransport, ITopicRegistry topicRegistry,
             IMessageSerDes messageSerDes, IConfiguration configuration)
         {
-            _topicPublisher = topicPublisher;
+            _messagingTransport = messagingTransport;
             _topicRegistry = topicRegistry;
             _messageSerDes = messageSerDes;
             _configuration = configuration;
         }
 
-        public async Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
+        public async Task PublishAsync<T>(T message, MessagingPublisherOptions publisherOptions = null,
+            CancellationToken cancellationToken = default)
         {
-            var outgoingEnvelope = PrepareMessageEnvelope(message, envelopeCustomizer);
-            var value = _messageSerDes.SerializeMessageEnvelope(outgoingEnvelope);
-            var newTopicName = _topicRegistry.GetTopicForName(topicName) ??
+            var outgoingEnvelope = PrepareMessageEnvelope(message, publisherOptions?.EnvelopeCustomizer);
+            var envelopeData = _messageSerDes.SerializeMessageEnvelope(outgoingEnvelope);
+
+            var newTopicName = _topicRegistry.GetTopicForName(publisherOptions?.TopicName) ??
                                _topicRegistry.GetTopicForMessageType(message.GetType());
 
-            await _topicPublisher.PublishAsync(newTopicName, value, cancellationToken);
-
+            await _messagingTransport.PublishAsync(newTopicName, envelopeData, cancellationToken);
             await Task.Yield();
         }
 
-        private  MessagingEnvelope<TMessage> PrepareMessageEnvelope<TMessage>(TMessage message, Action<MessagingEnvelope> customizer = null)
+        private MessagingEnvelope<TMessage> PrepareMessageEnvelope<TMessage>(TMessage message,
+            Action<MessagingEnvelope> customizer = null)
         {
             var outgoingEnvelope = new MessagingEnvelope<TMessage>(new Dictionary<string, string>
             {
@@ -57,7 +60,8 @@ namespace NBB.Messaging.Abstractions
 
             customizer?.Invoke(outgoingEnvelope);
 
-            outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId, (CorrelationManager.GetCorrelationId() ?? Guid.NewGuid()).ToString());
+            outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId,
+                (CorrelationManager.GetCorrelationId() ?? Guid.NewGuid()).ToString());
 
             return outgoingEnvelope;
         }

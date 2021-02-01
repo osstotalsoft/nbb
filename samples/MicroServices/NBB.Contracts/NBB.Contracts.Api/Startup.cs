@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using NBB.Contracts.Api.MultiTenancy;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
 using NBB.MultiTenancy.Abstractions.Hosting;
@@ -30,11 +31,11 @@ namespace NBB.Contracts.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton(Configuration);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             //services.AddKafkaMessaging();
-            services.AddNatsMessaging();
+            services.AddMessageBus().AddNatsTransport(Configuration);
 
             services.AddContractsReadModelDataAccess();
 

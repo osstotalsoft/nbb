@@ -42,8 +42,8 @@ namespace NBB.Messaging.Effects.Tests
             await sut.Handle(new PublishMessage.SideEffect(intMessage));
 
             //Assert
-            messageBusPublisher.Verify(mock => mock.PublishAsync((string)stringMessage, It.IsAny<CancellationToken>(), null, null), Times.Once);
-            messageBusPublisher.Verify(mock => mock.PublishAsync((int)intMessage, It.IsAny<CancellationToken>(), null, null), Times.Once);
+            messageBusPublisher.Verify(mock => mock.PublishAsync((string)stringMessage, null, It.IsAny<CancellationToken>()), Times.Once);
+            messageBusPublisher.Verify(mock => mock.PublishAsync((int)intMessage, null, It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

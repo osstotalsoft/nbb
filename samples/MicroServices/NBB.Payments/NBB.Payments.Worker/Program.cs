@@ -23,6 +23,7 @@ using Serilog.Sinks.MSSqlServer;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NBB.Messaging.Abstractions;
 
 namespace NBB.Payments.Worker
 {
@@ -66,7 +67,7 @@ namespace NBB.Payments.Worker
                 {
                     services.AddMediatR(typeof(PayableCommandHandlers).Assembly);
                     //services.AddKafkaMessaging();
-                    services.AddNatsMessaging();
+                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
                     services.AddPaymentsWriteDataAccess();
 

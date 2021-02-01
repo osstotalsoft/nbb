@@ -10,15 +10,7 @@ namespace NBB.Messaging.Abstractions
 {
     public class DefaultMessageTypeRegistry : IMessageTypeRegistry
     {
-        //private readonly IEnumerable<Assembly> _scannedAssemblies;
         private readonly ConcurrentDictionary<string, Type> _typeCache = new ConcurrentDictionary<string, Type>();
-
-        /*public DefaultMessageTypeRegistry(IEnumerable<Assembly> scannedAssemblies)
-        {
-            _scannedAssemblies = scannedAssemblies ?? new List<Assembly>();
-            _scannedAssemblies = _scannedAssemblies.Append(typeof(MessagingResponse<>).Assembly);
-        }
-        */
 
         public Type ResolveType(string messageTypeId, IEnumerable<Assembly> scannedAssemblies)
         {

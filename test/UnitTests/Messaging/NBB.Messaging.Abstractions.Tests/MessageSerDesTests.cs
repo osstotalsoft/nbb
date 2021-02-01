@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Reflection;
 using FluentAssertions;
 using Moq;
@@ -9,8 +10,13 @@ namespace NBB.Messaging.Abstractions.Tests
 {
     public class MessageSerDesTests
     {
-        interface ITestInterface { }
-        interface IWrongInterface { }
+        interface ITestInterface
+        {
+        }
+
+        interface IWrongInterface
+        {
+        }
 
         public record TestMessage(long ContractId, long PartnerId, string Details) : ITestInterface;
 
@@ -18,7 +24,8 @@ namespace NBB.Messaging.Abstractions.Tests
         public void Should_deserialize_messages_using_constructor_with_optional_params()
         {
             //Arrange
-            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x => x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
+            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x =>
+                x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
             var @event = new TestMessage(11232, 1122312, "something");
             var json = sut.SerializeMessageEnvelope(new MessagingEnvelope(new Dictionary<string, string>(), @event));
 
@@ -39,7 +46,7 @@ namespace NBB.Messaging.Abstractions.Tests
             var sut = new NewtonsoftJsonMessageSerDes(
                 Mock.Of<IMessageTypeRegistry>(x =>
                     x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage) &&
-                    x.GetTypeId(It.IsAny<Type>()) == "TestMessage"));
+                    x.GetTypeId(It.IsAny<Type>()) == "TestMessage")) as IMessageSerDes;
 
             var @event = new TestMessage(11232, 1122312, "something");
             var envelope = new MessagingEnvelope(new Dictionary<string, string>
@@ -53,8 +60,8 @@ namespace NBB.Messaging.Abstractions.Tests
             var deserialized = sut.DeserializeMessageEnvelope(json,
                 new MessageSerDesOptions()
                 {
-                    DeserializationType = DeserializationType.Dynamic,
-                    DynamicDeserializationScannedAssemblies = new[] { Assembly.GetExecutingAssembly() }
+                    UseDynamicDeserialization = true,
+                    DynamicDeserializationScannedAssemblies = new[] {Assembly.GetExecutingAssembly()}
                 });
 
             //Assert
@@ -67,7 +74,8 @@ namespace NBB.Messaging.Abstractions.Tests
         public void Should_not_deserialize_messages_using_wrong_interface()
         {
             //Arrange
-            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x => x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
+            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x =>
+                x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
             var @event = new TestMessage(11232, 1122312, "something");
             var envelope = new MessagingEnvelope(new Dictionary<string, string>
             {
@@ -80,7 +88,7 @@ namespace NBB.Messaging.Abstractions.Tests
             void Action() => sut.DeserializeMessageEnvelope<IWrongInterface>(json);
 
             //Assert
-            ((Action)Action).Should().Throw<Exception>();
+            ((Action) Action).Should().Throw<Exception>();
         }
 
         [Fact]
@@ -90,10 +98,10 @@ namespace NBB.Messaging.Abstractions.Tests
             var sut = new NewtonsoftJsonMessageSerDes(
                 Mock.Of<IMessageTypeRegistry>(x =>
                     x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage) &&
-                    x.GetTypeId(It.IsAny<Type>()) == "TestMessage"));
+                    x.GetTypeId(It.IsAny<Type>()) == "TestMessage")) as IMessageSerDes;
 
             var @event = new TestMessage(11232, 1122312, "something");
-            var iEvent = (ITestInterface)@event;
+            var iEvent = (ITestInterface) @event;
             var envelope = new MessagingEnvelope(new Dictionary<string, string>(), iEvent);
 
             var json = sut.SerializeMessageEnvelope(envelope);
@@ -101,8 +109,8 @@ namespace NBB.Messaging.Abstractions.Tests
             //Act
             var deserialized = sut.DeserializeMessageEnvelope<ITestInterface>(json, new MessageSerDesOptions()
             {
-                DeserializationType = DeserializationType.Dynamic,
-                DynamicDeserializationScannedAssemblies = new[] { Assembly.GetExecutingAssembly() }
+                UseDynamicDeserialization = true,
+                DynamicDeserializationScannedAssemblies = new[] {Assembly.GetExecutingAssembly()}
             });
 
             //Assert
@@ -114,7 +122,9 @@ namespace NBB.Messaging.Abstractions.Tests
         public void Should_deserialize_with_json_payload()
         {
             //Arrange
-            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x => x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
+            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x =>
+                    x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage))) as
+                IMessageSerDes;
             var @event = new TestMessage(11232, 1122312, "something");
             var envelope = new MessagingEnvelope(new Dictionary<string, string>
             {
@@ -125,54 +135,13 @@ namespace NBB.Messaging.Abstractions.Tests
 
             //Act
             var deserialized = sut.DeserializeMessageEnvelope(json,
-                new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
+                new MessageSerDesOptions {UseDynamicDeserialization = false});
 
             //Assert
             deserialized.Should().NotBeNull();
-            deserialized.Payload.GetType().Should().Be(typeof(string));
-            (deserialized.Payload as string).Should().ContainAll(@event.ContractId.ToString(), @event.PartnerId.ToString(), @event.Details);
-        }
-
-        [Fact]
-        public void Should_throw_when_typed_deserialization_with_incompatible_options()
-        {
-            //Arrange
-            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x => x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
-            var @event = new TestMessage(11232, 1122312, "something");
-            var envelope = new MessagingEnvelope(new Dictionary<string, string>
-            {
-                [MessagingHeaders.MessageType] = @event.GetType().Name
-            }, @event);
-
-            var json = sut.SerializeMessageEnvelope(envelope);
-
-            //Act
-            void Action() => sut.DeserializeMessageEnvelope<MessagingEnvelope<TestMessage>>(json, new MessageSerDesOptions { DeserializationType = DeserializationType.HeadersOnly });
-
-            //Assert
-
-            ((Action)Action).Should().Throw<Exception>().WithMessage("*HeadersOnly*");
-        }
-
-        [Fact]
-        public void Should_throw_when_untyped_deserialization_with_incompatible_options()
-        {
-            //Arrange
-            var sut = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>(x => x.ResolveType(It.IsAny<string>(), It.IsAny<IEnumerable<Assembly>>()) == typeof(TestMessage)));
-            var @event = new TestMessage(11232, 1122312, "something");
-            var envelope = new MessagingEnvelope(new Dictionary<string, string>
-            {
-                [MessagingHeaders.MessageType] = @event.GetType().Name
-            }, @event);
-
-            var json = sut.SerializeMessageEnvelope(envelope);
-
-            //Act
-            void Action() => sut.DeserializeMessageEnvelope(json, new MessageSerDesOptions { DeserializationType = DeserializationType.TypeSafe });
-
-            //Assert
-
-            ((Action)Action).Should().Throw<Exception>().WithMessage("*TypeSafe*");
+            deserialized.Payload.GetType().Should().Be(typeof(ExpandoObject));
+            (deserialized.Payload as IDictionary<string, object>).Should()
+                .ContainValues(@event.ContractId, @event.PartnerId, @event.Details);
         }
     }
 }

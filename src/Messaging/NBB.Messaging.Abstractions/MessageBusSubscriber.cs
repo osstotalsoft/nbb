@@ -1,87 +1,55 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Messaging.Abstractions
 {
-    public class MessageBusSubscriber<TMessage> : IMessageBusSubscriber<TMessage> 
+    public class MessageBusSubscriber : IMessageBusSubscriber
     {
+        private readonly IMessagingTransport _messagingTransport;
         private readonly ITopicRegistry _topicRegistry;
-        private readonly List<Func<MessagingEnvelope<TMessage>, Task>> _handlers = new List<Func<MessagingEnvelope<TMessage>, Task>>();
         private readonly IMessageSerDes _messageSerDes;
-        private bool _subscribedToTopic;
-        private readonly IMessagingTopicSubscriber _topicSubscriber;
-        private readonly ILogger<MessageBusSubscriber<TMessage>> _logger;
-        private string _topicName;
-        private MessagingSubscriberOptions _subscriberOptions;
-        private readonly object lockObj = new object();
+        private readonly ILogger<MessageBusSubscriber> _logger;
 
-        public MessageBusSubscriber(IMessagingTopicSubscriber topicSubscriber, ITopicRegistry topicRegistry,
+        public MessageBusSubscriber(IMessagingTransport messagingTransport, ITopicRegistry topicRegistry,
             IMessageSerDes messageSerDes,
-            ILogger<MessageBusSubscriber<TMessage>> logger)
+            ILogger<MessageBusSubscriber> logger)
         {
-            _topicSubscriber = topicSubscriber;
+            _messagingTransport = messagingTransport;
             _topicRegistry = topicRegistry;
             _messageSerDes = messageSerDes;
             _logger = logger;
         }
 
-        public Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default, string topicName = null, MessagingSubscriberOptions options = null)
+        public async Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
+            MessagingSubscriberOptions options = null,
+            CancellationToken cancellationToken = default)
         {
-            _handlers.Add(handler);
+            var topicName = _topicRegistry.GetTopicForName(options?.TopicName) ??
+                        _topicRegistry.GetTopicForMessageType(typeof(TMessage));
 
-            if (!_subscribedToTopic)
+            async Task MsgHandler(byte[] messageData)
             {
-                lock (lockObj)
+                _logger.LogDebug("Messaging subscriber received message from subject {Subject}", topicName);
+
+                try
                 {
-                    if (!_subscribedToTopic)
-                    {
-                        _subscribedToTopic = true;
-                        _topicName = _topicRegistry.GetTopicForName(topicName) ??
-                                     _topicRegistry.GetTopicForMessageType(typeof(TMessage));
-                        _subscriberOptions = options;
-                        _topicSubscriber.SubscribeAsync(_topicName, HandleMessage, cancellationToken, options);
-                    }
+                    var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope<TMessage>(messageData);
+
+                    await handler(messageEnvelope);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        "Messaging consumer encountered an error when handling a message from subject {Subject}.\n {Error}",
+                        topicName, ex);
+
+                    //TODO: push to DLQ
                 }
             }
 
-            return Task.CompletedTask;
-
-        }
-
-        async Task HandleMessage(string msg)
-        {
-            MessagingEnvelope<TMessage> deserializedMessage = null;
-            try
-            {
-                 deserializedMessage = _messageSerDes.DeserializeMessageEnvelope<TMessage>(msg, _subscriberOptions?.SerDes);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(
-                    "MessageBusSubscriber encountered an error when deserializing a message from topic {TopicName}.\n {Error} \n Message: {Message}",
-                    _topicName, ex, msg);
-                //TODO: push to DLQ
-            }
-
-
-            if (deserializedMessage != null)
-            {
-                foreach (var handler in _handlers.ToList())
-                {
-                    await handler(deserializedMessage);
-                }
-            }
-        }
-
-        public async Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default)
-        {
-            _handlers.Remove(handler);
-            if (_handlers.Count == 0)
-                await _topicSubscriber.UnSubscribeAsync(cancellationToken);
+            return await _messagingTransport.SubscribeAsync(topicName, MsgHandler, options?.Transport, cancellationToken);
         }
     }
 }

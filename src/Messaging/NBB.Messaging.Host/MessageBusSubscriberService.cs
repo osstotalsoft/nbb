@@ -12,49 +12,82 @@ namespace NBB.Messaging.Host
 {
     public class MessageBusSubscriberService<TMessage> : BackgroundService
     {
+        private readonly IMessageBus _messageBus;
         private readonly MessagingSubscriberOptions _subscriberOptions;
-        private readonly IMessageBusSubscriber<TMessage> _messageBusSubscriber;
         private readonly IServiceProvider _serviceProvider;
         private readonly MessagingContextAccessor _messagingContextAccessor;
         private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
 
         public MessageBusSubscriberService(
-            IMessageBusSubscriber<TMessage> messageBusSubscriber, 
+            IMessageBus messageBus,
             IServiceProvider serviceProvider,
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<TMessage>> logger,
             MessagingSubscriberOptions subscriberOptions = null
-            )
+        )
         {
+            _messageBus = messageBus;
             _subscriberOptions = subscriberOptions;
-            _messageBusSubscriber = messageBusSubscriber;
             _serviceProvider = serviceProvider;
             _messagingContextAccessor = messagingContextAccessor;
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken = default)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is starting", typeof(TMessage).GetPrettyName());
-
             Task HandleMsg(MessagingEnvelope<TMessage> msg) => Handle(msg, cancellationToken);
 
-            await _messageBusSubscriber.SubscribeAsync(HandleMsg, cancellationToken, null, _subscriberOptions);
-            await cancellationToken.WhenCanceled();
-            await _messageBusSubscriber.UnSubscribeAsync(HandleMsg, CancellationToken.None);
+            OnStarting();
 
-            _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is stopping", typeof(TMessage).GetPrettyName());
+            using var subscription =
+                await _messageBus.SubscribeAsync<TMessage>(HandleMsg, _subscriberOptions, cancellationToken);
+
+            await cancellationToken.WhenCanceled();
+
+            OnStopping();
         }
 
+        protected virtual void OnStarting()
+            => _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is starting",
+                typeof(TMessage).GetPrettyName());
+
+        protected virtual void OnStopping()
+            => _logger.LogInformation("MessageBusSubscriberService for message type {MessageType} is stopping",
+                typeof(TMessage).GetPrettyName());
 
         private async Task Handle(MessagingEnvelope<TMessage> message, CancellationToken cancellationToken)
         {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<MessagingEnvelope>>();
-                _messagingContextAccessor.MessagingContext = new MessagingContext(message);
-                await pipeline(message, cancellationToken);
-            }
+            using var scope = _serviceProvider.CreateScope();
+
+            var pipeline = scope.ServiceProvider.GetRequiredService<PipelineDelegate<MessagingEnvelope>>();
+            _messagingContextAccessor.MessagingContext = new MessagingContext(message);
+            await pipeline(message, cancellationToken);
         }
+    }
+
+    public class MessageBusSubscriberService : MessageBusSubscriberService<object>
+    {
+        private readonly ILogger<MessageBusSubscriberService<object>> _logger;
+        private readonly MessagingSubscriberOptions _subscriberOptions;
+
+        public MessageBusSubscriberService(
+            IMessageBus messageBus,
+            IServiceProvider serviceProvider,
+            MessagingContextAccessor messagingContextAccessor,
+            ILogger<MessageBusSubscriberService<object>> logger,
+            MessagingSubscriberOptions subscriberOptions)
+            : base(messageBus, serviceProvider, messagingContextAccessor, logger, subscriberOptions)
+        {
+            _logger = logger;
+            _subscriberOptions = subscriberOptions;
+        }
+
+        protected override void OnStarting()
+            => _logger.LogInformation(
+                "MessagingTopicSubscriberService for topic {TopicName} is starting", _subscriberOptions.TopicName);
+
+        protected override void OnStopping()
+            => _logger.LogInformation(
+                "MessagingTopicSubscriberService for topic {TopicName} is stopping", _subscriberOptions.TopicName);
     }
 }

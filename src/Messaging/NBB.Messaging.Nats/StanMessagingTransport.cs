@@ -28,6 +28,7 @@ namespace NBB.Messaging.Nats
             if (subscriberOptions.IsDurable)
             {
                 opts.DurableName = _natsOptions.Value.DurableName;
+                opts.LeaveOpen = true;
             }
 
             if (!subscriberOptions.DeliverNewMessagesOnly)
@@ -39,8 +40,7 @@ namespace NBB.Messaging.Nats
             opts.MaxInflight = subscriberOptions.MaxConcurrentMessages;
             opts.AckWait = subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000;
             opts.ManualAcks = true;
-            opts.DeliverAllAvailable();
-
+            
             async void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
                 await handler(args.Message.Data);

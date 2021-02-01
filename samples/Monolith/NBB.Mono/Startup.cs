@@ -22,6 +22,7 @@ using NBB.Core.DependencyInjection;
 using NBB.Domain;
 using NBB.Messaging.Host;
 using Microsoft.Extensions.Hosting;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
 
@@ -46,7 +47,7 @@ namespace NBB.Mono
                 typeof(InvoiceCommandHandlers).Assembly,
                 typeof(PayableCommandHandlers).Assembly);
 
-            services.AddInProcessMessaging();
+            services.AddMessageBus().AddInProcessTransport();
 
             services.AddContractsWriteModelDataAccess();
             services.AddContractsReadModelDataAccess();

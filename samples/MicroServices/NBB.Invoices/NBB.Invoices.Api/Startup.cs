@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.AspNet;
 using NBB.Invoices.Data;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats;
 
 namespace NBB.Invoices.Api
@@ -22,9 +23,9 @@ namespace NBB.Invoices.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton(Configuration);
             //services.AddKafkaMessaging();
-            services.AddNatsMessaging();
+            services.AddMessageBus().AddNatsTransport(Configuration);
             services.AddInvoicesReadDataAccess();
         }
 

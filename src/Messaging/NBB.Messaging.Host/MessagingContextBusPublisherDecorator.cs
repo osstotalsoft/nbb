@@ -1,6 +1,5 @@
 ﻿using NBB.Correlation;
 using NBB.Messaging.Abstractions;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,31 +10,36 @@ namespace NBB.Messaging.Host
         private readonly IMessageBusPublisher _inner;
         private readonly MessagingContextAccessor _messagingContextAccessor;
 
-        public MessagingContextBusPublisherDecorator(IMessageBusPublisher inner, MessagingContextAccessor messagingContextAccessor)
+        public MessagingContextBusPublisherDecorator(IMessageBusPublisher inner,
+            MessagingContextAccessor messagingContextAccessor)
         {
             _inner = inner;
             _messagingContextAccessor = messagingContextAccessor;
         }
 
-        public Task PublishAsync<T>(T message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> envelopeCustomizer = null, string topicName = null)
+        public Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
+            CancellationToken cancellationToken = default)
         {
+            options ??= MessagingPublisherOptions.Default;
+
             void NewEnvelopeCustomizer(MessagingEnvelope outgoingEnvelope)
             {
                 var correlationId = CorrelationManager.GetCorrelationId();
                 if (correlationId.HasValue)
-                    outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId, correlationId.ToString(), false);
+                    outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId, correlationId.ToString());
 
                 var receivedMessageEnvelope = _messagingContextAccessor.MessagingContext?.ReceivedMessageEnvelope;
                 if (receivedMessageEnvelope != null)
                 {
-                    receivedMessageEnvelope.TransferHeaderTo(outgoingEnvelope, MessagingHeaders.CorrelationId, false);
-                    receivedMessageEnvelope.TransferCustomHeadersTo(outgoingEnvelope, false);
+                    receivedMessageEnvelope.TransferHeaderTo(outgoingEnvelope, MessagingHeaders.CorrelationId);
+                    receivedMessageEnvelope.TransferCustomHeadersTo(outgoingEnvelope);
                 }
 
-                envelopeCustomizer?.Invoke(outgoingEnvelope);
+                options?.EnvelopeCustomizer?.Invoke(outgoingEnvelope);
             }
 
-            return _inner.PublishAsync(message, cancellationToken, NewEnvelopeCustomizer, topicName);
+            return _inner.PublishAsync(message, options with {EnvelopeCustomizer = NewEnvelopeCustomizer},
+                cancellationToken);
         }
     }
 }

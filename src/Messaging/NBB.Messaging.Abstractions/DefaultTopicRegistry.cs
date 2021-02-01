@@ -16,7 +16,7 @@ namespace NBB.Messaging.Abstractions
 
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
         {
-            var topic = GetTopicNameFromAttribute(messageType) ?? $"ch.messages.{messageType.GetLongPrettyName()}";
+            var topic = GetTopicNameFromAttribute(messageType) ?? messageType.GetLongPrettyName();
 
             topic = GetTopicForName(topic, includePrefix);
 

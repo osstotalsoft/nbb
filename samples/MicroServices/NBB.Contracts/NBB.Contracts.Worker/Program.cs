@@ -11,7 +11,6 @@ using NBB.EventStore;
 using NBB.EventStore.AdoNet;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Nats;
 using Serilog;
@@ -19,6 +18,7 @@ using Serilog.Events;
 using System.IO;
 using System.Threading.Tasks;
 using NBB.Contracts.Worker.MultiTenancy;
+using NBB.Messaging.Host.Builder;
 using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Repositories;
@@ -53,7 +53,8 @@ namespace NBB.Contracts.Worker
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+                        .WriteTo.MSSqlServer(connectionString,
+                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -64,21 +65,23 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
-                    //services.AddKafkaMessaging();
-                    services.AddNatsMessaging();
+                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
                     services.AddContractsWriteModelDataAccess();
                     services.AddContractsReadModelDataAccess();
 
 
                     services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
+                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                         .WithAdoNetEventRepository();
 
                     services.AddMessagingHost()
                         .AddSubscriberServices(config =>
                             config.FromMediatRHandledCommands().AddAllClasses())
-                        .WithOptions(config => config.Options.ConsumerType = MessagingConsumerType.CompetingConsumer)
+                            
+                        .WithOptions(optionsBuilder => optionsBuilder
+                            .ConfigureTransport(transportOptions => transportOptions with {MaxConcurrentMessages = 2})
+                        )
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()

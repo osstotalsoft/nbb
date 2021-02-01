@@ -28,7 +28,7 @@ namespace NBB.Messaging.Effects
 
             public async Task<Unit> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
             {
-                await _messageBusPublisher.PublishAsync(sideEffect.Message as dynamic, cancellationToken);
+                await _messageBusPublisher.PublishAsync(sideEffect.Message as dynamic, null, cancellationToken);
                 return Unit.Value;
             }
         }

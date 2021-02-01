@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats;
 using NBB.Payments.Data;
 
@@ -22,9 +23,8 @@ namespace NBB.Payments.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IConfiguration>(Configuration);
-            //services.AddKafkaMessaging();
-            services.AddNatsMessaging();
+            services.AddSingleton(Configuration);
+            services.AddMessageBus().AddNatsTransport(Configuration);
             services.AddPaymentsReadDataAccess();
         }
 
@@ -39,11 +39,7 @@ namespace NBB.Payments.Api
             }
 
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

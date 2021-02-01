@@ -137,7 +137,7 @@ namespace NBB.Messaging.Host.Tests
             //Act
             new MessagingHostBuilder(services)
                 .AddSubscriberServices(cfg => cfg.FromTopics("TopicName"))
-                .WithOptions(builder => builder.Options.SerDes.DeserializationType = DeserializationType.HeadersOnly);
+                .WithDefaultOptions();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
