@@ -43,6 +43,7 @@ namespace NBB.Messaging.Host.Tests
                     mockedServiceProvider,
                     Mock.Of<MessagingContextAccessor>(),
                     Mock.Of<ILogger<MessageBusSubscriberService<TestMessage>>>(),
+                    Mock.Of<ITopicRegistry>(),
                     new MessagingSubscriberOptions()
                 );
 

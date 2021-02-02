@@ -17,12 +17,14 @@ namespace NBB.Messaging.Host
         private readonly IServiceProvider _serviceProvider;
         private readonly MessagingContextAccessor _messagingContextAccessor;
         private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
+        private readonly ITopicRegistry _topicRegistry;
 
         public MessageBusSubscriberService(
             IMessageBus messageBus,
             IServiceProvider serviceProvider,
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<TMessage>> logger,
+            ITopicRegistry topicRegistry,
             MessagingSubscriberOptions subscriberOptions = null
         )
         {
@@ -31,6 +33,7 @@ namespace NBB.Messaging.Host
             _serviceProvider = serviceProvider;
             _messagingContextAccessor = messagingContextAccessor;
             _logger = logger;
+            _topicRegistry = topicRegistry;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -59,8 +62,11 @@ namespace NBB.Messaging.Host
         {
             using var scope = _serviceProvider.CreateScope();
 
+            var topicName = _topicRegistry.GetTopicForName(_subscriberOptions?.TopicName, false) ??
+                            _topicRegistry.GetTopicForMessageType(typeof(TMessage), false);
             var pipeline = scope.ServiceProvider.GetRequiredService<PipelineDelegate<MessagingEnvelope>>();
-            _messagingContextAccessor.MessagingContext = new MessagingContext(message);
+            _messagingContextAccessor.MessagingContext = new MessagingContext(message, topicName);
+
             await pipeline(message, cancellationToken);
         }
     }
@@ -75,8 +81,9 @@ namespace NBB.Messaging.Host
             IServiceProvider serviceProvider,
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<object>> logger,
+            ITopicRegistry topicRegistry,
             MessagingSubscriberOptions subscriberOptions)
-            : base(messageBus, serviceProvider, messagingContextAccessor, logger, subscriberOptions)
+            : base(messageBus, serviceProvider, messagingContextAccessor, logger, topicRegistry, subscriberOptions)
         {
             _logger = logger;
             _subscriberOptions = subscriberOptions;
