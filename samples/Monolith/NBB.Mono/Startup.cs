@@ -57,10 +57,10 @@ namespace NBB.Mono
             services.AddPaymentsWriteDataAccess();
 
             services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
+                .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                 .WithAdoNetEventRepository();
 
-            services.AddMessagingHost()
+            services.AddMessagingHost(hostBuilder => hostBuilder
                 .AddSubscriberServices(config => config
                     .FromMediatRHandledCommands().AddAllClasses()
                     .FromMediatRHandledEvents().AddAllClasses()
@@ -71,14 +71,16 @@ namespace NBB.Mono
                     .UseCorrelationMiddleware()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
-                );
+                )
+            );
 
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>),
                 serviceType => typeof(IEventedAggregateRoot).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(MediatorUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventStoreUowDecorator<>),
-                serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]) && typeof(IIdentifiedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
+                serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]) &&
+                               typeof(IIdentifiedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -92,11 +94,7 @@ namespace NBB.Mono
             }
 
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

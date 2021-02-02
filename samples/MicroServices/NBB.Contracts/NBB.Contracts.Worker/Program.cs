@@ -75,20 +75,19 @@ namespace NBB.Contracts.Worker
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                         .WithAdoNetEventRepository();
 
-                    services.AddMessagingHost()
-                        .AddSubscriberServices(config =>
-                            config.FromMediatRHandledCommands().AddAllClasses())
-                            
+                    services.AddMessagingHost(hostBuilder => hostBuilder
+                        .AddSubscriberServices(config => config
+                            .FromMediatRHandledCommands().AddAllClasses())
                         .WithOptions(optionsBuilder => optionsBuilder
-                            .ConfigureTransport(transportOptions => transportOptions with {MaxConcurrentMessages = 2})
-                        )
+                            .ConfigureTransport(transportOptions => transportOptions with {MaxConcurrentMessages = 2}))
                         .UsePipeline(pipelineBuilder => pipelineBuilder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
                             //.UseTenantMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
-                        );
+                        )
+                    );
 
                     services.AddMultitenancy(hostingContext.Configuration, _ =>
                     {

@@ -26,7 +26,10 @@ namespace NBB.Messaging.Host.Tests
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
 
             //Act
-            new MessagingHostBuilder(services).UsePipeline(_ => { });
+            new MessagingHostBuilder(services)
+                .AddSubscriberServices(builder => builder.FromTopic("Topic"))
+                .WithDefaultOptions()
+                .UsePipeline(_ => { });
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
@@ -45,7 +48,8 @@ namespace NBB.Messaging.Host.Tests
 
             //Act
             new MessagingHostBuilder(services)
-                .AddSubscriberServices(cfg => cfg.FromAssemblyOf<MessageToScanBase>().AddClassesAssignableTo<MessageToScanBase>())
+                .AddSubscriberServices(cfg =>
+                    cfg.FromAssemblyOf<MessageToScanBase>().AddClassesAssignableTo<MessageToScanBase>())
                 .WithDefaultOptions();
 
             //Assert
@@ -64,12 +68,14 @@ namespace NBB.Messaging.Host.Tests
             Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
             Mock.Get(services).Setup(x => x.GetEnumerator())
-                .Returns(new List<ServiceDescriptor> {
+                .Returns(new List<ServiceDescriptor>
+                {
                     new ServiceDescriptor(typeof(IRequestHandler<CommandMessage, Unit>), new CommandHandler())
                 }.GetEnumerator());
 
             //Act
-            new MessagingHostBuilder(services).AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses()).WithDefaultOptions();
+            new MessagingHostBuilder(services)
+                .AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses()).WithDefaultOptions();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
@@ -87,18 +93,21 @@ namespace NBB.Messaging.Host.Tests
             Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
             Mock.Get(services).Setup(x => x.GetEnumerator())
-                .Returns(new List<ServiceDescriptor> {
+                .Returns(new List<ServiceDescriptor>
+                {
                     new ServiceDescriptor(typeof(INotificationHandler<EventMessage>), new EventHandler())
                 }.GetEnumerator());
 
             //Act
-            new MessagingHostBuilder(services).AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses()).WithDefaultOptions();
+            new MessagingHostBuilder(services)
+                .AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses()).WithDefaultOptions();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
             registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
             registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);        }
+            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        }
 
 
         [Fact]
@@ -110,7 +119,8 @@ namespace NBB.Messaging.Host.Tests
             Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
             Mock.Get(services).Setup(x => x.GetEnumerator())
-                .Returns(new List<ServiceDescriptor> {
+                .Returns(new List<ServiceDescriptor>
+                {
                     new ServiceDescriptor(typeof(IRequestHandler<QueryMessage, string>), new QueryHandler())
                 }.GetEnumerator());
 
@@ -123,7 +133,8 @@ namespace NBB.Messaging.Host.Tests
             registeredDescriptor.Should().NotBeNull();
             registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
             registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);        }
+            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+        }
 
         [Fact]
         public void Should_register_handled_topics_singleton()
@@ -152,7 +163,7 @@ namespace NBB.Messaging.Host.Tests
 
         public record QueryMessage : IRequest<string>;
 
-        public abstract class MessageToScanBase 
+        public abstract class MessageToScanBase
         {
             public Guid MessageId => throw new NotImplementedException();
         }

@@ -91,10 +91,10 @@ namespace NBB.Messaging.Host
 
         protected override void OnStarting()
             => _logger.LogInformation(
-                "MessagingTopicSubscriberService for topic {TopicName} is starting", _subscriberOptions.TopicName);
+                "MessageBusSubscriberService for topic {TopicName} is starting", _subscriberOptions.TopicName);
 
         protected override void OnStopping()
             => _logger.LogInformation(
-                "MessagingTopicSubscriberService for topic {TopicName} is stopping", _subscriberOptions.TopicName);
+                "MessageBusSubscriberService for topic {TopicName} is stopping", _subscriberOptions.TopicName);
     }
 }

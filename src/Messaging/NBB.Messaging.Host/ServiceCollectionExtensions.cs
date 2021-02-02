@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.Builder;
 
@@ -6,12 +7,15 @@ namespace NBB.Messaging.Host
 {
     public static class ServiceCollectionExtensions
     {
-        public static MessagingHostBuilder AddMessagingHost(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddMessagingHost(this IServiceCollection serviceCollection, Action<MessagingHostBuilder> messagingHostBuilder)
         {
             serviceCollection.AddSingleton<MessagingContextAccessor>();
             serviceCollection.Decorate<IMessageBusPublisher, MessagingContextBusPublisherDecorator>();
 
-            return new MessagingHostBuilder(serviceCollection);
+            var builder = new MessagingHostBuilder(serviceCollection);
+            messagingHostBuilder?.Invoke(builder);
+
+            return serviceCollection;
         }
     }
 }

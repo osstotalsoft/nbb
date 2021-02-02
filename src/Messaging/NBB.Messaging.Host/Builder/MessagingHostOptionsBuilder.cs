@@ -13,15 +13,13 @@ namespace NBB.Messaging.Host.Builder
     /// </summary>
     public class MessagingHostOptionsBuilder
     {
-        private readonly MessagingHostBuilder _hostBuilder;
         private readonly IServiceCollection _serviceCollection;
         private readonly IMessageTopicProvider _topicProvider;
         private readonly IMessageTypeProvider _messageTypeProvider;
 
-        public MessagingHostOptionsBuilder(MessagingHostBuilder hostBuilder, IServiceCollection serviceCollection,
+        public MessagingHostOptionsBuilder(IServiceCollection serviceCollection,
             IMessageTypeProvider messageTypeProvider, IMessageTopicProvider topicProvider)
         {
-            _hostBuilder = hostBuilder;
             _serviceCollection = serviceCollection;
             _messageTypeProvider = messageTypeProvider;
             _topicProvider = topicProvider;
@@ -31,7 +29,7 @@ namespace NBB.Messaging.Host.Builder
         /// Specify default subscriber options for the previously added message subscribers.
         /// </summary>
         /// <returns></returns>
-        public MessagingHostBuilder WithDefaultOptions()
+        public MessagingHostPipelineBuilder WithDefaultOptions()
         {
             return WithOptions(_ => { });
         }
@@ -41,7 +39,7 @@ namespace NBB.Messaging.Host.Builder
         /// </summary>
         /// <param name="subscriberOptionsConfigurator">The subscriber options builder is used to configure the options.</param>
         /// <returns></returns>
-        public MessagingHostBuilder WithOptions(
+        public MessagingHostPipelineBuilder WithOptions(
             Action<SubscriberOptionsBuilder> subscriberOptionsConfigurator)
         {
             foreach (var messageType in _messageTypeProvider.GetTypes())
@@ -55,7 +53,7 @@ namespace NBB.Messaging.Host.Builder
                 RegisterHostedService(typeof(MessageBusSubscriberService), subscriberOptionsConfigurator, topic);
             }
 
-            return _hostBuilder;
+            return new MessagingHostPipelineBuilder(_serviceCollection);
         }
 
         private void RegisterHostedService(Type serviceType,

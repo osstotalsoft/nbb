@@ -73,7 +73,7 @@ namespace NBB.Invoices.Worker
                     .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                     .WithAdoNetEventRepository();
 
-                services.AddMessagingHost()
+                services.AddMessagingHost(hostBuilder => hostBuilder
                     .AddSubscriberServices(config => config
                         .FromMediatRHandledCommands().AddAllClasses()
                         .FromMediatRHandledEvents().AddAllClasses()
@@ -84,7 +84,8 @@ namespace NBB.Invoices.Worker
                         .UseExceptionHandlingMiddleware()
                         .UseDefaultResiliencyMiddleware()
                         .UseMediatRMiddleware()
-                    );
+                    )
+                );
 
                     //services.AddSingleton<IHostedService, MessageBusSubscriberService<GetInvoice.Query>>();
 

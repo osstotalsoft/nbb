@@ -75,7 +75,7 @@ namespace NBB.Payments.Worker
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                         .WithAdoNetEventRepository();
 
-                    services.AddMessagingHost()
+                    services.AddMessagingHost(hostBuilder => hostBuilder
                         .AddSubscriberServices(config => config
                             .FromMediatRHandledCommands().AddAllClasses()
                             .FromMediatRHandledEvents().AddAllClasses()
@@ -86,7 +86,8 @@ namespace NBB.Payments.Worker
                             .UseExceptionHandlingMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware()
-                        );
+                        )
+                    );
 
                     services
                         .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
