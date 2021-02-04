@@ -1,0 +1,65 @@
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using NBB.Messaging.Abstractions;
+
+namespace NBB.Messaging.InProcessMessaging.Internal
+{
+    public class InProcessMessagingTransport : IMessagingTransport
+    {
+        private readonly IStorage _storage;
+        private readonly ILogger<InProcessMessagingTransport> _logger;
+
+        public InProcessMessagingTransport(IStorage storage, ILogger<InProcessMessagingTransport> logger)
+        {
+            _storage = storage;
+            _logger = logger;
+        }
+
+        public async Task<IDisposable> SubscribeAsync(string topic, Func<byte[], Task> handler,
+            SubscriptionTransportOptions options = null,
+            CancellationToken cancellationToken = default)
+        {
+            await _storage.AddSubscription(topic, async msg =>
+            {
+                try
+                {
+                    await handler(msg);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        "InProcessMessagingTopicSubscriber encountered an error when handling a message from topic {TopicName}.\n {Error}",
+                        topic, ex);
+                    //TODO: push to DLQ
+                }
+            }, cancellationToken);
+
+            //_logger.LogInformation("InProcessMessagingTopicSubscriber has subscribed to topic {Topic}", topic);
+
+            return new Subscription();
+        }
+
+        public Task PublishAsync(string topic, byte[] message, CancellationToken cancellationToken = default)
+        {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+            _storage.Enqueue(message, topic);
+            stopWatch.Stop();
+
+            _logger.LogDebug("InProcess message published to topic {Topic} in {ElapsedMilliseconds} ms", topic,
+                stopWatch.ElapsedMilliseconds);
+
+            return Task.CompletedTask;
+        }
+
+        private class Subscription : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
+}

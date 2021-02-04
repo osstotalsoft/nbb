@@ -28,7 +28,7 @@ namespace NBB.Messaging.MultiTenancy.Tests
 
             // Assert
             publisherMock.Verify(
-                publisher => publisher.PublishAsync(message, default, It.IsAny<Action<MessagingEnvelope>>(), null),
+                publisher => publisher.PublishAsync(message,  It.IsAny<MessagingPublisherOptions>(), default),
                 Times.Once);
         }
 
@@ -44,7 +44,7 @@ namespace NBB.Messaging.MultiTenancy.Tests
             var sut = new MultiTenancyMessageBusPublisherDecorator(new MockMessageBusPublisher(), tenantContextAccessor);
 
             // Act
-            await sut.PublishAsync("test", default, EnvelopeCustomizer);
+            await sut.PublishAsync("test", new MessagingPublisherOptions {EnvelopeCustomizer = EnvelopeCustomizer});
 
             // Assert
             publishedEnvelope.Headers[MessagingHeaders.TenantId].Should().Be(tenantId.ToString());
@@ -52,11 +52,10 @@ namespace NBB.Messaging.MultiTenancy.Tests
 
         private class MockMessageBusPublisher : IMessageBusPublisher
         {
-            public Task PublishAsync<T>(T message, CancellationToken cancellationToken = default,
-                Action<MessagingEnvelope> envelopeCustomizer = null,
-                string topicName = null)
+            public Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
+                CancellationToken cancellationToken = default)
             {
-                envelopeCustomizer?.Invoke(new MessagingEnvelope(new Dictionary<string, string>(), message));
+                options?.EnvelopeCustomizer?.Invoke(new MessagingEnvelope(new Dictionary<string, string>(), message));
                 return Task.CompletedTask;
             }
         }

@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.Core.Pipeline;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.Builder.TypeSelector;
 using System;
 
@@ -27,28 +25,9 @@ namespace NBB.Messaging.Host.Builder
             builder?.Invoke(subscriberServiceSelector);
 
             var optionsBuilder =
-                new MessagingHostOptionsBuilder(this, ServiceCollection, subscriberServiceSelector, subscriberServiceSelector);
+                new MessagingHostOptionsBuilder(ServiceCollection, subscriberServiceSelector, subscriberServiceSelector);
 
             return optionsBuilder;
-        }
-
-        /// <summary>
-        /// Adds the message processing pipeline to the messaging host.
-        /// </summary>
-        /// <param name="configurePipeline">The pipeline configurator is used to add the middleware to the pipeline.</param>
-        /// <returns>The messaging host builder to further configure the messaging host. It is used in the fluent API</returns>
-        public MessagingHostBuilder UsePipeline(Action<IPipelineBuilder<MessagingEnvelope>> configurePipeline)
-        {
-            ServiceCollection.AddScoped(serviceProvider =>
-            {
-                var pipelineBuilder = new PipelineBuilder<MessagingEnvelope>(serviceProvider);
-
-                configurePipeline(pipelineBuilder);
-
-                return pipelineBuilder.Pipeline;
-            });
-
-            return this;
         }
     }
 }

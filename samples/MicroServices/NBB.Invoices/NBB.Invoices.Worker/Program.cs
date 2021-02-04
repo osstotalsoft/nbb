@@ -23,6 +23,7 @@ using Serilog.Sinks.MSSqlServer;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NBB.Messaging.Abstractions;
 
 namespace NBB.Invoices.Worker
 {
@@ -65,14 +66,14 @@ namespace NBB.Invoices.Worker
                 .ConfigureServices((hostingContext, services) =>
                 {
                 services.AddMediatR(typeof(InvoiceCommandHandlers).Assembly);
-                //services.AddKafkaMessaging();
-                services.AddNatsMessaging();
+                
+                services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                 services.AddInvoicesWriteDataAccess();
                 services.AddEventStore()
                     .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                     .WithAdoNetEventRepository();
 
-                services.AddMessagingHost()
+                services.AddMessagingHost(hostBuilder => hostBuilder
                     .AddSubscriberServices(config => config
                         .FromMediatRHandledCommands().AddAllClasses()
                         .FromMediatRHandledEvents().AddAllClasses()
@@ -83,7 +84,8 @@ namespace NBB.Invoices.Worker
                         .UseExceptionHandlingMiddleware()
                         .UseDefaultResiliencyMiddleware()
                         .UseMediatRMiddleware()
-                    );
+                    )
+                );
 
                     //services.AddSingleton<IHostedService, MessageBusSubscriberService<GetInvoice.Query>>();
 

@@ -16,15 +16,18 @@ namespace NBB.Messaging.OpenTracing.Publisher
         private readonly ITracer _tracer;
         private readonly ITopicRegistry _topicRegistry;
 
-        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITracer tracer,ITopicRegistry topicRegistry)
+        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITracer tracer, ITopicRegistry topicRegistry)
         {
             _inner = inner;
             _tracer = tracer;
             _topicRegistry = topicRegistry;
         }
 
-        public Task PublishAsync<T>(T message, CancellationToken cancellationToken = default, Action<MessagingEnvelope> customizer = null, string topicName = null)
+        public Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
+            CancellationToken cancellationToken = default)
         {
+            options ??= MessagingPublisherOptions.Default;
+
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {
                 if (_tracer.ActiveSpan != null)
@@ -33,11 +36,11 @@ namespace NBB.Messaging.OpenTracing.Publisher
                         new TextMapInjectAdapter(outgoingEnvelope.Headers));
                 }
 
-                customizer?.Invoke(outgoingEnvelope);
+                options.EnvelopeCustomizer?.Invoke(outgoingEnvelope);
             }
 
-            var formattedTopicName = _topicRegistry.GetTopicForName(topicName) ??
-                               _topicRegistry.GetTopicForMessageType(message.GetType());
+            var formattedTopicName = _topicRegistry.GetTopicForName(options.TopicName) ??
+                                     _topicRegistry.GetTopicForMessageType(message.GetType());
             var operationName = $"Publisher {message.GetType().GetPrettyName()}";
 
             using (var scope = _tracer.BuildSpan(operationName)
@@ -49,7 +52,8 @@ namespace NBB.Messaging.OpenTracing.Publisher
             {
                 try
                 {
-                    return _inner.PublishAsync(message, cancellationToken, NewCustomizer, topicName);
+                    return _inner.PublishAsync(message, options with {EnvelopeCustomizer = NewCustomizer},
+                        cancellationToken);
                 }
                 catch (Exception exception)
                 {

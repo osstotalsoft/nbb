@@ -3,6 +3,8 @@ using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.Builder.TypeSelector;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace NBB.Messaging.Host.Builder
 {
@@ -11,15 +13,13 @@ namespace NBB.Messaging.Host.Builder
     /// </summary>
     public class MessagingHostOptionsBuilder
     {
-        private readonly MessagingHostBuilder _hostBuilder;
         private readonly IServiceCollection _serviceCollection;
         private readonly IMessageTopicProvider _topicProvider;
         private readonly IMessageTypeProvider _messageTypeProvider;
-        
-        public MessagingHostOptionsBuilder(MessagingHostBuilder hostBuilder, IServiceCollection serviceCollection,
+
+        public MessagingHostOptionsBuilder(IServiceCollection serviceCollection,
             IMessageTypeProvider messageTypeProvider, IMessageTopicProvider topicProvider)
         {
-            _hostBuilder = hostBuilder;
             _serviceCollection = serviceCollection;
             _messageTypeProvider = messageTypeProvider;
             _topicProvider = topicProvider;
@@ -29,45 +29,85 @@ namespace NBB.Messaging.Host.Builder
         /// Specify default subscriber options for the previously added message subscribers.
         /// </summary>
         /// <returns></returns>
-        public MessagingHostBuilder WithDefaultOptions()
+        public MessagingHostPipelineBuilder WithDefaultOptions()
         {
-            return WithOptions();
+            return WithOptions(_ => { });
         }
 
         /// <summary>
         /// Specify subscriber options for the previously added message subscribers.
         /// </summary>
-        /// <param name="subscriberOptionsBuilder">The subscriber options builder is used to configure the options.</param>
+        /// <param name="subscriberOptionsConfigurator">The subscriber options builder is used to configure the options.</param>
         /// <returns></returns>
-        public MessagingHostBuilder WithOptions(
-            Action<MessagingSubscriberOptionsBuilder> subscriberOptionsBuilder = null)
+        public MessagingHostPipelineBuilder WithOptions(
+            Action<SubscriberOptionsBuilder> subscriberOptionsConfigurator)
         {
             foreach (var messageType in _messageTypeProvider.GetTypes())
             {
                 RegisterHostedService(typeof(MessageBusSubscriberService<>).MakeGenericType(messageType),
-                    subscriberOptionsBuilder);
+                    subscriberOptionsConfigurator);
             }
 
             foreach (var topic in _topicProvider.GetTopics())
             {
-                RegisterHostedService(typeof(MessagingTopicSubscriberService), subscriberOptionsBuilder, topic);
+                RegisterHostedService(typeof(MessageBusSubscriberService), subscriberOptionsConfigurator, topic);
             }
 
-            return _hostBuilder;
+            return new MessagingHostPipelineBuilder(_serviceCollection);
         }
 
         private void RegisterHostedService(Type serviceType,
-            Action<MessagingSubscriberOptionsBuilder> subscriberOptionsConfigurator = null, string topicName = null)
+            Action<SubscriberOptionsBuilder> subscriberOptionsConfigurator,
+            string topicName = null)
         {
             _serviceCollection.AddSingleton(sp =>
             {
-                var builder = new MessagingSubscriberOptionsBuilder(sp.GetService<MessagingSubscriberOptions>());
-                subscriberOptionsConfigurator?.Invoke(builder);
+                var subscriberOptionsBuilder = new SubscriberOptionsBuilder();
+                subscriberOptionsConfigurator.Invoke(subscriberOptionsBuilder);
 
-                return topicName == null
-                    ? (IHostedService) ActivatorUtilities.CreateInstance(sp, serviceType, builder.Options)
-                    : (IHostedService) ActivatorUtilities.CreateInstance(sp, serviceType, builder.Options, topicName);
+                var options = subscriberOptionsBuilder.Build();
+
+                if (topicName != null)
+                {
+                    options = options with {TopicName = topicName};
+                }
+
+                return (IHostedService) ActivatorUtilities.CreateInstance(sp, serviceType, options);
             });
+        }
+
+        public class SubscriberOptionsBuilder
+        {
+            private MessagingSubscriberOptions _subscriberOptions = new();
+
+            public SubscriberOptionsBuilder ConfigureTransport(
+                Func<SubscriptionTransportOptions, SubscriptionTransportOptions> subscriberOptionsConfigurator)
+            {
+                _subscriberOptions = _subscriberOptions with
+                {
+                    Transport = subscriberOptionsConfigurator(_subscriberOptions.Transport)
+                };
+
+                return this;
+            }
+
+            public SubscriberOptionsBuilder UseDynamicDeserialization(
+                IEnumerable<Assembly> dynamicDeserializationScannedAssemblies)
+            {
+                _subscriberOptions = _subscriberOptions with
+                {
+                    SerDes = _subscriberOptions.SerDes with
+                    {
+                        UseDynamicDeserialization = true,
+                        DynamicDeserializationScannedAssemblies = dynamicDeserializationScannedAssemblies
+                    }
+                };
+
+                return this;
+            }
+
+            internal MessagingSubscriberOptions Build()
+                => _subscriberOptions;
         }
     }
 }

@@ -19,6 +19,7 @@ namespace NBB.Contracts.ReadModel.Data
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();
                     var connectionString = configuration.GetConnectionString("DefaultConnection");
+                    
                     options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Contracts.Migrations"));
                 });
         }

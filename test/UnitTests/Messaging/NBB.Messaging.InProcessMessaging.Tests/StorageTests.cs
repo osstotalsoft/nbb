@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using NBB.Messaging.InProcessMessaging.Internal;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,7 +23,7 @@ namespace NBB.Messaging.InProcessMessaging.Tests
             //Arrange
             var topic = "x";
             var sut = new Storage();
-            var msg = "ala bala ";
+            var msg = System.Text.Encoding.UTF8.GetBytes("ala bala ");
             using (var tokenSource = new CancellationTokenSource())
             {
                 //Act
@@ -30,7 +31,7 @@ namespace NBB.Messaging.InProcessMessaging.Tests
                 await sut.AddSubscription(topic, message =>
                 {
                 //Assert
-                message.Should().Be(msg);
+                message.Should().AllBeEquivalentTo(msg);
 
                     tokenSource.Cancel();
                     return Task.CompletedTask;

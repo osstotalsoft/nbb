@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Dynamic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,40 +14,19 @@ namespace NBB.Messaging.Abstractions
             _messageTypeRegistry = messageTypeRegistry;
         }
 
-        public MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(string envelopeString, MessageSerDesOptions options = null)
+        public MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(byte[] envelopeData, MessageSerDesOptions options = null)
         {
-            var serDesOptions = options ?? new MessageSerDesOptions();
+            var envelopeString = System.Text.Encoding.UTF8.GetString(envelopeData);
+            var (partialEnvelope, runtimeType) = DeserializePartialEnvelope(envelopeString, typeof(TMessage), options);
 
-            if (serDesOptions.DeserializationType == DeserializationType.HeadersOnly)
-                throw new Exception("Cannot use typed deserialization using 'HeadersOnly' deserialization setting.");
+            var outputType = runtimeType ??
+                             (typeof(TMessage) == typeof(object) ? typeof(ExpandoObject) : typeof(TMessage));
 
-            if (serDesOptions.DeserializationType == DeserializationType.Dynamic)
-            {
-                var partialEnvelope = DeserializePartialEnvelope(envelopeString, out var concreteType, serDesOptions,
-                    typeof(TMessage));
-                return new MessagingEnvelope<TMessage>(partialEnvelope.Headers,
-                    (TMessage) partialEnvelope.Payload.ToObject(concreteType));
-            }
-
-            var message = JsonConvert.DeserializeObject<MessagingEnvelope<TMessage>>(envelopeString);
-            return message;
+            return new MessagingEnvelope<TMessage>(partialEnvelope.Headers,
+                (TMessage) partialEnvelope.Payload.ToObject(outputType));
         }
 
-        public MessagingEnvelope DeserializeMessageEnvelope(string envelopeString, MessageSerDesOptions options = null)
-        {
-            var serDesOptions = options ?? new MessageSerDesOptions();
-
-            if (serDesOptions.DeserializationType == DeserializationType.TypeSafe)
-                throw new Exception("Cannot deserialize generic envelope using the TypeSafe deserialization option");
-
-            var partialEnvelope = DeserializePartialEnvelope(envelopeString, out var concreteType, serDesOptions);
-
-            return serDesOptions.DeserializationType == DeserializationType.HeadersOnly
-                ? new MessagingEnvelope(partialEnvelope.Headers, partialEnvelope.Payload.ToString())
-                : new MessagingEnvelope(partialEnvelope.Headers, partialEnvelope.Payload.ToObject(concreteType));
-        }
-
-        public string SerializeMessageEnvelope(MessagingEnvelope message, MessageSerDesOptions options = null)
+        public byte[] SerializeMessageEnvelope(MessagingEnvelope message, MessageSerDesOptions options = null)
         {
             var messageTypeId = _messageTypeRegistry.GetTypeId(message.Payload.GetType());
             message.SetHeader(MessagingHeaders.MessageType, messageTypeId, true);
@@ -56,33 +36,37 @@ namespace NBB.Messaging.Abstractions
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
-            return json;
+            return System.Text.Encoding.UTF8.GetBytes(json);
         }
 
-        private MessagingEnvelope<JObject> DeserializePartialEnvelope(string envelopeString, out Type concreteType, MessageSerDesOptions serDesOptions, Type expectedType = null)
+        private (MessagingEnvelope<JObject> envelope, Type runtimeType) DeserializePartialEnvelope(
+            string envelopeString, Type expectedType = null, MessageSerDesOptions options = null)
         {
+            options ??= MessageSerDesOptions.Default;
             var partialEnvelope = JsonConvert.DeserializeObject<MessagingEnvelope<JObject>>(envelopeString);
-            if (serDesOptions.DeserializationType == DeserializationType.HeadersOnly)
-            {
-                concreteType = null;
-                return partialEnvelope;
-            }
+
+            if (!options.UseDynamicDeserialization)
+                return (partialEnvelope, null);
 
             var messageTypeId = partialEnvelope.GetMessageTypeId();
             if (messageTypeId == null)
             {
                 if (expectedType == null || expectedType.IsAbstract || expectedType.IsInterface)
                     throw new Exception("Type information was not found in MessageType header");
-                concreteType = expectedType;
-                return partialEnvelope;
+
+                return (partialEnvelope, null);
             }
 
-            concreteType = _messageTypeRegistry.ResolveType(messageTypeId, serDesOptions.DynamicDeserializationScannedAssemblies);
+            var runtimeType =
+                _messageTypeRegistry.ResolveType(messageTypeId, options.DynamicDeserializationScannedAssemblies);
 
-            if (expectedType != null && !expectedType.IsAssignableFrom(concreteType))
-                throw new Exception($"Incompatible types: expected {expectedType} and found {concreteType}");
+            if (runtimeType == null)
+                return (partialEnvelope, null);
 
-            return partialEnvelope;
+            if (expectedType != null && !expectedType.IsAssignableFrom(runtimeType))
+                throw new Exception($"Incompatible types: expected {expectedType} and found {runtimeType}");
+
+            return (partialEnvelope, runtimeType);
         }
     }
 }

@@ -41,7 +41,6 @@
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Migrations\NBB.EventStore.AdoNet.Migrations.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Multitenancy\NBB.EventStore.AdoNet.Multitenancy.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.InMemory\NBB.EventStore.InMemory.csproj" />
-    <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.MessagingExtensions\NBB.EventStore.MessagingExtensions.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore\NBB.EventStore.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.InProcessMessaging\NBB.Messaging.InProcessMessaging.csproj" />
   </ItemGroup>

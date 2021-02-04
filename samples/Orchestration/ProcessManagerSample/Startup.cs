@@ -13,6 +13,7 @@ using NBB.ProcessManager.Runtime;
 using ProcessManagerSample.MessageMiddlewares;
 using ProcessManagerSample.Queries;
 using System.Reflection;
+using NBB.Messaging.Abstractions;
 
 namespace ProcessManagerSample
 {
@@ -21,8 +22,8 @@ namespace ProcessManagerSample
         public static void ConfigureServicesDelegate(HostBuilderContext context, IServiceCollection services)
         {
             services.AddAutoMapper(Assembly.GetEntryAssembly());
-            //services.AddNatsMessaging();
-            services.AddInProcessMessaging();
+
+            services.AddMessageBus().AddInProcessTransport();
 
             services.AddMediatR(typeof(GetPartnerQuery).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
@@ -34,7 +35,7 @@ namespace ProcessManagerSample
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
 
-            services.AddMessagingHost()
+            services.AddMessagingHost(hostBuilder => hostBuilder
                 .AddSubscriberServices(config => config
                     .FromMediatRHandledCommands().AddAllClasses()
                     .FromMediatRHandledEvents().AddAllClasses())
@@ -45,7 +46,8 @@ namespace ProcessManagerSample
                     //.UseMiddleware<OpenTracingMiddleware>()
                     .UseDefaultResiliencyMiddleware()
                     .UseMiddleware<SubscriberLoggingMiddleware>()
-                    .UseMediatRMiddleware());
+                    .UseMediatRMiddleware())
+            );
         }
     }
 }
