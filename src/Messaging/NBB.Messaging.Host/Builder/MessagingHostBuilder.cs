@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NBB.Messaging.Host.Builder.TypeSelector;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Hosting;
 using NBB.Core.Pipeline;
@@ -15,8 +14,8 @@ namespace NBB.Messaging.Host.Builder
         private readonly IServiceCollection _serviceCollection;
         private IMessageTopicProvider _topicProvider;
         private IMessageTypeProvider _messageTypeProvider;
-        private readonly List<(Type type, MessagingSubscriberOptions options)> _subscriberSpecs = new();
-        private Action<IPipelineBuilder<MessagingEnvelope>> _pipelineConfigurator;
+        private MessagingHostConfiguration _hostConfiguration = new();
+        private MessagingHostConfiguration.SubscriberGroup _currentSubscriberGroup;
 
         public MessagingHostBuilder(IServiceCollection serviceCollection)
         {
@@ -31,6 +30,9 @@ namespace NBB.Messaging.Host.Builder
 
             _messageTypeProvider = subscriberServiceSelector;
             _topicProvider = subscriberServiceSelector;
+
+            _currentSubscriberGroup = new();
+            _hostConfiguration.SubscriberGroups.Add(_currentSubscriberGroup);
 
             return this;
         }
@@ -53,7 +55,7 @@ namespace NBB.Messaging.Host.Builder
 
         public void UsePipeline(Action<IPipelineBuilder<MessagingEnvelope>> configurePipeline)
         {
-            _pipelineConfigurator = configurePipeline;
+            _currentSubscriberGroup.PipelineConfigurator = configurePipeline;
         }
 
         private void RegisterHostedService(Type serviceType,
@@ -70,27 +72,31 @@ namespace NBB.Messaging.Host.Builder
                 options = options with {TopicName = topicName};
             }
 
-            _subscriberSpecs.Add((serviceType, options));
+            _currentSubscriberGroup.Subscribers.Add((serviceType, options));
         }
 
         internal void Build()
         {
-            if (!_subscriberSpecs.Any())
+            foreach (var subscriberGroup in _hostConfiguration.SubscriberGroups)
             {
-                throw new Exception(
-                    "No subscribers were configured. Use AddSubscribers(...).AddOptions(...) to configure subscribers.");
-            }
+                if (!subscriberGroup.Subscribers.Any())
+                {
+                    throw new Exception(
+                        "No subscribers were configured. Use AddSubscribers(...).AddOptions(...) to configure subscribers.");
+                }
 
-            if (_pipelineConfigurator == null)
-            {
-                throw new Exception("No pipeline was configured. Call UsePipeline(...) to configure a pipeline");
-            }
+                if (subscriberGroup.PipelineConfigurator == null)
+                {
+                    throw new Exception("No pipeline was configured. Call UsePipeline(...) to configure a pipeline");
+                }
 
-            foreach (var (type, options) in _subscriberSpecs)
-            {
-                _serviceCollection.AddSingleton(sp =>
-                    (IHostedService) ActivatorUtilities.CreateInstance(sp, type, options, _pipelineConfigurator));
+                foreach (var (type, options) in subscriberGroup.Subscribers)
+                {
+                    _serviceCollection.AddSingleton(sp =>
+                        (IHostedService) ActivatorUtilities.CreateInstance(sp, type, options, subscriberGroup.PipelineConfigurator));
+                }    
             }
+            
         }
     }
 
