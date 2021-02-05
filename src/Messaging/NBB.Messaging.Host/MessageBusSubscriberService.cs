@@ -18,6 +18,7 @@ namespace NBB.Messaging.Host
         private readonly MessagingContextAccessor _messagingContextAccessor;
         private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
         private readonly ITopicRegistry _topicRegistry;
+        private readonly Action<IPipelineBuilder<MessagingEnvelope>> _pipelineConfigurator;
 
         public MessageBusSubscriberService(
             IMessageBus messageBus,
@@ -25,6 +26,7 @@ namespace NBB.Messaging.Host
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<TMessage>> logger,
             ITopicRegistry topicRegistry,
+            Action<IPipelineBuilder<MessagingEnvelope>> pipelineConfigurator,
             MessagingSubscriberOptions subscriberOptions = null
         )
         {
@@ -34,6 +36,7 @@ namespace NBB.Messaging.Host
             _messagingContextAccessor = messagingContextAccessor;
             _logger = logger;
             _topicRegistry = topicRegistry;
+            _pipelineConfigurator = pipelineConfigurator;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -64,7 +67,11 @@ namespace NBB.Messaging.Host
 
             var topicName = _topicRegistry.GetTopicForName(_subscriberOptions?.TopicName, false) ??
                             _topicRegistry.GetTopicForMessageType(typeof(TMessage), false);
-            var pipeline = scope.ServiceProvider.GetRequiredService<PipelineDelegate<MessagingEnvelope>>();
+
+            var pipelineBuilder = new PipelineBuilder<MessagingEnvelope>(scope.ServiceProvider);
+            _pipelineConfigurator.Invoke(pipelineBuilder);
+            var pipeline = pipelineBuilder.Pipeline;
+
             _messagingContextAccessor.MessagingContext = new MessagingContext(message, topicName);
 
             await pipeline(message, cancellationToken);
@@ -82,8 +89,9 @@ namespace NBB.Messaging.Host
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<object>> logger,
             ITopicRegistry topicRegistry,
+            Action<IPipelineBuilder<MessagingEnvelope>> pipelineConfigurator,
             MessagingSubscriberOptions subscriberOptions)
-            : base(messageBus, serviceProvider, messagingContextAccessor, logger, topicRegistry, subscriberOptions)
+            : base(messageBus, serviceProvider, messagingContextAccessor, logger, topicRegistry, pipelineConfigurator, subscriberOptions)
         {
             _logger = logger;
             _subscriberOptions = subscriberOptions;
