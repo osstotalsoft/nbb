@@ -82,7 +82,7 @@ namespace NBB.Messaging.Host.Builder
                 if (!subscriberGroup.Subscribers.Any())
                 {
                     throw new Exception(
-                        "No subscribers were configured. Use AddSubscribers(...).AddOptions(...) to configure subscribers.");
+                        "No subscribers were configured. Use AddSubscribers(...).WithOptions(...) to configure subscribers.");
                 }
 
                 if (subscriberGroup.PipelineConfigurator == null)
