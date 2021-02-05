@@ -21,6 +21,7 @@ namespace NBB.Messaging.Host.Tests
             var envelope = new MessagingEnvelope<TestMessage>(new Dictionary<string, string>(), message);
             var pipeline = Mock.Of<PipelineDelegate<MessagingEnvelope>>();
             Func<MessagingEnvelope<TestMessage>, Task> messageBusSubscriberCallback = null;
+            var pipelineConfigurator = Mock.Of<Action<IPipelineBuilder<MessagingEnvelope>>>();
             var cancellationToken = new CancellationToken();
 
             var mockedMessageBusSubscriber = Mock.Of<IMessageBus>();
@@ -44,6 +45,7 @@ namespace NBB.Messaging.Host.Tests
                     Mock.Of<MessagingContextAccessor>(),
                     Mock.Of<ILogger<MessageBusSubscriberService<TestMessage>>>(),
                     Mock.Of<ITopicRegistry>(),
+                    pipelineConfigurator,
                     new MessagingSubscriberOptions()
                 );
 
@@ -53,7 +55,7 @@ namespace NBB.Messaging.Host.Tests
             await messageBusSubscriberService.StopAsync(cancellationToken);
 
             //Assert
-            Mock.Get(pipeline).Verify(x => x(envelope, cancellationToken));
+            Mock.Get(pipelineConfigurator).Verify(x => x(It.IsAny<IPipelineBuilder<MessagingEnvelope>>()));
         }
 
 

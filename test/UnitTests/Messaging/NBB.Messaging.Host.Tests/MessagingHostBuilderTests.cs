@@ -17,27 +17,6 @@ namespace NBB.Messaging.Host.Tests
     public class MessagingHostBuilderTests
     {
         [Fact]
-        public void Should_register_pipeline_scoped()
-        {
-            //Arrange
-            var services = Mock.Of<IServiceCollection>();
-            ServiceDescriptor registeredDescriptor = null;
-            Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
-
-            //Act
-            new MessagingHostBuilder(services)
-                .AddSubscriberServices(builder => builder.FromTopic("Topic"))
-                .WithDefaultOptions()
-                .UsePipeline(_ => { });
-
-            //Assert
-            registeredDescriptor.Should().NotBeNull();
-            registeredDescriptor.ServiceType.Should().Be(typeof(PipelineDelegate<MessagingEnvelope>));
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Scoped);
-        }
-
-        [Fact]
         public void Should_register_subscribers_singleton()
         {
             //Arrange
@@ -47,10 +26,14 @@ namespace NBB.Messaging.Host.Tests
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
 
             //Act
-            new MessagingHostBuilder(services)
+            var builder = new MessagingHostBuilder(services);
+            builder
                 .AddSubscriberServices(cfg =>
                     cfg.FromAssemblyOf<MessageToScanBase>().AddClassesAssignableTo<MessageToScanBase>())
-                .WithDefaultOptions();
+                .WithDefaultOptions()
+                .UsePipeline(_ => { });
+
+            builder.Build();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
@@ -74,8 +57,12 @@ namespace NBB.Messaging.Host.Tests
                 }.GetEnumerator());
 
             //Act
-            new MessagingHostBuilder(services)
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses()).WithDefaultOptions();
+            var builder = new MessagingHostBuilder(services);
+            builder
+                .AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses()).WithDefaultOptions()
+                .UsePipeline(_ => { });
+
+            builder.Build();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
@@ -99,8 +86,12 @@ namespace NBB.Messaging.Host.Tests
                 }.GetEnumerator());
 
             //Act
-            new MessagingHostBuilder(services)
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses()).WithDefaultOptions();
+            var builder = new MessagingHostBuilder(services);
+            builder
+                .AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses()).WithDefaultOptions()
+                .UsePipeline(_ => { });
+
+            builder.Build();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
@@ -125,10 +116,14 @@ namespace NBB.Messaging.Host.Tests
                 }.GetEnumerator());
 
             //Act
-            new MessagingHostBuilder(services)
+            var builder = new MessagingHostBuilder(services);
+            builder
                 .AddSubscriberServices(cfg => cfg.FromMediatRHandledQueries().AddAllClasses())
-                .WithDefaultOptions();
+                .WithDefaultOptions()
+                .UsePipeline(_ => { });
 
+            builder.Build();
+            
             //Assert
             registeredDescriptor.Should().NotBeNull();
             registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
@@ -146,9 +141,12 @@ namespace NBB.Messaging.Host.Tests
                 .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
 
             //Act
-            new MessagingHostBuilder(services)
+            var builder = new MessagingHostBuilder(services);
+            builder
                 .AddSubscriberServices(cfg => cfg.FromTopics("TopicName"))
-                .WithDefaultOptions();
+                .WithDefaultOptions()
+                .UsePipeline(_ => { });
+            builder.Build();
 
             //Assert
             registeredDescriptor.Should().NotBeNull();
