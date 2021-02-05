@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using NBB.Correlation;
 
 namespace NBB.Messaging.Abstractions
@@ -14,15 +15,17 @@ namespace NBB.Messaging.Abstractions
         private readonly ITopicRegistry _topicRegistry;
         private readonly IMessageSerDes _messageSerDes;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<MessageBusPublisher> _logger;
         private readonly IMessagingTransport _messagingTransport;
 
         public MessageBusPublisher(IMessagingTransport messagingTransport, ITopicRegistry topicRegistry,
-            IMessageSerDes messageSerDes, IConfiguration configuration)
+            IMessageSerDes messageSerDes, IConfiguration configuration, ILogger<MessageBusPublisher> logger)
         {
             _messagingTransport = messagingTransport;
             _topicRegistry = topicRegistry;
             _messageSerDes = messageSerDes;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task PublishAsync<T>(T message, MessagingPublisherOptions publisherOptions = null,
@@ -35,6 +38,8 @@ namespace NBB.Messaging.Abstractions
                                _topicRegistry.GetTopicForMessageType(message.GetType());
 
             await _messagingTransport.PublishAsync(newTopicName, envelopeData, cancellationToken);
+
+            _logger.LogDebug("Messaging publisher sent a message for subject {Subject}", newTopicName);
             await Task.Yield();
         }
 
