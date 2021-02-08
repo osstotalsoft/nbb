@@ -16,7 +16,7 @@ namespace NBB.Messaging.MultiTenancy
     /// obtained from the current identification strategy and builds the tenant context.
     /// </summary>
     /// <seealso cref="IPipelineMiddleware{MessagingEnvelope}" />
-    public class TenantMiddleware : IPipelineMiddleware<MessagingEnvelope>
+    public class TenantMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly ITenantContextAccessor _tenantContextAccessor;
         private readonly ITenantIdentificationService _tenantIdentificationService;
@@ -31,7 +31,7 @@ namespace NBB.Messaging.MultiTenancy
             _tenantRepository = tenantRepository;
         }
 
-        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
             if (_tenancyOptions.Value.TenancyType == TenancyType.None)
             {
@@ -41,7 +41,7 @@ namespace NBB.Messaging.MultiTenancy
 
             var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
 
-            if (!message.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
+            if (!context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
             {
                 throw new ApplicationException($"The tenant ID message header is missing from the message envelope");
             }
@@ -54,13 +54,13 @@ namespace NBB.Messaging.MultiTenancy
             if (messageTenantId != tenantId)
             {
                 throw new ApplicationException(
-                    $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {tenantId} but received {messageTenantIdHeader}");
+                    $"Invalid tenant ID for message {context.MessagingEnvelope.Payload.GetType()}. Expected {tenantId} but received {messageTenantIdHeader}");
             }
 
             if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant && _tenancyOptions.Value.TenantId != messageTenantId)
             {
                 throw new ApplicationException(
-                    $"Invalid tenant ID for message {message.Payload.GetType()}. Expected {_tenancyOptions.Value.TenantId} but received {messageTenantIdHeader}");
+                    $"Invalid tenant ID for message {context.MessagingEnvelope.Payload.GetType()}. Expected {_tenancyOptions.Value.TenantId} but received {messageTenantIdHeader}");
             }
 
             var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
@@ -91,7 +91,7 @@ namespace NBB.Messaging.MultiTenancy
 
     public static partial class MessagingPipelineExtensions
     {
-        public static IPipelineBuilder<MessagingEnvelope> UseTenantMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder)
-            => pipelineBuilder.UseMiddleware<TenantMiddleware, MessagingEnvelope>();
+        public static IPipelineBuilder<MessagingContext> UseTenantMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
+            => pipelineBuilder.UseMiddleware<TenantMiddleware, MessagingContext>();
     }
 }

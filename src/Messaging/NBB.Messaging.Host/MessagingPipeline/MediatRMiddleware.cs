@@ -11,7 +11,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
     /// A pipeline middleware that forwards messages that contain requests or events to mediatR.
     /// </summary>
     /// <seealso cref="IPipelineMiddleware{MessagingEnvelope}" />
-    public class MediatRMiddleware : IPipelineMiddleware<MessagingEnvelope>
+    public class MediatRMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly IMediator _mediator;
 
@@ -20,19 +20,19 @@ namespace NBB.Messaging.Host.MessagingPipeline
             _mediator = mediator;
         }
 
-        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
-            if (message.Payload is INotification @event)
+            if (context.MessagingEnvelope.Payload is INotification @event)
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
-            else if (message.Payload is IRequest request)
+            else if (context.MessagingEnvelope.Payload is IRequest request)
             {
                 await _mediator.Send(request, cancellationToken);
             }
             else
             {
-                throw new ApplicationException($"Message type {message.Payload.GetType()} cannot be handled by mediatR");
+                throw new ApplicationException($"Message type {context.MessagingEnvelope.Payload.GetType()} cannot be handled by mediatR");
             }
 
             await next();

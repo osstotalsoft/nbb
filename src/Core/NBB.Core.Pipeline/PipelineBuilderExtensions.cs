@@ -7,17 +7,18 @@ namespace NBB.Core.Pipeline
 {
     public static class PipelineBuilderExtensions
     {
-
         /// <summary>
         /// Adds the a middleware that is defined inline to the pipeline.
         /// </summary>
-        /// <typeparam name="T">The type of data/context processed in the pipeline.</typeparam>
+        /// <typeparam name="TContext">The type of data/context processed in the pipeline.</typeparam>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <param name="middleware">The middleware.</param>
         /// <returns>
         /// The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.
         /// </returns>
-        public static IPipelineBuilder<T> Use<T>(this IPipelineBuilder<T> pipelineBuilder, Func<T, CancellationToken, Func<Task>, Task> middleware)
+        public static IPipelineBuilder<TContext> Use<TContext>(this IPipelineBuilder<TContext> pipelineBuilder,
+            Func<TContext, CancellationToken, Func<Task>, Task> middleware)
+            where TContext : IPipelineContext
         {
             return pipelineBuilder.Use(next =>
             {
@@ -33,18 +34,23 @@ namespace NBB.Core.Pipeline
         /// Adds a middleware of type <typeparamref name="TMiddleware"/> the pipeline.
         /// </summary>
         /// <typeparam name="TMiddleware">The type of the middleware.</typeparam>
-        /// <typeparam name="T">The type of data/context processed in the pipeline.</typeparam>
+        /// <typeparam name="TContext">The type of data/context processed in the pipeline.</typeparam>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>
         /// The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.
         /// </returns>
-        public static IPipelineBuilder<T> UseMiddleware<TMiddleware, T>(this IPipelineBuilder<T> pipelineBuilder) where TMiddleware : IPipelineMiddleware<T>
+        public static IPipelineBuilder<TContext> UseMiddleware<TMiddleware, TContext>(
+            this IPipelineBuilder<TContext> pipelineBuilder)
+            where TMiddleware : IPipelineMiddleware<TContext>
+            where TContext : IPipelineContext
         {
             return pipelineBuilder.Use(
-                (data, cancellationToken, next) =>
+                (context, cancellationToken, next) =>
                 {
-                    var instance = (IPipelineMiddleware<T>)ActivatorUtilities.CreateInstance(pipelineBuilder.ServiceProvider, typeof(TMiddleware));
-                    return instance.Invoke(data, cancellationToken, next);
+                    var instance =
+                        (IPipelineMiddleware<TContext>) ActivatorUtilities.CreateInstance(context.Services,
+                            typeof(TMiddleware));
+                    return instance.Invoke(context, cancellationToken, next);
                 }
             );
         }

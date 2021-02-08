@@ -12,8 +12,8 @@ namespace NBB.Messaging.Host.MessagingPipeline
     /// <summary>
     /// A messaging pipeline middleware that logs and swallows all exceptions.
     /// </summary>
-    /// <seealso cref="NBB.Core.Pipeline.IPipelineMiddleware{NBB.Messaging.DataContracts.MessagingEnvelope}" />
-    public class ExceptionHandlingMiddleware : IPipelineMiddleware<MessagingEnvelope>
+    /// <seealso cref="NBB.Core.Pipeline.IPipelineMiddleware{MessagingEnvelope}" />
+    public class ExceptionHandlingMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
@@ -22,7 +22,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
             _logger = logger;
         }
 
-        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
@@ -33,14 +33,14 @@ namespace NBB.Messaging.Host.MessagingPipeline
 
                 _logger.LogInformation(
                     "Message of type {EventType} processed in {ElapsedMilliseconds} ms.",
-                    message.Payload.GetType().GetPrettyName(),
+                    context.MessagingEnvelope.Payload.GetType().GetPrettyName(),
                     stopWatch.ElapsedMilliseconds);
             }
             catch(Exception ex)
             {
                 _logger.LogError(
                     "Message of type {MessageType} could not be processed due to the following exception {Exception}.",
-                    message.Payload.GetType().GetPrettyName(), ex);
+                    context.MessagingEnvelope.Payload.GetType().GetPrettyName(), ex);
             }
             finally
             {

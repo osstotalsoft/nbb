@@ -17,7 +17,7 @@ namespace NBB.MultiTenancy.Identification.Messaging
 
         public Task<string> GetTenantToken()
         {
-            var headers = _messageContextAccessor?.MessagingContext?.ReceivedMessageEnvelope?.Headers;
+            var headers = _messageContextAccessor?.MessagingContext?.MessagingEnvelope?.Headers;
             if (headers == null || !headers.TryGetValue(_headerKey, out var token))
             {
                 return Task.FromResult<string>(null);

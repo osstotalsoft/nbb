@@ -18,7 +18,7 @@ namespace NBB.Messaging.Host
         private readonly MessagingContextAccessor _messagingContextAccessor;
         private readonly ILogger<MessageBusSubscriberService<TMessage>> _logger;
         private readonly ITopicRegistry _topicRegistry;
-        private readonly Action<IPipelineBuilder<MessagingEnvelope>> _pipelineConfigurator;
+        private readonly PipelineDelegate<MessagingContext> _pipeline;
 
         public MessageBusSubscriberService(
             IMessageBus messageBus,
@@ -26,7 +26,7 @@ namespace NBB.Messaging.Host
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<TMessage>> logger,
             ITopicRegistry topicRegistry,
-            Action<IPipelineBuilder<MessagingEnvelope>> pipelineConfigurator,
+            PipelineDelegate<MessagingContext> pipeline,
             MessagingSubscriberOptions subscriberOptions = null
         )
         {
@@ -36,7 +36,7 @@ namespace NBB.Messaging.Host
             _messagingContextAccessor = messagingContextAccessor;
             _logger = logger;
             _topicRegistry = topicRegistry;
-            _pipelineConfigurator = pipelineConfigurator;
+            _pipeline = pipeline;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -68,13 +68,11 @@ namespace NBB.Messaging.Host
             var topicName = _topicRegistry.GetTopicForName(_subscriberOptions?.TopicName, false) ??
                             _topicRegistry.GetTopicForMessageType(typeof(TMessage), false);
 
-            var pipelineBuilder = new PipelineBuilder<MessagingEnvelope>(scope.ServiceProvider);
-            _pipelineConfigurator.Invoke(pipelineBuilder);
-            var pipeline = pipelineBuilder.Pipeline;
 
-            _messagingContextAccessor.MessagingContext = new MessagingContext(message, topicName);
+            var context = new MessagingContext(message, topicName, scope.ServiceProvider);
+            _messagingContextAccessor.MessagingContext = context;
 
-            await pipeline(message, cancellationToken);
+            await _pipeline(context, cancellationToken);
         }
     }
 
@@ -89,9 +87,9 @@ namespace NBB.Messaging.Host
             MessagingContextAccessor messagingContextAccessor,
             ILogger<MessageBusSubscriberService<object>> logger,
             ITopicRegistry topicRegistry,
-            Action<IPipelineBuilder<MessagingEnvelope>> pipelineConfigurator,
+            PipelineDelegate<MessagingContext> pipeline,
             MessagingSubscriberOptions subscriberOptions)
-            : base(messageBus, serviceProvider, messagingContextAccessor, logger, topicRegistry, pipelineConfigurator, subscriberOptions)
+            : base(messageBus, serviceProvider, messagingContextAccessor, logger, topicRegistry, pipeline, subscriberOptions)
         {
             _logger = logger;
             _subscriberOptions = subscriberOptions;

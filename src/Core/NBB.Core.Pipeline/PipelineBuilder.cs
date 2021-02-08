@@ -5,24 +5,16 @@ using System.Threading.Tasks;
 
 namespace NBB.Core.Pipeline
 {
-    public class PipelineBuilder<T> : IPipelineBuilder<T>
+    public class PipelineBuilder<TContext> : IPipelineBuilder<TContext> where TContext : IPipelineContext
     {
-        private readonly IList<Func<PipelineDelegate<T>, PipelineDelegate<T>>> _components = new List<Func<PipelineDelegate<T>, PipelineDelegate<T>>>();
-        private PipelineDelegate<T> _builtPipeline;
+        private readonly IList<Func<PipelineDelegate<TContext>, PipelineDelegate<TContext>>> _components =
+            new List<Func<PipelineDelegate<TContext>, PipelineDelegate<TContext>>>();
 
-        public PipelineBuilder(IServiceProvider serviceProvider)
-        {
-            ServiceProvider = serviceProvider;
-        }
+        private PipelineDelegate<TContext> _builtPipeline;
 
-        public IServiceProvider ServiceProvider
-        {
-            get;
-        }
+        public PipelineDelegate<TContext> Pipeline => _builtPipeline ??= Build();
 
-        public PipelineDelegate<T> Pipeline => _builtPipeline ?? (_builtPipeline = Build());
-
-        public IPipelineBuilder<T> Use(Func<PipelineDelegate<T>, PipelineDelegate<T>> middleware)
+        public IPipelineBuilder<TContext> Use(Func<PipelineDelegate<TContext>, PipelineDelegate<TContext>> middleware)
         {
             _components.Add(middleware);
             _builtPipeline = null;
@@ -30,10 +22,10 @@ namespace NBB.Core.Pipeline
             return this;
         }
 
-        protected virtual PipelineDelegate<T> GetPipelineTerminator()
-            => (data, token) => Task.CompletedTask;
+        protected virtual PipelineDelegate<TContext> GetPipelineTerminator()
+            => (_, _) => Task.CompletedTask;
 
-        private PipelineDelegate<T> Build()
+        private PipelineDelegate<TContext> Build()
         {
             var pipeline = GetPipelineTerminator();
 

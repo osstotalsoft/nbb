@@ -19,35 +19,35 @@ namespace NBB.Messaging.Host.Tests
             //Arrange
             var message = new TestMessage();
             var envelope = new MessagingEnvelope<TestMessage>(new Dictionary<string, string>(), message);
-            var pipeline = Mock.Of<PipelineDelegate<MessagingEnvelope>>();
+            var pipeline = Mock.Of<PipelineDelegate<MessagingContext>>();
             Func<MessagingEnvelope<TestMessage>, Task> messageBusSubscriberCallback = null;
-            var pipelineConfigurator = Mock.Of<Action<IPipelineBuilder<MessagingEnvelope>>>();
             var cancellationToken = new CancellationToken();
 
             var mockedMessageBusSubscriber = Mock.Of<IMessageBus>();
             Mock.Get(mockedMessageBusSubscriber)
-                .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<TestMessage>, Task>>(), It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
-                .Callback((Func<MessagingEnvelope<TestMessage>, Task> handler, MessagingSubscriberOptions _,CancellationToken token) => {
+                .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<TestMessage>, Task>>(),
+                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+                .Callback((Func<MessagingEnvelope<TestMessage>, Task> handler, MessagingSubscriberOptions _,
+                    CancellationToken token) =>
+                {
                     messageBusSubscriberCallback = handler;
                     cancellationToken = token;
                 })
                 .Returns(Task.FromResult(Mock.Of<IDisposable>()));
 
             var mockedServiceProvider = Mock.Of<IServiceProvider>(sp =>
-                    sp.GetService(typeof(IServiceScopeFactory)) == Mock.Of<IServiceScopeFactory>(ssf =>
-                        ssf.CreateScope() == Mock.Of<IServiceScope>(ss =>
-                            ss.ServiceProvider == Mock.Of<IServiceProvider>(ssp =>
-                                (PipelineDelegate<MessagingEnvelope>) ssp.GetService(typeof(PipelineDelegate<MessagingEnvelope>)) == pipeline))));
+                sp.GetService(typeof(IServiceScopeFactory)) == Mock.Of<IServiceScopeFactory>(ssf =>
+                    ssf.CreateScope() == Mock.Of<IServiceScope>()));
 
             var messageBusSubscriberService = new MessageBusSubscriberService<TestMessage>(
-                    mockedMessageBusSubscriber,
-                    mockedServiceProvider,
-                    Mock.Of<MessagingContextAccessor>(),
-                    Mock.Of<ILogger<MessageBusSubscriberService<TestMessage>>>(),
-                    Mock.Of<ITopicRegistry>(),
-                    pipelineConfigurator,
-                    new MessagingSubscriberOptions()
-                );
+                mockedMessageBusSubscriber,
+                mockedServiceProvider,
+                Mock.Of<MessagingContextAccessor>(),
+                Mock.Of<ILogger<MessageBusSubscriberService<TestMessage>>>(),
+                Mock.Of<ITopicRegistry>(),
+                pipeline,
+                new MessagingSubscriberOptions()
+            );
 
             //Act     
             await messageBusSubscriberService.StartAsync(cancellationToken);
@@ -55,13 +55,13 @@ namespace NBB.Messaging.Host.Tests
             await messageBusSubscriberService.StopAsync(cancellationToken);
 
             //Assert
-            Mock.Get(pipelineConfigurator).Verify(x => x(It.IsAny<IPipelineBuilder<MessagingEnvelope>>()));
+            Mock.Get(pipeline).Verify(x =>
+                x(It.Is<MessagingContext>(ctx => ctx.MessagingEnvelope == envelope), cancellationToken));
         }
 
 
-        public class TestMessage 
+        public class TestMessage
         {
-          
         }
     }
 }

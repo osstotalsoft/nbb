@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
     /// A pipeline middleware that offers resiliency policies for "out of order" and concurrency exceptions.
     /// </summary>
     /// <seealso cref="NBB.Core.Pipeline.IPipelineMiddleware{MessagingEnvelope}" />
-    public class DefaultResiliencyMiddleware : IPipelineMiddleware<MessagingEnvelope>
+    public class DefaultResiliencyMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly ILogger<DefaultResiliencyMiddleware> _logger;
 
@@ -23,16 +23,16 @@ namespace NBB.Messaging.Host.MessagingPipeline
             _logger = logger;
         }
 
-        public async Task Invoke(MessagingEnvelope message, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
             var outOfOrderPolicy = GetOutOfOrderPolicy(retryCount => _logger.LogWarning(
                 "Message of type {MessageType} could not be processed due to OutOfOrderMessageException. Retry count is {RetryCount}.",
-                message.Payload.GetType().GetPrettyName(), retryCount));
+                context.MessagingEnvelope.Payload.GetType().GetPrettyName(), retryCount));
 
             var concurrencyException = GetConcurrencyExceptionPolicy(_ =>
                 _logger.LogWarning(
                     "Message of type {MessageType} could not be processed due to concurrency exception. The system will automatically retry it.",
-                    message.Payload.GetType().GetPrettyName()));
+                    context.MessagingEnvelope.Payload.GetType().GetPrettyName()));
 
             var policies = Policy.WrapAsync(outOfOrderPolicy, concurrencyException);
 

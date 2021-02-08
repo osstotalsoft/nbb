@@ -28,7 +28,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
             //Act
-            await resiliencyMiddleware.Invoke(envelope, default, Next);
+            await resiliencyMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null),default, Next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();
@@ -52,7 +52,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Act
             async Task Action()
             {
-                await resiliencyMiddleware.Invoke(envelope, default, Next);
+                await resiliencyMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
             }
 
             //Assert
@@ -76,7 +76,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Act
             async Task Action()
             {
-                await resiliencyMiddleware.Invoke(envelope, default, Next);
+                await resiliencyMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
             }
 
             //Assert

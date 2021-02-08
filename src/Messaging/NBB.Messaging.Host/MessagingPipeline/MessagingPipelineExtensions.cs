@@ -14,15 +14,15 @@ namespace NBB.Messaging.Host.MessagingPipeline
         /// <typeparam name="TMiddleware">The type of the middleware.</typeparam>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseMiddleware<TMiddleware>(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder) where TMiddleware : IPipelineMiddleware<MessagingEnvelope>
-            => pipelineBuilder.UseMiddleware<TMiddleware, MessagingEnvelope>();
+        public static IPipelineBuilder<MessagingContext> UseMiddleware<TMiddleware>(this IPipelineBuilder<MessagingContext> pipelineBuilder) where TMiddleware : IPipelineMiddleware<MessagingContext>
+            => pipelineBuilder.UseMiddleware<TMiddleware, MessagingContext>();
 
         /// <summary>
         /// Adds to the pipeline a middleware that creates a correlation scope from the correlation id received in the message headers.
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseCorrelationMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder)
+        public static IPipelineBuilder<MessagingContext> UseCorrelationMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
             => UseMiddleware<CorrelationMiddleware>(pipelineBuilder);
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseExceptionHandlingMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder)
+        public static IPipelineBuilder<MessagingContext> UseExceptionHandlingMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
             => UseMiddleware<ExceptionHandlingMiddleware>(pipelineBuilder);
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseMediatRMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder)
+        public static IPipelineBuilder<MessagingContext> UseMediatRMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
             => UseMiddleware<MediatRMiddleware>(pipelineBuilder);
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseDefaultResiliencyMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder)
+        public static IPipelineBuilder<MessagingContext> UseDefaultResiliencyMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
             => UseMiddleware<DefaultResiliencyMiddleware>(pipelineBuilder);
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace NBB.Messaging.Host.MessagingPipeline
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <param name="messageHandler">A handler that receives the message payload and returns an effect.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseEffectMiddleware(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder, Func<object, Effect<Unit>> messageHandler)
-            => pipelineBuilder.Use(async (envelope, token, next) =>
+        public static IPipelineBuilder<MessagingContext> UseEffectMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder, Func<object, Effect<Unit>> messageHandler)
+            => pipelineBuilder.Use(async (context, token, next) =>
             {
-                var interpreter = pipelineBuilder.ServiceProvider.GetRequiredService<IInterpreter>();
-                var effect = messageHandler(envelope.Payload);
+                var interpreter = context.Services.GetRequiredService<IInterpreter>();
+                var effect = messageHandler(context.MessagingEnvelope.Payload);
 
                 await interpreter.Interpret(effect, token);
                 await next.Invoke();

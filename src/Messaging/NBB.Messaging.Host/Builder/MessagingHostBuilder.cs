@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host.Builder
         private readonly IServiceCollection _serviceCollection;
         private IMessageTopicProvider _topicProvider;
         private IMessageTypeProvider _messageTypeProvider;
-        private MessagingHostConfiguration _hostConfiguration = new();
+        private readonly MessagingHostConfiguration _hostConfiguration = new();
         private MessagingHostConfiguration.SubscriberGroup _currentSubscriberGroup;
 
         public MessagingHostBuilder(IServiceCollection serviceCollection)
@@ -53,7 +53,7 @@ namespace NBB.Messaging.Host.Builder
             return this;
         }
 
-        public void UsePipeline(Action<IPipelineBuilder<MessagingEnvelope>> configurePipeline)
+        public void UsePipeline(Action<IPipelineBuilder<MessagingContext>> configurePipeline)
         {
             _currentSubscriberGroup.PipelineConfigurator = configurePipeline;
         }
@@ -142,6 +142,6 @@ namespace NBB.Messaging.Host.Builder
         /// </summary>
         /// <param name="configurePipeline">The pipeline configurator is used to add the middleware to the pipeline.</param>
         /// <returns>The messaging host builder to further configure the messaging host. It is used in the fluent API</returns>
-        void UsePipeline(Action<IPipelineBuilder<MessagingEnvelope>> configurePipeline);
+        void UsePipeline(Action<IPipelineBuilder<MessagingContext>> configurePipeline);
     }
 }

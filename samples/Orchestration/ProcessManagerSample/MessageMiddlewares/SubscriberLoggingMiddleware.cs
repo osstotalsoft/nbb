@@ -7,7 +7,7 @@ using NBB.Messaging.Abstractions;
 
 namespace ProcessManagerSample.MessageMiddlewares
 {
-    public class SubscriberLoggingMiddleware : IPipelineMiddleware<MessagingEnvelope>
+    public class SubscriberLoggingMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly ILogger<SubscriberLoggingMiddleware> _logger;
 
@@ -16,9 +16,9 @@ namespace ProcessManagerSample.MessageMiddlewares
             _logger = logger;
         }
 
-        public async Task Invoke(MessagingEnvelope messageEnvelope, CancellationToken cancellationToken, Func<Task> next)
+        public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
-            _logger.LogDebug("Message {@Message} was received.", messageEnvelope.Payload);
+            _logger.LogDebug("Message {@Message} was received.", context.MessagingEnvelope.Payload);
             await next();
         }
     }

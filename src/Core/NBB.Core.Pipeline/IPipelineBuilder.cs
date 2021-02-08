@@ -3,19 +3,17 @@
 namespace NBB.Core.Pipeline
 {
     /// <summary>
-    /// Used to configure a pipeline for data/context of type <typeparamref name="T"/>
+    /// Used to configure a pipeline for data/context of type <typeparamref name="TContext"/>
     /// </summary>
-    /// <typeparam name="T">The type of data/context </typeparam>
-    public interface IPipelineBuilder<T>
+    /// <typeparam name="TContext">The type of data/context </typeparam>
+    public interface IPipelineBuilder<TContext> where TContext: IPipelineContext
     {
-        IServiceProvider ServiceProvider { get; }
-
         /// <summary>
         /// Adds an inline defined middleware to the pipeline.
         /// </summary>
         /// <param name="middleware">The middleware.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        IPipelineBuilder<T> Use(Func<PipelineDelegate<T>, PipelineDelegate<T>> middleware);
+        IPipelineBuilder<TContext> Use(Func<PipelineDelegate<TContext>, PipelineDelegate<TContext>> middleware);
 
         /// <summary>
         /// Gets constructed the pipeline.
@@ -23,6 +21,6 @@ namespace NBB.Core.Pipeline
         /// <value>
         /// The pipeline.
         /// </value>
-        PipelineDelegate<T> Pipeline { get; }
+        PipelineDelegate<TContext> Pipeline { get; }
     }
 }
