@@ -55,7 +55,9 @@ namespace NBB.Messaging.Host.Builder
 
         public void UsePipeline(Action<IPipelineBuilder<MessagingContext>> configurePipeline)
         {
-            _currentSubscriberGroup.PipelineConfigurator = configurePipeline;
+            var builder = new PipelineBuilder<MessagingContext>();
+            configurePipeline?.Invoke(builder);
+            _currentSubscriberGroup.Pipeline = builder.Pipeline;
         }
 
         private void RegisterHostedService(Type serviceType,
@@ -82,10 +84,10 @@ namespace NBB.Messaging.Host.Builder
                 if (!subscriberGroup.Subscribers.Any())
                 {
                     throw new Exception(
-                        "No subscribers were configured. Use AddSubscribers(...).WithOptions(...) to configure subscribers.");
+                        "No subscribers were configured. Use AddSubscriberServices(...).WithOptions(...) to configure subscribers.");
                 }
 
-                if (subscriberGroup.PipelineConfigurator == null)
+                if (subscriberGroup.Pipeline == null)
                 {
                     throw new Exception("No pipeline was configured. Call UsePipeline(...) to configure a pipeline");
                 }
@@ -93,7 +95,7 @@ namespace NBB.Messaging.Host.Builder
                 foreach (var (type, options) in subscriberGroup.Subscribers)
                 {
                     _serviceCollection.AddSingleton(sp =>
-                        (IHostedService) ActivatorUtilities.CreateInstance(sp, type, options, subscriberGroup.PipelineConfigurator));
+                        (IHostedService) ActivatorUtilities.CreateInstance(sp, type, options, subscriberGroup.Pipeline));
                 }    
             }
             

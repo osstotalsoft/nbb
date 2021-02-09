@@ -68,7 +68,6 @@ namespace NBB.Messaging.Host
             var topicName = _topicRegistry.GetTopicForName(_subscriberOptions?.TopicName, false) ??
                             _topicRegistry.GetTopicForMessageType(typeof(TMessage), false);
 
-
             var context = new MessagingContext(message, topicName, scope.ServiceProvider);
             _messagingContextAccessor.MessagingContext = context;
 
