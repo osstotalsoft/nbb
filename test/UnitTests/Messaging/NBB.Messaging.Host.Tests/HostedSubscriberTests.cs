@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
+using NBB.Messaging.Host.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,7 +12,7 @@ using Xunit;
 
 namespace NBB.Messaging.Host.Tests
 {
-    public class MessageBusSubscriberServiceTests
+    public class HostedSubscriberTests
     {
         [Fact]
         public async Task Should_execute_pipeline_on_message_received()
@@ -39,20 +40,18 @@ namespace NBB.Messaging.Host.Tests
                 sp.GetService(typeof(IServiceScopeFactory)) == Mock.Of<IServiceScopeFactory>(ssf =>
                     ssf.CreateScope() == Mock.Of<IServiceScope>()));
 
-            var messageBusSubscriberService = new MessageBusSubscriberService<TestMessage>(
+            var messageBusSubscriberService = new HostedSubscriber<TestMessage>(
                 mockedMessageBusSubscriber,
                 mockedServiceProvider,
                 Mock.Of<MessagingContextAccessor>(),
-                Mock.Of<ILogger<MessageBusSubscriberService<TestMessage>>>(),
+                new MockLogger(),
                 Mock.Of<ITopicRegistry>(),
-                pipeline,
-                new MessagingSubscriberOptions()
+                new ExecutionMonitor()
             );
 
             //Act     
-            await messageBusSubscriberService.StartAsync(cancellationToken);
+            using var _ = await messageBusSubscriberService.SubscribeAsync(pipeline, new MessagingSubscriberOptions(),cancellationToken);
             await messageBusSubscriberCallback(envelope);
-            await messageBusSubscriberService.StopAsync(cancellationToken);
 
             //Assert
             Mock.Get(pipeline).Verify(x =>
@@ -62,6 +61,17 @@ namespace NBB.Messaging.Host.Tests
 
         public class TestMessage
         {
+        }
+
+        public class MockLogger : ILogger<MessagingHost>
+        {
+            public IDisposable BeginScope<TState>(TState state) => throw new NotImplementedException();
+
+            public bool IsEnabled(LogLevel logLevel) => false;
+
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+            {
+            }
         }
     }
 }

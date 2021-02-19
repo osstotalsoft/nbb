@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
+using System.Collections.Generic;
 
 namespace NBB.Messaging.Host.Builder
 {
@@ -15,8 +16,9 @@ namespace NBB.Messaging.Host.Builder
 
         private IMessageTopicProvider _topicProvider;
         private IMessageTypeProvider _messageTypeProvider;
-        private readonly MessagingHostConfiguration _hostConfiguration = new();
-        private MessagingHostConfiguration.SubscriberGroup _currentSubscriberGroup;
+
+        private List<List<MessagingHostConfiguration.Subscriber>> _subscriberGroups = new();
+        private List<MessagingHostConfiguration.Subscriber> _currentSubscriberGroup;
 
         public MessagingHostConfigurationBuilder(IServiceProvider applicationServices, IServiceCollection serviceCollection)
         {
@@ -33,22 +35,26 @@ namespace NBB.Messaging.Host.Builder
             _messageTypeProvider = subscriberServiceSelector;
             _topicProvider = subscriberServiceSelector;
 
-            _currentSubscriberGroup = new MessagingHostConfiguration.SubscriberGroup();
-            _hostConfiguration.SubscriberGroups.Add(_currentSubscriberGroup);
+            _currentSubscriberGroup = new List<MessagingHostConfiguration.Subscriber>();
 
             return this;
         }
 
         public IMessagingHostPipelineBuilder WithOptions(Action<SubscriberOptionsBuilder> subscriberOptionsConfigurator)
         {
+            var subscriberOptionsBuilder = new SubscriberOptionsBuilder();
+            subscriberOptionsConfigurator.Invoke(subscriberOptionsBuilder);
+
+            var options = subscriberOptionsBuilder.Build();
+
             foreach (var messageType in _messageTypeProvider.GetTypes())
             {
-                RegisterSubscriber(messageType, subscriberOptionsConfigurator);
+                RegisterSubscriber(messageType, options);
             }
 
             foreach (var topic in _topicProvider.GetTopics())
             {
-                RegisterSubscriber(typeof(object), subscriberOptionsConfigurator, topic);
+                RegisterSubscriber(typeof(object), options with { TopicName = topic });
             }
 
             return this;
@@ -58,43 +64,35 @@ namespace NBB.Messaging.Host.Builder
         {
             var builder = new PipelineBuilder<MessagingContext>();
             configurePipeline?.Invoke(builder);
-            _currentSubscriberGroup.Pipeline = builder.Pipeline;
-        }
 
-        private void RegisterSubscriber(Type serviceType,
-            Action<SubscriberOptionsBuilder> subscriberOptionsConfigurator,
-            string topicName = null)
-        {
-            var subscriberOptionsBuilder = new SubscriberOptionsBuilder();
-            subscriberOptionsConfigurator.Invoke(subscriberOptionsBuilder);
-
-            var options = subscriberOptionsBuilder.Build();
-
-            if (topicName != null)
+            foreach (var subscriber in _currentSubscriberGroup)
             {
-                options = options with {TopicName = topicName};
+                subscriber.Pipeline = builder.Pipeline;
             }
 
-            _currentSubscriberGroup.Subscribers.Add((serviceType, options));
+            _subscriberGroups.Add(_currentSubscriberGroup);
+            _currentSubscriberGroup = null;
         }
+
+        private void RegisterSubscriber(Type messageType, MessagingSubscriberOptions options)
+            => _currentSubscriberGroup.Add(new MessagingHostConfiguration.Subscriber { MessageType = messageType, Options = options });
 
         internal MessagingHostConfiguration Build()
         {
-            foreach (var subscriberGroup in _hostConfiguration.SubscriberGroups)
+            var hostConfiguration = new MessagingHostConfiguration();
+
+            foreach (var subscriberGroup in _subscriberGroups)
             {
-                if (!subscriberGroup.Subscribers.Any())
+                if (!subscriberGroup.Any())
                 {
                     throw new Exception(
-                        "No subscribers were configured. Use AddSubscriberServices(...).WithOptions(...) to subscriberBuilder subscribers.");
+                        "No subscribers were configured for group. Use AddSubscriberServices(...).WithOptions(...).UsePipeline(...) to configure subscribers.");
                 }
 
-                if (subscriberGroup.Pipeline == null)
-                {
-                    throw new Exception("No pipeline was configured. Call UsePipeline(...) to subscriberBuilder a pipeline");
-                }
+                hostConfiguration.Subscribers.AddRange(subscriberGroup);
             }
 
-            return _hostConfiguration;
+            return hostConfiguration;
         }
     }
 

@@ -32,10 +32,7 @@ namespace NBB.Invoices.Worker
         public static async Task Main(string[] _args)
         {
             var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config =>
-                {
-                    config.AddEnvironmentVariables("NETCORE_");
-                })
+                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
                 .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
                 {
                     configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
@@ -56,7 +53,8 @@ namespace NBB.Invoices.Worker
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+                        .WriteTo.MSSqlServer(connectionString,
+                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -65,27 +63,29 @@ namespace NBB.Invoices.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                services.AddMediatR(typeof(InvoiceCommandHandlers).Assembly);
-                
-                services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
-                services.AddInvoicesWriteDataAccess();
-                services.AddEventStore()
-                    .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
-                    .WithAdoNetEventRepository();
+                    services.AddMediatR(typeof(InvoiceCommandHandlers).Assembly);
 
-                services.AddMessagingHost(hostBuilder => hostBuilder
-                    .AddSubscriberServices(config => config
-                        .FromMediatRHandledCommands().AddAllClasses()
-                        .FromMediatRHandledEvents().AddAllClasses()
-                    )
-                    .WithDefaultOptions()
-                    .UsePipeline(pipelineBuilder => pipelineBuilder
-                        .UseCorrelationMiddleware()
-                        .UseExceptionHandlingMiddleware()
-                        .UseDefaultResiliencyMiddleware()
-                        .UseMediatRMiddleware()
-                    )
-                );
+                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+                    services.AddInvoicesWriteDataAccess();
+                    services.AddEventStore()
+                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                        .WithAdoNetEventRepository();
+
+                    services.AddMessagingHost(hostBuilder => hostBuilder
+                        .Configure(configBuilder =>  configBuilder
+                            .AddSubscriberServices(subscriberBuilder => subscriberBuilder
+                                .FromMediatRHandledCommands().AddAllClasses()
+                                .FromMediatRHandledEvents().AddAllClasses()
+                            )
+                            .WithDefaultOptions()
+                            .UsePipeline(pipelineBuilder => pipelineBuilder
+                                .UseCorrelationMiddleware()
+                                .UseExceptionHandlingMiddleware()
+                                .UseDefaultResiliencyMiddleware()
+                                .UseMediatRMiddleware()
+                            )
+                        )
+                    );
 
                     //services.AddSingleton<IHostedService, MessageBusSubscriberService<GetInvoice.Query>>();
 

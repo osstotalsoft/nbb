@@ -72,19 +72,16 @@ namespace NBB.Messaging.Host.Internal
 
                 var configuration = builder.Build();
 
-                foreach (var subscriberGroup in configuration.SubscriberGroups)
+                foreach (var subscriber in configuration.Subscribers)
                 {
-                    foreach (var (messageType, options) in subscriberGroup.Subscribers)
-                    {
-                        var hostedSubscriberType = typeof(HostedSubscriber<>).MakeGenericType(messageType);
-                        var hostedSubscriber =
-                            (IHostedSubscriber)ActivatorUtilities.CreateInstance(_serviceProvider,
-                                hostedSubscriberType, _executionMonitor);
+                    var hostedSubscriberType = typeof(HostedSubscriber<>).MakeGenericType(subscriber.MessageType);
+                    var hostedSubscriber =
+                        (IHostedSubscriber)ActivatorUtilities.CreateInstance(_serviceProvider,
+                            hostedSubscriberType, _executionMonitor);
 
-                        var subscription = await hostedSubscriber.SubscribeAsync(subscriberGroup.Pipeline, options, subscriptionToken);
+                    var subscription = await hostedSubscriber.SubscribeAsync(subscriber.Pipeline, subscriber.Options, subscriptionToken);
 
-                        _subscriptions.Add(subscription);
-                    }
+                    _subscriptions.Add(subscription);
                 }
             }
             finally
@@ -101,7 +98,7 @@ namespace NBB.Messaging.Host.Internal
         {
             // TODO: Add synchronization
             if (!_isStarted) return;
-            
+
             _logger.LogInformation("Messaging host is stopping");
 
             ExecuteCancellation(_stoppingSource);

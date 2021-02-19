@@ -32,10 +32,7 @@ namespace NBB.Payments.Worker
         public static async Task Main(string[] _args)
         {
             var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config =>
-                {
-                    config.AddEnvironmentVariables("NETCORE_");
-                })
+                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
                 .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
                 {
                     configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
@@ -56,7 +53,8 @@ namespace NBB.Payments.Worker
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString, new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+                        .WriteTo.MSSqlServer(connectionString,
+                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -76,18 +74,19 @@ namespace NBB.Payments.Worker
                         .WithAdoNetEventRepository();
 
                     services.AddMessagingHost(hostBuilder => hostBuilder
-                        .AddSubscriberServices(config => config
-                            .FromMediatRHandledCommands().AddAllClasses()
-                            .FromMediatRHandledEvents().AddAllClasses()
-                        )
-                        .WithDefaultOptions()
-                        .UsePipeline(pipelineBuilder => pipelineBuilder
-                            .UseCorrelationMiddleware()
-                            .UseExceptionHandlingMiddleware()
-                            .UseDefaultResiliencyMiddleware()
-                            .UseMediatRMiddleware()
-                        )
-                    );
+                        .Configure(configBuilder => configBuilder
+                            .AddSubscriberServices(subscriberBuilder => subscriberBuilder
+                                .FromMediatRHandledCommands().AddAllClasses()
+                                .FromMediatRHandledEvents().AddAllClasses()
+                            )
+                            .WithDefaultOptions()
+                            .UsePipeline(pipelineBuilder => pipelineBuilder
+                                .UseCorrelationMiddleware()
+                                .UseExceptionHandlingMiddleware()
+                                .UseDefaultResiliencyMiddleware()
+                                .UseMediatRMiddleware()
+                            )
+                        ));
 
                     services
                         .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
