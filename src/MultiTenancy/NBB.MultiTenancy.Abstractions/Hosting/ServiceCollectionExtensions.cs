@@ -16,6 +16,8 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
         {
             var configurationSection = configuration.GetSection(MessagingSectionName);
             var tenancyOptions = configurationSection.Get<TenancyHostingOptions>();
+            services.Configure<TenancyHostingOptions>(configurationSection);
+
             if (tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None)
             {
                 return;

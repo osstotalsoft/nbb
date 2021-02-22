@@ -17,18 +17,18 @@ namespace NBB.Core.Pipeline.Tests
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
-            var executePipeline = new PipelineBuilder<IData>(mockedServiceProvider)
-                .UseMiddleware<FirstMiddleware, IData>()
-                .UseMiddleware<SecondMiddleware, IData>()
+            var executePipeline = new PipelineBuilder<IContext>()
+                .UseMiddleware<FirstMiddleware, IContext>()
+                .UseMiddleware<SecondMiddleware, IContext>()
                 .Pipeline;
 
-            var sentData = new TestData();
+            var sentContext = new TestContext(mockedServiceProvider);
 
             //Act
-            await executePipeline(sentData, default);
+            await executePipeline(sentContext, default);
 
             //Assert
-            sentData.Log.Should().Equal(new[] { "FirstBefore", "SecondBefore", "SecondAfter", "FirstAfter" });
+            sentContext.Log.Should().Equal(new[] { "FirstBefore", "SecondBefore", "SecondAfter", "FirstAfter" });
         }
 
         [Fact]
@@ -36,29 +36,29 @@ namespace NBB.Core.Pipeline.Tests
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
-            var sentData = new TestData();
-            var pipeline = new PipelineBuilder<IData>(mockedServiceProvider)
+            var sentContext = new TestContext(mockedServiceProvider);
+            var pipeline = new PipelineBuilder<IContext>()
                 .Use(async (data, cancellationToken, next) =>
                 {
-                    (data as TestData)?.Log.Add("FirstBefore");
+                    (data as TestContext)?.Log.Add("FirstBefore");
                     await next();
                     Thread.Sleep(100);
-                    (data as TestData)?.Log.Add("FirstAfter");
+                    (data as TestContext)?.Log.Add("FirstAfter");
                 })
                 .Use(async (data, cancellationToken, next) =>
                 {
-                    (data as TestData)?.Log.Add("SecondBefore");
+                    (data as TestContext)?.Log.Add("SecondBefore");
                     await next();
-                    (data as TestData)?.Log.Add("SecondAfter");
+                    (data as TestContext)?.Log.Add("SecondAfter");
                 })
                 .Pipeline;
 
 
             //Act
-            await pipeline(sentData, default);
+            await pipeline(sentContext, default);
 
             //Assert
-            sentData.Log.Should().Equal(new[] { "FirstBefore", "SecondBefore", "SecondAfter", "FirstAfter" });
+            sentContext.Log.Should().Equal(new[] { "FirstBefore", "SecondBefore", "SecondAfter", "FirstAfter" });
         }
 
 
@@ -70,14 +70,14 @@ namespace NBB.Core.Pipeline.Tests
             var mockedServiceProvider = Mock.Of<IServiceProvider>(sp =>
                 sp.GetService(typeof(ILogger<MiddlewareWithDI>)) == Mock.Of<ILogger<MiddlewareWithDI>>());
 
-            var pipeline = new PipelineBuilder<IData>(mockedServiceProvider)
-                .UseMiddleware<MiddlewareWithDI, IData>()
+            var pipeline = new PipelineBuilder<IContext>()
+                .UseMiddleware<MiddlewareWithDI, IContext>()
                 .Pipeline;
 
-            var sentData = new TestData();
+            var sentContext = new TestContext(mockedServiceProvider);
 
             //Act
-            await pipeline(sentData, default);
+            await pipeline(sentContext, default);
 
             //Assert
             Mock.Get(mockedServiceProvider).Verify(x => x.GetService(typeof(ILogger<MiddlewareWithDI>)));
@@ -89,10 +89,10 @@ namespace NBB.Core.Pipeline.Tests
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
 
-            IData receivedData1 = null, receivedData2 = null;
+            IContext receivedData1 = null, receivedData2 = null;
             CancellationToken receivedCancellationToken1 = default, receivedCancellationToken2 = default;
 
-            var pipeline = new PipelineBuilder<IData>(mockedServiceProvider)
+            var pipeline = new PipelineBuilder<IContext>()
                 .Use(async (data, cancellationToken, next) =>
                 {
                     receivedData1 = data;
@@ -107,19 +107,19 @@ namespace NBB.Core.Pipeline.Tests
                  })
                 .Pipeline;
 
-            var sentData = Mock.Of<IData>();
+            var sentContext = Mock.Of<IContext>(x => x.Services == mockedServiceProvider);
             using (var ts = new CancellationTokenSource())
             {
                 var sentCancellationToken = ts.Token;
 
                 //Act
-                await pipeline(sentData, sentCancellationToken);
+                await pipeline(sentContext, sentCancellationToken);
 
                 //Assert
                 receivedCancellationToken1.Should().Be(sentCancellationToken);
                 receivedCancellationToken2.Should().Be(sentCancellationToken);
-                receivedData1.Should().Be(sentData);
-                receivedData2.Should().Be(sentData);
+                receivedData1.Should().Be(sentContext);
+                receivedData2.Should().Be(sentContext);
             }
         }
 
@@ -130,7 +130,7 @@ namespace NBB.Core.Pipeline.Tests
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
             bool hasMiddleware1Finished = false;
 
-            var pipeline = new PipelineBuilder<IData>(mockedServiceProvider)
+            var pipeline = new PipelineBuilder<IContext>()
                 .Use(async (data, cancellationToken, next) =>
                 {
                     await next();
@@ -143,10 +143,10 @@ namespace NBB.Core.Pipeline.Tests
                  })
                 .Pipeline;
 
-            var sentData = Mock.Of<IData>();
+            var sentContext = Mock.Of<IContext>(x => x.Services == mockedServiceProvider);
 
             //Act
-            async Task Action() => await pipeline(sentData, default);
+            async Task Action() => await pipeline(sentContext, default);
 
             //Assert
             ((Func<Task>)Action).Should().Throw<ApplicationException>();
@@ -160,7 +160,7 @@ namespace NBB.Core.Pipeline.Tests
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
             bool hasMiddleware1Finished = false;
 
-            var pipeline = new PipelineBuilder<IData>(mockedServiceProvider)
+            var pipeline = new PipelineBuilder<IContext>()
                 .Use((data, cancellationToken, next) =>
                 {
                     var nextTask = next();
@@ -171,10 +171,10 @@ namespace NBB.Core.Pipeline.Tests
                 .Use((data, cancellationToken, next) => throw new ApplicationException())
                 .Pipeline;
 
-            var sentData = Mock.Of<IData>();
+            var sentContext = Mock.Of<IContext>(x => x.Services == mockedServiceProvider);
 
             //Act
-            void Action() => pipeline(sentData, default).Wait();
+            void Action() => pipeline(sentContext, default).Wait();
 
             //Assert
             
@@ -191,52 +191,53 @@ namespace NBB.Core.Pipeline.Tests
             ILogger<MiddlewareWithDI> scopedDependency;
             services.AddScoped(_ => Mock.Of<ILogger<MiddlewareWithDI>>());
             services.AddScoped(sp => 
-                new PipelineBuilder<IData>(sp)
-                    .UseMiddleware<MiddlewareWithDI, IData>()
+                new PipelineBuilder<IContext>()
+                    .UseMiddleware<MiddlewareWithDI, IContext>()
                     .Pipeline
             );
 
-            var sentData = new TestData();
+            TestContext sentContext;
             var container = services.BuildServiceProvider();
             var rootDependency = container.GetService<ILogger<MiddlewareWithDI>>();
 
             //Act
             using (var scope = container.CreateScope())
             {
-                var pipeline = scope.ServiceProvider.GetService<PipelineDelegate<IData>>();
-                await pipeline(sentData, default);
+                sentContext = new TestContext(scope.ServiceProvider);
+                var pipeline = scope.ServiceProvider.GetRequiredService<PipelineDelegate<IContext>>();
+                await pipeline(sentContext, default);
                 scopedDependency = scope.ServiceProvider.GetService<ILogger<MiddlewareWithDI>>();
             }
 
             //Assert
-            sentData.Data.Should().NotBe(rootDependency);
-            sentData.Data.Should().Be(scopedDependency);
+            sentContext.Data.Should().NotBe(rootDependency);
+            sentContext.Data.Should().Be(scopedDependency);
         }
 
         // ReSharper Disable All 
-        public interface IData { }
+        public interface IContext : IPipelineContext { }
 
-        private class FirstMiddleware : IPipelineMiddleware<IData>
+        private class FirstMiddleware : IPipelineMiddleware<IContext>
         {
-            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IContext message, CancellationToken cancellationToken, Func<Task> next)
             {
-                (message as TestData)?.Log.Add("FirstBefore");
+                (message as TestContext)?.Log.Add("FirstBefore");
                 await next();
-                (message as TestData)?.Log.Add("FirstAfter");
+                (message as TestContext)?.Log.Add("FirstAfter");
             }
         }
 
-        private class SecondMiddleware : IPipelineMiddleware<IData>
+        private class SecondMiddleware : IPipelineMiddleware<IContext>
         {
-            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IContext message, CancellationToken cancellationToken, Func<Task> next)
             {
-                (message as TestData)?.Log.Add("SecondBefore");
+                (message as TestContext)?.Log.Add("SecondBefore");
                 await next();
-                (message as TestData)?.Log.Add("SecondAfter");
+                (message as TestContext)?.Log.Add("SecondAfter");
             }
         }
 
-        public class MiddlewareWithDI : IPipelineMiddleware<IData>
+        public class MiddlewareWithDI : IPipelineMiddleware<IContext>
         {
             private readonly ILogger<MiddlewareWithDI> _logger;
 
@@ -245,9 +246,9 @@ namespace NBB.Core.Pipeline.Tests
                 this._logger = logger;
             }
 
-            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IContext message, CancellationToken cancellationToken, Func<Task> next)
             {
-                if (message is TestData dataAsTestData)
+                if (message is TestContext dataAsTestData)
                     dataAsTestData.Data = _logger;
 
                 _logger.LogDebug("MiddlewareWithDI:Before");
@@ -261,7 +262,7 @@ namespace NBB.Core.Pipeline.Tests
             Guid Value { get; set; }
         }
 
-        private class MiddlewareWithDI2 : IPipelineMiddleware<IData>
+        private class MiddlewareWithDI2 : IPipelineMiddleware<IContext>
         {
             private readonly IGuidProvider dependency;
 
@@ -270,46 +271,49 @@ namespace NBB.Core.Pipeline.Tests
                 this.dependency = dependency;
             }
 
-            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IContext message, CancellationToken cancellationToken, Func<Task> next)
             {
                 await next();
             }
         }
 
-        private class TestMiddleware : IPipelineMiddleware<IData>
+        private class TestMiddleware : IPipelineMiddleware<IContext>
         {
-            public IData ResolvedObject { get; }
+            public IContext ResolvedObject { get; }
 
-            public TestMiddleware(IData resolvedObject)
+            public TestMiddleware(IContext resolvedObject)
             {
                 ResolvedObject = resolvedObject;
             }
 
-            public async Task Invoke(IData message, CancellationToken cancellationToken, Func<Task> next)
+            public async Task Invoke(IContext message, CancellationToken cancellationToken, Func<Task> next)
             {
-                (message as TestData)?.Log.Add("FirstBefore");
+                (message as TestContext)?.Log.Add("FirstBefore");
                 await next();
-                (message as TestData)?.Log.Add("FirstBefore");
+                (message as TestContext)?.Log.Add("FirstBefore");
             }
         }
 
-        private class TestData : IData
+        private class TestContext : IContext
         {
             public Guid EventId { get; private set; }
             public Guid DataId => EventId;
             public List<string> Log { get; set; }
             public Object Data { get; set; }
 
-            private TestData(Guid eventId)
+            private TestContext(Guid eventId)
             {
                 EventId = eventId;
                 Log = new List<string>();
             }
 
-            public TestData()
+            public TestContext(IServiceProvider services)
                 : this(Guid.NewGuid())
             {
+                Services = services;
             }
+
+            public IServiceProvider Services { get; }
         }
 
         // ReSharper Enable All 

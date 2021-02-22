@@ -36,17 +36,19 @@ namespace ProcessManagerSample
                 .WithAdoNetEventRepository();
 
             services.AddMessagingHost(hostBuilder => hostBuilder
-                .AddSubscriberServices(config => config
-                    .FromMediatRHandledCommands().AddAllClasses()
-                    .FromMediatRHandledEvents().AddAllClasses())
-                .WithDefaultOptions()
-                .UsePipeline(builder => builder
-                    .UseCorrelationMiddleware()
-                    .UseExceptionHandlingMiddleware()
-                    //.UseMiddleware<OpenTracingMiddleware>()
-                    .UseDefaultResiliencyMiddleware()
-                    .UseMiddleware<SubscriberLoggingMiddleware>()
-                    .UseMediatRMiddleware())
+                .Configure(configBuilder => configBuilder
+                    .AddSubscriberServices(subscriberBulder => subscriberBulder
+                        .FromMediatRHandledCommands().AddAllClasses()
+                        .FromMediatRHandledEvents().AddAllClasses())
+                    .WithDefaultOptions()
+                    .UsePipeline(builder => builder
+                        .UseCorrelationMiddleware()
+                        .UseExceptionHandlingMiddleware()
+                        //.UseMiddleware<OpenTracingMiddleware>()
+                        .UseDefaultResiliencyMiddleware()
+                        .UseMiddleware<SubscriberLoggingMiddleware>()
+                        .UseMediatRMiddleware())
+                )
             );
         }
     }

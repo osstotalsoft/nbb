@@ -40,9 +40,14 @@ namespace NBB.Messaging.Nats
             opts.MaxInflight = subscriberOptions.MaxConcurrentMessages;
             opts.AckWait = subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000;
             opts.ManualAcks = true;
+
+            //CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             
             async void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+
                 await handler(args.Message.Data);
                 args.Message.Ack();
             }

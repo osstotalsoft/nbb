@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace NBB.Messaging.Abstractions
 {
-    public class MessagingEnvelope
+    public record MessagingEnvelope
     {
-        public Dictionary<string, string> Headers { get; private set; }
+        public Dictionary<string, string> Headers { get; }
 
-        public object Payload { get; private set; }
+        public object Payload { get; }
 
         public MessagingEnvelope(Dictionary<string, string> headers, object payload)
         {
@@ -16,13 +16,13 @@ namespace NBB.Messaging.Abstractions
         }
     }
 
-    public class MessagingEnvelope<TMessage> : MessagingEnvelope
+    public record MessagingEnvelope<TMessage> : MessagingEnvelope
     {
         public MessagingEnvelope(Dictionary<string, string> headers, TMessage payload)
             : base(headers, payload)
         {
         }
 
-        public new TMessage Payload => (TMessage)base.Payload;
+        public new TMessage Payload => (TMessage) base.Payload;
     }
 }

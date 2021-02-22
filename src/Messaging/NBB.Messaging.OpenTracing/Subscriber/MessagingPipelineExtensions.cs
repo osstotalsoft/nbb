@@ -10,12 +10,14 @@ namespace NBB.Messaging.OpenTracing.Subscriber
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
         /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingEnvelope> UseOpenTracing(
-            this IPipelineBuilder<MessagingEnvelope> pipelineBuilder)
+        public static IPipelineBuilder<MessagingContext> UseOpenTracing(
+            this IPipelineBuilder<MessagingContext> pipelineBuilder)
             => UseMiddleware<OpenTracingMiddleware>(pipelineBuilder);
 
 
-        private static IPipelineBuilder<MessagingEnvelope> UseMiddleware<TMiddleware>(this IPipelineBuilder<MessagingEnvelope> pipelineBuilder) where TMiddleware : IPipelineMiddleware<MessagingEnvelope>
-            => pipelineBuilder.UseMiddleware<TMiddleware, MessagingEnvelope>();
+        private static IPipelineBuilder<MessagingContext> UseMiddleware<TMiddleware>(
+            this IPipelineBuilder<MessagingContext> pipelineBuilder)
+            where TMiddleware : IPipelineMiddleware<MessagingContext>
+            => pipelineBuilder.UseMiddleware<TMiddleware, MessagingContext>();
     }
 }

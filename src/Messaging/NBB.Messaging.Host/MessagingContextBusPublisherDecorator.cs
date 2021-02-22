@@ -28,11 +28,11 @@ namespace NBB.Messaging.Host
                 if (correlationId.HasValue)
                     outgoingEnvelope.SetHeader(MessagingHeaders.CorrelationId, correlationId.ToString());
 
-                var receivedMessageEnvelope = _messagingContextAccessor.MessagingContext?.ReceivedMessageEnvelope;
-                if (receivedMessageEnvelope != null)
+                var messagingEnvelope = _messagingContextAccessor.MessagingContext?.MessagingEnvelope;
+                if (messagingEnvelope != null)
                 {
-                    receivedMessageEnvelope.TransferHeaderTo(outgoingEnvelope, MessagingHeaders.CorrelationId);
-                    receivedMessageEnvelope.TransferCustomHeadersTo(outgoingEnvelope);
+                    messagingEnvelope.TransferHeaderTo(outgoingEnvelope, MessagingHeaders.CorrelationId);
+                    messagingEnvelope.TransferCustomHeadersTo(outgoingEnvelope);
                 }
 
                 options?.EnvelopeCustomizer?.Invoke(outgoingEnvelope);

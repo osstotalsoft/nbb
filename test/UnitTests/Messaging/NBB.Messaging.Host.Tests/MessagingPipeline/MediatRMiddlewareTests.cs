@@ -25,7 +25,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => Task.CompletedTask;
 
             //Act
-            await mediatRMiddleware.Invoke(envelope, default, Next);
+            await mediatRMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
 
             //Assert
             Mock.Get(mockedMediator).Verify(x => x.Publish<INotification>(sentMessage, default), Times.Once);
@@ -45,7 +45,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => Task.CompletedTask;
 
             //Act
-            await mediatRMiddleware.Invoke(envelope, default, Next);
+            await mediatRMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
 
             //Assert
             Mock.Get(mockedMediator).Verify(x => x.Send(sentMessage, default), Times.Once);
@@ -65,7 +65,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             Task Next() => Task.CompletedTask;
 
             //Act
-            Task Action() => mediatRMiddleware.Invoke(envelope, default, Next);
+            Task Action() => mediatRMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
 
             //Assert
 
@@ -90,7 +90,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             }
 
             //Act
-            await mediatRMiddleware.Invoke(envelope, default, Next);
+            await mediatRMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();

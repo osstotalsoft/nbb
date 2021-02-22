@@ -57,20 +57,22 @@ namespace NBB.Mono
             services.AddPaymentsWriteDataAccess();
 
             services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository();
 
             services.AddMessagingHost(hostBuilder => hostBuilder
-                .AddSubscriberServices(config => config
-                    .FromMediatRHandledCommands().AddAllClasses()
-                    .FromMediatRHandledEvents().AddAllClasses()
-                )
-                .WithDefaultOptions()
-                .UsePipeline(pipelineBuilder => pipelineBuilder
-                    .UseExceptionHandlingMiddleware()
-                    .UseCorrelationMiddleware()
-                    .UseDefaultResiliencyMiddleware()
-                    .UseMediatRMiddleware()
+                .Configure(configBuilder => configBuilder
+                    .AddSubscriberServices(subscriberBuiler => subscriberBuiler
+                        .FromMediatRHandledCommands().AddAllClasses()
+                        .FromMediatRHandledEvents().AddAllClasses()
+                    )
+                    .WithDefaultOptions()
+                    .UsePipeline(pipelineBuilder => pipelineBuilder
+                        .UseExceptionHandlingMiddleware()
+                        .UseCorrelationMiddleware()
+                        .UseDefaultResiliencyMiddleware()
+                        .UseMediatRMiddleware()
+                    )
                 )
             );
 

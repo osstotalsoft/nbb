@@ -7,12 +7,13 @@ namespace NBB.Messaging.Host
 {
     public class MessagingHostConfiguration
     {
-        public List<SubscriberGroup> SubscriberGroups { get; } = new();
+        public List<Subscriber> Subscribers { get; } = new();
 
-        public class SubscriberGroup
+        public class Subscriber
         {
-            public List<(Type subscriberType, MessagingSubscriberOptions options)> Subscribers { get; } = new();
-            public Action<IPipelineBuilder<MessagingEnvelope>> PipelineConfigurator { get; set; }
+            public Type MessageType { get; set; }
+            public MessagingSubscriberOptions Options { get; set; }
+            public PipelineDelegate<MessagingContext> Pipeline { get; set; }
         }
     }
 }

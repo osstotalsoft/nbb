@@ -21,25 +21,23 @@ namespace NBB.Messaging.Host.Tests
         {
             //Arrange
             var services = Mock.Of<IServiceCollection>();
-            ServiceDescriptor registeredDescriptor = null;
-            Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
+            var provider = Mock.Of<IServiceProvider>();
 
             //Act
-            var builder = new MessagingHostBuilder(services);
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
             builder
                 .AddSubscriberServices(cfg =>
                     cfg.FromAssemblyOf<MessageToScanBase>().AddClassesAssignableTo<MessageToScanBase>())
                 .WithDefaultOptions()
-                .UsePipeline(_ => { });
+                .UsePipeline(bld => { });
 
-            builder.Build();
+            var config = builder.Build();
 
             //Assert
-            registeredDescriptor.Should().NotBeNull();
-            registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
-            registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+            config.Subscribers.Should().NotBeEmpty();
+            config.Subscribers[0].MessageType.Should().Be(typeof(MessageToScan));
+            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
+            config.Subscribers[0].Pipeline.Should().NotBeNull();
         }
 
         [Fact]
@@ -47,9 +45,7 @@ namespace NBB.Messaging.Host.Tests
         {
             //Arrange
             var services = Mock.Of<IServiceCollection>();
-            ServiceDescriptor registeredDescriptor = null;
-            Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
+            var provider = Mock.Of<IServiceProvider>();
             Mock.Get(services).Setup(x => x.GetEnumerator())
                 .Returns(new List<ServiceDescriptor>
                 {
@@ -57,18 +53,19 @@ namespace NBB.Messaging.Host.Tests
                 }.GetEnumerator());
 
             //Act
-            var builder = new MessagingHostBuilder(services);
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
             builder
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses()).WithDefaultOptions()
+                .AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses())
+                .WithDefaultOptions()
                 .UsePipeline(_ => { });
 
-            builder.Build();
+            var config = builder.Build();
 
             //Assert
-            registeredDescriptor.Should().NotBeNull();
-            registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
-            registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+            config.Subscribers.Should().NotBeEmpty();
+            config.Subscribers[0].MessageType.Should().Be(typeof(CommandMessage));
+            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
+            config.Subscribers[0].Pipeline.Should().NotBeNull();
         }
 
         [Fact]
@@ -76,9 +73,7 @@ namespace NBB.Messaging.Host.Tests
         {
             //Arrange
             var services = Mock.Of<IServiceCollection>();
-            ServiceDescriptor registeredDescriptor = null;
-            Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
+            var provider = Mock.Of<IServiceProvider>();
             Mock.Get(services).Setup(x => x.GetEnumerator())
                 .Returns(new List<ServiceDescriptor>
                 {
@@ -86,18 +81,19 @@ namespace NBB.Messaging.Host.Tests
                 }.GetEnumerator());
 
             //Act
-            var builder = new MessagingHostBuilder(services);
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
             builder
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses()).WithDefaultOptions()
+                .AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses())
+                .WithDefaultOptions()
                 .UsePipeline(_ => { });
 
-            builder.Build();
+            var config = builder.Build();
 
             //Assert
-            registeredDescriptor.Should().NotBeNull();
-            registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
-            registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+            config.Subscribers.Should().NotBeEmpty();
+            config.Subscribers[0].MessageType.Should().Be(typeof(EventMessage));
+            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
+            config.Subscribers[0].Pipeline.Should().NotBeNull();
         }
 
 
@@ -106,9 +102,7 @@ namespace NBB.Messaging.Host.Tests
         {
             //Arrange
             var services = Mock.Of<IServiceCollection>();
-            ServiceDescriptor registeredDescriptor = null;
-            Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
+            var provider = Mock.Of<IServiceProvider>();
             Mock.Get(services).Setup(x => x.GetEnumerator())
                 .Returns(new List<ServiceDescriptor>
                 {
@@ -116,19 +110,19 @@ namespace NBB.Messaging.Host.Tests
                 }.GetEnumerator());
 
             //Act
-            var builder = new MessagingHostBuilder(services);
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
             builder
                 .AddSubscriberServices(cfg => cfg.FromMediatRHandledQueries().AddAllClasses())
                 .WithDefaultOptions()
                 .UsePipeline(_ => { });
 
-            builder.Build();
-            
+            var config = builder.Build();
+
             //Assert
-            registeredDescriptor.Should().NotBeNull();
-            registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
-            registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+            config.Subscribers.Should().NotBeEmpty();
+            config.Subscribers[0].MessageType.Should().Be(typeof(QueryMessage));
+            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
+            config.Subscribers[0].Pipeline.Should().NotBeNull();
         }
 
         [Fact]
@@ -136,23 +130,21 @@ namespace NBB.Messaging.Host.Tests
         {
             //Arrange
             var services = Mock.Of<IServiceCollection>();
-            ServiceDescriptor registeredDescriptor = null;
-            Mock.Get(services).Setup(x => x.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor sd) => registeredDescriptor = sd);
+            var provider = Mock.Of<IServiceProvider>();
 
             //Act
-            var builder = new MessagingHostBuilder(services);
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
             builder
                 .AddSubscriberServices(cfg => cfg.FromTopics("TopicName"))
                 .WithDefaultOptions()
                 .UsePipeline(_ => { });
-            builder.Build();
+            var config = builder.Build();
 
             //Assert
-            registeredDescriptor.Should().NotBeNull();
-            registeredDescriptor.ServiceType.Should().Be(typeof(IHostedService));
-            registeredDescriptor.ImplementationFactory.Should().NotBeNull();
-            registeredDescriptor.Lifetime.Should().Be(ServiceLifetime.Singleton);
+            config.Subscribers.Should().NotBeEmpty();
+            config.Subscribers[0].MessageType.Should().Be(typeof(object));
+            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default with {TopicName = "TopicName" });
+            config.Subscribers[0].Pipeline.Should().NotBeNull();
         }
 
         public record CommandMessage : IRequest;
