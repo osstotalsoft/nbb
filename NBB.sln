@@ -82,6 +82,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		nuget-push.ps1 = nuget-push.ps1
 		NuGet.config = NuGet.config
 		README.md = README.md
+		UpgradeToNBB5.md = UpgradeToNBB5.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{83E383BB-C9D9-4F5F-BAAF-FF1ADFF0B151}"
@@ -284,6 +285,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Tools.Serilog.OpenTracingSink", "src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj", "{A5826A9E-7E96-4A52-8A06-2B6DC9855954}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.EventStore.AdoNet.MultiTenancy", "src\EventStore\NBB.EventStore.AdoNet.Multitenancy\NBB.EventStore.AdoNet.MultiTenancy.csproj", "{2FEDB78D-E355-4449-A9D3-1C3079E38FD9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Application.DataContracts", "src\Application\NBB.Application.DataContracts\NBB.Application.DataContracts.csproj", "{0B65210B-9A1D-4D07-98B4-69995FEF21BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Messaging.BackwardCompatibility", "src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj", "{04556BEE-32FE-47D5-8C22-7D336FA44D7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -693,6 +698,14 @@ Global
 		{2FEDB78D-E355-4449-A9D3-1C3079E38FD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FEDB78D-E355-4449-A9D3-1C3079E38FD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FEDB78D-E355-4449-A9D3-1C3079E38FD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B65210B-9A1D-4D07-98B4-69995FEF21BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B65210B-9A1D-4D07-98B4-69995FEF21BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B65210B-9A1D-4D07-98B4-69995FEF21BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B65210B-9A1D-4D07-98B4-69995FEF21BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04556BEE-32FE-47D5-8C22-7D336FA44D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04556BEE-32FE-47D5-8C22-7D336FA44D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04556BEE-32FE-47D5-8C22-7D336FA44D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04556BEE-32FE-47D5-8C22-7D336FA44D7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -829,6 +842,8 @@ Global
 		{EF374BA2-61FC-41FB-8229-5187DCBAA63A} = {7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}
 		{A5826A9E-7E96-4A52-8A06-2B6DC9855954} = {EF374BA2-61FC-41FB-8229-5187DCBAA63A}
 		{2FEDB78D-E355-4449-A9D3-1C3079E38FD9} = {20C8482D-1525-47B0-B78B-09632892E8E4}
+		{0B65210B-9A1D-4D07-98B4-69995FEF21BD} = {4DCC0E0D-52D8-4F97-9B26-C3F9CB76F16F}
+		{04556BEE-32FE-47D5-8C22-7D336FA44D7C} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

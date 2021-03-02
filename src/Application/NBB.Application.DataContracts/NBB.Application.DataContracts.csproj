@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <Description>Legacy code for compatibiltity with NBB 4.x</Description>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+  </ItemGroup>
+
+
+</Project>
