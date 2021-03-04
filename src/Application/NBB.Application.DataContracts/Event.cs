@@ -3,6 +3,7 @@ using System;
 
 namespace NBB.Application.DataContracts
 {
+    [Obsolete("Ensures NBB4 compatibility. Use INotification instead.")]
     public abstract class Event : INotification
     {
         public EventMetadata Metadata { get; }
@@ -15,6 +16,7 @@ namespace NBB.Application.DataContracts
         public Guid EventId => Metadata.EventId;
     }
 
+    [Obsolete("Ensures NBB4 compatibility")]
     public class EventMetadata
     {
         public Guid EventId { get; }

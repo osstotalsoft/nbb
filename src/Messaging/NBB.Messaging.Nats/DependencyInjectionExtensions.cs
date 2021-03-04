@@ -7,11 +7,13 @@ namespace NBB.Messaging.Nats
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddNatsTransport(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddNatsTransport(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<NatsOptions>(configuration.GetSection("Messaging").GetSection("Nats"));
             services.AddSingleton<StanConnectionProvider>();
             services.AddSingleton<IMessagingTransport, StanMessagingTransport>();
+
+            return services;
         }
     }
 }

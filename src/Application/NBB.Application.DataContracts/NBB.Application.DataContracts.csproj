@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <Description>Legacy code for compatibiltity with NBB 4.x</Description>
+    <Description>Legacy code for compatibiltity with NBB 4.x. Reference this package only to support published language assemblies compiled against NBB 4</Description>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
   </ItemGroup>
