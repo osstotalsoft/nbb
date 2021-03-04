@@ -3,6 +3,7 @@ using System;
 
 namespace NBB.Application.DataContracts
 {
+    [Obsolete("Ensures NBB4 compatibility. Use IRequest instead.")]
     public abstract class Command : IRequest
     {
         public CommandMetadata Metadata { get; }
@@ -13,6 +14,7 @@ namespace NBB.Application.DataContracts
         }
     }
 
+    [Obsolete("Ensures NBB4 compatibility. Use IRequest<TResponse> instead")]
     public abstract class Command<TResponse> : IRequest<TResponse>
     {
         public CommandMetadata Metadata { get; }
@@ -23,6 +25,7 @@ namespace NBB.Application.DataContracts
         }
     }
 
+    [Obsolete("Ensures NBB4 compatibility")]
     public class CommandMetadata
     {
         public Guid CommandId { get; }

@@ -4,11 +4,11 @@ using MediatR;
 
 namespace NBB.Messaging.BackwardCompatibility
 {
-    public class LegacyTopicRegistryDecorator : ITopicRegistry
+    public class NBB4TopicRegistryDecorator : ITopicRegistry
     {
         private readonly ITopicRegistry innerTopicRegistry;
 
-        public LegacyTopicRegistryDecorator(ITopicRegistry innerTopicRegistry)
+        public NBB4TopicRegistryDecorator(ITopicRegistry innerTopicRegistry)
         {
             this.innerTopicRegistry = innerTopicRegistry;
         }

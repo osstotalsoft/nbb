@@ -3,8 +3,12 @@
 * Update Microsoft.Extensions.*  references to version 5.0.0
 * Microsoft.CSharp package version 4.7.0
 * Remove <LangVersion></LangVersion> from csproj
+* Update Dockerfile to use the following images
+  * mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim
+  * mcr.microsoft.com/dotnet/sdk:5.0-buster-slim
+  
 
-## References update
+## References update 
 * Upgrade NNB packages version 5.x.x (latest)
 * Renamed/removed packages
   * NBB.Messaging.DataContracts was renamed to NBB.Messaging.Abstractions
@@ -75,6 +79,7 @@
 * IProperty.Relational().TableName -> IProperty.GetTableName()
 * Microsoft.Data.SqlClient is used instead of System.Data.SqlClient
 * Concurrent DB operations throw exceptions (cannot have multiple DB tasks in parallel for the same DBContext)
+* Remove the call to .AddEntityFrameworkSqlServer() it is not necessary unless using a custom service provider
 
 
 
