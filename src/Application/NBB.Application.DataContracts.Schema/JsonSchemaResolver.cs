@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace NBB.Application.DataContracts.Schema
 {
@@ -10,41 +11,42 @@ namespace NBB.Application.DataContracts.Schema
     /// </summary>
     public class JsonSchemaResolver : ISchemaResolver
     {
-        public List<SchemaDefinition> GetSchema(Type baseType, Func<Type, string> topicResolver = null)
+        public List<SchemaDefinition> GetSchema(IEnumerable<Assembly> assemblies, Type baseType, Func<Type, string> topicResolver)
         {
-            var list = baseType.Assembly
-                .GetTypes().Where(t => baseType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
-                .Select(e =>
-                {
-                    var schema = JsonSchema4.FromTypeAsync(e).GetAwaiter().GetResult();
-                    var jsonSchema = schema.ToJson();
-                    var topic = topicResolver != null ? topicResolver(e) : string.Empty;
+            var schemas = new List<SchemaDefinition>();
+            foreach (var assembly in assemblies)
+            {
+                var assemblySchemas = assembly
+                    .GetTypes().Where(t => baseType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+                    .Select(e =>
+                    {
+                        var schema = JsonSchema.FromType(e);
+                        var jsonSchema = schema.ToJson();
+                        var topic = topicResolver(e);
 
-                    return new SchemaDefinition(e.Name, jsonSchema, topic);
-                }).ToList();
+                        return new SchemaDefinition(e.Name, e.FullName, jsonSchema, topic);
+                    })
+                    .ToList();
+                schemas.AddRange(assemblySchemas);
+            }
 
-            return list;
+            return schemas;
         }
 
-        public List<SchemaDefinition> GetSchema<T>(Func<Type, string> topicResolver = null)
+        public SchemaDefinitionUpdated GetSchema(IEnumerable<Assembly> assemblies, Type baseType, string applicationName, Func<Type, string> topicResolver)
         {
-            var baseType = typeof(T);
-            return GetSchema(baseType, topicResolver);
-        }
-
-        public SchemaDefinitionUpdated GetSchemaAsEvent(Type baseType, string applicationName, Func<Type, string> topicResolver = null)
-        {
-            var list = GetSchema(baseType, topicResolver);
-            var @event = new SchemaDefinitionUpdated(list, applicationName);
+            var schemas = GetSchema(assemblies, baseType, topicResolver);
+            var @event = new SchemaDefinitionUpdated(schemas, applicationName);
             return @event;
         }
 
-        public SchemaDefinitionUpdated GetSchemaAsEvent<T>(string applicationName, Func<Type, string> topicResolver = null)
+        public SchemaDefinition GetSchema(Type type, Func<Type, string> topicResolver)
         {
-            var baseType = typeof(T);
-            var list = GetSchema(baseType, topicResolver);
-            var @event = new SchemaDefinitionUpdated(list, applicationName);
-            return @event;
+            var schema = JsonSchema.FromType(type);
+            var jsonSchema = schema.ToJson();
+            var topic = topicResolver(type);
+
+            return new SchemaDefinition(type.Name, type.FullName, jsonSchema, topic);
         }
     }
 }
