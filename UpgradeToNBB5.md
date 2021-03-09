@@ -45,12 +45,6 @@
 * For generic command handling code we can use IRequest instead of Command/ICommand
 * For generic event handling code we can use INotification or object instead of Event/IEvent
 
-
-# Jaeger Update
-* add package reference for "Jaeger.Senders.Thrift"
-* "using Jaeger.Senders" -> "using Jaeger.Senders.Thrift"
-
-
 ## Third party upgrade
 * NewtonsoftJsonPackageVersion 12.0.3
 * MediatR 9.0.0
@@ -100,6 +94,10 @@
 * Concurrent DB operations throw exceptions (cannot have multiple DB tasks in parallel for the same DBContext)
 * Remove the call to .AddEntityFrameworkSqlServer() it is not necessary unless using a custom service provider
 
+## Jaeger Update
+* add package reference for "Jaeger.Senders.Thrift"
+* "using Jaeger.Senders" -> "using Jaeger.Senders.Thrift"
+
 ## Automapper upgrade
 * https://docs.automapper.org/en/stable/8.0-Upgrade-Guide.html
 * Replace linq ProjectTo() with mapper.ProjectTo
@@ -111,7 +109,7 @@
 * CascadeMode.StopOnFirstFailure should be replaced with CascadeMode.Stop
 * Constructor custom message should be replaced with override string GetDefaultMessageTemplate()
 
-# MediatR upgrade
+## MediatR upgrade
 * IRequestHanler / Handle method returns Task\<Unit> now
   * use Unit.Value or Unit.Task as return value
 * Make sure that the package "MediatR.Extensions.Microsoft.DependencyInjection" has the same versio as  "MediatR"
