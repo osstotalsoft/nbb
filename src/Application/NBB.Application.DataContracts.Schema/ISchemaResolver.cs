@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace NBB.Application.DataContracts.Schema
 {
     public interface ISchemaResolver
     {
-        List<SchemaDefinition> GetSchema(Type baseType, Func<Type, string> topicResolver = null);
+        List<SchemaDefinition> GetSchema(IEnumerable<Assembly> assemblies, Type baseType, Func<Type, string> topicResolver);
+        SchemaDefinition GetSchema(Type type, Func<Type, string> topicResolver);
 
-        List<SchemaDefinition> GetSchema<T>(Func<Type, string> topicResolver = null);
-
-        SchemaDefinitionUpdated GetSchemaAsEvent(Type baseType, string applicationName,
-           Func<Type, string> topicResolver = null);
-
-
-        SchemaDefinitionUpdated GetSchemaAsEvent<T>(string applicationName, Func<Type, string> topicResolver = null);
+        SchemaDefinitionUpdated GetSchema(IEnumerable<Assembly> assemblies, Type baseType, string applicationName,
+           Func<Type, string> topicResolver);
     }
 }

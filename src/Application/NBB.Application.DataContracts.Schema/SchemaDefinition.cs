@@ -2,13 +2,15 @@
 {
     public class SchemaDefinition
     {
-        public string ClassName { get; set; }
+        public string Name { get; set; }
+        public string FullName { get; set; }
         public string Schema { get; set; }
         public string Topic { get; set; }
 
-        public SchemaDefinition(string className, string schema, string topic)
+        public SchemaDefinition(string name, string fullName, string schema, string topic)
         {
-            ClassName = className;
+            Name = name;
+            FullName = fullName;
             Schema = schema;
             Topic = topic;
         }
