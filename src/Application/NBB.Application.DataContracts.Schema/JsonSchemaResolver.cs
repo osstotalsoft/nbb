@@ -11,9 +11,25 @@ namespace NBB.Application.DataContracts.Schema
     /// </summary>
     public class JsonSchemaResolver : ISchemaResolver
     {
-        public List<SchemaDefinition> GetSchema(IEnumerable<Assembly> assemblies, Type baseType, Func<Type, string> topicResolver)
+        public List<SchemaDefinition> GetSchemas(IEnumerable<Assembly> assemblies, Type baseType, Func<Type, string> topicResolver)
         {
+            if(assemblies==null || !assemblies.Any())
+            {
+                throw new ArgumentException("assemblies", "Assemblies are null or empty");
+            }
+
+            if (topicResolver == null)
+            {
+                throw new ArgumentException("topicResolver", "TopicResolver must be specified");
+            }
+            
+            if (baseType == null)
+            {
+                throw new ArgumentException("baseType", "BaseType must be specified");
+            }
+
             var schemas = new List<SchemaDefinition>();
+
             foreach (var assembly in assemblies)
             {
                 var assemblySchemas = assembly
@@ -33,15 +49,34 @@ namespace NBB.Application.DataContracts.Schema
             return schemas;
         }
 
-        public SchemaDefinitionUpdated GetSchema(IEnumerable<Assembly> assemblies, Type baseType, string applicationName, Func<Type, string> topicResolver)
+        public SchemaDefinitionUpdated BuildSchemaUpdatedEvent(List<SchemaDefinition> schemas, string applicationName)
         {
-            var schemas = GetSchema(assemblies, baseType, topicResolver);
+            if (schemas == null || !schemas.Any())
+            {
+                throw new ArgumentException("schemas", "Schemas are null or empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(applicationName))
+            {
+                throw new ArgumentException("applicationName", "ApplicationName must be specified");
+            }
+
             var @event = new SchemaDefinitionUpdated(schemas, applicationName);
             return @event;
         }
 
         public SchemaDefinition GetSchema(Type type, Func<Type, string> topicResolver)
         {
+            if (topicResolver == null)
+            {
+                throw new ArgumentException("topicResolver", "TopicResolver must be specified");
+            }
+
+            if (type == null)
+            {
+                throw new ArgumentException("type", "Type must be specified");
+            }
+
             var schema = JsonSchema.FromType(type);
             var jsonSchema = schema.ToJson();
             var topic = topicResolver(type);
