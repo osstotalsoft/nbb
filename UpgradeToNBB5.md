@@ -82,8 +82,8 @@
 ## EF upgrade
 * https://docs.microsoft.com/en-us/ef/core/what-is-new/ef-core-3.x/breaking-changes
 * DBQuery should be replaced with DBSet (use .HasNoKey if required)
-* IQueryTypeConfiguration<TQuery> should be replaced by IEntityTypeConfiguration<TEntity>
-* ModelBuilder.Query<>() should be replaced with ModelBuilder.Entity<>().HasNoKey()
+* IQueryTypeConfiguration\<TQuery\> should be replaced by IEntityTypeConfiguration\<TEntity\>
+* ModelBuilder.Query\<\>() should be replaced with ModelBuilder.Entity\<\>().HasNoKey()
 * DBSet.FromSql should be repladed with FromSqlRaw
   * Make sure the entity is configured with HasNoKey()
   * Make sure no linq is used on the query such as FirstOrDefaultAsync(). Replace with ToListAsync().FirstOrDefault()
@@ -105,14 +105,14 @@
 * Replace "UseValue(val)" with "MapFrom(_ => val)"
 
 ## FluentValidation upgrade
-* ValidationContext should be replaced with ValidationContext<T>
+* ValidationContext should be replaced with ValidationContext\<T\>
 * CascadeMode.StopOnFirstFailure should be replaced with CascadeMode.Stop
 * Constructor custom message should be replaced with override string GetDefaultMessageTemplate()
 
 ## MediatR upgrade
-* IRequestHanler / Handle method returns Task\<Unit> now
+* IRequestHanler / Handle method returns Task\<Unit\> now
   * use Unit.Value or Unit.Task as return value
-* Make sure that the package "MediatR.Extensions.Microsoft.DependencyInjection" has the same versio as  "MediatR"
+* Make sure that the package "MediatR.Extensions.Microsoft.DependencyInjection" has the same version as "MediatR"
 
 ## Hellang upgrade
 * IncludeExceptionDetails signature includes exception now
@@ -123,8 +123,8 @@
 * [MyProject].PublishedLanguage
   * remove Newtonsoft.Json package reference
 * Replace NBBProcessManagerRuntime build variable with NBBPackagesVersion
-* IConfiguration does not contain GetValue<>
+* IConfiguration does not contain GetValue\<\>
   * add Microsoft.Extensions.Configuration.Binder package reference
-* AddScoppedContravariant should support multiple type arguments like IRequest<T, Unit>
+* AddScoppedContravariant should support multiple type arguments like IRequest\<T, Unit\>
 * Replace IHostingEnvironment with IWebHostEnvironment 
 * Replace packages like "Microsoft.Aspnet*.Abstractions" with \<FrameworkReference Include="Microsoft.AspNetCore.App" /\>
