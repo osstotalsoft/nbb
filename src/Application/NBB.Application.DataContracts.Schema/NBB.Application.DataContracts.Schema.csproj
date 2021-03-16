@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="NJsonSchema" Version="$(NJsonSchemaPackageVersion)" />
+    <PackageReference Include="AutoFixture" Version="$(AutoFixturePackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
