@@ -19,5 +19,6 @@
     <AutoMapperPackageVersion>10.1.1</AutoMapperPackageVersion>
     <OpenTracingPackageVersion>0.12.1</OpenTracingPackageVersion>
     <NJsonSchemaPackageVersion>10.3.11</NJsonSchemaPackageVersion>
+    <AutoFixturePackageVersion>4.15.0</AutoFixturePackageVersion>
   </PropertyGroup>
 </Project>
