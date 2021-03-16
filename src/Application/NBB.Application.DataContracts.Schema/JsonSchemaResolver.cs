@@ -1,4 +1,6 @@
-﻿using NJsonSchema;
+﻿using NBB.Application.DataContracts.Schema.Sample;
+using Newtonsoft.Json;
+using NJsonSchema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +32,7 @@ namespace NBB.Application.DataContracts.Schema
 
             var schemas = new List<SchemaDefinition>();
 
+            var sampleBuilder = new SampleBuilder();
             foreach (var assembly in assemblies)
             {
                 var assemblySchemas = assembly
@@ -39,8 +42,10 @@ namespace NBB.Application.DataContracts.Schema
                         var schema = JsonSchema.FromType(e);
                         var jsonSchema = schema.ToJson();
                         var topic = topicResolver(e);
+                        var obj = sampleBuilder.GetSampleFromType(e);
+                        var sample = obj != null ? JsonConvert.SerializeObject(obj) : string.Empty;
 
-                        return new SchemaDefinition(e.Name, e.FullName, jsonSchema, topic);
+                        return new SchemaDefinition(e.Name, e.FullName, jsonSchema, topic, sample);
                     })
                     .ToList();
                 schemas.AddRange(assemblySchemas);
@@ -80,8 +85,11 @@ namespace NBB.Application.DataContracts.Schema
             var schema = JsonSchema.FromType(type);
             var jsonSchema = schema.ToJson();
             var topic = topicResolver(type);
+            var sampleBuilder = new SampleBuilder();
+            var obj = sampleBuilder.GetSampleFromType(type);
+            var sample = obj != null ? JsonConvert.SerializeObject(obj) : string.Empty;
 
-            return new SchemaDefinition(type.Name, type.FullName, jsonSchema, topic);
+            return new SchemaDefinition(type.Name, type.FullName, jsonSchema, topic, sample);
         }
     }
 }
