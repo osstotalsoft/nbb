@@ -11,7 +11,7 @@
 ## References update 
 * Upgrade NNB packages version 5.x.x (latest)
 * Renamed/removed packages
-  * NBB.Messaging.DataContracts was renamed to NBB.Messaging.Abstractions
+  * NBB.Messaging.DataContracts was merged with NBB.Messaging.Abstractions
   * NBB.Resiliency was removed 
     * reference can be deleted, messaging policies are included in NBB.Messaging.Abstractions
     * services.UseResiliency() can be deleted
@@ -31,7 +31,8 @@
   * The "Invoke" method handles a **MessagingContext** instead of a MessagingEnvelope
   * The "MessagingEnvelope" is a field in the MessagingContext
 * "services.AddNatsMessaging()" will be replaced by "services.AddMessageBus().AddNatsTransport(Configuration)"
-  * to support compatibility with NBB4 topics add "UseTopicResolutionBackwardCompatibility()"
+  * to support compatibility with NBB4 topics add "UseTopicResolutionBackwardCompatibility(Configuration)" from the package "NBB.Messaging.BackwardCompatibility"
+* "services.AddMessagingHost()" now uses an inner host builder "services.AddMessagingHost(hostBuilder => hostBuilder.Configure(...))"
 
 ## Process Manager update
 * Remove "AddProcessManagerDefinition(...)", "AddProcessManagerRuntime(...)", "AddNotificationHandlers", TimeoutOccuredHandler registratin
@@ -40,11 +41,13 @@
 
 
 ## Application update
-* Interfaces like ICommand, IEvent no longer exist
-* Base classes like Command, Event no longer exist
+* Interfaces like ICommand, IQuery, IEvent no longer exist
+* Base classes like Command, Query\<T\>, Event no longer exist
 * For generic command handling code we can use IRequest instead of Command/ICommand
 * For generic event handling code we can use INotification or object instead of Event/IEvent
-
+* Queries should extend IRequest\<T\> instead of Query\<T\>
+* Commands, Events and Queries can be rewritten as C# 9.0 "records" (immutable reference types)
+ 
 ## Third party upgrade
 * NewtonsoftJsonPackageVersion 12.0.3
 * MediatR 9.0.0
@@ -61,7 +64,7 @@
 * Jaeger: 0.4.3
 * Benchmark.Net: 0.12.1
 * FluentAssertions: 5.10.3
-* SerilogAspNetCorePackageVersion: 3.4.0 - 4.0.0
+* SerilogAspNetCorePackageVersion: 4.0.0
 * Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson: 5.0.0
 * Microsoft.VisualStudio.Azure.Containers.Tools.Targets: 1.10.9
 * FluentAssertionsPackageVersion: 5.10.3
@@ -93,6 +96,10 @@
 * Microsoft.Data.SqlClient is used instead of System.Data.SqlClient
 * Concurrent DB operations throw exceptions (cannot have multiple DB tasks in parallel for the same DBContext)
 * Remove the call to .AddEntityFrameworkSqlServer() it is not necessary unless using a custom service provider
+* Non-null reference navigations are not overwritten by queries 
+  * Do not initialize reference navigation properties https://docs.microsoft.com/en-us/ef/core/what-is-new/ef-core-5.0/breaking-changes#nonnullreferences
+  * Initialized collections still work.
+* For queries with multiple colection "includes" use AsSplitQuery() 
 
 ## Jaeger Update
 * add package reference for "Jaeger.Senders.Thrift"
@@ -110,7 +117,7 @@
 * Constructor custom message should be replaced with override string GetDefaultMessageTemplate()
 
 ## MediatR upgrade
-* IRequestHanler / Handle method returns Task\<Unit\> now
+* IRequestHandler / Handle method returns Task\<Unit\> now
   * use Unit.Value or Unit.Task as return value
 * Make sure that the package "MediatR.Extensions.Microsoft.DependencyInjection" has the same version as "MediatR"
 
@@ -128,3 +135,6 @@
 * AddScoppedContravariant should support multiple type arguments like IRequest\<T, Unit\>
 * Replace IHostingEnvironment with IWebHostEnvironment 
 * Replace packages like "Microsoft.Aspnet*.Abstractions" with \<FrameworkReference Include="Microsoft.AspNetCore.App" /\>
+* Automapper for positional records: does not work with "ForMember" mappings. Either use "ForCtorParam" or use nominal records.
+* Remove DTO SchemaFilter for swagger for metadata after replacing Command/Query with IRequest
+*
