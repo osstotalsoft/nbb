@@ -100,6 +100,7 @@
   * Do not initialize reference navigation properties https://docs.microsoft.com/en-us/ef/core/what-is-new/ef-core-5.0/breaking-changes#nonnullreferences
   * Initialized collections still work.
 * For queries with multiple colection "includes" use AsSplitQuery() 
+* * PropertyBuilder.UseSqlServerIdentityColumn() -> PropertyBuilder.UseIdentityColumn()
 
 ## Jaeger Update
 * add package reference for "Jaeger.Senders.Thrift"
@@ -115,6 +116,8 @@
 * ValidationContext should be replaced with ValidationContext\<T\>
 * CascadeMode.StopOnFirstFailure should be replaced with CascadeMode.Stop
 * Constructor custom message should be replaced with override string GetDefaultMessageTemplate()
+* Replace RuleFor(...).SetcollectionValidator(...) with RuleForEach(...).SetValidator(...)
+* Replace ValidatorOptions.LanguageManager with ValidatorOptions.Global.LanguageManager
 
 ## MediatR upgrade
 * IRequestHandler / Handle method returns Task\<Unit\> now
