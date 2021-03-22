@@ -36,6 +36,7 @@ namespace NBB.Messaging.Host.Builder
             _topicProvider = subscriberServiceSelector;
 
             _currentSubscriberGroup = new List<MessagingHostConfiguration.Subscriber>();
+             _subscriberGroups.Add(_currentSubscriberGroup);
 
             return this;
         }
@@ -70,7 +71,7 @@ namespace NBB.Messaging.Host.Builder
                 subscriber.Pipeline = builder.Pipeline;
             }
 
-            _subscriberGroups.Add(_currentSubscriberGroup);
+           
             _currentSubscriberGroup = null;
         }
 
@@ -86,7 +87,13 @@ namespace NBB.Messaging.Host.Builder
                 if (!subscriberGroup.Any())
                 {
                     throw new Exception(
-                        "No subscribers were configured for group. Use AddSubscriberServices(...).WithOptions(...).UsePipeline(...) to configure subscribers.");
+                        "No subscribers were configured for group. Use AddSubscriberServices(...).WithOptions(...) to configure subscribers.");
+                }
+
+                if (subscriberGroup.Any(x => x.Pipeline == null))
+                {
+                    throw new Exception(
+                        "No pipeline was configured for subscribers. Add .UsePipeline(...) to configure a pipeline.");
                 }
 
                 hostConfiguration.Subscribers.AddRange(subscriberGroup);
