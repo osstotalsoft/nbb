@@ -52,14 +52,16 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                 if (q.IsEmpty)
                     ev.WaitOne();
 
-                q.TryDequeue(out var msg);
-                await handler(msg);
+                if (q.TryDequeue(out var msg))
+                {
+                    await handler(msg);
+                }
             }
         }
 
         private void AwakeBroker(string topic)
         {
-            var ev = _brokersAutoReset[topic];
+            var ev = _brokersAutoReset.GetOrAdd(topic, new AutoResetEvent(false));
             ev?.Set();
         }
     }
