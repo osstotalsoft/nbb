@@ -17,17 +17,20 @@ namespace NBB.Messaging.BackwardCompatibility
         {
             var topic = innerTopicRegistry.GetTopicForMessageType(messageType, false);
 
+            static string Prepend(string prefix, string str)
+                => str.StartsWith(prefix) ? str : $"{prefix}{str}";
+
             if (typeof(IRequest<Unit>).IsAssignableFrom(messageType))
             {
-                topic = $"ch.commands.{topic}";
+                topic = Prepend("ch.commands.", topic);
             }
             else if (typeof(INotification).IsAssignableFrom(messageType))
             {
-                topic = $"ch.events.{topic}";
+                topic = Prepend("ch.events.", topic);
             }
             else
             {
-                topic = $"ch.messages.{topic}";
+                topic = Prepend("ch.messages.", topic);
             }
             topic = (includePrefix ? GetTopicPrefix() : string.Empty) + topic;
             return topic;
