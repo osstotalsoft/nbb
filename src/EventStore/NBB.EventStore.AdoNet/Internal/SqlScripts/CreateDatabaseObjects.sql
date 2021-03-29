@@ -1,32 +1,55 @@
-﻿CREATE TABLE [dbo].[EventStoreEvents](
-	[EventId] [uniqueidentifier] NOT NULL,
-	[EventData] [nvarchar](max) NOT NULL,
-	[EventType] [varchar](300) NOT NULL,
-	[CorrelationId] [uniqueidentifier] NULL,
-	[StreamId] [varchar](200) NOT NULL,
-	[StreamVersion] int NOT NULL
- CONSTRAINT [PK_EventStoreEvents] PRIMARY KEY NONCLUSTERED([EventId] ASC)
-);
+﻿IF object_id('EventStoreEvents', 'U') IS NULL
+BEGIN
+	CREATE TABLE [EventStoreEvents](
+		[EventId] [uniqueidentifier] NOT NULL,
+		[EventData] [nvarchar](max) NOT NULL,
+		[EventType] [varchar](300) NOT NULL,
+		[CorrelationId] [uniqueidentifier] NULL,
+		[StreamId] [varchar](200) NOT NULL,
+		[StreamVersion] int NOT NULL
+	 CONSTRAINT [PK_EventStoreEvents] PRIMARY KEY NONCLUSTERED([EventId] ASC)
+	);
+END
 
-CREATE CLUSTERED INDEX [IX_EventStoreEvents_StreamId] 
-	ON [dbo].[EventStoreEvents](StreamId);
+IF NOT EXISTS(
+    SELECT * 
+    FROM sys.indexes
+    WHERE name='IX_EventStoreEvents_StreamId' AND object_id = OBJECT_ID('EventStoreEvents', 'U'))
+BEGIN
+	CREATE CLUSTERED INDEX [IX_EventStoreEvents_StreamId] 
+		ON [EventStoreEvents](StreamId);
+END
 
-CREATE UNIQUE NONCLUSTERED INDEX [IX_EventStoreEvents_StreamId_StreamVersion] 
-	ON [dbo].[EventStoreEvents](StreamId, StreamVersion); 
+IF NOT EXISTS(
+    SELECT * 
+    FROM sys.indexes
+    WHERE name='IX_EventStoreEvents_StreamId_StreamVersion' AND object_id = OBJECT_ID('EventStoreEvents', 'U'))
+BEGIN
+	CREATE UNIQUE NONCLUSTERED INDEX [IX_EventStoreEvents_StreamId_StreamVersion] 
+		ON [EventStoreEvents](StreamId, StreamVersion); 
+END
 
+IF NOT EXISTS(
+    SELECT * 
+    FROM sys.table_types tt JOIN sys.schemas s ON tt.schema_id = s.schema_id
+    WHERE tt.name='NewEventStoreEvents')
+BEGIN
+	CREATE TYPE NewEventStoreEvents AS TABLE (
+			OrderNo             INT IDENTITY                            NOT NULL,
+			EventId             UNIQUEIDENTIFIER                        NOT NULL,
+			EventData           NVARCHAR(max)                           NOT NULL,
+			EventType           VARCHAR(300)                            NOT NULL,
+			CorrelationId       UNIQUEIDENTIFIER                        NULL
+	);
+END
 
-CREATE TYPE dbo.NewEventStoreEvents AS TABLE (
-        OrderNo             INT IDENTITY                            NOT NULL,
-        EventId             UNIQUEIDENTIFIER                        NOT NULL,
-        EventData           NVARCHAR(max)                           NOT NULL,
-        EventType           VARCHAR(300)                            NOT NULL,
-		CorrelationId       UNIQUEIDENTIFIER                        NULL
-);
-
-CREATE TABLE [dbo].[EventStoreSnapshots](
-	[SnapshotData] [nvarchar](max) NOT NULL,
-	[SnapshotType] [varchar](300) NOT NULL,
-	[StreamId] [varchar](200) NOT NULL,
-	[StreamVersion] int NOT NULL
- CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([StreamId], [StreamVersion] ASC)
-);
+IF object_id('EventStoreSnapshots', 'U') IS NULL
+BEGIN
+	CREATE TABLE [EventStoreSnapshots](
+		[SnapshotData] [nvarchar](max) NOT NULL,
+		[SnapshotType] [varchar](300) NOT NULL,
+		[StreamId] [varchar](200) NOT NULL,
+		[StreamVersion] int NOT NULL
+	 CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([StreamId], [StreamVersion] ASC)
+	);
+END
