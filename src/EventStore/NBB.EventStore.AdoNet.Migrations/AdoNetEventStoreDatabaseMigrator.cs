@@ -48,22 +48,22 @@ namespace NBB.EventStore.AdoNet.Migrations
             await CreateDatabaseObjectsAsync(cancellationToken);
         }
 
-        private async Task CreateDatabaseObjectsAsync(CancellationToken cancellationToken = default)
+        public async Task CreateDatabaseObjectsAsync(CancellationToken cancellationToken = default)
         {
             using (var cnx = new SqlConnection(_connectionString))
             {
-                cnx.Open();
+                await cnx.OpenAsync(cancellationToken);
 
                 var cmd = new SqlCommand(_scripts.CreateDatabaseObjects, cnx);
                 await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
         }
 
-        private async Task DropDatabaseObjectsAsync(CancellationToken cancellationToken = default)
+        public async Task DropDatabaseObjectsAsync(CancellationToken cancellationToken = default)
         {
             using (var cnx = new SqlConnection(_connectionString))
             {
-                cnx.Open();
+                await cnx.OpenAsync(cancellationToken);
 
                 var cmd = new SqlCommand(_scripts.DropDatabaseObjects, cnx);
                 await cmd.ExecuteNonQueryAsync(cancellationToken);
