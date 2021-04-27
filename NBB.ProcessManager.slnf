@@ -2,6 +2,7 @@
   "solution": {
     "path": "NBB.sln",
     "projects": [
+      "samples\\Orchestration\\MicroServicesOrchestration\\MicroServicesOrchestration\\MicroServicesOrchestration.csproj",
       "samples\\Orchestration\\ProcessManagerSample\\ProcessManagerSample.csproj",
       "src\\Orchestration\\NBB.ProcessManager.Definition\\NBB.ProcessManager.Definition.csproj",
       "src\\Orchestration\\NBB.ProcessManager.Runtime\\NBB.ProcessManager.Runtime.csproj",
