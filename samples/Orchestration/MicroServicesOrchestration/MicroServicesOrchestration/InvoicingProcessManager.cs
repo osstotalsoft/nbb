@@ -43,7 +43,7 @@ namespace MicroServicesOrchestration
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayable });
 
             When<PayableCreated>((ev, state) => ev.ContractId.HasValue)
-                .RequestTimeout(TimeSpan.FromSeconds(10), (ev, data) => new PayableExpired(ev.PayableId, ev.ContractId.Value))
+                .RequestTimeout(TimeSpan.FromDays(1), (ev, data) => new PayableExpired(ev.PayableId, ev.ContractId.Value))
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayment });
 
             When<PaymentReceived>((ev, state) => ev.ContractId.HasValue && ev.InvoiceId.HasValue)
