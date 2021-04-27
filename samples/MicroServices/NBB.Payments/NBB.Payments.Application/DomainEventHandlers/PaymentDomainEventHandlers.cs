@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using NBB.Messaging.Abstractions;
@@ -21,7 +22,9 @@ namespace NBB.Payments.Application.DomainEventHandlers
             return _messageBusPublisher.PublishAsync(
                 new PublishedLanguage.PaymentReceived(domainEvent.PayableId, domainEvent.PaymentId,
                     domainEvent.InvoiceId,
-                    domainEvent.PaymentDate), cancellationToken);
+                    domainEvent.PaymentDate,
+                    Guid.NewGuid() // TODO: pass correct contractId
+                    ), cancellationToken);
         }
     }
 }
