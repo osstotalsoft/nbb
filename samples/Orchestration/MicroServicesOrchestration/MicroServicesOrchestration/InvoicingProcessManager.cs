@@ -19,7 +19,7 @@ namespace MicroServicesOrchestration
         PaymentFailure
     }
 
-    record InvoicingState(InvoicingStatus Status, Guid ContractId);
+    public record InvoicingState(InvoicingStatus Status, Guid ContractId);
 
     public record PayableExpired(Guid PayableId, Guid ContractId) : INotification;
 
