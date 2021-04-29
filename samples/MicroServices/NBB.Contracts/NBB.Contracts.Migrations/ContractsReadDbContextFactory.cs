@@ -25,7 +25,7 @@ namespace NBB.Contracts.Migrations
 
             if (isDevelopment)
             {
-                configurationBuilder.AddUserSecrets(Assembly.GetCallingAssembly());
+                configurationBuilder.AddUserSecrets(Assembly.GetEntryAssembly());
             }
 
             var configuration = configurationBuilder.Build();

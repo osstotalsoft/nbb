@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.Serilog;
@@ -18,7 +17,7 @@ namespace NBB.Mono
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-            .ConfigureLogging((hostingContext, logging) =>
+                .ConfigureLogging((hostingContext, logging) =>
                 {
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
@@ -39,6 +38,7 @@ namespace NBB.Mono
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .UseDefaultServiceProvider(options => options.ValidateScopes = false);
     }
 }
