@@ -1,31 +1,25 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Application.MediatR;
-using NBB.Core.Abstractions;
-using NBB.Correlation.Serilog;
-using NBB.Domain;
-using NBB.Domain.Abstractions;
-using NBB.EventStore;
-using NBB.EventStore.Abstractions;
-using NBB.EventStore.AdoNet;
-using NBB.Invoices.Application.CommandHandlers;
-using NBB.Invoices.Data;
-using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Nats;
+using NBB.Messaging.Abstractions;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using NBB.Messaging.Abstractions;
+using Serilog.Sinks.MSSqlServer;
+using NBB.Correlation.Serilog;
+using NBB.Messaging.Host;
+using NBB.Messaging.Nats;
+using NBB.Messaging.Host.Builder;
+using NBB.Messaging.Host.MessagingPipeline;
+using System.Reflection;
+using System.Linq;
+using NBB.ProcessManager.Runtime;
+using NBB.EventStore;
+using NBB.EventStore.AdoNet;
 
-namespace NBB.Invoices.Worker
+namespace NBB.Contracts.Worker
 {
     public class Program
     {
@@ -49,12 +43,12 @@ namespace NBB.Invoices.Worker
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
                     Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Debug()
+                        .MinimumLevel.Information()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
+                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -63,19 +57,24 @@ namespace NBB.Invoices.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(CreateInvoiceCommandHandler).Assembly);
+                    services.AddMediatR(typeof(Program).Assembly);
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
-                    services.AddInvoicesWriteDataAccess();
+
                     services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                        .WithNewtownsoftJsonEventStoreSeserializer()
                         .WithAdoNetEventRepository();
 
+                    var integrationMessageAssemblies = new[] {
+                        typeof(NBB.Contracts.PublishedLanguage.ContractValidated).Assembly,
+                        typeof(NBB.Invoices.PublishedLanguage.InvoiceCreated).Assembly,
+                        typeof(NBB.Payments.PublishedLanguage.PayableCreated).Assembly,
+                    };
+
                     services.AddMessagingHost(hostBuilder => hostBuilder
-                        .Configure(configBuilder =>  configBuilder
+                        .Configure(configBuilder => configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                                .FromMediatRHandledCommands().AddAllClasses()
-                                .FromMediatRHandledEvents().AddAllClasses()
+                                .FromMediatRHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
                             )
                             .WithDefaultOptions()
                             .UsePipeline(pipelineBuilder => pipelineBuilder
@@ -84,18 +83,14 @@ namespace NBB.Invoices.Worker
                                 .UseDefaultResiliencyMiddleware()
                                 .UseMediatRMiddleware()
                             )
-                        )
-                    );
+                        ));
 
-                    //services.AddSingleton<IHostedService, MessageBusSubscriberService<GetInvoice.Query>>();
-
-                    services
-                        .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
-                        .Decorate(typeof(IUow<>), typeof(MediatorUowDecorator<>))
-                        .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
+                    services.AddProcessManager(Assembly.GetEntryAssembly());
                 });
 
-            await builder.RunConsoleAsync(CancellationToken.None);
+            var host = builder.UseConsoleLifetime().Build();
+
+            await host.RunAsync();
         }
     }
 }

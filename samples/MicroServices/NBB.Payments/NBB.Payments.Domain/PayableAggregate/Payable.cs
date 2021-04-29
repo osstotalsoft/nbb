@@ -10,6 +10,7 @@ namespace NBB.Payments.Domain.PayableAggregate
         public decimal Amount { get; private set; }
         public Guid? InvoiceId { get; private set; }
         public Payment Payment { get; private set; }
+        public Guid? ContractId { get; private set; }
         public bool IsPayed => Payment != null;
 
         //needed 4 repository should be private
@@ -17,9 +18,9 @@ namespace NBB.Payments.Domain.PayableAggregate
         {
         }
 
-        public Payable(Guid clientId, decimal amount, Guid? invoiceId)
+        public Payable(Guid clientId, decimal amount, Guid? invoiceId, Guid? contractId)
         {
-            Emit(new PayableCreated(Guid.NewGuid(), invoiceId, clientId, amount));
+            Emit(new PayableCreated(Guid.NewGuid(), invoiceId, clientId, contractId, amount));
         }
 
         public override Guid GetIdentityValue() => PayableId;
@@ -29,7 +30,7 @@ namespace NBB.Payments.Domain.PayableAggregate
             if (this.IsPayed)
                 throw new Exception("payment already payed");
 
-            Emit(new PaymentReceived(Guid.NewGuid(), this.PayableId, this.InvoiceId, DateTime.Now));
+            Emit(new PaymentReceived(Guid.NewGuid(), this.PayableId, this.InvoiceId, this.ContractId, DateTime.Now));
         }
 
         private void Apply(PayableCreated e)
@@ -38,6 +39,7 @@ namespace NBB.Payments.Domain.PayableAggregate
             this.ClientId = e.ClientId;
             this.Amount = e.Amount;
             this.InvoiceId = e.InvoiceId;
+            this.ContractId = e.ContractId;
         }
 
         private void Apply(PaymentReceived e)

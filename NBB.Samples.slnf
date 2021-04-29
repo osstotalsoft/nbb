@@ -30,7 +30,7 @@
       "samples\\MicroServices\\NBB.Payments\\NBB.Payments.Worker\\NBB.Payments.Worker.csproj",
       "samples\\Monolith\\NBB.Mono.Migrations\\NBB.Mono.Migrations.csproj",
       "samples\\Monolith\\NBB.Mono\\NBB.Mono.csproj",
-      "samples\\Orchestration\\MicroServicesOrchestration\\MicroServicesOrchestration\\MicroServicesOrchestration.csproj",
+      "samples\\MicroServices\\NBB.MicroServicesOrchestration\\NBB.MicroServicesOrchestration.csproj",
       "samples\\Orchestration\\ProcessManagerSample\\ProcessManagerSample.csproj"
     ]
   }

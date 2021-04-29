@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using NBB.Contracts.PublishedLanguage;
-using NBB.Invoices.Application.Commands;
 using NBB.Invoices.PublishedLanguage;
-using NBB.Payments.Application.Commands;
 using NBB.Payments.PublishedLanguage;
 using NBB.ProcessManager.Definition.Builder;
 using System;
@@ -19,7 +17,11 @@ namespace MicroServicesOrchestration
         PaymentFailure
     }
 
-    public record InvoicingState(InvoicingStatus Status, Guid ContractId);
+    public record InvoicingState
+    {
+        public InvoicingStatus Status { get; init; }
+        public Guid ContractId { get; init; }
+    }
 
     public record PayableExpired(Guid PayableId, Guid ContractId) : INotification;
 
@@ -46,13 +48,13 @@ namespace MicroServicesOrchestration
                 .RequestTimeout(TimeSpan.FromDays(1), (ev, data) => new PayableExpired(ev.PayableId, ev.ContractId.Value))
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayment });
 
-            When<PaymentReceived>((ev, state) => ev.ContractId.HasValue && ev.InvoiceId.HasValue)
-                .SendCommand((ev, state) => new MarkInvoiceAsPayed(ev.InvoiceId.Value))
-                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.PaymentReceived });
-
             When<PayableExpired>((ev, state) => state.Data.Status == InvoicingStatus.AwaitingPayment)
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.PaymentFailure })
                 .Complete();
+
+            When<PaymentReceived>((ev, state) => ev.ContractId.HasValue && ev.InvoiceId.HasValue)
+                .SendCommand((ev, state) => new MarkInvoiceAsPayed(ev.InvoiceId.Value, ev.PaymentId))
+                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.PaymentReceived });
 
             When<InvoiceMarkedAsPayed>()
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.SuccessfullyCompleted })

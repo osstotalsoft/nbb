@@ -1,17 +1,17 @@
 ﻿using MediatR;
 using NBB.Data.Abstractions;
-using NBB.Payments.Application.Commands;
 using NBB.Payments.Domain.PayableAggregate;
+using NBB.Payments.PublishedLanguage;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Payments.Application.CommandHandlers
 {
-    public class PayableCommandHandlers : IRequestHandler<PayPayable>
+    public class PayPayableCommandHandler : IRequestHandler<PayPayable>
     {
         private readonly ICrudRepository<Payable> _repository;
 
-        public PayableCommandHandlers(ICrudRepository<Payable> repository)
+        public PayPayableCommandHandler(ICrudRepository<Payable> repository)
         {
             _repository = repository;
         }

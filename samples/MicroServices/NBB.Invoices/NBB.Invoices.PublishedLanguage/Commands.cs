@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace NBB.Invoices.Application.Commands
+namespace NBB.Invoices.PublishedLanguage
 {
     public record CreateInvoice(
         decimal Amount,

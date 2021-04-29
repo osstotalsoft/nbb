@@ -49,7 +49,7 @@ namespace NBB.Payments.Worker
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
                     Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Information()
+                        .MinimumLevel.Debug()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
@@ -63,7 +63,7 @@ namespace NBB.Payments.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(PayableCommandHandlers).Assembly);
+                    services.AddMediatR(typeof(PayPayableCommandHandler).Assembly);
                     //services.AddKafkaMessaging();
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 

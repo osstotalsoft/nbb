@@ -3,8 +3,8 @@ using MediatR;
 
 namespace NBB.Payments.Domain.PayableAggregate
 {
-    public record PayableCreated(Guid PayableId, Guid? InvoiceId, Guid ClientId, decimal Amount) : INotification;
+    public record PayableCreated(Guid PayableId, Guid? InvoiceId, Guid ClientId, Guid? ContractId, decimal Amount) : INotification;
 
     public record PaymentReceived
-        (Guid PaymentId, Guid PayableId, Guid? InvoiceId, DateTime PaymentDate) : INotification;
+        (Guid PaymentId, Guid PayableId, Guid? InvoiceId, Guid? ContractId, DateTime PaymentDate) : INotification;
 }

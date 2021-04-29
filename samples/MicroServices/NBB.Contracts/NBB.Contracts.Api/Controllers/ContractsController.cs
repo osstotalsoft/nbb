@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NBB.Contracts.Application.Commands;
+using NBB.Contracts.PublishedLanguage;
 using NBB.Contracts.ReadModel;
 using NBB.Messaging.Abstractions;
 using System;

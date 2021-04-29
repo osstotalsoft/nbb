@@ -39,7 +39,6 @@
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
-    <ProjectReference Include="..\NBB.Invoices.Application.Commands\NBB.Invoices.Application.Commands.csproj" />
     <ProjectReference Include="..\NBB.Invoices.Data\NBB.Invoices.Data.csproj" />
     <ProjectReference Include="..\NBB.Invoices.PublishedLanguage\NBB.Invoices.PublishedLanguage.csproj" />
   </ItemGroup>

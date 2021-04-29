@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\NBB.Contracts\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
     <ProjectReference Include="..\..\NBB.Payments\NBB.Payments.PublishedLanguage\NBB.Payments.PublishedLanguage.csproj" />
-    <ProjectReference Include="..\NBB.Invoices.Application.Commands\NBB.Invoices.Application.Commands.csproj" />
     <ProjectReference Include="..\NBB.Invoices.Domain\NBB.Invoices.Domain.csproj" />
     <ProjectReference Include="..\NBB.Invoices.PublishedLanguage\NBB.Invoices.PublishedLanguage.csproj" />
   </ItemGroup>

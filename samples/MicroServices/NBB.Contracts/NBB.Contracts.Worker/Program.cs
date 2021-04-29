@@ -51,7 +51,7 @@ namespace NBB.Contracts.Worker
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
                     Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Information()
+                        .MinimumLevel.Debug()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()

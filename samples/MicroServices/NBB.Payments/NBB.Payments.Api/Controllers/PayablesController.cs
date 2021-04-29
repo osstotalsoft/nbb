@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NBB.Messaging.Abstractions;
-using NBB.Payments.Application.Commands;
 using NBB.Payments.Domain.PayableAggregate;
+using NBB.Payments.PublishedLanguage;
 using System;
 using System.Linq;
 using System.Threading;
