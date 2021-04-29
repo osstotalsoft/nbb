@@ -35,12 +35,10 @@ namespace NBB.Invoices.Domain.InvoiceAggregate
 
         public override Guid GetIdentityValue() => InvoiceId;
 
-        public void MarkAsPayed(Guid paymentId)
+        public void MarkAsPayed(Guid paymentId, Guid? contractId)
         {
             PaymentId = paymentId;
-            AddEvent(new InvoicePayed(InvoiceId, paymentId));
+            AddEvent(new InvoicePayed(InvoiceId, paymentId, contractId));
         }
-
-        
     }
 }

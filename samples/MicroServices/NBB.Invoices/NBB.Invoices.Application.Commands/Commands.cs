@@ -3,11 +3,14 @@ using MediatR;
 
 namespace NBB.Invoices.Application.Commands
 {
-    public record CreateInvoice (
+    public record CreateInvoice(
         decimal Amount,
         Guid ClientId,
         Guid? ContractId
     ) : IRequest;
 
-    //string IKeyProvider.Key => ContractId.ToString();
+    public record MarkInvoiceAsPayed(
+        Guid InvoiceId, 
+        Guid PaymentId
+    ) : IRequest;
 }

@@ -44,17 +44,15 @@ namespace NBB.Mono
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddMediatR(
                 typeof(ContractCommandHandlers).Assembly,
-                typeof(InvoiceCommandHandlers).Assembly,
-                typeof(PayableCommandHandlers).Assembly);
+                typeof(CreateInvoiceCommandHandler).Assembly,
+                typeof(PayPayableCommandHandler).Assembly);
 
             services.AddMessageBus().AddInProcessTransport();
 
             services.AddContractsWriteModelDataAccess();
             services.AddContractsReadModelDataAccess();
             services.AddInvoicesDataAccess();
-            services.AddInvoicesWriteDataAccess();
             services.AddPaymentsDataAccess();
-            services.AddPaymentsWriteDataAccess();
 
             services.AddEventStore()
                 .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })

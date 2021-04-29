@@ -38,7 +38,7 @@
     <ProjectReference Include="..\..\..\..\src\MultiTenancy\NBB.MultiTenancy.AspNet\NBB.MultiTenancy.AspNet.csproj" />
     <ProjectReference Include="..\..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Http\NBB.MultiTenancy.Identification.Http.csproj" />
     <ProjectReference Include="..\..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification\NBB.MultiTenancy.Identification.csproj" />
-    <ProjectReference Include="..\NBB.Contracts.Application.Commands\NBB.Contracts.Application.Commands.csproj" />
+    <ProjectReference Include="..\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
     <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
   </ItemGroup>
 

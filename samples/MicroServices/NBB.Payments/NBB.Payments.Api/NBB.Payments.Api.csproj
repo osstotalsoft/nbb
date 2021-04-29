@@ -38,8 +38,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
-    <ProjectReference Include="..\NBB.Payments.Application.Commands\NBB.Payments.Application.Commands.csproj" />
     <ProjectReference Include="..\NBB.Payments.Data\NBB.Payments.Data.csproj" />
+    <ProjectReference Include="..\NBB.Payments.PublishedLanguage\NBB.Payments.PublishedLanguage.csproj" />
   </ItemGroup>
 
 </Project>

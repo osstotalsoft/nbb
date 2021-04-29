@@ -15,6 +15,7 @@ namespace NBB.Payments.Migrations.Migrations
                     Amount = table.Column<decimal>(nullable: false),
                     ClientId = table.Column<Guid>(nullable: false),
                     InvoiceId = table.Column<Guid>(nullable: true),
+                    ContractId = table.Column<Guid>(nullable: true),
                     Version = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

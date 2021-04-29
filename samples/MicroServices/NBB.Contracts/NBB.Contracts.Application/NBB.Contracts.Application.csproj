@@ -24,7 +24,6 @@
     <ProjectReference Include="..\..\..\..\src\Data\NBB.Data.Abstractions\NBB.Data.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.Abstractions\NBB.EventStore.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\NBB.Contracts.Application.Commands\NBB.Contracts.Application.Commands.csproj" />
     <ProjectReference Include="..\NBB.Contracts.Domain\NBB.Contracts.Domain.csproj" />
     <ProjectReference Include="..\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
     <ProjectReference Include="..\NBB.Contracts.ReadModel\NBB.Contracts.ReadModel.csproj" />

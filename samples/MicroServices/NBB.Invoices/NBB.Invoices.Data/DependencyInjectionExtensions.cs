@@ -15,7 +15,7 @@ namespace NBB.Invoices.Data
 
             services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
 
-            services.AddDbContextPool<InvoicesDbContext>(
+            services.AddDbContext<InvoicesDbContext>(
                 (serviceProvider, options) =>
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();
@@ -29,7 +29,7 @@ namespace NBB.Invoices.Data
             services.AddEntityFrameworkDataAccess();
 
             services.AddEfQuery<Invoice, InvoicesDbContext>();
-            services.AddEfReadOnlyRepository<Invoice, InvoicesDbContext>();
+            //services.AddEfReadOnlyRepository<Invoice, InvoicesDbContext>();
 
             services.AddDbContextPool<InvoicesDbContext>(
                 (serviceProvider, options) =>
@@ -40,14 +40,15 @@ namespace NBB.Invoices.Data
                 });
         }
 
-        public static void AddInvoicesDataAccess(this IServiceCollection services/*, IUowPilelineBuilder uowPipelineBuilder*/)
+        public static void AddInvoicesDataAccess(this IServiceCollection services)
         {
             services.AddEntityFrameworkDataAccess();
 
-            services.AddEfAsyncEnumerable<Invoice, InvoicesDbContext>();
+            //services.AddEfAsyncEnumerable<Invoice, InvoicesDbContext>();
+            services.AddEfQuery<Invoice, InvoicesDbContext>();
             services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
 
-            services.AddDbContext<InvoicesDbContext>(
+            services.AddDbContextPool<InvoicesDbContext>(
                 (serviceProvider, options) =>
                 {
                     var configuration = serviceProvider.GetService<IConfiguration>();

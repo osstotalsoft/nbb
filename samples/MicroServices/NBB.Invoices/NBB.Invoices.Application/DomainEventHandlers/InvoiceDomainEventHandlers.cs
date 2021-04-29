@@ -7,7 +7,8 @@ using NBB.Messaging.Abstractions;
 namespace NBB.Invoices.Application.DomainEventHandlers
 {
     public class InvoiceDomainEventHandlers :
-        INotificationHandler<InvoiceCreated>
+        INotificationHandler<InvoiceCreated>,
+        INotificationHandler<InvoicePayed>
     {
 
         private readonly IMessageBusPublisher _messageBusPublisher;
@@ -22,6 +23,14 @@ namespace NBB.Invoices.Application.DomainEventHandlers
             return _messageBusPublisher.PublishAsync(
                 new PublishedLanguage.InvoiceCreated(
                     domainEvent.InvoiceId, domainEvent.Amount, domainEvent.ClientId, domainEvent.ContractId),
+                cancellationToken);
+        }
+
+        public Task Handle(InvoicePayed domainEvent, CancellationToken cancellationToken)
+        {
+            return _messageBusPublisher.PublishAsync(
+                new PublishedLanguage.InvoiceMarkedAsPayed(
+                    domainEvent.InvoiceId,domainEvent.ContractId),
                 cancellationToken);
         }
     }

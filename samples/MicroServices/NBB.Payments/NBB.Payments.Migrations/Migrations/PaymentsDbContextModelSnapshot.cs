@@ -31,6 +31,8 @@ namespace NBB.Payments.Migrations.Migrations
 
                     b.Property<Guid?>("InvoiceId");
 
+                    b.Property<Guid?>("ContractId");
+
                     b.Property<int>("Version");
 
                     b.HasKey("PayableId");
