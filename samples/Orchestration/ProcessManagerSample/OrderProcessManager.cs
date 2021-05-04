@@ -46,7 +46,7 @@ namespace ProcessManagerSample
                         .Then(partners => MessageBus.Publish(new DoPayment()))
                         .Then(partner => MessageBus.Publish(new DoPayment()));
                 })
-                .RequestTimeout(TimeSpan.FromSeconds(10), (created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0));
+                .Schedule((created, data) => new OrderPaymentExpired(Guid.Empty, 0, 0), TimeSpan.FromSeconds(10));
 
             When<OrderPaymentExpired>()
                 .Complete();
