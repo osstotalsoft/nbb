@@ -46,7 +46,7 @@ namespace NBB.ProcessManager.Definition.Builder
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> RequestTimeout<T>(TimeSpan timeSpan, Func<TEvent, InstanceData<TData>, T> messageFactory,
+        public EventActivitySetBuilder<TEvent, TData> Schedule<T>(Func<TEvent, InstanceData<TData>, T> messageFactory, TimeSpan timeSpan,
             EventPredicate<TEvent, TData> predicate = null)
         {
             Then((whenEvent, state) => Timeout.Request(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state)), predicate);
