@@ -3,13 +3,17 @@ using NBB.ProcessManager.Runtime.Events;
 using System;
 using System.Collections.Generic;
 using NBB.Core.Effects;
+using Microsoft.Extensions.Logging;
+using NBB.Core.Abstractions;
 
 namespace NBB.ProcessManager.Runtime
 {
-    public class Instance<TData> 
-        where TData : new()
+    public class Instance<TData>
+        where TData : IEquatable<TData>, new()
     {
         private readonly IDefinition<TData> _definition;
+        private readonly ILogger<Instance<TData>> _logger;
+
         public TData Data { get; private set; }
         public InstanceStates State { get; private set; }
         public object InstanceId { get; private set; }
@@ -21,22 +25,24 @@ namespace NBB.ProcessManager.Runtime
         public IEnumerable<object> GetUncommittedChanges() => _changes;
         public IEnumerable<Effect<Unit>> GetUncommittedEffects() => _effects;
 
-        public Instance(IDefinition<TData> definition)
+        public Instance(IDefinition<TData> definition, ILogger<Instance<TData>> logger)
         {
             _definition = definition;
+            _logger = logger;
             Data = new TData();
         }
 
         private void StartProcess<TEvent>(TEvent @event)
         {
             var eventType = typeof(TEvent);
+
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
             if (!starter)
-                throw new Exception($"Definition {_definition.GetType()} does not accept eventType {eventType} as a starter event.");
+                throw new Exception($"Definition {_definition.GetType().GetLongPrettyName()} does not accept eventType {eventType.GetLongPrettyName()} as a starter event.");
 
             var idSelector = _definition.GetCorrelationFilter<TEvent>();
             if (idSelector == null)
-                throw new ArgumentNullException($"No correlation defined for eventType {eventType} in definition {_definition.GetType()}");
+                throw new ArgumentNullException($"No correlation defined for eventType {eventType.GetLongPrettyName()} in definition {_definition.GetType().GetLongPrettyName()}");
 
             if (State != InstanceStates.NotStarted)
                 throw new Exception($"Cannot start an instance which is in state {State}");
@@ -45,12 +51,22 @@ namespace NBB.ProcessManager.Runtime
             Emit(new ProcessStarted(identity));
         }
 
+        private bool IsObsoleteProcess() => Attribute.GetCustomAttribute(_definition.GetType(), typeof(ObsoleteAttribute)) != null;
+
         public void ProcessEvent<TEvent>(TEvent @event)
         {
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
 
             if (State == InstanceStates.NotStarted && starter)
+            {
+                if (IsObsoleteProcess())
+                {
+                    _logger.LogWarning($"Definition {_definition.GetType().GetLongPrettyName()} is obsolete and new process instances cannot be started.");
+                    return;
+                }
+
                 StartProcess(@event);
+            }
 
             switch (State)
             {
@@ -64,15 +80,26 @@ namespace NBB.ProcessManager.Runtime
             var effect = _definition.GetEffectFunc<TEvent>()(@event, GetInstanceData());
             _effects.Add(effect);
 
-            Emit(new EventReceived<TEvent>(@event));
+            Emit(new EventReceived(@event, @event.GetType().GetLongPrettyName()));
+
+            var newData = _definition.GetSetStateFunc<TEvent>()(@event, GetInstanceData());
+            if (!newData.Equals(Data))
+            {
+                Emit(new StateUpdated<TData>(newData));
+            }
 
             if (_definition.GetCompletionPredicate<TEvent>()(@event, GetInstanceData()))
-                Emit(new ProcessCompleted<TEvent>(@event));
+                Emit(new ProcessCompleted());
         }
 
-        private void Apply<TEvent>(EventReceived<TEvent> @event)
+        private void Apply(EventReceived _)
         {
-            Data = _definition.GetSetStateFunc<TEvent>()(@event.ReceivedEvent, GetInstanceData());
+            ;
+        }
+
+        private void Apply(StateUpdated<TData> @event)
+        {
+            Data = @event.State;
         }
 
         private void Apply(ProcessStarted @event)
@@ -81,14 +108,30 @@ namespace NBB.ProcessManager.Runtime
             InstanceId = @event.InstanceId;
         }
 
-        private void Apply<TEvent>(ProcessCompleted<TEvent> @event)
+        private void Apply(ProcessCompleted _)
         {
             State = InstanceStates.Completed;
         }
 
-        private void ApplyChanges(dynamic @event, bool isNew)
+        private void ApplyChanges(object @event, bool isNew)
         {
-            Apply(@event);
+            switch (@event)
+            {
+                case ProcessStarted processStarted:
+                    Apply(processStarted);
+                    break;
+                case EventReceived eventReceived:
+                    Apply(eventReceived);
+                    break;
+                case StateUpdated<TData> stateUpdated:
+                    Apply(stateUpdated);
+                    break;
+                case ProcessCompleted processCompleted:
+                    Apply(processCompleted);
+                    break;
+                default:
+                    throw new Exception($"Event of type {@event.GetType().GetLongPrettyName()} could not be processed");
+            }
 
             if (isNew)
             {

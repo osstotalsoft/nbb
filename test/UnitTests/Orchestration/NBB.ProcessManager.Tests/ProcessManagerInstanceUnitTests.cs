@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using NBB.Messaging.Effects;
 using NBB.ProcessManager.Definition;
 using Xunit;
+using Moq;
+using Microsoft.Extensions.Logging;
 
 namespace NBB.ProcessManager.Tests
 {
@@ -26,8 +28,9 @@ namespace NBB.ProcessManager.Tests
         {
             var @event = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
             var definition = new OrderProcessManager3();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             var identitySelector =
                 ((IDefinition<OrderProcessManagerData>) definition).GetCorrelationFilter<OrderCreated>();
             if (identitySelector != null)
@@ -42,8 +45,9 @@ namespace NBB.ProcessManager.Tests
         {
             var @event = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
             var definition = new OrderProcessManagerNoCorrelation();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             Action act = () => instance.ProcessEvent(@event);
             act.Should().Throw<Exception>();
         }
@@ -68,8 +72,9 @@ namespace NBB.ProcessManager.Tests
         {
             var @event = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
             var definition = new OrderProcessManager2();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             instance.ProcessEvent(@event);
             instance.Data.Amount.Should().Be(100);
         }
@@ -98,8 +103,9 @@ namespace NBB.ProcessManager.Tests
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
             var definition = new OrderProcessManager3();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             instance.ProcessEvent(orderCreated);
             instance.Data.Amount.Should().Be(100);
 
@@ -142,8 +148,9 @@ namespace NBB.ProcessManager.Tests
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
             var definition = new OrderProcessManager4();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             instance.ProcessEvent(orderCreated);
             instance.State.Should().Be(InstanceStates.NotStarted);
         }
@@ -165,8 +172,9 @@ namespace NBB.ProcessManager.Tests
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
             var orderPaymentCreated = new OrderPaymentCreated(orderId, 100, 0, 0);
             var definition = new OrderProcessManager5();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             instance.ProcessEvent(orderCreated);
             instance.State.Should().Be(InstanceStates.Started);
             instance.Data.IsPaid.Should().Be(true);
@@ -220,8 +228,9 @@ namespace NBB.ProcessManager.Tests
             var orderCompleted = new OrderCompleted(orderId, 100, 0, 0);
             var orderPaymentCreated = new OrderPaymentCreated(orderId, 100, 0, 0);
             var definition = new OrderProcessManager6();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             instance.ProcessEvent(orderCreated);
             instance.ProcessEvent(orderCompleted);
             instance.State.Should().Be(InstanceStates.Completed);
@@ -260,8 +269,9 @@ namespace NBB.ProcessManager.Tests
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
             var orderShipped = new OrderShipped(orderId, DateTime.Parse("2019-09-09"));
             var definition = new OrderProcessManager7();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
-            var instance = new Instance<OrderProcessManagerData>(definition);
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
             instance.ProcessEvent(orderCreated);
             instance.ProcessEvent(orderShipped);
             instance.State.Should().Be(InstanceStates.Started);

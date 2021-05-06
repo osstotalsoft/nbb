@@ -19,12 +19,13 @@ namespace NBB.ProcessManager.Tests
                 .BuildServiceProvider();
 
             var logger = serviceProvider.GetRequiredService<ILogger<EventStore.EventStore>>();
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
             var sideEffectBroker = Mock.Of<ISideEffectBroker>();
             var interpreter = new Interpreter(sideEffectBroker);
 
             Repository = new InstanceDataRepository(
                 new EventStore.EventStore(new InMemoryRepository(), new NewtonsoftJsonEventStoreSerDes(), logger),
-                interpreter);
+                interpreter, loggerFactory);
         }
     }
 }
