@@ -28,6 +28,9 @@ namespace NBB.EventStore
         public async Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion,
             CancellationToken cancellationToken = default)
         {
+            if (events == null || !events.Any())
+                return;
+
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
@@ -48,7 +51,7 @@ namespace NBB.EventStore
 
             var eventDescriptors = await _eventRepository.GetEventsFromStreamAsync(stream, startFromVersion, cancellationToken);
             var evDescriptors = eventDescriptors.ToList();
-            var results = DeserializeEvents(stream, evDescriptors);
+            var results = evDescriptors.Any() ? DeserializeEvents(stream, evDescriptors) : new();
 
             stopWatch.Stop();
             _logger.LogDebug("EventStore.GetEventsFromStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
