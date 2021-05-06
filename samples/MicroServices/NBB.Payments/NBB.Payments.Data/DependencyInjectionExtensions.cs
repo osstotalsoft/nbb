@@ -43,7 +43,7 @@ namespace NBB.Payments.Data
             services.AddEntityFrameworkDataAccess();
 
             services.AddEfCrudRepository<Payable, PaymentsDbContext>();
-            services.AddEfAsyncEnumerable<Payable, PaymentsDbContext>();
+            services.AddEfQuery<Payable, PaymentsDbContext>();
 
             services.AddDbContext<PaymentsDbContext>(
                 (serviceProvider, options) =>

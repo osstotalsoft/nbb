@@ -38,6 +38,7 @@
     <ProjectReference Include="..\..\MicroServices\NBB.Contracts\NBB.Contracts.WriteModel.Data\NBB.Contracts.WriteModel.Data.csproj" />
     <ProjectReference Include="..\..\MicroServices\NBB.Invoices\NBB.Invoices.Api\NBB.Invoices.Api.csproj" />
     <ProjectReference Include="..\..\MicroServices\NBB.Invoices\NBB.Invoices.Application\NBB.Invoices.Application.csproj" />
+    <ProjectReference Include="..\..\MicroServices\NBB.MicroServicesOrchestration\NBB.MicroServicesOrchestration.csproj" />
     <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Api\NBB.Payments.Api.csproj" />
     <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Application\NBB.Payments.Application.csproj" />
   </ItemGroup>

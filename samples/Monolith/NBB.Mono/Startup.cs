@@ -25,6 +25,9 @@ using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
+using NBB.ProcessManager.Runtime;
+using System.Linq;
+using MicroServicesOrchestration;
 
 namespace NBB.Mono
 {
@@ -58,11 +61,17 @@ namespace NBB.Mono
                 .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                 .WithAdoNetEventRepository();
 
+            var integrationMessageAssemblies = new[] {
+                typeof(NBB.Contracts.PublishedLanguage.ContractValidated).Assembly,
+                typeof(NBB.Invoices.PublishedLanguage.InvoiceCreated).Assembly,
+                typeof(NBB.Payments.PublishedLanguage.PayableCreated).Assembly,
+            };
+
             services.AddMessagingHost(hostBuilder => hostBuilder
                 .Configure(configBuilder => configBuilder
                     .AddSubscriberServices(subscriberBuiler => subscriberBuiler
-                        .FromMediatRHandledCommands().AddAllClasses()
-                        .FromMediatRHandledEvents().AddAllClasses()
+                        .FromMediatRHandledCommands().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
+                        .FromMediatRHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
                     )
                     .WithDefaultOptions()
                     .UsePipeline(pipelineBuilder => pipelineBuilder
@@ -73,6 +82,8 @@ namespace NBB.Mono
                     )
                 )
             );
+
+            services.AddProcessManager(typeof(InvoicingProcessManager).Assembly);
 
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>),
                 serviceType => typeof(IEventedAggregateRoot).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
