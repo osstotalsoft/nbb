@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Effects;
+using System;
+using Microsoft.Extensions.Logging;
 
 namespace NBB.ProcessManager.Runtime.Persistence
 {
@@ -12,15 +14,17 @@ namespace NBB.ProcessManager.Runtime.Persistence
     {
         private readonly IEventStore _eventStore;
         private readonly IInterpreter _interpreter;
+        private readonly ILoggerFactory _loggerFactory;
 
-        public InstanceDataRepository(IEventStore eventStore, IInterpreter interpreter)
+        public InstanceDataRepository(IEventStore eventStore, IInterpreter interpreter, ILoggerFactory loggerFactory)
         {
             _eventStore = eventStore;
             _interpreter = interpreter;
+            _loggerFactory = loggerFactory;
         }
 
         public async Task Save<TData>(Instance<TData> instance, CancellationToken cancellationToken = default)
-            where TData: new()
+            where TData:  IEquatable<TData>, new()
         {
             var events = instance.GetUncommittedChanges().ToList();
             var effects = instance.GetUncommittedEffects().ToList();
@@ -34,9 +38,9 @@ namespace NBB.ProcessManager.Runtime.Persistence
         }
 
         public async Task<Instance<TData>> Get<TData>(IDefinition<TData> definition, object identity, CancellationToken cancellationToken = default)
-            where TData: new()
+            where TData:  IEquatable<TData>, new()
         {
-            var instance = new Instance<TData>(definition);
+            var instance = new Instance<TData>(definition, _loggerFactory.CreateLogger<Instance<TData>>());
             var streamId = instance.GetStreamFor(identity);
             var events = await _eventStore.GetEventsFromStreamAsync(streamId, instance.Version + 1, cancellationToken);
             if (events.Any())

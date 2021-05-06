@@ -1,10 +1,12 @@
 ﻿namespace NBB.ProcessManager.Runtime.Events
 {
-    public record EventReceived<TEvent>(TEvent ReceivedEvent);
+    public record EventReceived(object ReceivedEvent, string ReceivedEventType);
+
+    public record StateUpdated<TState>(TState State);
 
     public record ProcessAborted;
 
-    public record ProcessCompleted<TEvent>(TEvent ReceivedEvent);
+    public record ProcessCompleted();
 
     public record ProcessStarted(object InstanceId);
 
