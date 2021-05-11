@@ -30,9 +30,37 @@ let handler (IncrementCommand id) =
     }
 ```
 
+## Lifting side-effects into effects
+Use *Effect.Of* function to lift side-effects into effects
+```fsharp
+module ConsoleEffects
+
+open NBB.Core.Effects
+
+type ConsoleSideEffect<'a> =
+    | ReadLine of (string -> 'a)
+    | WriteLine of str: string * (unit -> 'a)
+    interface ISideEffect<'a>
+
+let readLine : Effect<string> =
+    Effect.Of(ReadLine id)
+
+let writeLine str : Effect<unit> = 
+    Effect.Of(WriteLine (str id))
+```
+
+## Haskell style custom operators
+Where possible we have created Haskell style operators
+```fsharp
+let (<!>) = Effect.map
+let (<*>) = Effect.apply
+let (>>=) eff func = Effect.bind func eff
+let (>=>) = Effect.composeK
+```
 
 
-## Sample
+## Custom effects sample
+In the sample below we define some custom console side-effects, we lift them in the Effect type, and we combine this effects in various ways, using the effect computation expression and functions 
 ```fsharp
 module ConsoleEffects
 
@@ -52,11 +80,11 @@ let writeLine str : Effect<unit> =
 
 let handle (sideEffect : ConsoleSideEffect<'a>) () = 
     match sideEffect with
-    | ReadLine continuation -> 
-        //do sideeffect
-        continuation "sdsdsd"
+    | ReadLine continuation ->
+        let line = System.Console.ReadLine()
+        continuation line
     | WriteLine (str, continuation) ->
-        //do sideeffect
+        System.Console.WriteLine str
         continuation ()
 
 
