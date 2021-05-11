@@ -24,4 +24,4 @@ This repo contains a sample Microservices application decomposed around three bo
 They are autonomous and the integration is based on events delivered with NATS.
 The sample application contains scripts for building CI / CD pipelines for docker-compose or kubernetes.
 ## The blocks
-- [`NBB.Core`](./Core#readme) - provides core abstractions and functionality that other packages rely upon
+- [`NBB.Core`](./src/Core#readme) - provides core abstractions and functionality that other packages rely upon
