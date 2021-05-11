@@ -1,8 +1,7 @@
-# NBB
-.Net Building Blocks
+# NBB [![Build status](https://dev.azure.com/totalsoft//NBB/_apis/build/status/NBB-CI-GitHub)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=35)
+>.Net Building Blocks
 
-[![Build status](https://dev.azure.com/totalsoft//NBB/_apis/build/status/NBB-CI-GitHub)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=35)
-
+![Building blocks](assets/img/appicon.png)
 
 ## Our philosophy
 Build cutting-edge, cloud-ready, scalable, maintanable and fun LOB services with .Net Building Blocks

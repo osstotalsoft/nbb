@@ -291,6 +291,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MicroServicesOrchestrat
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NBB.Core.FSharp.Tests", "test\UnitTests\NBB.Core.FSharp.Tests\NBB.Core.FSharp.Tests.fsproj", "{31DDD372-FA89-4FD2-9912-E610233EF83D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{729F9B40-DA6F-4223-8FEE-76DBC9184112}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{B951278D-3864-4239-A2CF-769953E827EC}"
+	ProjectSection(SolutionItems) = preProject
+		assets\img\appicon.png = assets\img\appicon.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -840,6 +847,7 @@ Global
 		{04556BEE-32FE-47D5-8C22-7D336FA44D7C} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 		{4054ACD4-492E-4315-A42D-554E5F6565E5} = {CC43326A-DD67-4B00-80EE-C244B31A319F}
 		{31DDD372-FA89-4FD2-9912-E610233EF83D} = {29B7593C-60F4-41DC-A883-4976FF467927}
+		{B951278D-3864-4239-A2CF-769953E827EC} = {729F9B40-DA6F-4223-8FEE-76DBC9184112}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
