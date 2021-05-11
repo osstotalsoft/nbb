@@ -1,84 +1,80 @@
-# NBB.Core.FSharp
+# NBB.Core.Pipeline
 
-F# reader writter state monadic computations
+A multi-purpose pipeline builder
 
 ## NuGet install
 ```
-dotnet add package NBB.Core.FSharp
+dotnet add package NBB.Core.Pipeline
 ```
 
-## Reader computations
-A reader value is a computation that depends on s shared environment. See the example usage of reader computation expression below.
+## Philosophy
+A pipeline is a function of some context, composed from one or multiple middlewares.
+Each middleware receives the context and the next middleware, and is responsible of how and when to invoke the next middleware.
 
-```fsharp
-module ReaderSample
+## Design pattern
+**Chain of Responsibility** is a behavioral design pattern that lets you pass requests along a chain of handlers. Upon receiving a request, each handler decides either to process the request or to pass it to the next handler in the chain.
 
-open NBB.Core.FSharp.Data.Reader
-
-let add x = 
-    reader {
-        let! y = Reader.ask
-        return x + y
+## Pipeline middleware
+Create the middleware class by implementing the *IPipelineMiddleware* interface:
+```csharp
+private class SomeMiddleware : IPipelineMiddleware<IContext>
+{
+    public async Task Invoke(IContext ctx, CancellationToken cancellationToken, Func<Task> next)
+    {
+        ctx.Log.Add("FirstBefore");
+        await next();
+        ctx.Log.Add("FirstAfter");
     }
-
-let mult x = 
-    reader {
-        let! y = Reader.ask
-        return x * y
-    }
-
-let addThenMult = add >=> mult
-let result = Reader.run (addThenMult 2) 3
+}
+```
+Now register the middleware with the pipeline:
+```csharp
+//somewhere in a func
+var pipeline = new PipelineBuilder<IContext>()
+    .UseMiddleware<SomeMiddleware, IContext>()
+    .UseMiddleware<SomeOtherMiddleware, IContext>()
+    .Pipeline;
 ```
 
-## Statefull computations
-A statefull computation has the effect of modifying the state besides returning the value. See the example usage of state computation expression below.
-
-```fsharp
-open NBB.Core.FSharp.Data.State
-
-let inc x = x + 1
-
-let add x = 
-    state {
-        let! s = State.get
-        do! State.modify inc
-        return x + s
-    }
-
-let mult x = 
-    state {
-        let! s = State.get
-        do! State.modify inc
-        return x * s
-    }
-
-let addThenMult = add >=> mult
-let (result, state) = State.run (addThenMult 2) 3
+## Functional pipeline middleware
+If you don't require constructor injection you can model the middleware using just a function.
+```csharp
+var pipeline = new PipelineBuilder<IContext>()
+    .Use(async (ctx, cancellationToken, next) =>
+    {
+        ctx.Log.Add("FirstBefore");
+        await next();
+        Thread.Sleep(100);
+        ctx.Log.Add("FirstAfter");
+    })
+    .Use(async (data, cancellationToken, next) =>
+    {
+        ctx.Log.Add("SecondBefore");
+        await next();
+        ctx.Log.Add("SecondAfter");
+    })
+    .Pipeline;
 ```
 
-## Reader state computations
-A reader state computational effect can read a value from a shared environment and also modify some state
+## Pipeline context
+You can use whatever context type for your pipeline, the only restriction is to expose an instance of the IServiceProvider
+```csharp
+public interface IPipelineContext
+{
+    IServiceProvider Services { get; }
+}
 
-```fsharp
-open NBB.Core.FSharp.Data.ReaderState
-
-let inc x = x + 1
-
-let add x = 
-    readerState {
-        let! s = ReaderState.ask
-        do! ReaderState.modify inc
-        return x + s
-    }
-
-let mult x = 
-    readerState {
-        let! s = ReaderState.ask
-        do! ReaderState.modify inc
-        return x * s
-    }
-
-let addThenMult = add >=> mult
-let (result, state) = ReaderState.run (addThenMult 2) 3 4
+public record MessagingContext
+    (MessagingEnvelope MessagingEnvelope, string TopicName, IServiceProvider Services) : IPipelineContext;
 ```
+
+## Pipeline execution
+The PipelineBuilder.Pipeline returns just a function, that when executed executes the pipeline
+```csharp
+var pipeline = new PipelineBuilder<SomeContext>()
+    .UseMiddleware<FirstMiddleware, SomeContext>()
+    .Pipeline;
+
+await pipeline(new SomeContext(), default);
+```
+
