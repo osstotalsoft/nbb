@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NBB.Core.Effects\NBB.Core.Effects.csproj" />
-    <ProjectReference Include="..\NBB.Core.FSharp\NBB.Core.FSharp\NBB.Core.FSharp.fsproj" />
+    <ProjectReference Include="..\NBB.Core.FSharp\NBB.Core.FSharp.fsproj" />
   </ItemGroup>
 
 </Project>
