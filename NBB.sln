@@ -100,6 +100,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Contracts.ReadModel", "samples\MicroServices\NBB.Contracts\NBB.Contracts.ReadModel\NBB.Contracts.ReadModel.csproj", "{5169916E-092C-431A-8577-50F2713C10CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{14726095-DA28-43A6-A9A9-F16C605932E1}"
+	ProjectSection(SolutionItems) = preProject
+		src\Core\README.md = src\Core\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Abstractions", "src\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj", "{2F591414-63E0-4CD8-AA1E-11132CC20EA9}"
 EndProject
@@ -260,7 +263,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Core.Effects.FSharp.Tes
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Core.Evented.FSharp.Tests", "test\UnitTests\Core\NBB.Core.Evented.FSharp.Tests\NBB.Core.Evented.FSharp.Tests.fsproj", "{16EC08F8-DC9B-4D8E-89BA-6A8FBD74265B}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Core.FSharp", "src\Core\NBB.Core.FSharp\NBB.Core.FSharp\NBB.Core.FSharp.fsproj", "{06E25E78-E1B6-4237-8D48-2A4EFBD73240}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Core.FSharp", "src\Core\NBB.Core.FSharp\NBB.Core.FSharp.fsproj", "{06E25E78-E1B6-4237-8D48-2A4EFBD73240}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.AspNet", "src\MultiTenancy\NBB.MultiTenancy.AspNet\NBB.MultiTenancy.AspNet.csproj", "{64EDD4BF-5BFB-45DE-B066-A232B277090B}"
 EndProject
@@ -285,6 +288,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.BackwardCompatibility", "src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj", "{04556BEE-32FE-47D5-8C22-7D336FA44D7C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MicroServicesOrchestration", "samples\MicroServices\NBB.MicroServicesOrchestration\NBB.MicroServicesOrchestration.csproj", "{4054ACD4-492E-4315-A42D-554E5F6565E5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NBB.Core.FSharp.Tests", "test\UnitTests\NBB.Core.FSharp.Tests\NBB.Core.FSharp.Tests.fsproj", "{31DDD372-FA89-4FD2-9912-E610233EF83D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{729F9B40-DA6F-4223-8FEE-76DBC9184112}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{B951278D-3864-4239-A2CF-769953E827EC}"
+	ProjectSection(SolutionItems) = preProject
+		assets\img\appicon.png = assets\img\appicon.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -694,6 +706,10 @@ Global
 		{4054ACD4-492E-4315-A42D-554E5F6565E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4054ACD4-492E-4315-A42D-554E5F6565E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4054ACD4-492E-4315-A42D-554E5F6565E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -830,6 +846,8 @@ Global
 		{0B65210B-9A1D-4D07-98B4-69995FEF21BD} = {4DCC0E0D-52D8-4F97-9B26-C3F9CB76F16F}
 		{04556BEE-32FE-47D5-8C22-7D336FA44D7C} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 		{4054ACD4-492E-4315-A42D-554E5F6565E5} = {CC43326A-DD67-4B00-80EE-C244B31A319F}
+		{31DDD372-FA89-4FD2-9912-E610233EF83D} = {29B7593C-60F4-41DC-A883-4976FF467927}
+		{B951278D-3864-4239-A2CF-769953E827EC} = {729F9B40-DA6F-4223-8FEE-76DBC9184112}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
