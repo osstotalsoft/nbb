@@ -6,7 +6,7 @@ When it comes to messaging systems we embrace the Microservices philosophy:
 
 
 Althought NBB targets distributed systems, the messaging system is not a core building block, it is treated as an infrastructure detail.
-It is your choise to make to use or not to use one, and what provider to choose. (Note. You may choose to integrate services via Http or Event Store Streams).
+It is your choice to make to use or not to use one, and what provider to choose. (Note. You may choose to integrate services via Http or Event Store Streams).
 
 
 Messaging abstractions
@@ -38,5 +38,5 @@ Other packages
 -------------
 * *NBB.Messaging.BackwardCompatibility* - used for backward compatibility with messaging policies from previous NBB versions
 * *NBB.Messaging.Effects* - Messaging side effects and handlers for the NBB effects infrastructure
-* *NBB.Messaging.Multitenancy* - Support for messaging in multi-tenant environments
-* *NBB.Messaging.Opentracig* - Support for OpenTracing in messaging publishers and subscribers
+* *NBB.Messaging.MultiTenancy* - Support for messaging in multi-tenant environments
+* *NBB.Messaging.OpenTracig* - Support for OpenTracing in messaging publishers and subscribers
