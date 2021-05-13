@@ -6,7 +6,7 @@ When it comes to messaging systems we embrace the Microservices philosophy:
 
 
 Althought NBB targets distributed systems, the messaging system is not a core building block, it is treated as an infrastructure detail.
-It is your choice to make to use or not to use one, and what provider to choose. (Note. You may choose to integrate services via Http or Event Store Streams).
+It is your choice whether to use it or choose another messaging library. (Note. You may also choose to integrate services via Http or Event Store Streams).
 
 
 Messaging abstractions
