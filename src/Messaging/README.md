@@ -43,4 +43,4 @@ Other packages
 * *NBB.Messaging.BackwardCompatibility* - used for backward compatibility with messaging policies from previous NBB versions
 * *NBB.Messaging.Effects* - Messaging side effects and handlers for the NBB effects infrastructure
 * *NBB.Messaging.MultiTenancy* - Support for messaging in multi-tenant environments
-* *NBB.Messaging.OpenTracig* - Support for OpenTracing in messaging publishers and subscribers
+* *NBB.Messaging.OpenTracing* - Support for OpenTracing in messaging publishers and subscribers
