@@ -74,7 +74,7 @@ To publish messages, you should resolve/inject from the DI container one of the 
 await _messageBusPublisher.PublishAsync(command, cancellationToken);
 ```
 
-The topic is determined from the message type using the policy defined in the topic registry.
+The topic is determined from the message type using the policy defined in the [`Topic Registry`](#topic-registry).
 
 Some standard message headers are added such as source, correlation id, message type, publish time, message id 
 ### Publish a message with custom options:
@@ -83,7 +83,7 @@ await _messageBusPublisher.PublishAsync(command, new MessagingPublisherOptions {
 ```
 
 #### Publisher Options: 
-- **TopicName** - Override the topic name resoved from the topic registry
+- **TopicName** - Override the topic name resoved from the [`Topic Registry`](#topic-registry)
 - **EvelopeCustomizer** - A delegate that can modify the outgoing message envelope, usually for customizing message headers.
 
 
@@ -100,7 +100,7 @@ await _messageBusSubscriber.SubscribeAsync<TMessage>(HandleMsg, cancellationToke
 ```
 The *HandleMsg* message handler is a function that receives the message envelope and processes it.
 
-The topic is determined from the message type using the policy defined in the topic registry.
+The topic is determined from the message type using the policy defined in the [`Topic Registry`](#topic-registry).
 
 The default subscription is durable, within a consumer group, which handles one message at a time. 
 
@@ -112,7 +112,7 @@ var subscription = await _messageBus.SubscribeAsync<TMessage>(HandleMsg, Messagi
 #### Subscriber options
 - **TopicName** -  The name of the topic to subscribe to (optional for typed subscriptions)
 - **SerDes** - options regarding the serialization/deserialization of messages
-  - **UseDynamicDeserialization** (default false) - see [`NBB.Core`](#dynamic-deserialization)
+  - **UseDynamicDeserialization** (default false) - see [`Dynamic deserialization`](#dynamic-deserialization)
   - **DynamicDeserializationScannedAssemblies** - the assemblies to scan in case UseDynamicDeserialization is used
 - **Transport** - options for the messaging transport
   - **IsDurable** (default true) - Specifies if a durable subscription should be made
