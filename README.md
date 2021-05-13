@@ -25,3 +25,4 @@ They are autonomous and the integration is based on events delivered with NATS.
 The sample application contains scripts for building CI / CD pipelines for docker-compose or kubernetes.
 ## The blocks
 - [`NBB.Core`](./src/Core#readme) - provides core abstractions and functionality that other packages rely upon
+- [`NBB.Messaging`](./src/Messaging#readme) - distributed application infrastructure that enables loosely-coupled, message-based asynchronous communication

@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7311E32F-C1B0-41C9-B5F1-DE9EBB6ABB55}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messaging", "Messaging", "{584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}"
+	ProjectSection(SolutionItems) = preProject
+		src\Messaging\README.md = src\Messaging\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Abstractions", "src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj", "{2D956C4C-140C-4C4B-8975-43F82EBC06B6}"
 EndProject
