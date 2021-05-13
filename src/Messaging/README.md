@@ -2,7 +2,7 @@ Messaging
 ===============
 
 When it comes to messaging systems we embrace the Microservices philosophy:
-> smart endpoints dumb pipes
+> "smart endpoints dumb pipes"
 
 
 Althought NBB targets distributed systems, the messaging system is not a core building block, it is treated as an infrastructure detail.
