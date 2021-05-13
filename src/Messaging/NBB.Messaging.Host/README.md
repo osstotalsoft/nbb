@@ -225,6 +225,8 @@ Add dynamic deserialization
     .UseDynamicDeserialization(new[] { typeof(MyMessage).Assembly }))
 ```
 
+For more details see [`Subscriber options`](../NBB.Messaging.Abstractions#subscriber-options)
+
 #### Default options
 Use default transport and serialization options
 
@@ -233,8 +235,7 @@ Use default transport and serialization options
 .WithDefaultOptions()
 ```
 
-
-
+For more details see [`Subscriber options`](../NBB.Messaging.Abstractions#subscriber-options)
 
 ## Pipeline configuration
 

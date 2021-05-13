@@ -112,7 +112,7 @@ var subscription = await _messageBus.SubscribeAsync<TMessage>(HandleMsg, Messagi
 #### Subscriber options
 - **TopicName** -  The name of the topic to subscribe to (optional for typed subscriptions)
 - **SerDes** - options regarding the serialization/deserialization of messages
-  - **UseDynamicDeserialization** (default false) - deserializes the message payload according to the "message type" header in the envelope. The actual type is determined by scanning assemblies according to the policy in *MessageTypeRegistry*
+  - **UseDynamicDeserialization** (default false) - see [`NBB.Core`](#dynamic-deserialization)
   - **DynamicDeserializationScannedAssemblies** - the assemblies to scan in case UseDynamicDeserialization is used
 - **Transport** - options for the messaging transport
   - **IsDurable** (default true) - Specifies if a durable subscription should be made
@@ -129,3 +129,42 @@ Predefined combinations of transport options:
 **Note**: If the message type is not known and we don't use *DynamicDeserialization*, the message payload will be deserialized into an *ExpandoObject*
 
 
+## Topic resolution
+The topic name for publishing and subscribing to messages is determined by the policies defined in the *TopicRegistry*.
+
+### Topic registry
+
+The topic registry is a service that implements interface **ITopicRegistry*. There is a default implementation that is automatically registered in the DI container when registering the MessageBus, but it can also be replaced with a custom implementation.
+
+The default topic resolution policy (based on a message type):
+* Use the full type name (including namespace) in case a *TopicNameAttribute* is not specified
+* Use the value of the *TopicNameAttribute* if it is presend on the type
+* In both cases add a prefix with the environment (as speciffied in the configuration section *Messaging.Env*)
+
+The default topic resolution policy (based on a topic name):
+* Use the given topic name prefixed with the environment (as speciffied in the configuration section *Messaging.Env*)
+
+## Message serialization / deserialization
+Serialization and deserialization is performed by a service that implements the interface *IMessageSerDes*. There is a default implementation that is automatically registered in the DI container when registering the MessageBus, but it can also be replaced with a custom implementation.
+
+The default implementation uses JSON serialization for messages.
+
+### Dynamic deserialization
+When the message type is not known (or object) we have the option to deserialize the message payload according to the "message type" header in the envelope. The actual type is determined by scanning assemblies according to the policy in *MessageTypeRegistry*
+
+If we don't use dynamic deserialization in this case the message payload will be deserialized into an *ExpandoObject*
+
+
+## Message envelope
+All messages transported on the bus are wrapped in a message envelope. It has the following sections
+- Headers: a dictionary of string keys and values representing message metadata
+- Payload: the data
+
+### Standard headers
+| Code                            | Value                  | Description                                                  |
+| --------------------------------| ---------------------- | ------------------------------------------------------------ |
+| MessagingHeaders.MessageType    | "nbb-messageType"      | The type name of the payload (can be used in dynamic deserialization)                                                        |
+| MessagingHeaders.Source         | "nbb-source"           | The source service (where the message was published)                                                      |
+| MessagingHeaders.CorrelationId  | "nbb-correlationId"    | A correlation ID for tracing the message                                                         |
+| MessagingHeaders.MessageId      | "nbb-messageId"        | A unique identifier of the message (can be used for idempotency chcecks)                                                         |
+| MessagingHeaders.PublishTime    | "nbb-publishTime"      | The date and time when the message was published.                                                         |
