@@ -40,7 +40,7 @@ The message bus uses an abstraction over the messaging transport. The following 
 
 Other packages
 -------------
-* *NBB.Messaging.BackwardCompatibility* - used for backward compatibility with messaging policies from previous NBB versions
+* *NBB.Messaging.BackwardCompatibility* - used for backward compatibility with messaging policies from previous NBB versions (currently ensures compatiblity with NBB 4.x)
 * *NBB.Messaging.Effects* - messaging side effects and handlers for the NBB effects infrastructure
 * *NBB.Messaging.MultiTenancy* - support for messaging in multi-tenant environments
 * *NBB.Messaging.OpenTracing* - support for *OpenTracing* in messaging publishers and subscribers
