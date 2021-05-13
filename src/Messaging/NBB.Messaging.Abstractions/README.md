@@ -138,7 +138,7 @@ The topic registry is a service that implements interface **ITopicRegistry*. The
 
 The default topic resolution policy (based on a message type):
 * Use the full type name (including namespace) in case a *TopicNameAttribute* is not specified
-* Use the value of the *TopicNameAttribute* if it is presend on the type
+* Use the value of the *TopicNameAttribute* if it is present on the type
 * In both cases add a prefix with the environment (as speciffied in the configuration section *Messaging.Env*)
 
 The default topic resolution policy (based on a topic name):
