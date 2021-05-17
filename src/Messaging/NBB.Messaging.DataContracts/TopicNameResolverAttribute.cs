@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 
-namespace NBB.Messaging.Abstractions
+namespace NBB.Messaging.DataContracts
 {
     public abstract class TopicNameResolverAttribute : Attribute
     {
