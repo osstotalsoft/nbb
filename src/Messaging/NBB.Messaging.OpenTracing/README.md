@@ -15,7 +15,7 @@ To enable creating a publisher span, register the following publisher decorator 
 services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
 ```
 
-The span is tagged with span kind **producer**, component **NBB.Messaging**
+The span is tagged with **span.kind** = "producer", **component** = "NBB.Messaging", **message_bus.destination** = the topic for the published message, **nbb.correlation_id** = the current correlation ID
 
 ## Subscriber 
 To enable creating a subscriber span, add the following middleware in the messaging host pipeline:
@@ -29,3 +29,5 @@ To enable creating a subscriber span, add the following middleware in the messag
         ...
 });
 ```
+
+This span relates to the publishinr span  using a reference of type "follows_from". It tagged with **span.kind** = "consumer", **component** = "NBB.Messaging", **peer.service** = the name of the service that published the message , **nbb.correlation_id** = the current correlation ID
