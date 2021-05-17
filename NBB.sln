@@ -292,7 +292,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.BackwardCompa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MicroServicesOrchestration", "samples\MicroServices\NBB.MicroServicesOrchestration\NBB.MicroServicesOrchestration.csproj", "{4054ACD4-492E-4315-A42D-554E5F6565E5}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NBB.Core.FSharp.Tests", "test\UnitTests\NBB.Core.FSharp.Tests\NBB.Core.FSharp.Tests.fsproj", "{31DDD372-FA89-4FD2-9912-E610233EF83D}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Core.FSharp.Tests", "test\UnitTests\NBB.Core.FSharp.Tests\NBB.Core.FSharp.Tests.fsproj", "{31DDD372-FA89-4FD2-9912-E610233EF83D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{729F9B40-DA6F-4223-8FEE-76DBC9184112}"
 EndProject
@@ -300,6 +300,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{B951278D-386
 	ProjectSection(SolutionItems) = preProject
 		assets\img\appicon.png = assets\img\appicon.png
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Messaging.DataContracts", "src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj", "{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -713,6 +715,10 @@ Global
 		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31DDD372-FA89-4FD2-9912-E610233EF83D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -851,6 +857,7 @@ Global
 		{4054ACD4-492E-4315-A42D-554E5F6565E5} = {CC43326A-DD67-4B00-80EE-C244B31A319F}
 		{31DDD372-FA89-4FD2-9912-E610233EF83D} = {29B7593C-60F4-41DC-A883-4976FF467927}
 		{B951278D-3864-4239-A2CF-769953E827EC} = {729F9B40-DA6F-4223-8FEE-76DBC9184112}
+		{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
