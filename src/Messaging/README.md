@@ -19,7 +19,7 @@ The package *NBB.Messaging.Abstractions* contains some very lightweight abstract
 * Message envelope
 * Message serialization
 
-For more details see [`NBB.Messaging.Abstractions`](.//NBB.Messaging.Abstractions)
+For more details see [`NBB.Messaging.Abstractions`](.//NBB.Messaging.Abstractions#readme)
 
 Messaging host
 ----------------
@@ -30,7 +30,7 @@ It provides the following core functionalities:
 * Configuring the messaging subscriptions (topics, options)
 * Building the incomming message pipeline
 
-For more details see [`NBB.Messaging.Host`](./NBB.Messaging.Host)
+For more details see [`NBB.Messaging.Host`](./NBB.Messaging.Host#readme)
 
 Messaging transports
 -----------------

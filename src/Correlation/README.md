@@ -19,9 +19,9 @@ Using correlation makes it easy to investigate problems in a business flow becau
 ## Messaging integration
 The correlation ID can be attached to messages and transported across all microservices involved in a business flow.
 
-There is a dedicated messaging header **nbb-correlationID** interpreted by
+There is a dedicated messaging header **nbb-correlationID** interpreted by:
 * [`message bus publisher`](../Messaging/NBB.Messaging.Abstractions#publish) - the publisher automatically adds the current correlation ID to the envelope headers
 * [`messaging host`](../Messaging/NBB.Messaging.Host#readme) - there is a built-in [`correlation middleware `](../Messaging/NBB.Messaging.Host#built-in-correlation-middleware) that reads the messaging header and sets the current correlation ID
 
-## Open Tracing integration
-A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans. 
+### Open Tracing integration
+A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans. For details see [`NBB.Messaging.Opentracing`](./../Messaging/NBB.Messaging.Correlation#readme)
