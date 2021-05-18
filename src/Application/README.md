@@ -1,5 +1,5 @@
 # nbb application packages
-##### provides application layer specific functionality 
+##### application layer specific functionality
 
 
 ## The packages
