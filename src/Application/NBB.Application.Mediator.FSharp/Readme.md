@@ -85,7 +85,7 @@ let cmdPipeline =
 
 
 ## Query pipeline
-A query pipeline is just a request pipeline, where requests are querries, so `QueryHandler` and `QueryMiddleware` are just aliases for `RequestHandler` and `RequestMiddleware`
+A query pipeline is just a request pipeline, where requests are queries, so `QueryHandler` and `QueryMiddleware` are just aliases for `RequestHandler` and `RequestMiddleware`
 
 ```fsharp
 type IQuery = interface end
@@ -115,7 +115,7 @@ An event pipeline is a composition of functions used for handling certain applic
 
 ### Event handler
 An `EventHandler` is a function that may handle some event.
-It returns an optional unit, that measns that the handler can decide whether to process or not the event.
+It returns an optional unit, that means that the handler can decide whether to process or not the event.
 
 ```fsharp
 type EventHandler<'TEvent when 'TEvent :> IEvent> = 'TEvent -> Effect<unit option>

@@ -8,7 +8,7 @@ dotnet add package NBB.Application.MediatR.Effects
 ```
 
 ## Registration
-You need to register the side-effects somewere in the omposition root, like so:
+You need to register the side-effects somewere in the composition root, like so:
 
 ```csharp
 services.AddMediatorEffects();
