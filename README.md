@@ -27,3 +27,4 @@ The sample application contains scripts for building CI / CD pipelines for docke
 - [`NBB.Core`](./src/Core#readme) - core abstractions and functionality that other packages rely upon
 - [`NBB.Application`](./src/Application#readme) - application layer specific functionality
 - [`NBB.Messaging`](./src/Messaging#readme) - distributed application infrastructure that enables loosely-coupled, message-based asynchronous communication
+- [`NBB.Correlation`](./src/Correlation#readme) - facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow
