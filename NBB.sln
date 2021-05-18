@@ -110,6 +110,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Abstractions", "src\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj", "{2F591414-63E0-4CD8-AA1E-11132CC20EA9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventStore", "EventStore", "{20C8482D-1525-47B0-B78B-09632892E8E4}"
+	ProjectSection(SolutionItems) = preProject
+		src\EventStore\README.md = src\EventStore\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.EventStore.Abstractions", "src\EventStore\NBB.EventStore.Abstractions\NBB.EventStore.Abstractions.csproj", "{7197E4CE-120D-4601-AA8B-F65B8DB2E883}"
 EndProject
@@ -301,7 +304,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{B951278D-386
 		assets\img\appicon.png = assets\img\appicon.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Messaging.DataContracts", "src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj", "{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.DataContracts", "src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj", "{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
