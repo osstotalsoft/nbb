@@ -10,7 +10,7 @@ Using correlation makes it easy to investigate problems in a business flow becau
   - [`NBB.Correlation`](./NBB.Correlation#readme) - provides core correlation functionality such as accessing the current correlation ID
 
 ## Serilog integration
-  - [`NBB.Correlation.Serilog`](./NBB.Correlation.Serilog#readme) - correlation extenstions for Serilog logging infrastructure
+  - [`NBB.Correlation.Serilog`](./NBB.Correlation.Serilog#readme) - correlation extensions for Serilog logging infrastructure
   - [`NBB.Correlation.Serilog.SqlServer`](./NBB.Correlation.Serilog.SqlServer#readme) - extensions for log persistence using the Serilog sink for SQL Server
 
 ## ASP.NET integration

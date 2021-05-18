@@ -30,4 +30,4 @@ To enable creating a subscriber span, add the following middleware in the messag
 });
 ```
 
-This span relates to the publishinr span  using a reference of type "follows_from". It tagged with **span.kind** = "consumer", **component** = "NBB.Messaging", **peer.service** = the name of the service that published the message , **nbb.correlation_id** = the current correlation ID
+This span relates to the publisher span  using a reference of type "follows_from". The following tags are associated with the span: **span.kind** = "consumer", **component** = "NBB.Messaging", **peer.service** = the name of the service that published the message , **nbb.correlation_id** = the current correlation ID
