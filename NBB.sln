@@ -25,6 +25,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Domain", "src\Domain\NBB.Domain\NBB.Domain.csproj", "{AA00FED4-B9D1-4E7E-A06B-4A9403BFF7FF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{4DCC0E0D-52D8-4F97-9B26-C3F9CB76F16F}"
+	ProjectSection(SolutionItems) = preProject
+		src\Application\README.md = src\Application\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.MediatR", "src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj", "{3A9676F0-9B5E-44DB-99A5-644200971512}"
 EndProject
@@ -151,6 +154,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Mono.Migrations", "samples\Monolith\NBB.Mono.Migrations\NBB.Mono.Migrations.csproj", "{4569E00B-D010-460B-BCFD-6E56832CB2A0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Correlation", "Correlation", "{307E1650-6128-4A36-9C98-297F2BF71C83}"
+	ProjectSection(SolutionItems) = preProject
+		src\Correlation\README.md = src\Correlation\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Correlation", "src\Correlation\NBB.Correlation\NBB.Correlation.csproj", "{9C0F71FC-16A0-401E-B479-D9458CBC95D7}"
 EndProject

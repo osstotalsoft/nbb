@@ -31,7 +31,7 @@ namespace NBB.Messaging.OpenTracing.Subscriber
                 .WithTag(Tags.SpanKind, Tags.SpanKindConsumer)
                 .WithTag(Tags.PeerService,
                     context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var value) ? value : default)
-                .WithTag("correlationId", CorrelationManager.GetCorrelationId()?.ToString())
+                .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
                 .StartActive(true))
             {
 

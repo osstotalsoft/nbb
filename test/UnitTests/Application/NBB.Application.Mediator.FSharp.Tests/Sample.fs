@@ -1,7 +1,6 @@
 ﻿module Application
 
 open NBB.Core.Effects.FSharp
-open NBB.Core.Abstractions
 open NBB.Application.Mediator.FSharp
 open System
 
