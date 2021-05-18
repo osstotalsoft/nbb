@@ -98,7 +98,7 @@ type QueryMiddleware<'TQuery, 'TResponse when 'TQuery :> IQuery> = RequestMiddle
 type QueryMiddleware = QueryMiddleware<IQuery, obj>
 ```
 
-### Command pipeline combinators
+### Query pipeline combinators
  - `QueryHandler.upCast` - converts a `QueryHandler<'TQuery, 'TResponse>` to a `QueryHandler`. It is useful in conjuction with `RequestMiddleware.handlers` combinator
 ```fsharp
 let queryPipeline = 
@@ -109,30 +109,6 @@ let queryPipeline =
 ```
 
  - `QueryMiddleware.run` - transforms a query middleware into a query handler
-
-
-## Event pipeline
-An `RequestMiddleware` is just a function that receives the next request handler and returns a resulting request handler
-```fsharp
-type RequestMiddleware<'TRequest, 'TResponse> = RequestHandler<'TRequest, 'TResponse> -> RequestHandler<'TRequest, 'TResponse>
-```
-
-Example:
-```fsharp
-let logRequest =
-    fun next req ->
-    effect {
-        Console.WriteLine "before"
-        let! result = next req
-        Console.WriteLine "after"
-        return result
-    }
-```
-
-Request middlewares compose via simple function composition:
-```fsharp
-let requestPipeline = handleExceptions << logRequest
-```
 
 ## Event pipeline
 An event pipeline is a composition of functions used for handling certain application events
@@ -152,7 +128,8 @@ let handle (_: Event1) =
         return () |> Some
     }
 ```
-Event handlers compose via the append fn or (++) operator:
+Event handlers compose via the append fn or (++) operator, which evaluates the handlers in sequence:
+
 ```fsharp
 let myEvHandler = Event1.handle1 ++ Event1.handle2
 ```

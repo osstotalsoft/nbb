@@ -4,7 +4,7 @@ This package provides legacy base application data contracts, usefull when refer
 
 Starting with version 5, NBB does not formalize application data contracts any more, because there are packages like MediatR, that offer application mediator functionality and they ussually formalize application requests and events.
 
-Projects targetting NBB can still formalize application requests, segregate them into commands and querries using interface and/or base classes.
+Projects targetting NBB can still formalize application requests, and maybe segregate them into commands and querries using interface and/or base classes. It is their choise.
 
 ## NuGet install
 ```
@@ -12,7 +12,7 @@ dotnet add package NBB.Application.DataContracts
 ```
 
 ## Base data contracts
-Tipically published language assemblies referencing NBB4.x expose commands and events that depend on *NBB.Application.DataContracts.Command* and *NBB.Application.DataContracts.Event*. If you need to reference this kind of assemblies, you will also need to reference this package, so that Command and Event base classes will be linked to the ones provided by this package
+Tipically published language assemblies referencing NBB4.x expose commands and events that depend on `NBB.Application.DataContracts.Command` and `NBB.Application.DataContracts.Event`. If you need to reference this kind of assemblies, you will also need to reference this package, so that `Command` and `Event` base classes will be linked to the ones provided by this package.
 
 Example:
 - ServiceA published language assembly referencing NBB4.x, contains
@@ -30,7 +30,7 @@ namespace ServiceA.PublishedLanguage.Commands
     }
 }
 ```
-- ServiceB references ServiceA published language needs to also reference this package:
+- ServiceB references ServiceA published language so, it needs to also reference this package:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
