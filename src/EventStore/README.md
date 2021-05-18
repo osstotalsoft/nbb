@@ -4,25 +4,25 @@
 > An event store is just a database that stores events. 
 > This is a pretty simple idea with some very powerful implications.
 
-The package [`NBB.EventStore.Abstractions`](./NBB.Eventsore.Abstractions#readme) contains *IEventStore* a lightweight abstraction over any EventStore client. 
+The package [`NBB.EventStore.Abstractions`](./NBB.EventStore.Abstractions#readme) contains *IEventStore* a lightweight abstraction over any EventStore client. 
 It is ment to be consumed only by infrastructure packages in order to decouple from any EventStore implementation.
 
 
-The package [`NBB.EventStore`](./NBB.Eventsore#readme) offers *EventStore*, a modest implementation of the concept.
+The package [`NBB.EventStore`](./NBB.EventStore#readme) offers *EventStore*, a modest implementation of the concept.
 
 ## Event repositories
 
 The *EventStore* delegates persistence responsabilities to the *IEventRepository* implementations in order to decouple from any possible implementation.
 
 ### ADO.NET
-The package [`NBB.EventStore.AdoNet`](./NBB.Eventsore.AdoNet#AdoNet) offers an ADO.NET based implementation for *IEventRepository*.
+The package [`NBB.EventStore.AdoNet`](./NBB.EventStore.AdoNet#AdoNet) offers an ADO.NET based implementation for *IEventRepository*.
 
 The package [`NBB.EventStore.AdoNet.MultiTenancy`](./NBB.EventStore.AdoNet.MultiTenancy#readme) offers an ADO.NET based implementation for *IEventRepository* with multi-tenancy support.
 
 The package [`NBB.EventStore.AdoNet.Migrations`](./NBB.EventStore.AdoNet.Migrations#readme) offers a migrations API for *AdoNetEventRepository*.
 
 ### In-memory
-The package [`NBB.EventStore.InMemory`](./NBB.Eventsore.InMemory#readme) offers an in-process implementation for *IEventRepository*.
+The package [`NBB.EventStore.InMemory`](./NBB.EventStore.InMemory#readme) offers an in-process implementation for *IEventRepository*.
 
 
 ## Registration
@@ -58,11 +58,11 @@ If two threads or processes want to save to events with the same sequence number
 
 Snapshotting
 ----------------
-The package [`NBB.EventStore.Abstractions`](./NBB.Eventsore.Abstractions#readme) contains *ISnapshotStore* a lightweight abstraction for any snapshot store client.
+The package [`NBB.EventStore.Abstractions`](./NBB.EventStore.Abstractions#readme) contains *ISnapshotStore* a lightweight abstraction for any snapshot store client.
 
 The *SnapshotStore* delegates persistence responsibilities to the *ISnapshotRepository* implementations in order to decouple from any possible implementation.
 
-The package  [`NBB.EventStore.AdoNet`](./NBB.Eventsore.AdoNet#AdoNet) offers an Ado.Net based implementation for *ISnapshotRepository*.
+The package  [`NBB.EventStore.AdoNet`](./NBB.EventStore.AdoNet#AdoNet) offers an Ado.Net based implementation for *ISnapshotRepository*.
 
 
 
