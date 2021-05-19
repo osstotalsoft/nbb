@@ -12,7 +12,7 @@ The package [`NBB.EventStore`](./NBB.EventStore#readme) offers *EventStore*, a m
 
 ## Event repositories
 
-The *EventStore* delegates persistence responsabilities to the *IEventRepository* implementations in order to decouple from any possible implementation.
+The *EventStore* delegates persistence responsibilities to the *IEventRepository* implementations in order to decouple from any possible implementation.
 
 ### ADO.NET
 The package [`NBB.EventStore.AdoNet`](./NBB.EventStore.AdoNet#AdoNet) offers an ADO.NET based implementation for *IEventRepository*.
@@ -52,9 +52,9 @@ Concurrency model
 ----------------
 The event store uses the concurrency model defined at the IEventRepository level (at the storage level).
 
-The *EfEventRepository* and *AdoNetEventRepository* offers optimistic concurency based on the event's SequenceNumber.
+The *EfEventRepository* and *AdoNetEventRepository* offers optimistic concurrency based on the event's SequenceNumber.
 
-If two threads or processes want to save to events with the same sequence number to same stream of events, the last will fail with a ConcurencyException.
+If two threads or processes want to save to events with the same sequence number to same stream of events, the last will fail with a *ConcurrencyException*.
 
 Snapshotting
 ----------------

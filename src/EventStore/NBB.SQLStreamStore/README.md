@@ -1,6 +1,6 @@
 # NBB.SQLStreamStore
 
-This package provides a [`SQL Strem Store`](https://github.com/SQLStreamStore/SQLStreamStore#readme) implementation of the *Event Store* abstractions as defined in package [`NBB.EventStore.Abstractions`](../NBB.EventStore.Abstractions).
+This package provides a [`SQL Stream Store`](https://github.com/SQLStreamStore/SQLStreamStore#readme) implementation of the *Event Store* abstractions as defined in package [`NBB.EventStore.Abstractions`](../NBB.EventStore.Abstractions).
 
 ## NuGet install
 ```

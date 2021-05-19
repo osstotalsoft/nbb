@@ -4,7 +4,7 @@ Creates the database objects for the [`NBB.EventStore.AdoNet`](../NBB.EventStore
 
 ## Configuration
 
-The configuration alows specifying:
+The configuration allows specifying:
 * the connection string of the event store database
 * the tenancy type (determines whether to add multi-tenant support)
 

@@ -2,7 +2,7 @@
 
 This package provides an implementation of the *Event Store* abstractions as defined in package [`NBB.EventStore.Abstractions`](../NBB.EventStore.Abstractions).
 
-The package also provides abstractions for the event and shapshot repositories.
+The package also provides abstractions for the event and snapshot repositories.
 
 
 ## NuGet install

@@ -13,7 +13,7 @@ The following main abstractions are provided
 
 ## IEventStore
 
-This is the main event store abstraction that specifies how events should be added or retreived from the store:
+This is the main event store abstraction that specifies how events should be added or retrieved from the store:
 
 ```csharp
 public interface IEventStore
@@ -23,7 +23,7 @@ public interface IEventStore
 }
 ```
 
-### IShapshotStore
+### ISnapshotStore
 
 This abstraction enables [`snapshotting`](../#snapshotting) and specifies how snapshots are stored or loaded from the store
 
