@@ -17,6 +17,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Domain.Abstractions", "src\Domain\NBB.Domain.Abstractions\NBB.Domain.Abstractions.csproj", "{5EDA8FDA-2639-464F-A835-97006BDB8C4F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{F031DBDA-5D3F-4CE6-B133-09CE7E212584}"
+	ProjectSection(SolutionItems) = preProject
+		src\Data\README.md = src\Data\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Data.EntityFramework", "src\Data\NBB.Data.EntityFramework\NBB.Data.EntityFramework.csproj", "{52D658B6-C557-43AB-8886-1EE9DE1D1E37}"
 EndProject
