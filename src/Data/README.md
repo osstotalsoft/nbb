@@ -22,23 +22,19 @@ The package *NBB.Data.EntityFramework* provides some implementations formalized 
 * `EfUow` - unit of work implementation
 * `EfQuery` - implementation of `IQueryable<TEntity>` and `IAsyncEnumerable<TEntity>`
 
-It provides the following core functionalities:
-* Raising a background (hosted) service that processes incomming messages
-* Configuring the messaging subscriptions (topics, options)
-* Building the incomming message pipeline
-
 For more details see [`NBB.Data.EntityFramework`](./NBB.Data.EntityFramework#readme)
 
 Entity Framework multi-tenancy
 -----------------
-The message bus uses an abstraction over the messaging transport. The following implementations are currently supported:
-* **NATS Streaming** (*NBB.Messaging.Nats* package) - https://nats.io
-* **In-process** (*NBB.Messaging.InProcessMessaging*) - can be used as *test doubles* in integration tests
+The package *NBB.Data.EntityFramework.MultiTenancy* helps implementing a multi-tenant data access solution using Entity Framework
+
+For more details see [`NBB.Data.EntityFramework.MultiTenancy`](./NBB.Data.EntityFramework.MultiTenancy#readme)
 
 Event sourcing
 -------------
-* *NBB.Messaging.BackwardCompatibility* - used for backward compatibility with messaging policies from previous NBB versions (currently ensures compatiblity with NBB 4.x)
-* *NBB.Messaging.DataContracts* - helps us formalize and instrument messaging data contracts
-* *NBB.Messaging.Effects* - messaging side effects and handlers for the NBB effects infrastructure
-* *NBB.Messaging.MultiTenancy* - support for messaging in multi-tenant environments
-* *NBB.Messaging.OpenTracing* - support for *OpenTracing* in messaging publishers and subscribers
+This package aims to help you deal with data access when working with event sourced domain models.
+
+It offers an `EventSourcedRepository` that:
+* reads/persists events from/into an `IEventStore`
+* manages snapshots using an `ISnapshotStore`
+* dispatches events using `MediatR`
