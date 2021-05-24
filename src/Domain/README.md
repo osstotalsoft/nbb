@@ -212,32 +212,9 @@ Those side effects must be consistent so either all the operations related to th
 
 Domain events as a preferred way to trigger side effects across multiple aggregates within the same domain.
 
-![domain events](/images/domain_events.png)
-
-
 ```csharp
-public class ContractValidated : DomainEvent
-{
-    public Guid ContractId { get; }
-    public Guid ClientId { get; }
-    public decimal Amount { get; }
+public record ContractValidated(Guid ContractId, Guid ClientId, decimal Amount) : INotification;
 
-    [JsonConstructor]
-    private ContractValidated(Guid eventId, DomainEventMetadata metadata,
-        Guid contractId, Guid clientId, decimal amount)
-        : base(eventId, metadata)
-    {
-        ContractId = contractId;
-        ClientId = clientId;
-        Amount = amount;
-    }
-
-    public ContractValidated(Guid contractId, Guid clientId, decimal amount)
-        : this(Guid.NewGuid(), new DomainEventMetadata { CreationDate = DateTime.UtcNow }, contractId, clientId, amount)
-    {
-    }
-
-}
 ```
 
 Repositories
@@ -257,38 +234,36 @@ It's your decision to use this as a building block for your specific domain tune
 If you want to use an EventStore for Audit you can hook the *EventedCrudRepositoryDecorator* that pushes the events in the EventStore.
 
 ```csharp
- public static class DependencyInjectionExtensions
+public static class DependencyInjectionExtensions
+{
+    public static void AddInvoicesDataAccess(this IServiceCollection services)
     {
-        public static void AddInvoicesDataAccess(this IServiceCollection services)
-        {
-            services.AddEntityFrameworkDataAccess();
+        services.AddEntityFrameworkDataAccess();
 
-            services
-                .AddScoped<ICrudRepository<Invoice>, EfCrudRepository<Invoice, InvoicesDbContext>>()
-                .Decorate<ICrudRepository<Invoice>, EventedCrudRepositoryDecorator<Invoice>>();
+        services.AddEfQuery<Invoice, InvoicesDbContext>();
+        services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
 
-            services.AddDbContext<InvoicesDbContext>(
-                (serviceProvider, options) =>
-                {
-                    var configuration = serviceProvider.GetService<IConfiguration>();
-                    var connectionString = configuration.GetConnectionString("DefaultConnection");
-                    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
-                });
-        }
+        services.AddDbContextPool<InvoicesDbContext>(
+            (serviceProvider, options) =>
+            {
+                var configuration = serviceProvider.GetService<IConfiguration>();
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
+                options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
+            });
     }
+}
 ```
 
 For EventSourcedAggregates we provide a generic *EventSourcedRepository* that makes use of the default configured IEventStore.
 ```csharp
 public static class DependencyInjectionExtensions
+{
+    public static void AddContractsWriteModelDataAccess(this IServiceCollection services)
     {
-        public static void AddContractsWriteModelDataAccess(this IServiceCollection services)
-        {
-            services.AddScoped<IEventSourcedRepository<Domain.ContractAggregate.Contract>, EventSourcedRepository<Domain.ContractAggregate.Contract>>();
-            services.AddScoped<IEventSourcedRepository<Domain.InsuranceAggregate.Insurance>, EventSourcedRepository<Domain.InsuranceAggregate.Insurance>>();
-            services.AddScoped<IEventSourcedRepository<Domain.InvoiceAggregate.Invoice>, EventSourcedRepository<Domain.InvoiceAggregate.Invoice>>();
-        }
+        services.AddEventSourcingDataAccess()
+            .AddEventSourcedRepository<Contract>();
     }
+}
 ```
 
 Domain services
