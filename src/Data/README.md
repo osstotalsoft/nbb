@@ -20,7 +20,7 @@ For more details see [`NBB.Data.Abstractions`](.//NBB.Data.Abstractions#readme)
 
 Entity Framework
 ----------------
-The package *NBB.Data.EntityFramework* provides some implementations formalized above using Entity Framework:
+The package *NBB.Data.EntityFramework* provides some implementations for abstractions formalized above using Entity Framework:
 * `EfCrudRepository`
 * `EfReadOnlyRepository`
 * `EfUow` - unit of work implementation
@@ -42,3 +42,5 @@ It offers an `EventSourcedRepository` that:
 * reads/persists events from/into an `IEventStore`
 * manages snapshots using an `ISnapshotStore`
 * dispatches events using `MediatR`
+
+For more details see [`NBB.Data.EventSourcing`](./NBB.Data.EventSourcing#readme)

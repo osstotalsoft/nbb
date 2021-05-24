@@ -5,7 +5,6 @@ The package *NBB.Data.Abstractions* contains some very lightweight abstractions 
 * Event sourced repository
 * Read-only repository
 * Unit of work repository
-* Message serialization
 
 NuGet install
 ----------------

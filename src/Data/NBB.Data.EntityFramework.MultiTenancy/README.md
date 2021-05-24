@@ -22,7 +22,7 @@ This package supports all 3 strategies stated above, so that you can write tenan
 
 Tenant database configuration
 ----------------
-You need to provide an implementation for `ITenantDatabaseConfigService` so that when executing a query the system knows to inject or not a TenantId filter.
+You need to provide an implementation for `ITenantDatabaseConfigService` so that when executing a query, the system knows to inject or not a TenantId filter.
 ```csharp
 public interface ITenantDatabaseConfigService
 {

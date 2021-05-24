@@ -15,8 +15,8 @@ dotnet add package NBB.Data.EntityFramework
 
 CRUD Repositories
 ----------------
-Package *NBB.Data.EntityFramework* exposes EfCrudRepository, witch is a generic repository based on EF Core and implements ICrudRepository.
-The use of generic repository is controversal in the DDD landscape, they say that you should only use single purpose repositories as dictated by the business domain.
+The EfCrudRepository is a generic CRUD repository based on EF Core, that implements the ICrudRepository interface from package `NBB.Data.Abstractions`.
+Although the use of generic repository is controversal, they say that you should only use single purpose repositories as dictated by the business domain, you may find this useful when implementing data access for CRUD domains.
 
 You have to explicitly register the generic repository for a specific entity with the container:
 
@@ -48,9 +48,9 @@ public async Task Handle(EventStoreEnvelope<ContractLineAdded> @event, Cancellat
 Read-Only Repositories
 ----------------
 For read models, if you need a clean separation, you can  provide read-only repositories, although you may need a CRUD one for read model generators.
-```cshap
-services.AddScoped<IReadOnlyRepository<Contract>, EfReadOnlyRepository<Contract, ContractsReadDbContext>>();
-services.AddScoped<ICrudRepository<Contract>, EfCrudRepository<Contract, ContractsReadDbContext>>();
+
+```csharp
+services.AddEfReadOnlyRepository<Invoice, InvoicesDbContext>();
 ```
 
 Using Queries for read model
