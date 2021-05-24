@@ -1,5 +1,10 @@
 NBB.Data
 ===============
+
+In Martin Fowler’s PoEAA, the Repository pattern is described as:
+> Mediates between the domain and data mapping layers using a collection-like interface for accessing domain objects.
+
+
 This collection of packages focus on formalizing data access abstrations and offer some unambitious implementations.
 This packages are designed with respect to clean architecture and evented domain centric applications, although they add value even if your model is rather crud.
 
@@ -10,7 +15,6 @@ The package *NBB.Data.Abstractions* contains some very lightweight abstractions 
 * Event sourced repository
 * Read-only repository
 * Unit of work repository
-* Message serialization
 
 For more details see [`NBB.Data.Abstractions`](.//NBB.Data.Abstractions#readme)
 
