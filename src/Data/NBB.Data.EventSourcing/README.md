@@ -26,9 +26,9 @@ public interface IEventSourcedRepository<TAggregateRoot>
 }
 ```
 
-For EventSore and SnaphotStore configuration see [`NBB.EventStore`](../EventStore/#readme).
+For EventSore and SnaphotStore configuration see [`NBB.EventStore`](../../EventStore/#readme).
 
-For more info about how to model event sourced snapshotable entities see [`NBB.Domain`](../Domain/#readme).
+For more info about how to model event sourced snapshotable entities see [`NBB.Domain`](../../Domain/#readme).
 
 
 Loading domain aggregates
