@@ -1,9 +1,11 @@
-# NBB [![Build status](https://dev.azure.com/totalsoft//NBB/_apis/build/status/NBB-CI-GitHub)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=35)
+NBB [![Build status](https://dev.azure.com/totalsoft//NBB/_apis/build/status/NBB-CI-GitHub)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=35)
+===============
 >.Net Building Blocks
 
 ![Building blocks](assets/img/appicon.png)
 
-## Our philosophy
+Our philosophy
+----------------
 Build cutting-edge, cloud-ready, scalable, maintanable and fun LOB services with .Net Building Blocks
 
 Combining domain-driven design tactical patterns with clean architecture by decoupling the bussiness model and use-cases of the application with the rest of the technology and infrastructure, you get a technology-independent, hand-crafted, stable, encapsulated business model that will evolve over time, regardles the UI, Database, Messaging or other infrastructure or technology.
@@ -12,7 +14,8 @@ Applying concepts from EDA, CQRS or ES we decouple furthermore the business doma
 
 Applying concepts from the Microservices architectural style, you get a new beggining with every new bounded context (module).
 
-## Architectural considerations
+Architectural considerations
+----------------
 > The goal of software architecture is to minimize the human resources required to build and mantain the required system.
 >
 > -- <cite>Robert C. Martin</cite>
@@ -23,10 +26,13 @@ It is important to mention that NBB does not impose any kind of architecture.
 This repo contains a sample Microservices application decomposed around three bounded contexts: Contracts, Invoices and Payments. 
 They are autonomous and the integration is based on events delivered with NATS.
 The sample application contains scripts for building CI / CD pipelines for docker-compose or kubernetes.
-## The blocks
-- [`NBB.Core`](./src/Core#readme) - core abstractions and functionality that other packages rely upon
-- [`NBB.Application`](./src/Application#readme) - application layer specific functionality
-- [`NBB.Messaging`](./src/Messaging#readme) - distributed application infrastructure that enables loosely-coupled, message-based asynchronous communication
-- [`NBB.EventStore`](./src/EventStore#readme) - event store functionality
-- [`NBB.Correlation`](./src/Correlation#readme) - facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow
-- [`NBB.ProcessManager`](./src/Orchestration#readme) - a way of orchestrating your events
+
+The blocks
+----------------
+* [`NBB.Core`](./src/Core#readme) - core abstractions and functionality that other packages rely upon
+* [`NBB.Application`](./src/Application#readme) - application layer specific functionality
+* [`NBB.Data`](./src/Data#readme) - data access abstrations and implementations
+* [`NBB.Messaging`](./src/Messaging#readme) - distributed application infrastructure that enables loosely-coupled, message-based asynchronous communication
+* [`NBB.EventStore`](./src/EventStore#readme) - event store functionality
+* [`NBB.Correlation`](./src/Correlation#readme) - facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow
+* [`NBB.ProcessManager`](./src/Orchestration#readme) - a way of orchestrating your events
