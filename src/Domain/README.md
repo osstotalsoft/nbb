@@ -5,7 +5,7 @@
 >
 > -- <cite>Eric Evans</cite>
 
-All the domain building blocks are encapsulated in the package [`NBB.Domain`](./NBB.Domain#readme).
+The domain building blocks are formalized in package [`NBB.Domain.Abstractions`](./NBB.Domain.Abstractions#readme) implemented in the package [`NBB.Domain`](./NBB.Domain#readme).
 
 ## Aggregates and Roots
 
@@ -212,8 +212,10 @@ Those side effects must be consistent so either all the operations related to th
 
 Domain events as a preferred way to trigger side effects across multiple aggregates within the same domain.
 
+We don't provide any base classes for your domain services as there aren't any constraints:
+
 ```csharp
-public record ContractValidated(Guid ContractId, Guid ClientId, decimal Amount) : INotification;
+public record ContractValidated(Guid ContractId, Guid ClientId, decimal Amount);
 
 ```
 
@@ -229,42 +231,12 @@ Repositories
 Keep in mind that the shape of the repository is a domain concept, but the implementation is in the infrastructure layer.
 
 
-For EventedAggregates we provide an EntityFramework implementation (NBB.Data.EntityFramework) for the generic repository *ICrudRepository*.
+For EventedAggregates we provide an EntityFramework implementation [`NBB.Data.EntityFramework`](../Data/NBB.Data.EntityFramework#readme) for the generic repository *ICrudRepository*.
 It's your decision to use this as a building block for your specific domain tuned repositories or use the generic built-in one.
-If you want to use an EventStore for Audit you can hook the *EventedCrudRepositoryDecorator* that pushes the events in the EventStore.
 
-```csharp
-public static class DependencyInjectionExtensions
-{
-    public static void AddInvoicesDataAccess(this IServiceCollection services)
-    {
-        services.AddEntityFrameworkDataAccess();
+If you want to use an EventStore for Audit you can hook the *EventStoreUowDecorator* that pushes the events in the [`EventStore`](../EventStore#readme).
 
-        services.AddEfQuery<Invoice, InvoicesDbContext>();
-        services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
-
-        services.AddDbContextPool<InvoicesDbContext>(
-            (serviceProvider, options) =>
-            {
-                var configuration = serviceProvider.GetService<IConfiguration>();
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
-                options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
-            });
-    }
-}
-```
-
-For EventSourcedAggregates we provide a generic *EventSourcedRepository* that makes use of the default configured IEventStore.
-```csharp
-public static class DependencyInjectionExtensions
-{
-    public static void AddContractsWriteModelDataAccess(this IServiceCollection services)
-    {
-        services.AddEventSourcingDataAccess()
-            .AddEventSourcedRepository<Contract>();
-    }
-}
-```
+For EventSourcedAggregates we provide a generic *EventSourcedRepository* defined in [`NBB.Data.EventSourcing`](../Data/NBB.Data.EventSourcing#readme) that makes use of the default configured [`EventStore`](../EventStore#readme).
 
 Domain services
 ----------------
