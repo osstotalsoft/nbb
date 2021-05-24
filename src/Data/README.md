@@ -5,7 +5,7 @@ In Martin Fowler’s PoEAA, the Repository pattern is described as:
 > Mediates between the domain and data mapping layers using a collection-like interface for accessing domain objects.
 
 
-This collection of packages focus on formalizing data access abstrations and offer some unambitious implementations.
+This collection of packages focus on formalizing data access abstractions and offer some unambitious implementations.
 This packages are designed with respect to clean architecture and evented domain centric applications, although they add value even if your model is rather crud.
 
 Data abstractions

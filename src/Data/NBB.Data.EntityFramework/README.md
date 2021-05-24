@@ -16,7 +16,7 @@ dotnet add package NBB.Data.EntityFramework
 CRUD Repositories
 ----------------
 The EfCrudRepository is a generic CRUD repository based on EF Core, that implements the ICrudRepository interface from package `NBB.Data.Abstractions`.
-Although the use of generic repository is controversal, they say that you should only use single purpose repositories as dictated by the business domain, you may find this useful when implementing data access for CRUD domains.
+Although the use of generic repository is controversial, they say that you should only use single purpose repositories as dictated by the business domain, you may find this useful when implementing data access for CRUD domains.
 
 You have to explicitly register the generic repository for a specific entity with the container:
 
@@ -55,7 +55,7 @@ services.AddEfReadOnlyRepository<Invoice, InvoicesDbContext>();
 
 Using Queries for read model
 ----------------
-When writting read-model queries, you may not want to add another layer of abstraction, such as repositories, but still, you may not want to work directly with EF objects  in your Application Layer (Query handlers). If this is your case, you can choose to work with IQueriable<TEntity> and this is exactly what this package facilitates.
+When writing read-model queries, you may not want to add another layer of abstraction, such as repositories, but still, you may not want to work directly with EF objects  in your Application Layer (Query handlers). If this is your case, you can choose to work with IQueryable<TEntity> and this is exactly what this package facilitates.
 
 ```csharp
 services.AddEfQuery<Invoice, InvoicesDbContext>();
