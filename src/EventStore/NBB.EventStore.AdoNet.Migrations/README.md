@@ -1,4 +1,4 @@
-# NBB.Eventstore.AdoNet.Migrations
+# NBB.EventStore.AdoNet.Migrations
 
 Creates the database objects for the [`NBB.EventStore.AdoNet`](../NBB.EventStore.AdoNet#readme) and [`NBB.EventStore.AdoNet.MultiTenancy`](../NBB.EventStore.AdoNet.MultiTenancy#readme) event repositories.
 

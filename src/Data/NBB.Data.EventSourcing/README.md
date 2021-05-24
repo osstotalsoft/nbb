@@ -26,30 +26,30 @@ public interface IEventSourcedRepository<TAggregateRoot>
 }
 ```
 
-For EventSore and SnaphotStore configuration see [`NBB.EventStore`](../../EventStore/#readme).
+For EventSore and SnapshotStore configuration see [`NBB.EventStore`](../../EventStore/#readme).
 
-For more info about how to model event sourced snapshotable entities see [`NBB.Domain`](../../Domain/#readme).
+For more info about how to model event sourced snapshot-able entities see [`NBB.Domain`](../../Domain/#readme).
 
 
 Loading domain aggregates
 -------------
 When loading domain aggregates, the repository uses the following algorithm:
-* if the entity is snaphotable it tries to load the last snapshot
+* if the entity is snapshot-able it tries to load the last snapshot
 * it loads the events from the event store (starting with last one from the snapshot, if any)
 * it applies the events, re-hydrating the state of the aggregate, by  calling the `LoadFromHistory` instance method on the ES aggregate root
 
 Saving domain aggregates
 -------------
 When saving domain aggregates, the repository uses the following algorithm:
-* fetches uncommited events from the aggregate
-* saves the events in the event store, with the concurency control set to aggregate-loaded-at-version
-* if the entity is snaphotable it checks if it should persist a snapshot
+* fetches uncommitted events from the aggregate
+* saves the events in the event store, with the concurrency control set to aggregate-loaded-at-version
+* if the entity is snapshot-able it checks if it should persist a snapshot
 * dispatches events using `MediatR`
 
 
 Stream identity
 -------------
-The process of mapping an event sorced entity to a stream, is a pure function like this:
+The process of mapping an event sourced entity to a stream, is a pure function like this:
 ```csharp
  public static string GetStream(this IIdentifiedEntity entity)
     => entity.GetType().FullName + ":" + entity.GetIdentityValue();

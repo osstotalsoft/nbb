@@ -1,6 +1,6 @@
 # NBB.Core.FSharp
 
-F# reader writter state monadic computations
+F# reader writer state monadic computations
 
 ## NuGet install
 ```
@@ -31,8 +31,8 @@ let addThenMult = add >=> mult
 let result = Reader.run (addThenMult 2) 3
 ```
 
-## Statefull computations
-A statefull computation has the effect of modifying the state besides returning the value. See the example usage of state computation expression below.
+## Stateful computations
+A stateful computation has the effect of modifying the state besides returning the value. See the example usage of state computation expression below.
 
 ```fsharp
 open NBB.Core.FSharp.Data.State

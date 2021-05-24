@@ -15,7 +15,7 @@ services.DecorateOpenGenericWhen(
         serviceType.GetGenericArguments()[0]));
 ```
 
-As this is the only functionallity of this package, we should try to make a pull request in Scrutor with this functionallity and Obsolete this one.
+As this is the only functionality of this package, we should try to make a pull request in Scrutor with this functionality and Obsolete this one.
 
 ## NuGet install
 ```

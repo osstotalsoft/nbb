@@ -1,11 +1,11 @@
-# NBB.Eventstore.AdoNet.MultiTenancy
+# NBB.EventStore.AdoNet.MultiTenancy
 
-This package provides ADO.NET muti-tenant implementations for the *Event Repository* and *Snapshot Repository* abstractions.
+This package provides ADO.NET multi-tenant implementations for the *Event Repository* and *Snapshot Repository* abstractions.
 
 
 ## NuGet install
 ```
-dotnet add package NBB.Eventstore.AdoNet.MultiTenancy
+dotnet add package NBB.EventStore.AdoNet.MultiTenancy
 ```
 
 ## Usage

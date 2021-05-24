@@ -9,7 +9,7 @@ dotnet add package NBB.Correlation.Serilog
 
 ## Log event enricher
 
-The provided log event enricher should be added to the serolog configuration.
+The provided log event enricher should be added to the Serilog configuration.
 
 ```csharp
 Log.Logger = new LoggerConfiguration()

@@ -7,7 +7,7 @@ The package also provides abstractions for the event and snapshot repositories.
 
 ## NuGet install
 ```
-dotnet add package NBB.Eventstore
+dotnet add package NBB.EventStore
 ```
 
 ## Usage

@@ -3,7 +3,7 @@
 Pure functional, type-safe, composable asynchronous and concurrent programming for .net
 
 ## From side-effect to effect
-An Effect system is an api that allows you to represent side-effects at type level, without actually performing them, so that you can model and compose side-effectfull processes using just pure functions.
+An Effect system is an api that allows you to represent side-effects at type level, without actually performing them, so that you can model and compose side-effect-full processes using just pure functions.
 
 ## NuGet install
 ```
@@ -74,7 +74,7 @@ public static class DependencyInjectionExtensions
 
 
 ## Composing effects
-Effect compisition is based on the functor, applicative and monad algebras
+Effect composition is based on the functor, applicative and monad algebras
 
 ### Chaining effects with Then (Map, Bind)
 You can map/bind the value inside an effect using Then.
@@ -96,8 +96,8 @@ public static readonly Effect<Unit> Main =
     });
 ```
 
-### Concurent effects
-Produces a compound effect, that when interpreted, it will concurently interpret the two composed effects
+### Concurrent effects
+Produces a compound effect, that when interpreted, it will concurrently interpret the two composed effects
 ```csharp
 public static readonly Effect<Unit> Main =
     Effect.Parallel(
@@ -116,7 +116,7 @@ public static readonly Effect<Unit> Main =
 ```
 
 ## Interpreting effects
-Usually effect interpretation is done once in the programm entrypoint.
+Usually effect interpretation is done once in the program entry-point.
 ```csharp
 using NBB.Core.Effects;
 

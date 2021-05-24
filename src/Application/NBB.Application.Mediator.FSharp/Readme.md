@@ -12,7 +12,7 @@ A request pipeline is a composition of functions used for handling certain appli
 
 ### Request handler
 A `RequestHandler` is a function that receives the request and returns an effect of an optional result.
-The optional result measns that the handler can decide whether to process or not the request.
+The optional result means that the handler can decide whether to process or not the request.
 
 ```fsharp
 type RequestHandler<'TRequest, 'TResponse> = 'TRequest -> Effect<'TResponse option>
@@ -49,7 +49,7 @@ let logRequest =
     }
 ```
 
-Request middlewares compose via simple function composition:
+Request middleware compose via simple function composition:
 ```fsharp
 let requestPipeline = handleExceptions << logRequest
 ```
@@ -72,7 +72,7 @@ type CommandMiddleware<'TCommand when 'TCommand :> ICommand> = RequestMiddleware
 type CommandMiddleware = CommandMiddleware<ICommand>
 ```
 ### Command pipeline combinators
- - `CommandHandler.upCast` - converts a `CommandHandler<'TCommand>` to a `CommandHandler`. It is useful in conjuction with `RequestMiddleware.handlers`
+ - `CommandHandler.upCast` - converts a `CommandHandler<'TCommand>` to a `CommandHandler`. It is useful in conjunction with `RequestMiddleware.handlers`
 ```fsharp
 let cmdPipeline = 
     handlers [
@@ -99,7 +99,7 @@ type QueryMiddleware = QueryMiddleware<IQuery, obj>
 ```
 
 ### Query pipeline combinators
- - `QueryHandler.upCast` - converts a `QueryHandler<'TQuery, 'TResponse>` to a `QueryHandler`. It is useful in conjuction with `RequestMiddleware.handlers` combinator
+ - `QueryHandler.upCast` - converts a `QueryHandler<'TQuery, 'TResponse>` to a `QueryHandler`. It is useful in conjunction with `RequestMiddleware.handlers` combinator
 ```fsharp
 let queryPipeline = 
     handlers [
@@ -152,7 +152,7 @@ let logEvent: EventMiddleware =
     }
 ```
 
-Event middlewares compose via simple function composition:
+Event middleware compose via simple function composition:
 ```fsharp
 let eventPipeline = handleExceptions << logEvent
 ```
@@ -380,7 +380,7 @@ module ReadApplication =
          << logRequest
          << lift publishMessage
 
-    let sendQuery (query: 'TQuery) = QueryMidleware.run queryPipeline query
+    let sendQuery (query: 'TQuery) = QueryMiddleware.run queryPipeline query
     let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
 
 
