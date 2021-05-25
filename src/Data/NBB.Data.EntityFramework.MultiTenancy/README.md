@@ -13,7 +13,7 @@ Philosophy
 ----------------
 When it comes to multi-tenant data access, there are 3 strategies:
 * Database per tenant: in this case, the only thing you have to do, is to provide a connection string per tenant, when registering a DbContext. This strategy offers the biggest isolation level, but is the most expensive one
-* Shared database: when using this strategy, multi-tenant tables are partitioned by a TenantId column. This package provides extensions for EF objects, in order to configure both a shadow state property `TenantId` and a global query filter with the value set to `ITenantContext.GetTenantId`, so that user queries can remain tenancy ignorant. This strategy offers a poor isolation level so it must be used with caution!
+* Shared database: when using this strategy, multi-tenant tables are partitioned by a TenantId column. This package provides extensions for EF objects, in order to configure both a shadow state property `TenantId` and a global query filter with the value set to `ITenantContext.GetTenantId`, so that user queries can remain tenancy agnostic. This strategy offers a poor isolation level so it must be used with caution!
 
 * A mix of shared and dedicated databases: some tenants may be shared in the same database while others have dedicated database instances
 
