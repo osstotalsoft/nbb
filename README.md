@@ -31,6 +31,7 @@ The blocks
 ----------------
 * [`NBB.Core`](./src/Core#readme) - core abstractions and functionality that other packages rely upon
 * [`NBB.Application`](./src/Application#readme) - application layer specific functionality
+* [`NBB.Domain`](./src/Domain#readme) - building blocks for domain modelling in DDD 
 * [`NBB.Data`](./src/Data#readme) - data access abstractions and implementations
 * [`NBB.Messaging`](./src/Messaging#readme) - distributed application infrastructure that enables loosely-coupled, message-based asynchronous communication
 * [`NBB.EventStore`](./src/EventStore#readme) - event store functionality
