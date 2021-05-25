@@ -1,10 +1,10 @@
-# NBB.Eventstore.Abstractions
+# NBB.EventStore.Abstractions
 
 This package provides core abstractions for an event store
 
 ## NuGet install
 ```
-dotnet add package NBB.Eventstore.Abstractions
+dotnet add package NBB.EventStore.Abstractions
 ```
 
 ## Abstractions

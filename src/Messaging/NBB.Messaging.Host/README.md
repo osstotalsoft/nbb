@@ -48,7 +48,7 @@ services.AddMessagingHost(hostBuilder => hostBuilder
 
 #### Multiple configurations
 
-In case you need different settings for speciffic groups of subscribers (eg. different pipelines) you can call *Configure* multiple times:
+In case you need different settings for specific groups of subscribers (eg. different pipelines) you can call *Configure* multiple times:
 
 ```csharp
 
@@ -159,7 +159,7 @@ The fluent API for configuration starts with specifying the sources of message t
    - `AddType<TMessage>()`
    - `AddTypes(params Type[] types)`
    - `AddTypes(IEnumerable<Type> types)`
-- MediatR handled messages: finds MediatR handlers registerd in the IoC container and extracts the handled types:
+- MediatR handled messages: finds MediatR handlers registered in the IoC container and extracts the handled types:
    - `FromMediatRHandledEvents()`
    - `FromMediatRHandledCommands()`
    - `FromMediatRHandledQueries()`
@@ -193,13 +193,13 @@ Add a subscriber for messages of a speciffic type:
     .AddType<MyMessage>())
 ```
 
-Add subscribers for all classes in an assembly that implement a speciffic interface:
+Add subscribers for all classes in an assembly that implement a specific interface:
 ```csharp
 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
     .FromAssemblyOf<MyMessage>().AddClassesAssignableTo<IMyInterface>())
 ```
 
-Add subscribers for classes in the entry assembly that have a speciffic namespace
+Add subscribers for classes in the entry assembly that have a specific namespace
 
 ```csharp
 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
@@ -239,9 +239,9 @@ For more details see [`Subscriber options`](../NBB.Messaging.Abstractions#subscr
 
 ## Pipeline configuration
 
-The pipeline builder allows plugging in various custom or built-in middlewares.
+The pipeline builder allows plugging in various custom or built-in middleware.
 
-### Custom middlewares
+### Custom middleware
 
 #### Class middleware
 
@@ -249,7 +249,7 @@ The pipeline builder allows plugging in various custom or built-in middlewares.
 .UsePipeline(pipelineBuilder => pipelineBuilder.UseMiddleware<MyCustomMiddleware>())
 ```
 
-The custom middlware class should implement the interface `IPipelineMiddleware<MessagingContext>` and can have constructor injected parameters.
+The custom middleware class should implement the interface `IPipelineMiddleware<MessagingContext>` and can have constructor injected parameters.
 
 
 #### Inline function middleware
@@ -266,9 +266,9 @@ Adds a middleware delegate defined in-line to the message pipeline.
 ```
    
 
-### Built-in middlewares
+### Built-in middleware
 
-The messaging host provides some built in middlewares
+The messaging host provides some built in middleware
 
 #### built-in correlation middleware
 
@@ -277,7 +277,7 @@ The messaging host provides some built in middlewares
 ```
 
 
-Typically configured early in the pipeline, it has the role to fetch the correlation id from the received message or create a new one if the incomming message does not have one.
+Typically configured early in the pipeline, it has the role to fetch the correlation id from the received message or create a new one if the incoming message does not have one.
 #### built-in exception handling middleware
 
 ```csharp
@@ -291,8 +291,8 @@ Typically configured very early in the pipeline, it swallows exceptions and logs
 .UsePipeline(pipelineBuilder => pipelineBuilder.UseDefaultResiliencyMiddleware())
 ```
 
-Includes the following resiliency policies for incomming messages:
-* Retry forever when a **ConcurrencyException** is receved
+Includes the following resiliency policies for incoming messages:
+* Retry forever when a **ConcurrencyException** is received
 * Retry three times with a progressive delay when an **OutOfOrderException** is received
 #### built-in MediatR middleware
 
@@ -307,7 +307,7 @@ Tipically configured last in the pipeline, it acts as a message dispatcher (brok
 .UsePipeline(pipelineBuilder => pipelineBuilder.UseOpenTracing())
 ```
 
-Typically configured early in the pipeline, it creates an OpenTracing span for incomming message processing and correlates it with the publisher span.
+Typically configured early in the pipeline, it creates an OpenTracing span for incoming message processing and correlates it with the publisher span.
 
 To use it you must reference the *NBB.Messaging.OpenTracing* package
 
@@ -317,7 +317,7 @@ To use it you must reference the *NBB.Messaging.OpenTracing* package
 .UsePipeline(pipelineBuilder => pipelineBuilder.UseTenantMiddleware())
 ```
 
-It identifies the tenant from the incomming message, preforms various validations against the current multi-tenant configuration, and creates the tenancy context.
+It identifies the tenant from the incoming message, preforms various validations against the current multi-tenant configuration, and creates the tenancy context.
 
 To use it you must reference the *NBB.Messaging.MultiTenancy* package
 
@@ -328,16 +328,16 @@ To use it you must reference the *NBB.Messaging.MultiTenancy* package
 .UsePipeline(pipelineBuilder => pipelineBuilder.When(isMultiTenant, x => x.UseTenantMiddleware()))
 ```
 
-Registers a middleware only when the condition is met. This allows configuring the pipeline based on a deployment speciffic configuration.
+Registers a middleware only when the condition is met. This allows configuring the pipeline based on a deployment specific configuration.
 
-It can be used to register any custom or built-in middlweare previously described.
+It can be used to register any custom or built-in middleware previously described.
 
 
 ## Messaging context
 
-When processing incomming messages we have acces to a messaging context that contains:
+When processing incoming messages we have access to a messaging context that contains:
 - the received message envelope (including payload and headers)
-- the topic of the incomming message
+- the topic of the incoming message
 
 In the pipeline middleware we have direct access to the messaging context as a parameter
 

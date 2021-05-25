@@ -30,7 +30,7 @@ Settings:
 - **Env** - name of the environment. If specified, it allows having multiple environments / deployments to use the same messaging infrastructure. It is added as a prefix in messaging topics so the topics will be partitioned by environment.
 - **Source** - specifies the name of the service that publishes messages on the bus. It is recorded in the message headers.
 
-The messaging transport should also be specified in the regsitration:
+The messaging transport should also be specified in the registration:
 
 ### Message bus with NATS transport:
 Add a reference to *NBB.Messaging.Nats* package
@@ -38,7 +38,7 @@ Add a reference to *NBB.Messaging.Nats* package
 ```csharp
 services.AddMessageBus().AddNatsTransport(Configuration);
 ```
-Nats speciffic settings should be speciffied in *appsettings.json* in the *Messaging* section:
+Nats specific settings should be specified in *appsettings.json* in the *Messaging* section:
 
 
 ```json
@@ -83,7 +83,7 @@ await _messageBusPublisher.PublishAsync(command, new MessagingPublisherOptions {
 ```
 
 #### Publisher Options: 
-- **TopicName** - Override the topic name resoved from the [`Topic Registry`](#topic-registry)
+- **TopicName** - Override the topic name resolved from the [`Topic Registry`](#topic-registry)
 - **EvelopeCustomizer** - A delegate that can modify the outgoing message envelope, usually for customizing message headers.
 
 
@@ -139,10 +139,10 @@ The topic registry is a service that implements interface **ITopicRegistry*. The
 The default topic resolution policy (based on a message type):
 * Use the full type name (including namespace) in case a *TopicNameAttribute* is not specified
 * Use the value of the *TopicNameAttribute* if it is present on the type
-* In both cases add a prefix with the environment (as speciffied in the configuration section *Messaging.Env*)
+* In both cases add a prefix with the environment (as specified in the configuration section *Messaging.Env*)
 
 The default topic resolution policy (based on a topic name):
-* Use the given topic name prefixed with the environment (as speciffied in the configuration section *Messaging.Env*)
+* Use the given topic name prefixed with the environment (as specified in the configuration section *Messaging.Env*)
 
 ## Message serialization / deserialization
 Serialization and deserialization is performed by a service that implements the interface *IMessageSerDes*. There is a default implementation that is automatically registered in the DI container when registering the MessageBus, but it can also be replaced with a custom implementation.
@@ -166,5 +166,5 @@ All messages transported on the bus are wrapped in a message envelope. It has th
 | MessagingHeaders.MessageType    | "nbb-messageType"      | The type name of the payload (can be used in dynamic deserialization)                                                        |
 | MessagingHeaders.Source         | "nbb-source"           | The source service (where the message was published)                                                      |
 | MessagingHeaders.CorrelationId  | "nbb-correlationId"    | A correlation ID for tracing the message                                                         |
-| MessagingHeaders.MessageId      | "nbb-messageId"        | A unique identifier of the message (can be used for idempotency chcecks)                                                         |
+| MessagingHeaders.MessageId      | "nbb-messageId"        | A unique identifier of the message (can be used for idempotency checks)                                                         |
 | MessagingHeaders.PublishTime    | "nbb-publishTime"      | The date and time when the message was published.                                                         |

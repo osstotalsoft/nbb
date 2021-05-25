@@ -5,7 +5,7 @@
 > This is a pretty simple idea with some very powerful implications.
 
 The package [`NBB.EventStore.Abstractions`](./NBB.EventStore.Abstractions#readme) contains *IEventStore* a lightweight abstraction over any EventStore client. 
-It is ment to be consumed only by infrastructure packages in order to decouple from any EventStore implementation.
+It is meant to be consumed only by infrastructure packages in order to decouple from any EventStore implementation.
 
 
 The package [`NBB.EventStore`](./NBB.EventStore#readme) offers *EventStore*, a modest implementation of the concept.

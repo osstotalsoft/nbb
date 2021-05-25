@@ -8,7 +8,7 @@ The correlation ID is persisted separate column which facilitates filtering the 
 dotnet add package NBB.Serilog.SqlServer
 ```
 
-To configure the databse persistance use the following extension in  the serilog configuration:
+To configure the database persistance use the following extension in  the serilog configuration:
 
 ```csharp
 Log.Logger = new LoggerConfiguration()

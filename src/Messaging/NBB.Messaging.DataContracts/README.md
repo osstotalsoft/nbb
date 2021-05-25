@@ -8,7 +8,7 @@ dotnet add package NBB.Messaging.DataContracts
 ```
 
 ## Topic name attribute
-Use this attribute to speciffy explicit topic name mapping for messages.
+Use this attribute to specify explicit topic name mapping for messages.
 
 ```csharp
 [TopicName("my-custom-topic-name")]
