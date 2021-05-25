@@ -27,7 +27,7 @@ Rules of design:
 * Aggregates should not reference other aggregates, they can reference other aggregates or entities identity.
 * A delete operation must remove everything within the Aggregate boundary all at once
 * Prefer asynchronous event handlers when sync-ing between aggregates.
-* No lazy loading required
+* No lazy loading required.
 * Choose CQRS if you want a model freed up of query /read responsibilities.
 
 
