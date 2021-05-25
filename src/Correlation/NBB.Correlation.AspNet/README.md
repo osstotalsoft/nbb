@@ -9,7 +9,7 @@ dotnet add package NBB.Correlation.AspNet
 
 ### Correlation middleware
 
-This ASP.NET middlware is responsible with creating a correlation scope for the current request.
+This ASP.NET middleware is responsible with creating a correlation scope for the current request.
 
 ```csharp
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -20,7 +20,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 ```
 
-The middeware searches the current request for a correlation ID in the following locations:
+The middleware searches the current request for a correlation ID in the following locations:
 * **x-correlation-id** http header 
 * **correlationId** query string parameter 
 

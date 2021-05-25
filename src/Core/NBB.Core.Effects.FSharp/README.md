@@ -9,7 +9,7 @@ dotnet add package NBB.Core.Effects.FSharp
 
 ## Effect computation expressions
 Lets you compose effects the fsharp way.
-There is one, more performant, strict computation expression *effect* and a lazy one *effect'*
+There is one, more efficient, strict computation expression *effect* and a lazy one *effect'*
 
 ### Strict computation expression effect
 ```fsharp

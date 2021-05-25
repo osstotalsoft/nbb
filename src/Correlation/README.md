@@ -1,9 +1,9 @@
 Correlation
 ==============
 
-Correlation facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow. They all include a randomly generated unique identifier that is reffered to as a "Correlation ID".
+Correlation facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow. They all include a randomly generated unique identifier that is referred to as a "Correlation ID".
 
-Using correlation makes it easy to investigate problems in a business flow because the correlation ID propagates througout all the components involved, and it can be used to search the logs. This is especially true in distributed systems where data can be scattered across different machines.
+Using correlation makes it easy to investigate problems in a business flow because the correlation ID propagates throughout all the components involved, and it can be used to search the logs. This is especially true in distributed systems where data can be scattered across different machines.
 
 
 ## Core package
@@ -26,4 +26,4 @@ There is a dedicated messaging header **nbb-correlationID** interpreted by:
 ### Open Tracing integration
 A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans. 
 
-For details see [`NBB.Messaging.Opentracing`](./../Messaging/NBB.Messaging.OpenTracing#readme)
+For details see [`NBB.Messaging.OpenTracing`](./../Messaging/NBB.Messaging.OpenTracing#readme)

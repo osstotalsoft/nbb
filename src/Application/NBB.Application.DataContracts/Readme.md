@@ -12,7 +12,7 @@ dotnet add package NBB.Application.DataContracts
 ```
 
 ## Base data contracts
-Tipically published language assemblies referencing NBB4.x expose commands and events that depend on `NBB.Application.DataContracts.Command` and `NBB.Application.DataContracts.Event`. If you need to reference this kind of assemblies, you will also need to reference this package, so that `Command` and `Event` base classes will be linked to the ones provided by this package.
+Topically published language assemblies referencing NBB4.x expose commands and events that depend on `NBB.Application.DataContracts.Command` and `NBB.Application.DataContracts.Event`. If you need to reference this kind of assemblies, you will also need to reference this package, so that `Command` and `Event` base classes will be linked to the ones provided by this package.
 
 Example:
 - ServiceA published language assembly referencing NBB4.x, contains
