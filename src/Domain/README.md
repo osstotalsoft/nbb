@@ -21,7 +21,7 @@ The domain building blocks are formalized in package [`NBB.Domain.Abstractions`]
 
 
 Rules of design:
-* Aggregate roots have global identity, they  are created through factories, factory methods or constructors, hydrated and persisted through repositories as a whole. Only Aggregate Roots can be obtained directly with database queries. Everything else must be done through traversal.
+* Aggregate roots have global identity, they are created through factories, factory methods or constructors, hydrated and persisted through repositories as a whole. Only Aggregate Roots can be obtained directly with database queries. Everything else must be done through traversal.
 * Keep aggregates small, as the aggregate is the transactional and consistency boundary. Big aggregates limit concurrency because of locking.
 * The aggregate root is responsible for the whole aggregate invariants. The aggregate should be valid at any point in time.
 * Aggregates should not reference other aggregates, they can reference other aggregates or entities identity.
@@ -168,7 +168,7 @@ Value objects
 >
 > But when checking the Color of a specific PaintBucket, the Color has no identity in an of itself. If I have two Colors with the exact same pigmentation values, I consider them to be the same.
 >
-> When designing Value Objects, I want to keep them away from the trappings of Entity life cycles, so I make the Value Object immutable, and remove any concept of identity.  Additionally, I’ll override Equals to compare attributes, so that attribute equality is represented in my model.
+> When designing Value Objects, I want to keep them away from the trappings of Entity life cycles, so I make the Value Object immutable, and remove any concept of identity. Additionally, I’ll override Equals to compare attributes, so that attribute equality is represented in my model.
 >
 > By making my Value Object immutable, many operations are greatly simplified, as I’m immediately led down paths to Side-Effect Free Functions. I don’t create a type with a bunch of read-write properties and call it a Value Object. I make it immutable, put all of the attributes in the constructor, and enforce attribute equality.
 >
