@@ -1,0 +1,11 @@
+﻿{
+  "profiles": {
+    "NBB.Tasks.Worker": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:60543/"
+    }
+  }
+}
