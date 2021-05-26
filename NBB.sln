@@ -13,6 +13,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Abstractions", "src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj", "{2D956C4C-140C-4C4B-8975-43F82EBC06B6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{77D2CC92-A3CB-499E-9A85-DDFB74D56580}"
+	ProjectSection(SolutionItems) = preProject
+		src\Domain\README.md = src\Domain\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Domain.Abstractions", "src\Domain\NBB.Domain.Abstractions\NBB.Domain.Abstractions.csproj", "{5EDA8FDA-2639-464F-A835-97006BDB8C4F}"
 EndProject
