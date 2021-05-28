@@ -9,7 +9,7 @@ using NBB.Todo.Data;
 
 namespace NBB.Todo.Migrations.Migrations
 {
-    [DbContext(typeof(TodoDbContext))]
+    [DbContext(typeof(NoTenantTodoDbContext))]
     [Migration("20210526140317_TenantId")]
     partial class TenantId
     {

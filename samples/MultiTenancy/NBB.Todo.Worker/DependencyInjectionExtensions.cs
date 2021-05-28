@@ -8,6 +8,12 @@ using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats;
 using NBB.Todos.Data;
+using NBB.Messaging.MultiTenancy;
+using NBB.MultiTenancy.Identification.Messaging.Extensions;
+using NBB.MultiTenancy.Abstractions.Repositories;
+using NBB.MultiTenancy.Abstractions.Hosting;
+using NBB.MultiTenancy.Abstractions.Options;
+using Microsoft.Extensions.Options;
 
 namespace NBB.Todo.Worker
 {
@@ -25,18 +31,33 @@ namespace NBB.Todo.Worker
             services.AddMessageBus().AddNatsTransport(configuration);
 
             services.AddMessagingHost(hostBuilder => hostBuilder
-                .Configure(configBuilder => configBuilder
-                    .AddSubscriberServices(selector =>
-                    {
-                        selector.FromMediatRHandledCommands().AddAllClasses();
-                    })
-                    .WithDefaultOptions()
-                    .UsePipeline(builder => builder
-                        .UseCorrelationMiddleware()
-                        .UseExceptionHandlingMiddleware()
-                        .UseDefaultResiliencyMiddleware()
-                        .UseMediatRMiddleware()
-                    )));
+                .Configure(configBuilder =>
+                {
+                    var tenancyOptions = configBuilder.ApplicationServices.GetRequiredService<IOptions<TenancyHostingOptions>>();
+                    var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
+
+                    configBuilder
+                        .AddSubscriberServices(selector => selector.
+                            FromMediatRHandledCommands().AddAllClasses())
+                        .WithDefaultOptions()
+                        .UsePipeline(builder => builder
+                            .UseCorrelationMiddleware()
+                            .UseExceptionHandlingMiddleware()
+                            .When(isMultiTenant, x => x.UseTenantMiddleware())
+                            .UseDefaultResiliencyMiddleware()
+                            .UseMediatRMiddleware()
+                    );
+                }));
+
+            // Multitenancy
+            services.AddMultitenancy(configuration, _ =>
+            {
+                services.AddMultiTenantMessaging()
+                        .AddDefaultMessagingTenantIdentification()
+                        .AddTenantRepository<BasicTenantRepository>();
+
+                 services.AddMultiTenantTodoDataAccess();
+            });
         }
     }
 }

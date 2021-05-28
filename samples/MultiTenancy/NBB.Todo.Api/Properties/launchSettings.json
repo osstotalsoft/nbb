@@ -4,8 +4,6 @@
     "NBB.Tasks.Api": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
-      "launchBrowser": true,
-      "launchUrl": "api/todo",
       "applicationUrl": "http://localhost:58733",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

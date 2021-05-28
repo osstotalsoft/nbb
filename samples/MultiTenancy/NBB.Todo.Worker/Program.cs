@@ -53,6 +53,7 @@ namespace NBB.Todo.Worker
                     $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
                     optional: true, reloadOnChange: true)
                 .AddUserSecrets<Program>()
+                .AddEnvironmentVariables()
                 .Build();
         }
     }

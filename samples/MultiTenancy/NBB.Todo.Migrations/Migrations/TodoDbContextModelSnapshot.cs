@@ -8,7 +8,7 @@ using NBB.Todo.Data;
 
 namespace NBB.Todo.Migrations.Migrations
 {
-    [DbContext(typeof(TodoDbContext))]
+    [DbContext(typeof(NoTenantTodoDbContext))]
     partial class TodoDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

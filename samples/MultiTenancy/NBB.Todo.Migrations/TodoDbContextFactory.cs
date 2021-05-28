@@ -10,9 +10,9 @@ namespace NBB.Todo.Migrations
 {
     //dotnet ef migrations add Initial -c TodoDbContext -o Migrations
     //dotnet ef migrations remove -c TodoDbContext
-    public class TodoDbContextFactory : IDesignTimeDbContextFactory<TodoDbContext>
+    public class TodoDbContextFactory : IDesignTimeDbContextFactory<NoTenantTodoDbContext>
     {
-        public TodoDbContext CreateDbContext(string[] args)
+        public NoTenantTodoDbContext CreateDbContext(string[] args)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -30,9 +30,9 @@ namespace NBB.Todo.Migrations
             var configuration = configurationBuilder.Build();
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             Console.WriteLine(connectionString);
-            var builder = new DbContextOptionsBuilder<TodoDbContext>();
+            var builder = new DbContextOptionsBuilder<NoTenantTodoDbContext>();
             builder.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Todo.Migrations"));
-            return new TodoDbContext(builder.Options);
+            return new NoTenantTodoDbContext(builder.Options);
         }
     }
 }
