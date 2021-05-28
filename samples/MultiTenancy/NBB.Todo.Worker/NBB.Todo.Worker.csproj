@@ -1,14 +1,17 @@
 ﻿<Project>
-  <Sdk Name="Microsoft.NET.Sdk.Web" />
+  <Sdk Name="Microsoft.NET.Sdk" />
   
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <UserSecretsId>NBB_Todo_a9328d3a-7681-452a-9dbe-a52a9b6a0593</UserSecretsId>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="appsettings.json" />
     <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -23,7 +26,6 @@
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00777" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="$(MediatRPackageVersion)" />
   </ItemGroup>
 
@@ -42,3 +44,4 @@
     <ProjectReference Include="..\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj" />
   </ItemGroup>
 </Project>
+

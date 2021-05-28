@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00777" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Multitenancy\NBB.EventStore.AdoNet.MultiTenancy.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.MultiTenancy\NBB.Messaging.MultiTenancy.csproj" />
