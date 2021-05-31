@@ -99,8 +99,6 @@ namespace NBB.Todo.Worker
                 services.AddMultiTenantMessaging()
                         .AddDefaultMessagingTenantIdentification()
                         .AddTenantRepository<BasicTenantRepository>();
-
-                services.AddMultiTenantTodoDataAccess();
             });
         }
 

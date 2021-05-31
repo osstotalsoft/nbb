@@ -9,9 +9,9 @@ using NBB.Todo.Data;
 
 namespace NBB.Todo.Migrations.Migrations
 {
-    [DbContext(typeof(NoTenantTodoDbContext))]
-    [Migration("20210526140317_TenantId")]
-    partial class TenantId
+    [DbContext(typeof(TodoDbContext))]
+    [Migration("20210531093928_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,9 +38,6 @@ namespace NBB.Todo.Migrations.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("TodoTaskId");
 

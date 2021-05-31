@@ -4,35 +4,33 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Options;
 using NBB.Todo.Data;
 
 namespace NBB.Todo.Migrations
 {
     //dotnet ef migrations add Initial -c TodoDbContext -o Migrations
     //dotnet ef migrations remove -c TodoDbContext
-    public class TodoDbContextFactory : IDesignTimeDbContextFactory<NoTenantTodoDbContext>
+    public class TodoDbContextFactory : IDesignTimeDbContextFactory<TodoDbContext>
     {
-        public NoTenantTodoDbContext CreateDbContext(string[] args)
+        public TodoDbContext CreateDbContext(string[] args)
         {
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
+            var dependencyResolver = new DependencyResolver();
 
-            var environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
-            var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
+            var tenancyOptions = dependencyResolver.ServiceProvider.GetRequiredService<IOptions<TenancyHostingOptions>>();
+            var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
 
-            if (isDevelopment)
+            if (isMultiTenant)
             {
-                configurationBuilder.AddUserSecrets(Assembly.GetEntryAssembly());
+                var tenenantContextAccessor = dependencyResolver.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
+                tenenantContextAccessor.TenantContext = new TenantContext(new Tenant(Guid.NewGuid(), string.Empty, true));
             }
 
-            var configuration = configurationBuilder.Build();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            Console.WriteLine(connectionString);
-            var builder = new DbContextOptionsBuilder<NoTenantTodoDbContext>();
-            builder.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Todo.Migrations"));
-            return new NoTenantTodoDbContext(builder.Options);
+            return dependencyResolver.ServiceProvider.GetRequiredService<TodoDbContext>();
         }
     }
 }

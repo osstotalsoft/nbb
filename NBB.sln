@@ -319,16 +319,19 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.DataContracts", "src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj", "{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MultiTenancy", "MultiTenancy", "{FA5EB6F2-9864-46B9-B62E-13D6578D9009}"
+	ProjectSection(SolutionItems) = preProject
+		samples\MultiTenancy\README.md = samples\MultiTenancy\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.Api", "samples\MultiTenancy\NBB.Todo.Api\NBB.Todo.Api.csproj", "{84EFA90D-94CE-4FF3-A945-073ED22F575E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.Worker", "samples\MultiTenancy\NBB.Todo.Worker\NBB.Todo.Worker.csproj", "{44718FD6-CF6F-4AE6-A31E-0F510628E516}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Todo.Data", "samples\MultiTenancy\NBB.Todo.Data\NBB.Todo.Data.csproj", "{2752E754-8275-4712-81A9-FD64E85376D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.Data", "samples\MultiTenancy\NBB.Todo.Data\NBB.Todo.Data.csproj", "{2752E754-8275-4712-81A9-FD64E85376D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Todo.Migrations", "samples\MultiTenancy\NBB.Todo.Migrations\NBB.Todo.Migrations.csproj", "{AEF0202F-2450-4D38-B5FF-48EBFBAAD26D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.Migrations", "samples\MultiTenancy\NBB.Todo.Migrations\NBB.Todo.Migrations.csproj", "{AEF0202F-2450-4D38-B5FF-48EBFBAAD26D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Todo.PublishedLanguage", "samples\MultiTenancy\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj", "{37C07DBD-BE79-4897-B571-152F0E81CA4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.PublishedLanguage", "samples\MultiTenancy\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj", "{37C07DBD-BE79-4897-B571-152F0E81CA4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

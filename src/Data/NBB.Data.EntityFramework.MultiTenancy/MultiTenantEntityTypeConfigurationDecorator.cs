@@ -3,7 +3,9 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Options;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
 {
@@ -11,12 +13,16 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         private readonly IEntityTypeConfiguration<TEntity> _innerConfiguration;
         private readonly IServiceProvider _sp;
+        private readonly bool _isMultiTenant;
         private string _tenantIdColumn;
 
         public MultiTenantEntityTypeConfigurationDecorator(IEntityTypeConfiguration<TEntity> innerConfiguration, IServiceProvider sp)
         {
             _innerConfiguration = innerConfiguration;
             _sp = sp;
+
+            var tenancyOptions = _sp.GetRequiredService<IOptions<TenancyHostingOptions>>();
+            _isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
         }
 
         public MultiTenantEntityTypeConfigurationDecorator<TEntity> WithTenantIdColumn(string tenantIdColumn)
@@ -29,6 +35,8 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
             _innerConfiguration.Configure(builder);
 
+            if (!_isMultiTenant)
+                return;
 
             var tenantId = ResolveTenantId();
             var isSharedDb = IsSharedDb(tenantId);
@@ -60,13 +68,13 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             }
 
             Expression<Func<TEntity, bool>> filter = t =>
-                EF.Property<Guid?>(t, MultiTenancy.TenantIdProp) == tenantId;
+                EF.Property<Guid>(t, MultiTenancy.TenantIdProp) == tenantId;
             builder.HasQueryFilter(filter);
         }
 
         private void AddTenantIdProperty(EntityTypeBuilder<TEntity> builder)
         {
-            var prop = builder.Property<Guid?>(MultiTenancy.TenantIdProp);
+            var prop = builder.Property<Guid>(MultiTenancy.TenantIdProp);
             if (!string.IsNullOrWhiteSpace(_tenantIdColumn))
             {
                 prop.HasColumnName(_tenantIdColumn);

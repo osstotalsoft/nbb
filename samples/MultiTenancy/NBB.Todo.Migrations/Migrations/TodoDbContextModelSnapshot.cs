@@ -8,7 +8,7 @@ using NBB.Todo.Data;
 
 namespace NBB.Todo.Migrations.Migrations
 {
-    [DbContext(typeof(NoTenantTodoDbContext))]
+    [DbContext(typeof(TodoDbContext))]
     partial class TodoDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -36,9 +36,6 @@ namespace NBB.Todo.Migrations.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("TodoTaskId");
 

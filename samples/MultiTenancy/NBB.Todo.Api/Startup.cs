@@ -42,9 +42,7 @@ namespace NBB.Todo.Api
                 services
                     .AddDefaultHttpTenantIdentification()
                     .AddMultiTenantMessaging()
-                    .AddTenantRepository<BasicTenantRepository>();
-
-                services.AddMultiTenantTodoDataAccess();
+                    .AddTenantRepository<BasicTenantRepository>();               
             });
         }
 

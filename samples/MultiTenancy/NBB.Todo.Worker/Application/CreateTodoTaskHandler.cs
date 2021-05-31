@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using NBB.Todo.Data;
+using NBB.Data.Abstractions;
 using NBB.Todo.Data.Entities;
 using NBB.Todo.PublishedLanguage;
 using System.Threading;
@@ -9,11 +9,11 @@ namespace NBB.Todo.Worker.Application
 {
     public class CreateTodoTaskHandler : IRequestHandler<CreateTodoTask>
     {
-        private readonly TodoDbContext _todoDbContext;
+        private readonly ICrudRepository<TodoTask> _todoTaskRepository;
 
-        public CreateTodoTaskHandler(TodoDbContext todoDbContext)
+        public CreateTodoTaskHandler(ICrudRepository<TodoTask> todoTaskRepository)
         {
-            _todoDbContext = todoDbContext;
+            _todoTaskRepository = todoTaskRepository;
         }
 
         public async Task<Unit> Handle(CreateTodoTask request, CancellationToken cancellationToken)
@@ -25,8 +25,9 @@ namespace NBB.Todo.Worker.Application
                 DueDate = request.DueDate
             };
 
-            _todoDbContext.Add(todoTask);
-            await _todoDbContext.SaveChangesAsync();
+            await _todoTaskRepository.AddAsync(todoTask, cancellationToken);
+
+            await _todoTaskRepository.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
         }

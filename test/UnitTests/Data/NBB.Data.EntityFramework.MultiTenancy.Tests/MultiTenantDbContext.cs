@@ -9,12 +9,9 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
     public class MultiTenantDbContext : DbContext
     {
         public DbSet<TestEntity> TestEntities { get; set; }
-        private readonly Guid _tenantId;
 
-
-        public MultiTenantDbContext(DbContextOptions<MultiTenantDbContext> options, ITenantContextAccessor tenantService) : base(options)
+        public MultiTenantDbContext(DbContextOptions<MultiTenantDbContext> options) : base(options)
         {
-            _tenantId = tenantService.TenantContext.GetTenantId();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,13 +22,13 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
-            this.SetTenantId(_tenantId);
+            this.SetTenantIdFromContext();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
-            this.SetTenantId(_tenantId);
+            this.SetTenantIdFromContext();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
     }
