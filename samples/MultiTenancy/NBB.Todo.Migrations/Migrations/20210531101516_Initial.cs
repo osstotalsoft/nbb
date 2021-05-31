@@ -15,7 +15,8 @@ namespace NBB.Todo.Migrations.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsCompleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

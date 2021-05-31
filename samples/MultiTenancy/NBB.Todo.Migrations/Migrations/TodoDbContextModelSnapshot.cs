@@ -37,9 +37,15 @@ namespace NBB.Todo.Migrations.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("TodoTaskId");
 
                     b.ToTable("TodoTasks");
+
+                    b
+                        .HasAnnotation("nbb:multitenant", true);
                 });
 #pragma warning restore 612, 618
         }

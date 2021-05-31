@@ -10,7 +10,7 @@ using NBB.Todo.Data;
 namespace NBB.Todo.Migrations.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20210531093928_Initial")]
+    [Migration("20210531101516_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,9 +39,15 @@ namespace NBB.Todo.Migrations.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("TodoTaskId");
 
                     b.ToTable("TodoTasks");
+
+                    b
+                        .HasAnnotation("nbb:multitenant", true);
                 });
 #pragma warning restore 612, 618
         }
