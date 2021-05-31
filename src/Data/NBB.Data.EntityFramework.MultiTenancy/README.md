@@ -53,25 +53,20 @@ services.AddMultiTenantEfUow<MyEntity, MyDbContext>();
 ```
 * if you do not use the unit of work for saving entities, you need to override the methods `SaveChangesAsync` and `SaveChanges` in every multi-tenant dbContext, like so:
 ```csharp
-private readonly ITenantContextAccessor _tenantContextAccessor;
-
 public MyDbContext(DbContextOptions<KycDbContext> options) : base(options)
 {
-    _tenantContextAccessor = sp.GetRequiredService<ITenantContextAccessor>();
 }
 
 public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
 {
-    var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
-    this.SetTenantId(tenantId);
+    this.SetTenantIdFromContext();
    
     return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 }
 
 public override int SaveChanges(bool acceptAllChangesOnSuccess)
 {
-    var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
-    this.SetTenantId(tenantId);
+    this.SetTenantIdFromContext();
 
     return base.SaveChanges(acceptAllChangesOnSuccess);
 }

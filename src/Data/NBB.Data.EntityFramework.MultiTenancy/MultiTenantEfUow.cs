@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
-using NBB.MultiTenancy.Abstractions.Context;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,12 +15,10 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         private readonly TContext _dbContext;
         private readonly ILogger<MultiTenantEfUow<TEntity, TContext>> _logger;
-        private readonly ITenantContextAccessor _tenantContextAccessor;
 
-        public MultiTenantEfUow(TContext dbContext, ITenantContextAccessor tenantContextAccessor, ILogger<MultiTenantEfUow<TEntity, TContext>> logger)
+        public MultiTenantEfUow(TContext dbContext, ILogger<MultiTenantEfUow<TEntity, TContext>> logger)
         {
             _dbContext = dbContext;
-            _tenantContextAccessor = tenantContextAccessor;
             _logger = logger;
         }
 
@@ -35,9 +32,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
-
-            _dbContext.SetTenantId(tenantId);
+            _dbContext.SetTenantIdFromContext();
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             stopWatch.Stop();

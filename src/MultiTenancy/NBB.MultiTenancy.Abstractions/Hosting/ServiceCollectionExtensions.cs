@@ -24,8 +24,6 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
             }
 
             services.AddSingleton<IHostedService, TenancyHostingValidator>();
-            services.Configure<TenancyHostingOptions>(configurationSection);
-
             services.AddSingleton<ITenantContextAccessor, TenantContextAccessor>();
 
             addTenantAwareServices(tenancyOptions);
