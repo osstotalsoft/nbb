@@ -10,7 +10,7 @@ The package [`NBB.MultiTenancy.Identification`](NBB.MultiTenancy.Identification#
 
 The package [`NBB.MultiTenancy.Identification.Http`](NBB.MultiTenancy.Identification.Http#readme) provides tenant identification strategies from HTTP requests.
 
-The package The package [`NBB.MultiTenancy.AspNet`](NBB.MultiTenancy.AspNet#readme) provides a messaging host middleware that identifies the tenant, loads the tenant information and sets it on the current tenancy context.
+The package [`NBB.MultiTenancy.AspNet`](NBB.MultiTenancy.AspNet#readme) provides a messaging host middleware that identifies the tenant, loads the tenant information and sets it on the current tenancy context.
 
 ## Multi-tenant messaging applications
 
