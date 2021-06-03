@@ -19,22 +19,18 @@ module Mediator =
 
     let dispatchEvent (event: #IEvent) =
         getMediator
-        |> Effect.bind (fun mediator -> mediator.DispatchEvent(event :> IEvent))
+        >>= (fun mediator -> mediator.DispatchEvent(event :> IEvent))
 
     let sendCommand (cmd: #ICommand) =
         getMediator
-        |> Effect.bind (fun mediator -> mediator.SendCommand(cmd :> ICommand))
+        >>= (fun mediator -> mediator.SendCommand(cmd :> ICommand))
 
-    let dispatchEvents (events: #IEvent list) =
-        List.traverse_ dispatchEvent events
-        |> Effect.ignore
+    let dispatchEvents (events: #IEvent list) = List.traverse_ dispatchEvent events
 
     let sendQuery (query: #IQuery<'TResponse>) =
         getMediator
-        |> Effect.bind
-            (fun mediator ->
-                mediator.SendQuery(query :> IQuery)
-                |> Effect.map unbox<'TResponse>)
+        >>= (fun mediator -> mediator.SendQuery(query :> IQuery))
+        |> Effect.map unbox<'TResponse>
 
     let sendMessage message =
         match box message with

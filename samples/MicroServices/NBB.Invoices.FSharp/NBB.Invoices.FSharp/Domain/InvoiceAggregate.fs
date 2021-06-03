@@ -15,8 +15,8 @@ module InvoiceAggregate =
           PaymentId: Guid option }
 
     type InvoiceEvent =
-        | InvoiceCreated of Invoice:Invoice
-        | InvoicePayed of Invoice:Invoice
+        | InvoiceCreated of Invoice: Invoice
+        | InvoicePayed of Invoice: Invoice
         interface IEvent
 
     let create clientId contractId amount =
@@ -32,9 +32,11 @@ module InvoiceAggregate =
             return invoice
         }
 
-    let markAsPayed paymentId invoice=
+    let markAsPayed paymentId invoice =
         evented {
-            let invoice' = { invoice with PaymentId = Some paymentId }
+            let invoice' =
+                { invoice with
+                      PaymentId = Some paymentId }
 
             do! addEvent (InvoicePayed invoice')
             return invoice'
@@ -48,7 +50,8 @@ module InvoiceAggregate =
 
 module InvoiceRepository =
     open InvoiceAggregate
-    type InvoiceRepoSideEffect<'a> =
+
+    type SideEffect<'a> =
         | GetById of InvoiceId: Guid * Continuation: (Invoice -> 'a)
         | Save of Invoice: Invoice * Continuation: (unit -> 'a)
         interface ISideEffect<'a>

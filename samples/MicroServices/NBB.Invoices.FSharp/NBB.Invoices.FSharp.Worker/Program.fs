@@ -4,15 +4,14 @@ open Microsoft.Extensions.Configuration
 open System.Reflection
 open System.IO
 open Microsoft.Extensions.DependencyInjection
-open NBB.Application.Mediator.FSharp
 open NBB.Invoices.FSharp.Application
 open NBB.Core.Effects
-open NBB.Messaging.Effects
 open NBB.Messaging.Abstractions
 open NBB.Messaging.Host
 open NBB.Messaging.Nats
 open Microsoft.Extensions.Logging
 open NBB.Messaging.Host.MessagingPipeline
+open NBB.Invoices.FSharp.Data
 
 [<EntryPoint>]
 let main argv =
@@ -30,7 +29,10 @@ let main argv =
 
     // Services configuration
     let serviceConfig (context: HostBuilderContext) (services: IServiceCollection) =
-        services |> WriteApplication.addServices
+        services
+        |> WriteApplication.addServices
+        |> DataAccess.addServices
+        |> ignore
 
         services
             .AddMessageBus()
@@ -43,7 +45,7 @@ let main argv =
                     (fun configBuilder ->
                         configBuilder
                             .AddSubscriberServices(fun config ->
-                                config.AddTypes(typeof<InvoiceApplication.Command>)
+                                config.AddTypes(typeof<CreateInvoice.Command>, typeof<MarkInvoiceAsPayed.Command>)
                                 |> ignore)
                             .WithDefaultOptions()
                             .UsePipeline(fun pipelineBuilder ->

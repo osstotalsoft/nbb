@@ -44,7 +44,8 @@ module WriteApplication =
 
     let private commandPipeline =
         log
-        << handlers [ InvoiceApplication.handle |> upCast ]
+        << handlers [ CreateInvoice.handle |> upCast
+                      MarkInvoiceAsPayed.handle |> upCast ]
 
     open EventMiddleware
     open EventHandler
@@ -74,4 +75,3 @@ module WriteApplication =
         services.AddMessagingEffects() |> ignore
 
         services.AddSideEffectHandler(Mediator.handleGetMediator mediator)
-        |> ignore
