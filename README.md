@@ -37,4 +37,4 @@ The blocks
 * [`NBB.EventStore`](./src/EventStore#readme) - event store functionality
 * [`NBB.Correlation`](./src/Correlation#readme) - facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow
 * [`NBB.ProcessManager`](./src/Orchestration#readme) - a way of orchestrating your events
-* [`NBB.MultiTenancy`](./src/EventTenancy#readme) -  building blocks for multi-tenant applications
+* [`NBB.MultiTenancy`](./src/MultiTenancy#readme) -  building blocks for multi-tenant applications
