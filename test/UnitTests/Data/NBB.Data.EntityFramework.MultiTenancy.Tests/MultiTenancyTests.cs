@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Core.Abstractions;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Options;
 using Xunit;
 
 namespace NBB.Data.EntityFramework.MultiTenancy.Tests
@@ -128,12 +130,15 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 
         private IServiceProvider GetServiceProvider<TDBContext>(Guid tenantId, bool isSharedDB, bool useUow) where TDBContext : DbContext
         {
-
             var tenantService = Mock.Of<ITenantContextAccessor>(x =>
                 x.TenantContext == new TenantContext(new Tenant(tenantId, null, false)));
             var tenantDatabaseConfigService =
                 Mock.Of<ITenantDatabaseConfigService>(x => x.IsSharedDatabase(tenantId) == isSharedDB && x.GetConnectionString(tenantId) == "Test");
             var services = new ServiceCollection();
+            services.AddOptions<TenancyHostingOptions>().Configure(o =>
+            {
+                o.TenancyType = TenancyType.MultiTenant;
+            });
             services.AddSingleton(tenantService);
             services.AddSingleton(tenantDatabaseConfigService);
             services.AddLogging();
