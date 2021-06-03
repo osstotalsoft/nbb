@@ -23,3 +23,7 @@ The package [`NBB.Messaging.MultiTenancy`](../Messaging/NBB.Messaging.MultiTenan
 ## Multi-tenant data access
 
 The package [`NBB.Data.EntityFramework.MultiTenancy`](../Data/NBB.Data.EntityFramework.MultiTenancy#readme) helps implementing a multi-tenant data access solution using Entity Framework.
+
+## Samples
+
+* [`Todo Tasks`](../../samples/MultiTenancy#readme) is a sample multi-tenant service containing split across two containers one Web API and one worker. It uses Entyty Framework for data access.
