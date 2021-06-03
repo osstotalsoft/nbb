@@ -29,7 +29,7 @@ namespace NBB.Todo.Api
         {
             Log.Logger = new LoggerConfiguration()
               .ReadFrom.Configuration(ctx.Configuration)
-              .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
               .Enrich.FromLogContext()
               .WriteTo.Console()
               .CreateLogger();

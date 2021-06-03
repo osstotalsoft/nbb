@@ -248,6 +248,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Http.Effects.Tests", "test\UnitTests\Http\NBB.Http.Effects.Tests\NBB.Http.Effects.Tests.csproj", "{4AE166DE-9E9D-482B-84F6-3556AC743DEF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MultiTenancy", "MultiTenancy", "{F170EE3D-296D-487B-9498-CCD8541BAFB2}"
+	ProjectSection(SolutionItems) = preProject
+		src\MultiTenancy\README.md = src\MultiTenancy\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Abstractions", "src\MultiTenancy\NBB.MultiTenancy.Abstractions\NBB.MultiTenancy.Abstractions.csproj", "{39812860-D4CB-4C4B-B18E-24C0AB9D8DFE}"
 EndProject
