@@ -13,7 +13,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         public static void SetTenantIdFromContext(this DbContext context)
         {
-            var sp =  context.GetInfrastructure();
+            var sp = context.GetInfrastructure();
             var tenancyOptions = sp.GetRequiredService<IOptions<TenancyHostingOptions>>();
             var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
 
@@ -39,5 +39,8 @@ namespace NBB.Data.EntityFramework.MultiTenancy
                 e.SetTenantId(tenantId);
             }
         }
+
+        public static Guid GetTenantIdFromContext(this DbContext dbContext)
+          => dbContext.GetInfrastructure().GetRequiredService<ITenantContextAccessor>().TenantContext.GetTenantId();
     }
 }
