@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.MultiTenancy.Abstractions.Context;
+using Microsoft.Extensions.Options;
+using NBB.MultiTenancy.Abstractions.Options;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
 {
@@ -11,12 +11,17 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         private readonly IEntityTypeConfiguration<TEntity> _innerConfiguration;
         private readonly IServiceProvider _sp;
+        private readonly DbContext _dbContext;
+        private readonly bool _isMultiTenant;
         private string _tenantIdColumn;
 
-        public MultiTenantEntityTypeConfigurationDecorator(IEntityTypeConfiguration<TEntity> innerConfiguration, IServiceProvider sp)
+        public MultiTenantEntityTypeConfigurationDecorator(IEntityTypeConfiguration<TEntity> innerConfiguration, IServiceProvider sp, DbContext dbContext)
         {
             _innerConfiguration = innerConfiguration;
             _sp = sp;
+            _dbContext = dbContext;
+            var tenancyOptions = _sp.GetRequiredService<IOptions<TenancyHostingOptions>>();
+            _isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
         }
 
         public MultiTenantEntityTypeConfigurationDecorator<TEntity> WithTenantIdColumn(string tenantIdColumn)
@@ -29,44 +34,39 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
             _innerConfiguration.Configure(builder);
 
+            if (!_isMultiTenant)
+                return;
 
-            var tenantId = ResolveTenantId();
-            var isSharedDb = IsSharedDb(tenantId);
+            var isSharedDb = IsSharedDb();
 
             builder.HasAnnotation(MultiTenancy.MultiTenantAnnotation, true);
             AddTenantIdProperty(builder);
-            AddTenantIdQueryFilter(builder, tenantId, isSharedDb);
+            AddTenantIdQueryFilter(builder, isSharedDb);
         }
 
-        private Guid ResolveTenantId()
+        private bool IsSharedDb()
         {
-            var tenantContextAccessor = _sp.GetRequiredService<ITenantContextAccessor>();
-            var tenantId = tenantContextAccessor.TenantContext.GetTenantId();
+            var tenantId = _dbContext.GetTenantIdFromContext();
 
-            return tenantId;
-        }
-
-        private bool IsSharedDb(Guid tenantId)
-        {
             var tenantDatabaseConfigService = _sp.GetRequiredService<ITenantDatabaseConfigService>();
             return tenantDatabaseConfigService.IsSharedDatabase(tenantId);
         }
 
-        private void AddTenantIdQueryFilter(EntityTypeBuilder<TEntity> builder, Guid tenantId, bool isSharedDb)
+        private void AddTenantIdQueryFilter(EntityTypeBuilder<TEntity> builder, bool isSharedDb)
         {
             if (!isSharedDb)
             {
                 return;
             }
 
-            Expression<Func<TEntity, bool>> filter = t =>
-                EF.Property<Guid?>(t, MultiTenancy.TenantIdProp) == tenantId;
-            builder.HasQueryFilter(filter);
+            https://github.com/dotnet/efcore/pull/11017
+            builder.HasQueryFilter(t =>
+                EF.Property<Guid>(t, MultiTenancy.TenantIdProp) == _dbContext.GetTenantIdFromContext());
         }
 
         private void AddTenantIdProperty(EntityTypeBuilder<TEntity> builder)
         {
-            var prop = builder.Property<Guid?>(MultiTenancy.TenantIdProp);
+            var prop = builder.Property<Guid>(MultiTenancy.TenantIdProp);
             if (!string.IsNullOrWhiteSpace(_tenantIdColumn))
             {
                 prop.HasColumnName(_tenantIdColumn);
