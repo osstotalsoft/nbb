@@ -9,14 +9,14 @@ open NBB.Application.Mediator.FSharp
 module CreateInvoice =
     type Command =
         { ClientId: Guid
-          ContractId: Guid option
+          ContractId: Guid
           Amount: decimal }
         interface ICommand
 
     let handle cmd =
         effect {
             let eventedInvoice =
-                InvoiceAggregate.create cmd.ClientId cmd.ContractId cmd.Amount
+                InvoiceAggregate.create cmd.ClientId (Some cmd.ContractId) cmd.Amount
 
             do!
                 eventedInvoice
