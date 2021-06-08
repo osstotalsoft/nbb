@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
-//using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Core.Abstractions;
 using NBB.MultiTenancy.Abstractions;
@@ -22,17 +20,21 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             // arrange
             var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(testTenantId, true, true);
+            var sp = GetServiceProvider<TestDbContext>(true);
             var testEntity = new TestEntity { Id = 1 };
-            var dbContext = sp.GetRequiredService<TestDbContext>();
-            dbContext.TestEntities.Add(testEntity);
-            var uow = sp.GetRequiredService<IUow<TestEntity>>();
 
-            // act
-            await uow.SaveChangesAsync();
+            await WithTenantScope(sp, testTenantId, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+                dbContext.TestEntities.Add(testEntity);
+                var uow = sp.GetRequiredService<IUow<TestEntity>>();
 
-            // assert
-            dbContext.Entry(testEntity).GetTenantId().Should().Be(testTenantId);
+                // act
+                await uow.SaveChangesAsync();
+
+                // assert
+                dbContext.Entry(testEntity).GetTenantId().Should().Be(testTenantId);
+            });
         }
 
         [Fact]
@@ -40,67 +42,95 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             // arrange
             var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(testTenantId, true, true);
+            var sp = GetServiceProvider<TestDbContext>(true);
             var testEntity = new TestEntity { Id = 1 };
             var testEntityOtherId = new TestEntity { Id = 2 };
-            var dbContext = sp.GetRequiredService<TestDbContext>();
-            var uow = sp.GetRequiredService<IUow<TestEntity>>();
+            await WithTenantScope(sp, testTenantId, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+                var uow = sp.GetRequiredService<IUow<TestEntity>>();
 
-            dbContext.TestEntities.Add(testEntity);
-            dbContext.TestEntities.Add(testEntityOtherId);
+                dbContext.TestEntities.Add(testEntity);
+                dbContext.TestEntities.Add(testEntityOtherId);
 
-            await uow.SaveChangesAsync(); // Bypasses multi tenancy UoW !
-            dbContext.Entry(testEntityOtherId).Property("TenantId").CurrentValue = Guid.NewGuid();
+                await uow.SaveChangesAsync(); // Bypasses multi tenancy UoW !
+                dbContext.Entry(testEntityOtherId).Property("TenantId").CurrentValue = Guid.NewGuid();
 
-            // act && assert
-            Exception ex = Assert.Throws<Exception>(() => uow.SaveChangesAsync().GetAwaiter().GetResult());
+                // act && assert
+                Exception ex = Assert.Throws<Exception>(() => uow.SaveChangesAsync().GetAwaiter().GetResult());
+            });
         }
 
         [Fact]
         public async Task Shoud_Apply_Filter_When_Shared_Database()
         {
             // arrange
-            var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(testTenantId, true, true);
+            var testTenantId1 = Guid.NewGuid();
+            var testTenantId2 = Guid.NewGuid();
             var testEntity = new TestEntity { Id = 1 };
             var testEntityOtherId = new TestEntity { Id = 2 };
-            var dbContext = sp.GetRequiredService<TestDbContext>();
+            var sp = GetServiceProvider<TestDbContext>(true);
 
-            dbContext.TestEntities.Add(testEntity);
-            dbContext.TestEntities.Add(testEntityOtherId);
-            dbContext.Entry(testEntity).Property("TenantId").CurrentValue = testTenantId;
-            dbContext.Entry(testEntityOtherId).Property("TenantId").CurrentValue = Guid.NewGuid();
-            await dbContext.SaveChangesAsync();
+            await WithTenantScope(sp, testTenantId1, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+                dbContext.TestEntities.Add(testEntity);
+                await dbContext.SaveChangesAsync();
+            });
 
-            // act
-            var list = dbContext.TestEntities.ToList();
+            await WithTenantScope(sp, testTenantId2, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+                dbContext.TestEntities.Add(testEntityOtherId);
+                await dbContext.SaveChangesAsync();
+            });
 
-            // assert
-            list.Count().Should().Be(1);
+            await WithTenantScope(sp, testTenantId2, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+
+                // act
+                var entities = await dbContext.TestEntities.ToListAsync();
+
+                // assert
+                entities.Count.Should().Be(1);
+            });
         }
 
         [Fact]
         public async Task Shoud_NotApply_Filter_When_NonShared_Database()
         {
             // arrange
-            var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(testTenantId, false, true);
+            var testTenantId1 = Guid.NewGuid();
+            var testTenantId2 = Guid.NewGuid();
             var testEntity = new TestEntity { Id = 1 };
             var testEntityOtherId = new TestEntity { Id = 2 };
-            var dbContext = sp.GetRequiredService<TestDbContext>();
+            var sp = GetServiceProvider<TestDbContext>(false);
 
-            dbContext.TestEntities.Add(testEntity);
-            dbContext.TestEntities.Add(testEntityOtherId);
-            dbContext.Entry(testEntity).Property("TenantId").CurrentValue = testTenantId;
-            dbContext.Entry(testEntityOtherId).Property("TenantId").CurrentValue = Guid.NewGuid();
+            await WithTenantScope(sp, testTenantId1, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+                dbContext.TestEntities.Add(testEntity);
+                await dbContext.SaveChangesAsync();
+            });
 
-            await dbContext.SaveChangesAsync();
+            await WithTenantScope(sp, testTenantId2, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
+                dbContext.TestEntities.Add(testEntityOtherId);
+                await dbContext.SaveChangesAsync();
+            });
 
-            // act
-            var list = dbContext.TestEntities.ToList();
+            await WithTenantScope(sp, testTenantId2, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
 
-            // assert
-            list.Count().Should().Be(2);
+                // act
+                var entities = await dbContext.TestEntities.ToListAsync();
+
+                // assert
+                entities.Count.Should().Be(2);
+            });
         }
 
         [Fact]
@@ -108,32 +138,35 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             // arrange
             var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<MultiTenantDbContext>(testTenantId, true, false);
+            var sp = GetServiceProvider<TestDbContext>(true);
             var testEntity = new TestEntity { Id = 1 };
             var testEntity1 = new TestEntity { Id = 2 };
-            var dbContext = sp.GetRequiredService<MultiTenantDbContext>();
 
-            dbContext.TestEntities.Add(testEntity);
-            dbContext.TestEntities.Add(testEntity1);
+            await WithTenantScope(sp, testTenantId, async sp =>
+            {
+                var dbContext = sp.GetRequiredService<TestDbContext>();
 
-            // act
-            await dbContext.SaveChangesAsync();
-            var list = dbContext
-                .TestEntities
-                .Select(x => (Guid)dbContext.Entry(x).Property("TenantId").CurrentValue)
-                .ToList()
-                .Distinct();
+                dbContext.TestEntities.Add(testEntity);
+                dbContext.TestEntities.Add(testEntity1);
 
-            // assert
-            list.Count().Should().Be(1);
+                // act
+                await dbContext.SaveChangesAsync();
+                var list = dbContext
+                    .TestEntities
+                    .Select(x => (Guid)dbContext.Entry(x).Property("TenantId").CurrentValue)
+                    .ToList()
+                    .Distinct();
+
+                // assert
+                list.Count().Should().Be(1);
+            });
         }
 
-        private IServiceProvider GetServiceProvider<TDBContext>(Guid tenantId, bool isSharedDB, bool useUow) where TDBContext : DbContext
+        private IServiceProvider GetServiceProvider<TDBContext>(bool isSharedDB) where TDBContext : DbContext
         {
-            var tenantService = Mock.Of<ITenantContextAccessor>(x =>
-                x.TenantContext == new TenantContext(new Tenant(tenantId, null, false)));
+            var tenantService = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == null);
             var tenantDatabaseConfigService =
-                Mock.Of<ITenantDatabaseConfigService>(x => x.IsSharedDatabase(tenantId) == isSharedDB && x.GetConnectionString(tenantId) == "Test");
+                Mock.Of<ITenantDatabaseConfigService>(x => x.IsSharedDatabase(It.IsAny<Guid>()) == isSharedDB && x.GetConnectionString(It.IsAny<Guid>()) == (isSharedDB ? "Test" : Guid.NewGuid().ToString()));
             var services = new ServiceCollection();
             services.AddOptions<TenancyHostingOptions>().Configure(o =>
             {
@@ -151,12 +184,19 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
 
-            if (useUow)
-            {
-                services.AddMultiTenantEfUow<TestEntity, TDBContext>();
-            }
+            services.AddEfUow<TestEntity, TDBContext>();
 
             return services.BuildServiceProvider();
+        }
+
+        private static async Task WithTenantScope(IServiceProvider sp, Guid tenantId, Func<IServiceProvider, Task> action)
+        {
+            var scope = sp.CreateScope();
+            var tenantContextAccessor = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
+            var dbConfigService = scope.ServiceProvider.GetRequiredService<ITenantDatabaseConfigService>();
+            tenantContextAccessor.TenantContext = new TenantContext(new Tenant(tenantId, string.Empty, dbConfigService.IsSharedDatabase(tenantId)));
+
+            await action(scope.ServiceProvider);
         }
     }
 }

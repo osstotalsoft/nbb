@@ -17,6 +17,7 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
             var configurationSection = configuration.GetSection(MessagingSectionName);
             var tenancyOptions = configurationSection.Get<TenancyHostingOptions>();
             services.Configure<TenancyHostingOptions>(configurationSection);
+            services.AddSingleton<ITenantContextAccessor, TenantContextAccessor>();
 
             if (tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None)
             {
@@ -24,8 +25,6 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
             }
 
             services.AddSingleton<IHostedService, TenancyHostingValidator>();
-            services.AddSingleton<ITenantContextAccessor, TenantContextAccessor>();
-
             addTenantAwareServices(tenancyOptions);
         }
     }

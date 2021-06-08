@@ -13,16 +13,10 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         public static void SetTenantIdFromContext(this DbContext context)
         {
-            var sp = context.GetInfrastructure();
-            var tenancyOptions = sp.GetRequiredService<IOptions<TenancyHostingOptions>>();
-            var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
-
-            if (!isMultiTenant)
+            if (!context.IsSharedDatabase())
                 return;
 
-            var tenantContextAccessor = sp.GetRequiredService<ITenantContextAccessor>();
-
-            var tenantId = tenantContextAccessor.TenantContext.GetTenantId();
+            var tenantId = context.GetTenantIdFromContext();
 
             var multiTenantEntities =
                 context.ChangeTracker.Entries()
@@ -42,5 +36,21 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public static Guid GetTenantIdFromContext(this DbContext dbContext)
           => dbContext.GetInfrastructure().GetRequiredService<ITenantContextAccessor>().TenantContext.GetTenantId();
+
+        public static bool IsSharedDatabase(this DbContext dbContext)
+        {
+            var sp = dbContext.GetInfrastructure();
+
+            var tenancyOptions = sp.GetRequiredService<IOptions<TenancyHostingOptions>>();
+            var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
+            if (!isMultiTenant)
+                return false;
+
+            var tenantDatabaseConfigService = sp.GetRequiredService<ITenantDatabaseConfigService>();
+            var tenantId = dbContext.GetTenantIdFromContext();
+            var isSharedDB = tenantDatabaseConfigService.IsSharedDatabase(tenantId);
+
+            return isSharedDB;
+        }
     }
 }

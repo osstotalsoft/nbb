@@ -2,7 +2,7 @@
 
 namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 {
-    public class TestDbContext : DbContext
+    public class TestDbContext : MultiTenantDbContext
     {
         public DbSet<TestEntity> TestEntities { get; set; }
 
@@ -12,9 +12,9 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyMultiTenantConfiguration(new TestEntityConfiguration(), this);
+            modelBuilder.ApplyConfiguration(new TestEntityConfiguration());
 
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NBB.Todo.Data.Entities;
+using NBB.Data.EntityFramework.MultiTenancy;
 
 namespace NBB.Todo.Data.EntityConfigurations
 {
@@ -10,6 +11,7 @@ namespace NBB.Todo.Data.EntityConfigurations
         {
             builder
                 .ToTable("TodoTasks")
+                .IsMultiTenant()
                 .HasKey(x => x.TodoTaskId);
         }
     }
