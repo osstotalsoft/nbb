@@ -7,6 +7,7 @@ module Invoice =
     let handler : HttpHandler = 
         subRoute "/invoices" (
             choose [
-                POST >=> route  "/"  >=> bindJson<CreateInvoice.Command> (Mediator.sendCommand |> HandlerUtils.interpretCommand)
+                POST >=> route  "/create"  >=> bindJson<CreateInvoice.Command> (Mediator.sendCommand |> HandlerUtils.interpretCommand)
+                POST >=> route  "/pay"  >=> bindJson<MarkInvoiceAsPayed.Command> (Mediator.sendCommand |> HandlerUtils.interpretCommand)
             ])
 

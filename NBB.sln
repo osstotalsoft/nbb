@@ -337,12 +337,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.PublishedLanguage", "samples\MultiTenancy\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj", "{37C07DBD-BE79-4897-B571-152F0E81CA4B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NBB.Invoices.FSharp", "NBB.Invoices.FSharp", "{29AF1BE2-AB2E-4261-BAAF-613C9A536684}"
+	ProjectSection(SolutionItems) = preProject
+		samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.postman_collection.json = samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.postman_collection.json
+		samples\MicroServices\NBB.Invoices.FSharp\README.md = samples\MicroServices\NBB.Invoices.FSharp\README.md
+	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Invoices.FSharp", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp\NBB.Invoices.FSharp.fsproj", "{DD572450-C7AE-47A9-B3BF-47A81E98D167}"
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Invoices.FSharp.Worker", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Worker\NBB.Invoices.FSharp.Worker.fsproj", "{009CD834-1FF7-4085-B71F-90EEAA52A490}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NBB.Invoices.FSharp.Api", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Api\NBB.Invoices.FSharp.Api.fsproj", "{6AD829F2-83F4-4A94-B4E6-72203679B2F0}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Invoices.FSharp.Api", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Api\NBB.Invoices.FSharp.Api.fsproj", "{6AD829F2-83F4-4A94-B4E6-72203679B2F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
