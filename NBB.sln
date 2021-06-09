@@ -38,8 +38,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.MediatR", "src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj", "{3A9676F0-9B5E-44DB-99A5-644200971512}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D28298B7-63A2-4751-BEB9-C3C30F2E7107}"
+	ProjectSection(SolutionItems) = preProject
+		samples\README.md = samples\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MicroServices", "MicroServices", "{CC43326A-DD67-4B00-80EE-C244B31A319F}"
+	ProjectSection(SolutionItems) = preProject
+		samples\MicroServices\README.md = samples\MicroServices\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NBB.Contracts", "NBB.Contracts", "{A820C4C2-1472-46ED-BA95-47B588B1D7AF}"
 EndProject

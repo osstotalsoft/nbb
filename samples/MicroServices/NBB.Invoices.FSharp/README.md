@@ -2,25 +2,14 @@
 
 This is a sample F# service split across two containers one Web API and one worker.
 
-This sample demonstrates the usage of:
-- Functional domain modelling using DDD concepts
+This sample shows the usage of:
+- Pure functional domain modelling using DDD concepts
 - Evented domain entities powered by the [`Evented computation expression`](../../../src/Core/NBB.Core.Evented.FSharp#README.md)
-- Clean architecture with DI powered by the `Effect computation expression`
-- Pure domain and application layer powered by the `Effect computation expression`
-- Application use-cases and pipelines powered by `NBB.Application.Mediator.FSharp`
-- Web api powered `Giraffe`
-- Messaging worker powered by `NBB.Messaging.Host` and `NBB.Messaging.Effects`
-
-## Domain
-
-
-## Application
-
-## Data access
-
-## Web Api
-
-## Messaging
+- Clean architecture with DI powered by the [`Effect computation expression`](../../../src/Core/NBB.Core.Effects.FSharp#README.md)
+- Pure domain and application layer powered by the [`Effect computation expression`](../../../src/Core/NBB.Core.Effects.FSharp#README.md)
+- Application use-cases and pipelines powered by [`NBB.Application.Mediator.FSharp`](../../../src/Application/NBB.Application.Mediator.FSharp#README.md)
+- Web api powered by [`Giraffe`](https://github.com/giraffe-fsharp/Giraffe)
+- Messaging worker powered by [`NBB.Messaging.Host`](../../../src/Messaging/NBB.Messaging.Host#README.md) and [`NBB.Messaging.Effects`](../../../src/Messaging/NBB.Messaging.Effects#README.md)
 
 
 ## Configuration
