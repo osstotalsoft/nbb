@@ -38,8 +38,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Application.MediatR", "src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj", "{3A9676F0-9B5E-44DB-99A5-644200971512}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D28298B7-63A2-4751-BEB9-C3C30F2E7107}"
+	ProjectSection(SolutionItems) = preProject
+		samples\README.md = samples\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MicroServices", "MicroServices", "{CC43326A-DD67-4B00-80EE-C244B31A319F}"
+	ProjectSection(SolutionItems) = preProject
+		samples\MicroServices\README.md = samples\MicroServices\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NBB.Contracts", "NBB.Contracts", "{A820C4C2-1472-46ED-BA95-47B588B1D7AF}"
 EndProject
@@ -335,6 +341,18 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.Migrations", "samples\MultiTenancy\NBB.Todo.Migrations\NBB.Todo.Migrations.csproj", "{AEF0202F-2450-4D38-B5FF-48EBFBAAD26D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Todo.PublishedLanguage", "samples\MultiTenancy\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj", "{37C07DBD-BE79-4897-B571-152F0E81CA4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NBB.Invoices.FSharp", "NBB.Invoices.FSharp", "{29AF1BE2-AB2E-4261-BAAF-613C9A536684}"
+	ProjectSection(SolutionItems) = preProject
+		samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.postman_collection.json = samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.postman_collection.json
+		samples\MicroServices\NBB.Invoices.FSharp\README.md = samples\MicroServices\NBB.Invoices.FSharp\README.md
+	EndProjectSection
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Invoices.FSharp", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp\NBB.Invoices.FSharp.fsproj", "{DD572450-C7AE-47A9-B3BF-47A81E98D167}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Invoices.FSharp.Worker", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Worker\NBB.Invoices.FSharp.Worker.fsproj", "{009CD834-1FF7-4085-B71F-90EEAA52A490}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Invoices.FSharp.Api", "samples\MicroServices\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Api\NBB.Invoices.FSharp.Api.fsproj", "{6AD829F2-83F4-4A94-B4E6-72203679B2F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -772,6 +790,18 @@ Global
 		{37C07DBD-BE79-4897-B571-152F0E81CA4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37C07DBD-BE79-4897-B571-152F0E81CA4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37C07DBD-BE79-4897-B571-152F0E81CA4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD572450-C7AE-47A9-B3BF-47A81E98D167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD572450-C7AE-47A9-B3BF-47A81E98D167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD572450-C7AE-47A9-B3BF-47A81E98D167}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD572450-C7AE-47A9-B3BF-47A81E98D167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{009CD834-1FF7-4085-B71F-90EEAA52A490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{009CD834-1FF7-4085-B71F-90EEAA52A490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{009CD834-1FF7-4085-B71F-90EEAA52A490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{009CD834-1FF7-4085-B71F-90EEAA52A490}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD829F2-83F4-4A94-B4E6-72203679B2F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD829F2-83F4-4A94-B4E6-72203679B2F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD829F2-83F4-4A94-B4E6-72203679B2F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD829F2-83F4-4A94-B4E6-72203679B2F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -917,6 +947,10 @@ Global
 		{2752E754-8275-4712-81A9-FD64E85376D4} = {FA5EB6F2-9864-46B9-B62E-13D6578D9009}
 		{AEF0202F-2450-4D38-B5FF-48EBFBAAD26D} = {FA5EB6F2-9864-46B9-B62E-13D6578D9009}
 		{37C07DBD-BE79-4897-B571-152F0E81CA4B} = {FA5EB6F2-9864-46B9-B62E-13D6578D9009}
+		{29AF1BE2-AB2E-4261-BAAF-613C9A536684} = {CC43326A-DD67-4B00-80EE-C244B31A319F}
+		{DD572450-C7AE-47A9-B3BF-47A81E98D167} = {29AF1BE2-AB2E-4261-BAAF-613C9A536684}
+		{009CD834-1FF7-4085-B71F-90EEAA52A490} = {29AF1BE2-AB2E-4261-BAAF-613C9A536684}
+		{6AD829F2-83F4-4A94-B4E6-72203679B2F0} = {29AF1BE2-AB2E-4261-BAAF-613C9A536684}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

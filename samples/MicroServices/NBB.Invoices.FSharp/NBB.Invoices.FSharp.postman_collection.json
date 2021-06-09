@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "aa0d3cfb-57b6-4b3f-87f1-d40469550963",
+		"name": "MultiTenantTodoList",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get all todo tasks",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "tenantId",
+						"value": "f7bfa571-4067-4167-a4c5-dafb71ccdcf7",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:58733/api/todo",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "58733",
+					"path": [
+						"api",
+						"todo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create todo task",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "tenantId",
+						"value": "f7bfa571-4067-4167-a4c5-dafb71ccdcf7",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Name\": \"My task name\",\n  \"Description\": \"My task description\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:58733/api/todo",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "58733",
+					"path": [
+						"api",
+						"todo"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

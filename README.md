@@ -38,3 +38,7 @@ The blocks
 * [`NBB.Correlation`](./src/Correlation#readme) - facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow
 * [`NBB.ProcessManager`](./src/Orchestration#readme) - a way of orchestrating your events
 * [`NBB.MultiTenancy`](./src/MultiTenancy#readme) -  building blocks for multi-tenant applications
+
+The samples
+----------------
+Please see our [`samples`](./samples#README.md) folder to get you started with various architectures built with NBB.
