@@ -27,30 +27,31 @@ namespace NBB.MultiTenancy.Abstractions.Hosting
             _applicationLifetime = applicationLifetime;
         }
 
+        // TODO: Check if any hosting validations are required
         private async Task CheckMonoTenant(CancellationToken cancellationToken)
         {
             if (_tenancyOptions.Value.TenancyType != TenancyType.MonoTenant)
                 return;
 
-            var tenantId = _tenancyOptions.Value.TenantId ??
-                           throw new ApplicationException("MonoTenant Id is not configured");
+            //var tenantId = _tenancyOptions.Value.TenantId ??
+            //               throw new ApplicationException("MonoTenant Id is not configured");
 
-            using var scope = _scopeFactory.CreateScope();
-            var tenantRepository = scope.ServiceProvider.GetRequiredService<ITenantRepository>();
-            var tenant = await tenantRepository.Get(tenantId, cancellationToken);
+            //using var scope = _scopeFactory.CreateScope();
+            //var tenantRepository = scope.ServiceProvider.GetRequiredService<ITenantRepository>();
+            //var tenant = await tenantRepository.Get(tenantId, cancellationToken);
 
-            if (tenant == null)
-            {
-                _logger.LogCritical($"Tenant {tenantId} was not found in the repository");
-                _applicationLifetime.StopApplication();
-                return;
-            }
+            //if (tenant == null)
+            //{
+            //    _logger.LogCritical($"Tenant {tenantId} was not found in the repository");
+            //    _applicationLifetime.StopApplication();
+            //    return;
+            //}
 
-            if (tenant.IsShared)
-            {
-                _logger.LogCritical($"Attempting to start host for shared tenant {tenantId} in a MonoTenant context");
-                _applicationLifetime.StopApplication();
-            }
+            //if (tenant.IsShared)
+            //{
+            //    _logger.LogCritical($"Attempting to start host for shared tenant {tenantId} in a MonoTenant context");
+            //    _applicationLifetime.StopApplication();
+            //}
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

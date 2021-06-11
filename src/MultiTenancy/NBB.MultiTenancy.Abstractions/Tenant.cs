@@ -8,13 +8,10 @@ namespace NBB.MultiTenancy.Abstractions
 
         public string Code { get; }
 
-        public bool IsShared { get; }
-
-        public Tenant(Guid tenantId, string code, bool isShared)
+        public Tenant(Guid tenantId, string code)
         {
             TenantId = tenantId;
             Code = code;
-            IsShared = isShared;
         }
     }
 }
