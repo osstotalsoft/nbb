@@ -7,7 +7,6 @@ namespace NBB.Messaging.MultiTenancy
     {
         public static IServiceCollection AddMultiTenantMessaging(this IServiceCollection services)
         {
-            services.Decorate<ITopicRegistry, MultiTenancyTopicRegistryDecorator>();
             services.Decorate<IMessageBusPublisher, MultiTenancyMessageBusPublisherDecorator>();
 
             return services;

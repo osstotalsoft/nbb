@@ -62,7 +62,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         }
 
         [Fact]
-        public async Task Shoud_Apply_Filter_When_Shared_Database()
+        public async Task Shoud_Apply_Filter()
         {
             // arrange
             var testTenantId1 = Guid.NewGuid();
@@ -97,41 +97,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             });
         }
 
-        [Fact]
-        public async Task Shoud_NotApply_Filter_When_NonShared_Database()
-        {
-            // arrange
-            var testTenantId1 = Guid.NewGuid();
-            var testTenantId2 = Guid.NewGuid();
-            var testEntity = new TestEntity { Id = 1 };
-            var testEntityOtherId = new TestEntity { Id = 2 };
-            var sp = GetServiceProvider<TestDbContext>(false);
-
-            await WithTenantScope(sp, testTenantId1, async sp =>
-            {
-                var dbContext = sp.GetRequiredService<TestDbContext>();
-                dbContext.TestEntities.Add(testEntity);
-                await dbContext.SaveChangesAsync();
-            });
-
-            await WithTenantScope(sp, testTenantId2, async sp =>
-            {
-                var dbContext = sp.GetRequiredService<TestDbContext>();
-                dbContext.TestEntities.Add(testEntityOtherId);
-                await dbContext.SaveChangesAsync();
-            });
-
-            await WithTenantScope(sp, testTenantId2, async sp =>
-            {
-                var dbContext = sp.GetRequiredService<TestDbContext>();
-
-                // act
-                var entities = await dbContext.TestEntities.ToListAsync();
-
-                // assert
-                entities.Count.Should().Be(2);
-            });
-        }
 
         [Fact]
         public async Task Should_add_TenantId_and_filter_for_MultiTenantContext()
@@ -194,7 +159,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             var scope = sp.CreateScope();
             var tenantContextAccessor = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
             var dbConfigService = scope.ServiceProvider.GetRequiredService<ITenantDatabaseConfigService>();
-            tenantContextAccessor.TenantContext = new TenantContext(new Tenant(tenantId, string.Empty, dbConfigService.IsSharedDatabase(tenantId)));
+            tenantContextAccessor.TenantContext = new TenantContext(new Tenant(tenantId, string.Empty));
 
             await action(scope.ServiceProvider);
         }

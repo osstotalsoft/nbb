@@ -14,12 +14,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ConfigureMultiTenant(this);
-            base.OnModelCreating(modelBuilder);
-        }
-
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             this.SetTenantIdFromContext();

@@ -50,7 +50,6 @@ namespace NBB.Todo.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             var tenancyOptions = app.ApplicationServices.GetRequiredService<IOptions<TenancyHostingOptions>>();
-            var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
 
             if (env.IsDevelopment())
             {
@@ -62,7 +61,7 @@ namespace NBB.Todo.Api
             app.UseAuthorization();
 
             app.UseWhen(
-                ctx => isMultiTenant && ctx.Request.Path.StartsWithSegments(new PathString("/api")),
+                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
                 appBuilder => appBuilder.UseTenantMiddleware());
 
             app.UseEndpoints(endpoints =>

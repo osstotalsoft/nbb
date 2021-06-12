@@ -202,7 +202,7 @@ namespace TheBenchmarks
 
         private class TenantContextAccessorMock : ITenantContextAccessor
         {
-            private readonly TenantContext _tenantContext = new TenantContext(new Tenant(Guid.NewGuid(), null, false));
+            private readonly TenantContext _tenantContext = new TenantContext(new Tenant(Guid.NewGuid(), null));
             public TenantContext TenantContext { get => _tenantContext; set => throw new NotImplementedException(); }
 
             public TenantContextFlow ChangeTenantContext(TenantContext context)

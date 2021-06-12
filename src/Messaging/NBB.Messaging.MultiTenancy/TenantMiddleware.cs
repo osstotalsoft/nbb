@@ -8,6 +8,7 @@ using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Services;
+using NBB.MultiTenancy.Abstractions;
 
 namespace NBB.Messaging.MultiTenancy
 {
@@ -33,8 +34,14 @@ namespace NBB.Messaging.MultiTenancy
 
         public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
-            if (_tenancyOptions.Value.TenancyType == TenancyType.None)
+            if (_tenantContextAccessor.TenantContext != null)
             {
+                throw new ApplicationException("Tenant context is already set");
+            }
+
+            if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
+            {
+                 _tenantContextAccessor.TenantContext = new TenantContext(Tenant.Default);
                 await next();
                 return;
             }
@@ -57,37 +64,15 @@ namespace NBB.Messaging.MultiTenancy
                     $"Invalid tenant ID for message {context.MessagingEnvelope.Payload.GetType()}. Expected {tenantId} but received {messageTenantIdHeader}");
             }
 
-            if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant && _tenancyOptions.Value.TenantId != messageTenantId)
-            {
-                throw new ApplicationException(
-                    $"Invalid tenant ID for message {context.MessagingEnvelope.Payload.GetType()}. Expected {_tenancyOptions.Value.TenantId} but received {messageTenantIdHeader}");
-            }
-
             var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
                          ?? throw new ApplicationException($"Tenant {tenantId} not found");
 
-            if (tenant.IsShared && _tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
-            {
-                throw new ApplicationException(
-                    $"Received a message for shared tenant {messageTenantIdHeader} in a MonoTenant hosting");
-            }
-
-            if (!tenant.IsShared && _tenancyOptions.Value.TenancyType == TenancyType.MultiTenant)
-            {
-                throw new ApplicationException(
-                    $"Received a message for premium tenant {messageTenantIdHeader} in a MultiTenant (shared) context");
-            }
-
-            if (_tenantContextAccessor.TenantContext != null)
-            {
-                throw new ApplicationException("Tenant context is already set");
-            }
-
-            _tenantContextAccessor.TenantContext = new TenantContext(tenant);
+             _tenantContextAccessor.TenantContext = new TenantContext(tenant);
 
             await next();
         }
     }
+
 
     public static partial class MessagingPipelineExtensions
     {

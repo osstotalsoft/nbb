@@ -165,7 +165,7 @@ namespace NBB.EventStore.IntegrationTests
             services.AddMultitenancy(configuration, _ =>
                     {
                         services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                            x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
+                            x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null))));
                         services.WithMultiTenantAdoNetEventRepository();
                     });
 

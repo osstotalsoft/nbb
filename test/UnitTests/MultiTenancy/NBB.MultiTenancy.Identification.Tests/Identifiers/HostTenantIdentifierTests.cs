@@ -24,7 +24,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
         {
             // Arrange
             var tenantId = Guid.NewGuid();
-            var tenant = new Tenant(tenantId, string.Empty, false);
+            var tenant = new Tenant(tenantId, string.Empty);
             _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(tenant));
             var sut = new HostTenantIdentifier(_hostTenantRepository.Object);
 
@@ -40,7 +40,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
         {
             // Arrange
             const string tenantToken = "tenant token";
-            _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tenant(Guid.Empty, string.Empty, false)));
+            _hostTenantRepository.Setup(r => r.GetByHost(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tenant(Guid.Empty, string.Empty)));
             var sut = new HostTenantIdentifier(_hostTenantRepository.Object);
 
             // Act

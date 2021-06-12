@@ -17,15 +17,9 @@ using Serilog;
 using Serilog.Events;
 using System.IO;
 using System.Threading.Tasks;
-using NBB.Contracts.Worker.MultiTenancy;
 using NBB.Messaging.Host.Builder;
-using NBB.Messaging.MultiTenancy;
-using NBB.MultiTenancy.Abstractions.Hosting;
-using NBB.MultiTenancy.Abstractions.Repositories;
-using NBB.MultiTenancy.Identification.Messaging.Extensions;
 using Serilog.Sinks.MSSqlServer;
 using Microsoft.Extensions.Options;
-using NBB.MultiTenancy.Abstractions.Options;
 
 namespace NBB.Contracts.Worker
 {
@@ -56,7 +50,7 @@ namespace NBB.Contracts.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
+                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -74,17 +68,11 @@ namespace NBB.Contracts.Worker
 
 
                     services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                        .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
 
                     services.AddMessagingHost(hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
-                    services.AddMultitenancy(hostingContext.Configuration, _ =>
-                    {
-                        services.AddMultiTenantMessaging()
-                            .AddDefaultMessagingTenantIdentification()
-                            .AddTenantRepository<TenantRepositoryMock>();
-                    });
                 });
 
             var host = builder.UseConsoleLifetime().Build();
@@ -95,27 +83,17 @@ namespace NBB.Contracts.Worker
 
     class MessagingHostStartup : IMessagingHostStartup
     {
-        private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
-
-        public MessagingHostStartup(IOptions<TenancyHostingOptions> tenancyOptions)
-        {
-            _tenancyOptions = tenancyOptions;
-        }
-
         public Task Configure(IMessagingHostConfigurationBuilder hostConfigurationBuilder)
         {
-            var isMultiTenant = _tenancyOptions?.Value?.TenancyType != TenancyType.None;
-
             hostConfigurationBuilder
                 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
                     .FromMediatRHandledCommands().AddAllClasses())
                 .WithOptions(optionsBuilder => optionsBuilder
                     .ConfigureTransport(transportOptions =>
-                        transportOptions with {MaxConcurrentMessages = 2}))
+                        transportOptions with { MaxConcurrentMessages = 2 }))
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
-                    .When(isMultiTenant, x => x.UseTenantMiddleware())
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );

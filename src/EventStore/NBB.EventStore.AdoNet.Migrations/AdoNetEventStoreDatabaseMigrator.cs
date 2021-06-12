@@ -33,7 +33,7 @@ namespace NBB.EventStore.AdoNet.Migrations
             _connectionString = configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
             var tenancySection = configuration.GetSection("MultiTenancy");
             var tenancyOptions = tenancySection.Get<TenancyHostingOptions>();
-            if ((tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None) && !forceMultiTenant)
+            if ((tenancyOptions == null) && !forceMultiTenant)
             {
                 _scripts = new Internal.Scripts();
             }

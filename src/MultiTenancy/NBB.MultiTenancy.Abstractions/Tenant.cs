@@ -13,5 +13,7 @@ namespace NBB.MultiTenancy.Abstractions
             TenantId = tenantId;
             Code = code;
         }
+
+        public static Tenant Default { get; } = new Tenant(default, "default");
     }
 }

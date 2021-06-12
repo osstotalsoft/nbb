@@ -8,7 +8,13 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         public static EntityTypeBuilder<T> IsMultiTenant<T>(this EntityTypeBuilder<T> builder) where T : class
         {
+            if (builder.Metadata.FindAnnotation(MultiTenancy.MultiTenantAnnotation) != null)
+                return builder;
+
             builder.HasAnnotation(MultiTenancy.MultiTenantAnnotation, true);
+
+            builder.AddTenantIdProperty();
+            builder.AddTenantIdQueryFilter();
 
             return builder;
         }
@@ -16,19 +22,17 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public static EntityTypeBuilder<T> WithTenantIdColumn<T>(this EntityTypeBuilder<T> builder, string tenantIdComlumnName) where T : class
         {
-            builder.HasAnnotation(MultiTenancy.MultiTenantColumnAnnotation, tenantIdComlumnName);
+            if (builder.Metadata.FindAnnotation(MultiTenancy.MultiTenantAnnotation) != null)
+                throw new Exception($"Call '{ nameof(IsMultiTenant) }()' before using '{ nameof(WithTenantIdColumn) }'");
+
+            var prop = builder.Property(MultiTenancy.TenantIdProp).HasColumnName(tenantIdComlumnName);
 
             return builder;
         }
 
-        internal static EntityTypeBuilder<T> AddTenantIdProperty<T>(this EntityTypeBuilder<T> builder, string tenantIdColumn = null) where T : class
+        internal static EntityTypeBuilder<T> AddTenantIdProperty<T>(this EntityTypeBuilder<T> builder) where T : class
         {
-            var prop = builder.Property<Guid>(MultiTenancy.TenantIdProp);
-
-            if (string.IsNullOrWhiteSpace(tenantIdColumn))
-                return builder;
-
-            prop.HasColumnName(tenantIdColumn);
+            builder.Property<Guid>(MultiTenancy.TenantIdProp).IsRequired();
 
             return builder;
         }
