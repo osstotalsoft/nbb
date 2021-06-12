@@ -34,16 +34,13 @@ namespace NBB.Todo.Api
             services.AddControllers();
             services.AddMessageBus().AddNatsTransport(Configuration);
             services.AddTodoDataAccess();
-            
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddMultitenancy(Configuration, _ =>
-            {
-                services
-                    .AddDefaultHttpTenantIdentification()
-                    .AddMultiTenantMessaging()
-                    .AddTenantRepository<BasicTenantRepository>();               
-            });
+            services.AddMultitenancy(Configuration)
+                .AddDefaultHttpTenantIdentification()
+                .AddMultiTenantMessaging()
+                .AddTenantRepository<BasicTenantRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

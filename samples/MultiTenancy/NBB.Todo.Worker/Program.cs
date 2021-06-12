@@ -87,12 +87,10 @@ namespace NBB.Todo.Worker
             Log.Information("Messaging.Env=" + hostingContext.Configuration.GetSection("Messaging")["Env"]);
 
             // Multitenancy
-            services.AddMultitenancy(hostingContext.Configuration, _ =>
-            {
-                services.AddMultiTenantMessaging()
-                        .AddDefaultMessagingTenantIdentification()
-                        .AddTenantRepository<BasicTenantRepository>();
-            });
+            services.AddMultitenancy(hostingContext.Configuration)
+                .AddMultiTenantMessaging()
+                .AddDefaultMessagingTenantIdentification()
+                .AddTenantRepository<BasicTenantRepository>();
         }
 
         private static void ConfigureApp(HostBuilderContext ctx, IConfigurationBuilder configurationBuilder)
