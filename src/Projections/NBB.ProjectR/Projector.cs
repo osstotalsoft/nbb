@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Effects;
 
-namespace ProjectR
+namespace NBB.ProjectR
 {
     class Projector : IProjector
     {
@@ -22,7 +23,9 @@ namespace ProjectR
 
         public Effect<Unit> Project(object ev)
         {
-            return InternalProject(ev as dynamic);
+            var mi = this.GetType().GetMethod("InternalProject", BindingFlags.NonPublic | BindingFlags.Instance);
+            var gmi = mi.MakeGenericMethod(ev.GetType());
+            return gmi.Invoke(this, new[]{ev}) as Effect<Unit>;
         }
 
     }

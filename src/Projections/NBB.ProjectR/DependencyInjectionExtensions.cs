@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.ProjectR.ProjectionStores;
 
-namespace ProjectR
+namespace NBB.ProjectR
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection AddProjectR(IServiceCollection services, params Assembly[] assemblies)
+        public static IServiceCollection AddProjectR(this IServiceCollection services, params Assembly[] assemblies)
         {
             services.Scan(scan => scan
                 .FromAssemblies(assemblies)
@@ -30,7 +31,7 @@ namespace ProjectR
                                 i.GetGenericTypeDefinition() == typeof(IProject<,>))
                             .Select(i =>
                             {
-                                var args = i.GetGenericTypeDefinition().GenericTypeArguments;
+                                var args = i.GenericTypeArguments;
                                 var eventType = args[0];
                                 var projectionType = args[1];
                                 var identityType = GetIdentityTypeFrom(projectionType);
@@ -43,6 +44,14 @@ namespace ProjectR
                 var serviceType = typeof(IEventProjector<>).MakeGenericType(m.eventType);
                 var implementationType =
                     typeof(EventProjector<,,>).MakeGenericType(m.eventType, m.projectionType, m.identityType);
+                services.AddScoped(serviceType, implementationType);
+            }
+            
+            foreach (var projectionType in metadata.Select(m=> m.projectionType).Distinct())
+            {
+                var identityType = GetIdentityTypeFrom(projectionType);
+                var serviceType = typeof(IProjectionStore<,>).MakeGenericType(projectionType, identityType);
+                var implementationType = typeof(InMemoryProjectionStore<,>).MakeGenericType(projectionType, identityType);
                 services.AddScoped(serviceType, implementationType);
             }
 

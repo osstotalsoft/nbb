@@ -1,6 +1,6 @@
 ﻿using NBB.Core.Effects;
 
-namespace ProjectR
+namespace NBB.ProjectR
 {
 
     public interface IProjector

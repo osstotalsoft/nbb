@@ -1,11 +1,6 @@
 ﻿using NBB.Core.Effects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ProjectR
+namespace NBB.ProjectR
 {
 
     class EventProjector<TEvent, TProjection, TIdentity> : IEventProjector<TEvent>

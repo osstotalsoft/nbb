@@ -1,7 +1,7 @@
 ﻿using NBB.Core.Effects;
 using System;
 
-namespace ProjectR
+namespace NBB.ProjectR.Tests
 {
     record ContractCreated(Guid ContractId, decimal Value);
     record ContractValidated(Guid ContractId);
