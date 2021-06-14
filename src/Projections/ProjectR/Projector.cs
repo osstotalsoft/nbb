@@ -1,34 +1,29 @@
-﻿using NBB.Core.Effects;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using NBB.Core.Effects;
 
 namespace ProjectR
 {
-    class Projector<TEvent, TProjection, TIdentity> : IProjector<TEvent>
+    class Projector : IProjector
     {
-        private readonly IProjector<TEvent, TProjection> _innerProjector;
-        private readonly IProjectionCorrelator<TProjection, TIdentity> _projectionCorrelator;
-        private readonly IProjectionStore<TProjection, TIdentity> _projectionStore;
+        private readonly IServiceProvider _serviceProvider;
 
-        public Projector(IProjector<TEvent, TProjection> innerProjector, IProjectionCorrelator<TProjection, TIdentity> projectionCorrelator, IProjectionStore<TProjection, TIdentity> projectionStore)
+        public Projector(IServiceProvider serviceProvider)
         {
-            _innerProjector = innerProjector;
-            _projectionCorrelator = projectionCorrelator;
-            _projectionStore = projectionStore;
-
+            this._serviceProvider = serviceProvider;
         }
 
-        public Effect<Unit> Project(TEvent ev)
+        private Effect<Unit> InternalProject<TEvent>(TEvent ev)
         {
-            var id = _projectionCorrelator.Correlate(ev);
-            return id.HasValue
-                ? _projectionStore.LoadById(id.Value)
-                    .Then(proj => _innerProjector.Project(ev, proj))
-                    .Then(_projectionStore.Save)
-                : Effect.Pure(Unit.Value);
+            var eventProjectors = _serviceProvider.GetServices<IEventProjector<TEvent>>();
+            return Effect.Sequence(eventProjectors.Select(p => p.Project(ev)));
         }
+
+        public Effect<Unit> Project(object ev)
+        {
+            return InternalProject(ev as dynamic);
+        }
+
     }
 }
