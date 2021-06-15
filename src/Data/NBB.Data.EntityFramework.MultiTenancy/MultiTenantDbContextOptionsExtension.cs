@@ -20,8 +20,8 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public void ApplyServices(IServiceCollection services)
         {
-            services.TryAddScoped(_ => _serviceProvider.GetService<ITenantContextAccessor>());
-            services.TryAddScoped(_ => _serviceProvider.GetService<ITenantDatabaseConfigService>());
+            services.TryAddSingleton(_serviceProvider.GetService<ITenantContextAccessor>());
+            services.TryAddSingleton(_serviceProvider.GetService<ITenantDatabaseConfigService>());
         }
 
         public void Validate(IDbContextOptions options)
