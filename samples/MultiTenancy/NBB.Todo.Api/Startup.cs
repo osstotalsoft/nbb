@@ -46,8 +46,6 @@ namespace NBB.Todo.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var tenancyOptions = app.ApplicationServices.GetRequiredService<IOptions<TenancyHostingOptions>>();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

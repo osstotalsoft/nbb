@@ -73,7 +73,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         private class TenantDbConfig
         {
-            public Guid TenantId { get; set; }
+            public Guid TenantId { get; init; }
             public string ConnectionString { get; init; }
 
             public static TenantDbConfig Default { get; } = new TenantDbConfig { TenantId = Tenant.Default.TenantId };

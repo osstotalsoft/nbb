@@ -41,7 +41,7 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         public Task<Tenant> Get(Guid id, CancellationToken token = default)
         {
 
-            return Task.FromResult(tenantMap.TryGetValue(id, out var result) ? result : throw new Exception($"Database configiguration not found for tenant {id}"));
+            return Task.FromResult(tenantMap.TryGetValue(id, out var result) ? result : throw new Exception($"Tenant configuration not found for tenant {id}"));
         }
 
         public Task<Tenant> GetByHost(string host, CancellationToken token = default)
@@ -66,7 +66,7 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
 
         private void LoadDefaultTenant()
         {
-            var newTenant = _configurationSection.GetSection("Defaults").Get<Tenant>() ?? Tenant.Default;
+            var newTenant = Tenant.Default;
             tenantMap = new ConcurrentDictionary<Guid, Tenant>() { [newTenant.TenantId] = newTenant };
         }
     }

@@ -8,7 +8,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         public static EntityTypeBuilder<T> IsMultiTenant<T>(this EntityTypeBuilder<T> builder) where T : class
         {
-            if (builder.Metadata.FindAnnotation(MultiTenancy.MultiTenantAnnotation) != null)
+            if (builder.Metadata.IsMultiTenant())
                 return builder;
 
             builder.HasAnnotation(MultiTenancy.MultiTenantAnnotation, true);
@@ -30,14 +30,14 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             return builder;
         }
 
-        internal static EntityTypeBuilder<T> AddTenantIdProperty<T>(this EntityTypeBuilder<T> builder) where T : class
+        private static EntityTypeBuilder<T> AddTenantIdProperty<T>(this EntityTypeBuilder<T> builder) where T : class
         {
             builder.Property<Guid>(MultiTenancy.TenantIdProp).IsRequired();
 
             return builder;
         }
 
-        internal static EntityTypeBuilder<T> AddTenantIdQueryFilter<T>(this EntityTypeBuilder<T> builder) where T : class
+        private static EntityTypeBuilder<T> AddTenantIdQueryFilter<T>(this EntityTypeBuilder<T> builder) where T : class
         {
             // https://github.com/dotnet/efcore/pull/11017
             DbContext dummyDbContext = null;

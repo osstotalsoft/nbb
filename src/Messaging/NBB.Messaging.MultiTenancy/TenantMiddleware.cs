@@ -47,23 +47,6 @@ namespace NBB.Messaging.MultiTenancy
             }
 
             var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
-
-            if (!context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.TenantId, out var messageTenantIdHeader))
-            {
-                throw new ApplicationException($"The tenant ID message header is missing from the message envelope");
-            }
-
-            if (!Guid.TryParse(messageTenantIdHeader, out var messageTenantId))
-            {
-                throw new ApplicationException($"The tenant ID message header is invalid");
-            }
-
-            if (messageTenantId != tenantId)
-            {
-                throw new ApplicationException(
-                    $"Invalid tenant ID for message {context.MessagingEnvelope.Payload.GetType()}. Expected {tenantId} but received {messageTenantIdHeader}");
-            }
-
             var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
                          ?? throw new ApplicationException($"Tenant {tenantId} not found");
 
