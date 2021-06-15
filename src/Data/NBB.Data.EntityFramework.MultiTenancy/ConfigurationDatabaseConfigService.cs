@@ -57,7 +57,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
             foreach (var tenantSection in tenants)
             {
-                var newTenantConfig = _configurationSection.GetSection("Defaults").Get<TenantDbConfig>() ?? TenantDbConfig.Default;
+                var newTenantConfig = _configurationSection.GetSection("Defaults").Get<TenantDbConfig>() ?? new TenantDbConfig();
                 tenantSection.Bind(newTenantConfig, options => options.BindNonPublicProperties = true);
                 newMap.TryAdd(newTenantConfig.TenantId, newTenantConfig);
             }
