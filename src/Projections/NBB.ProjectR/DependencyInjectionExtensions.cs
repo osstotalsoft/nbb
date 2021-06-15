@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.ProjectR.ProjectionStores;
 
@@ -41,7 +42,7 @@ namespace NBB.ProjectR
             
             foreach (var m in metadata)
             {
-                var serviceType = typeof(IEventProjector<>).MakeGenericType(m.eventType);
+                var serviceType = typeof(INotificationHandler<>).MakeGenericType(m.eventType);
                 var implementationType =
                     typeof(EventProjector<,,>).MakeGenericType(m.eventType, m.projectionType, m.identityType);
                 services.AddScoped(serviceType, implementationType);
@@ -54,8 +55,6 @@ namespace NBB.ProjectR
                 var implementationType = typeof(InMemoryProjectionStore<,>).MakeGenericType(projectionType, identityType);
                 services.AddScoped(serviceType, implementationType);
             }
-
-            services.AddScoped<IProjector, Projector>();
 
 
             return services;

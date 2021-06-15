@@ -1,27 +1,13 @@
-﻿using NBB.Core.Effects;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.ProjectR
 {
-
-    public interface IProjector
-    {
-        Effect<Unit> Project(object ev);
-    }
-    public interface IEventProjector<in TEvent>
-    {
-        Effect<Unit> Project(TEvent ev);
-    }
-    
-    public interface IIdentityProvider<out TIdentity>
-    {
-        TIdentity Identity { get; }
-    }
-    
     public interface IHaveIdentityOf<TIdentity>{}
 
     public interface IProject<in TEvent, TProjection>
     {
-        Effect<TProjection> Project(TEvent ev, TProjection projection);
+        TProjection Project(TEvent ev, TProjection projection);
     }
 
     public interface ICorrelate<TProjection, TIdentity>
@@ -31,8 +17,8 @@ namespace NBB.ProjectR
 
     public interface IProjectionStore<TProjection, in TIdentity>
     {
-        Effect<TProjection> LoadById(TIdentity id);
-        Effect<Unit> Save(TProjection projection);
+        Task<TProjection> LoadById(TIdentity id, CancellationToken cancellationToken);
+        Task Save(TProjection projection, CancellationToken cancellationToken);
     }
 
     

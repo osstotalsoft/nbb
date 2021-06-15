@@ -1,9 +1,14 @@
-﻿using NBB.Core.Effects;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 
 namespace NBB.ProjectR
 {
 
-    class EventProjector<TEvent, TProjection, TIdentity> : IEventProjector<TEvent>
+    class EventProjector<TEvent, TProjection, TIdentity> : INotificationHandler<TEvent>
+        where TProjection : IEquatable<TProjection>
+        where TEvent : INotification
     {
         private readonly IProject<TEvent, TProjection> _innerProject;
         private readonly ICorrelate<TProjection, TIdentity> _correlate;
@@ -17,14 +22,16 @@ namespace NBB.ProjectR
 
         }
 
-        public Effect<Unit> Project(TEvent ev)
+
+        public async Task Handle(TEvent ev, CancellationToken cancellationToken)
         {
             var id = _correlate.Correlate(ev);
-            return id.HasValue
-                ? _projectionStore.LoadById(id.Value)
-                    .Then(proj => _innerProject.Project(ev, proj))
-                    .Then(_projectionStore.Save)
-                : Effect.Pure(Unit.Value);
+            if (!id.HasValue)
+                return;
+            var projection = await _projectionStore.LoadById(id.Value, cancellationToken);
+            var newProjection = _innerProject.Project(ev, projection);
+            if (!projection.Equals(newProjection))
+                await _projectionStore.Save(newProjection, cancellationToken);
         }
     }
 }

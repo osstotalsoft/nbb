@@ -1,22 +1,18 @@
-﻿using NBB.Core.Effects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.ProjectR.ProjectionStores
 {
     class InMemoryProjectionStore<TProjection, TIdentity> : IProjectionStore<TProjection, TIdentity>
     {
-        public Effect<TProjection> LoadById(TIdentity id)
+        public Task<TProjection> LoadById(TIdentity id, CancellationToken cancellationToken)
         {
-            return Effect.Pure(default(TProjection));
+            return Task.FromResult(default(TProjection));
         }
 
-        public Effect<Unit> Save(TProjection projection)
+        public Task Save(TProjection projection, CancellationToken cancellationToken)
         {
-            return Effect.Pure(Unit.Value);
+            return Task.CompletedTask;
         }
     }
 }
