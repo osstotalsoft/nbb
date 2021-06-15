@@ -40,7 +40,7 @@ namespace NBB.Todo.Api
             services.AddMultitenancy(Configuration)
                 .AddDefaultHttpTenantIdentification()
                 .AddMultiTenantMessaging()
-                .AddTenantRepository<BasicTenantRepository>();
+                .AddTenantRepository<ConfigurationTenantRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

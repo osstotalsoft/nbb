@@ -131,7 +131,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             var tenantService = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == null);
             var tenantDatabaseConfigService =
-                Mock.Of<ITenantDatabaseConfigService>(x => x.IsSharedDatabase(It.IsAny<Guid>()) == isSharedDB && x.GetConnectionString(It.IsAny<Guid>()) == (isSharedDB ? "Test" : Guid.NewGuid().ToString()));
+                Mock.Of<ITenantDatabaseConfigService>(x => x.GetConnectionString() == (isSharedDB ? "Test" : Guid.NewGuid().ToString()));
             var services = new ServiceCollection();
             services.AddOptions<TenancyHostingOptions>().Configure(o =>
             {
@@ -144,8 +144,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TDBContext>((sp, options) =>
                 {
-                    var tenantId = sp.GetRequiredService<ITenantContextAccessor>().TenantContext.GetTenantId();
-                    var conn = sp.GetRequiredService<ITenantDatabaseConfigService>().GetConnectionString(tenantId);
+                    var conn = sp.GetRequiredService<ITenantDatabaseConfigService>().GetConnectionString();
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
 

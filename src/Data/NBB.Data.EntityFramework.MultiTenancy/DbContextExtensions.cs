@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Options;
 using System;
 using System.Linq;
 
@@ -33,5 +31,11 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public static Guid GetTenantIdFromContext(this DbContext dbContext)
           => dbContext.GetInfrastructure().GetRequiredService<ITenantContextAccessor>().TenantContext.GetTenantId();
+
+        public static void UseMultitenancy(this DbContextOptionsBuilder options, IServiceProvider serviceProvider)
+        {
+            var extension = new MultiTenantOptionsExtension(serviceProvider);
+            ((IDbContextOptionsBuilderInfrastructure)options).AddOrUpdateExtension(extension);
+        }
     }
 }
