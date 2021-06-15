@@ -22,40 +22,56 @@ This package supports all 3 strategies stated above, so that you can write tenan
 
 Tenant database configuration
 ----------------
-You need to provide an implementation for `ITenantDatabaseConfigService` so that when executing a query, the system knows to inject or not a TenantId filter.
+You need to provide an implementation for `ITenantDatabaseConfigService` so the system can find the database settings for the current tenant.
 ```csharp
 public interface ITenantDatabaseConfigService
 {
-    string GetConnectionString(Guid tenantId);
-    bool IsSharedDatabase(Guid tenantId);
+    string GetConnectionString();
 }
+```
+
+NBB provides an implementation that reads the connection info from the application's configuration (appsettings.json). It can be registerd as follows:
+```csharp
+services.AddTenantDatabaseConfigService<ConfigurationDatabaseConfigService>();
 ```
 
 Multi-tenant DbContext configuration
 ----------------
-* to configure a multi-tenant entity, you need to call `ApplyMultiTenantConfiguration` inside  `OnModelCreating`, like so:
+* to configure a multi-tenant entity, you need to call `IsMultiTenant()` inside  entity configuration, like so:
 
 ```csharp
-protected override void OnModelCreating(ModelBuilder modelBuilder)
+public class MyEntityConfiguration: IEntityTypeConfiguration<TodoTask>
 {
-    base.OnModelCreating(modelBuilder);
+    public void Configure(EntityTypeBuilder<MyEntity> builder)
+    {
+        builder
+            .ToTable("MyEntities")
+            .IsMultiTenant()
+            .HasKey(x => x.MyEntityId);
+    }
+}
+```
 
-    modelBuilder.ApplyMultiTenantConfiguration(new AgentConfiguration(), this);
-    modelBuilder.ApplyMultiTenantConfiguration(new CustomerConfiguration(), this);
-    modelBuilder.ApplyMultiTenantConfiguration(new DocumentConfiguration(), this);
-    modelBuilder.ApplyMultiTenantConfiguration(new IdentificationConfiguration(), this);
-    modelBuilder.ApplyMultiTenantConfiguration(new IdentificationStatisticConfiguration(), this);
-}
-```
-* if you use unit of work repositories register the `MultiTenantEfUow` by calling `AddMultiTenantEfUow` or `AddMultiTenantEfCrudRepository` in the composition root:
+* you can derive from `MultiTenantDbContext` in order to use multi-tenant capabilities:
 ```csharp
-services.AddMultiTenantEfUow<MyEntity, MyDbContext>();
-```
-* if you do not use the unit of work for saving entities, you need to override the methods `SaveChangesAsync` and `SaveChanges` in every multi-tenant dbContext, like so:
-```csharp
-public MyDbContext(DbContextOptions<KycDbContext> options) : base(options)
+public class MyDbContext : MultiTenantDbContext
 {
+    public DbSet<MyEntity> MyEntities { get; set; }
+    public TodoDbContext(DbContextOptions<MyDbContext> options)
+        : base(options)
+    {
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new MyEntityConfiguration());
+            
+        base.OnModelCreating(modelBuilder);
+    }
 }
+```
+* if you cannot derive from MultiTenantDbContext, you can add multi-tenant capabilities to your existing DbContext by overriding the methods `SaveChangesAsync` and `SaveChanges` , like so:
+```csharp
 
 public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
 {
@@ -74,16 +90,17 @@ public override int SaveChanges(bool acceptAllChangesOnSuccess)
 
 DbContext container registration
 ----------------
-When registering multi-tenant DbContext you can use the `ITenantContextAccessor` and `ITenantDatabaseConfigService` abstractions in order to get the tenant's connection string.
+When registering multi-tenant DbContext you can use the `ITenantDatabaseConfigService` abstractions in order to get the tenant's connection string. You also need to call the `UseMultitenancy` extension:
 ```csharp
 services.AddDbContext<KycDbContext>((serviceProvider, options) =>
 {
-    var databaseService = serviceProvider.GetService<ITenantDatabaseConfigService>();
-    var accessor = serviceProvider.GetService<ITenantContextAccessor>();
-    var tenantId = accessor.TenantContext.GetTenantId();
-    var connectionString = databaseService.GetConnectionString(tenantId);
+    var databaseService = serviceProvider.GetRequiredService<ITenantDatabaseConfigService>();
+    var connectionString = databaseService.GetConnectionString();
     
-    options.UseSqlServer(connectionString);
+    options
+        .UseSqlServer(connectionString)
+        .UseMultitenancy(serviceProvider);
+});
 ```
 
 > Be aware that when using a multi-tenant dbContext, you cannot use the `DbContextPool`
