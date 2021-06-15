@@ -14,7 +14,7 @@ namespace NBB.EventStore.AdoNet.Migrations
         private readonly string _connectionString;
         private readonly Internal.Scripts _scripts;
 
-        public AdoNetEventStoreDatabaseMigrator(bool forceMultiTenant = false)
+        public AdoNetEventStoreDatabaseMigrator(bool forceMultiTenant = false, bool isTestHost = false)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -26,7 +26,7 @@ namespace NBB.EventStore.AdoNet.Migrations
 
             if (isDevelopment)
             {
-                configurationBuilder.AddUserSecrets(Assembly.GetEntryAssembly());
+                configurationBuilder.AddUserSecrets(isTestHost ? Assembly.GetCallingAssembly() : Assembly.GetEntryAssembly());
             }
 
             var configuration = configurationBuilder.Build();

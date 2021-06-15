@@ -144,7 +144,7 @@ namespace NBB.EventStore.IntegrationTests
 
         private static void PrepareDb()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(null).Wait();
+            new AdoNetEventStoreDatabaseMigrator(isTestHost: true).ReCreateDatabaseObjects(null).Wait();
         }
     }
 
