@@ -34,24 +34,18 @@ namespace NBB.Todo.Api
             services.AddControllers();
             services.AddMessageBus().AddNatsTransport(Configuration);
             services.AddTodoDataAccess();
-            
+
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddMultitenancy(Configuration, _ =>
-            {
-                services
-                    .AddDefaultHttpTenantIdentification()
-                    .AddMultiTenantMessaging()
-                    .AddTenantRepository<BasicTenantRepository>();               
-            });
+            services.AddMultitenancy(Configuration)
+                .AddDefaultHttpTenantIdentification()
+                .AddMultiTenantMessaging()
+                .AddTenantRepository<ConfigurationTenantRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var tenancyOptions = app.ApplicationServices.GetRequiredService<IOptions<TenancyHostingOptions>>();
-            var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -62,7 +56,7 @@ namespace NBB.Todo.Api
             app.UseAuthorization();
 
             app.UseWhen(
-                ctx => isMultiTenant && ctx.Request.Path.StartsWithSegments(new PathString("/api")),
+                ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
                 appBuilder => appBuilder.UseTenantMiddleware());
 
             app.UseEndpoints(endpoints =>

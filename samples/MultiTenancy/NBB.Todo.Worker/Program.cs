@@ -13,8 +13,6 @@ using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats;
 using NBB.Todo.Worker.Application;
 using NBB.Messaging.Host;
-using NBB.MultiTenancy.Abstractions.Options;
-using Microsoft.Extensions.Options;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.MultiTenancy.Abstractions.Hosting;
@@ -73,33 +71,26 @@ namespace NBB.Todo.Worker
             services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
             services.AddMessagingHost(hostBuilder => hostBuilder
-                .Configure(configBuilder =>
-                {
-                    var tenancyOptions = configBuilder.ApplicationServices.GetRequiredService<IOptions<TenancyHostingOptions>>();
-                    var isMultiTenant = tenancyOptions?.Value?.TenancyType != TenancyType.None;
-
-                    configBuilder
-                        .AddSubscriberServices(selector => selector.
-                            FromMediatRHandledCommands().AddAllClasses())
+                .Configure(configBuilder => configBuilder
+                        .AddSubscriberServices(selector => selector
+                            .FromMediatRHandledCommands().AddAllClasses())
                         .WithDefaultOptions()
                         .UsePipeline(builder => builder
                             .UseCorrelationMiddleware()
                             .UseExceptionHandlingMiddleware()
-                            .When(isMultiTenant, x => x.UseTenantMiddleware())
+                            .UseTenantMiddleware()
                             .UseDefaultResiliencyMiddleware()
-                            .UseMediatRMiddleware()
-                    );
-                }));
+                            .UseMediatRMiddleware())
+                    )
+                );
 
             Log.Information("Messaging.Env=" + hostingContext.Configuration.GetSection("Messaging")["Env"]);
 
             // Multitenancy
-            services.AddMultitenancy(hostingContext.Configuration, _ =>
-            {
-                services.AddMultiTenantMessaging()
-                        .AddDefaultMessagingTenantIdentification()
-                        .AddTenantRepository<BasicTenantRepository>();
-            });
+            services.AddMultitenancy(hostingContext.Configuration)
+                .AddMultiTenantMessaging()
+                .AddDefaultMessagingTenantIdentification()
+                .AddTenantRepository<BasicTenantRepository>();
         }
 
         private static void ConfigureApp(HostBuilderContext ctx, IConfigurationBuilder configurationBuilder)
@@ -126,7 +117,7 @@ namespace NBB.Todo.Worker
               .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
               .Enrich.FromLogContext()
               .WriteTo.Console()
-              .CreateLogger();          
+              .CreateLogger();
         }
     }
 }

@@ -39,9 +39,7 @@ namespace NBB.Todo.Migrations
             var configuration = configurationBuilder.Build();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddTodoDataAccess();
-            services.AddMultitenancy(configuration, _ =>
-            {
-            });
+            services.AddMultitenancy(configuration);
         }
     }
 }

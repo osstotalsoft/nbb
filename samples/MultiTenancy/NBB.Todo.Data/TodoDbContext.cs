@@ -5,7 +5,7 @@ using NBB.Todo.Data.EntityConfigurations;
 
 namespace NBB.Todo.Data
 {
-    public class TodoDbContext : DbContext
+    public class TodoDbContext : MultiTenantDbContext
     {
         public DbSet<TodoTask> TodoTasks { get; set; }
         public TodoDbContext(DbContextOptions<TodoDbContext> options)
@@ -15,21 +15,9 @@ namespace NBB.Todo.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.ApplyConfiguration(new TodoTaskConfiguration());
+            
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.ApplyMultiTenantConfiguration(new TodoTaskConfiguration(), this);
         }
-
-        //public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
-        //{
-        //    this.SetTenantIdFromContext();
-        //    return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        //}
-
-        //public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        //{
-        //    this.SetTenantIdFromContext();
-        //    return base.SaveChanges(acceptAllChangesOnSuccess);
-        //}
     }
 }

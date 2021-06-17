@@ -45,7 +45,7 @@ namespace NBB.EventStore.IntegrationTests
                         try
                         {
                             eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] {new TestEvent(Guid.NewGuid())}, streamVersion,
+                                    new[] { new TestEvent(Guid.NewGuid()) }, streamVersion,
                                     CancellationToken.None)
                                 .Wait();
                         }
@@ -89,7 +89,7 @@ namespace NBB.EventStore.IntegrationTests
                     var t = new Thread(() =>
                     {
                         eventStore.AppendEventsToStreamAsync(stream,
-                            new[] {new TestEvent(Guid.NewGuid())}, null, CancellationToken.None).Wait();
+                            new[] { new TestEvent(Guid.NewGuid()) }, null, CancellationToken.None).Wait();
                     });
                     t.Start();
                     threads.Add(t);
@@ -132,12 +132,10 @@ namespace NBB.EventStore.IntegrationTests
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
 
-            services.AddMultitenancy(configuration, _ =>
-            {
-                services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
-                services.WithMultiTenantAdoNetEventRepository();
-            });
+            services.AddMultitenancy(configuration)
+                .AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null))))
+                .WithMultiTenantAdoNetEventRepository();
 
 
             var container = services.BuildServiceProvider();
@@ -146,7 +144,7 @@ namespace NBB.EventStore.IntegrationTests
 
         private static void PrepareDb()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(null).Wait();
+            new AdoNetEventStoreDatabaseMigrator(isTestHost: true).ReCreateDatabaseObjects(null).Wait();
         }
     }
 
