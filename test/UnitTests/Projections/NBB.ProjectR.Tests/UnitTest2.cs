@@ -3,13 +3,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Messaging.Abstractions;
+using NBB.Core.Effects;
 using Xunit;
+using Mediator = NBB.Application.MediatR.Effects.Mediator;
+using MessageBus = NBB.Messaging.Effects.MessageBus;
+using Unit = NBB.Core.Effects.Unit;
 
 namespace NBB.ProjectR.Tests
 {
 
-    
+
 
     public class UnitTest2
     {
@@ -26,18 +29,18 @@ namespace NBB.ProjectR.Tests
             record Projection(Guid ContractId, bool IsValidated, Guid? ValidatedByUserId, string ValidatedByUsername) : IHaveIdentityOf<Guid>;
 
             record LoadUsed(Guid UserId) : IRequest<UserLoaded>;
-            
+
             public record UserLoaded(Guid ContractId, Guid UserId, string Username) : INotification;
 
 
             class Projector : IProjector<Message, Projection, Guid>
             {
-                public Projection Project(Message message, Projection projection) => message._ switch
+                public (Projection, Effect<Unit>) Project(Message message, Projection projection) => message._ switch
                 {
-                    ContractCreated ev => new(ev.ContractId, false, null, null),
-                    ContractValidated ev => projection with { IsValidated = true, ValidatedByUserId = ev.UserId },
-                    UserLoaded ev => projection with { ValidatedByUsername = ev.Username },
-                    _ => projection
+                    ContractCreated ev => (new(ev.ContractId, false, null, null), Cmd.None),
+                    ContractValidated ev => (projection with { IsValidated = true, ValidatedByUserId = ev.UserId }, LoadUserName(ev)),
+                    UserLoaded ev => (projection with { ValidatedByUsername = ev.Username }, Cmd.None),
+                    _ => (projection, Cmd.None)
                 };
 
 
@@ -49,25 +52,24 @@ namespace NBB.ProjectR.Tests
                     _ => Maybe<Guid>.Nothing
                 };
 
-
+                private Effect<Unit> LoadUserName(ContractValidated ev) =>
+                    from x in Mediator.Send(new LoadUserById.Query(ev.UserId))
+                    from _ in MessageBus.Publish(new UserLoaded(ev.ContractId, x.UserId, x.UserName))
+                    select _;
             }
 
-            class Handler :
-                INotificationHandler<ContractValidated>
+            class LoadUserById
             {
-                private readonly IMessageBus _messageBus;
+                public record Query(Guid UserId) : IRequest<Model>;
 
-                public Handler(IMessageBus messageBus)
+                public record Model(Guid UserId, string UserName);
+
+                class Handler : IRequestHandler<Query, Model>
                 {
-                    _messageBus = messageBus;
-                }
-
-                public async Task Handle(ContractValidated ev, CancellationToken cancellationToken)
-                {
-                    Task<string> LoadUserNameBy(Guid userId) => Task.FromResult("rpopovici");
-
-                    var userName = await LoadUserNameBy(ev.UserId);
-                    await _messageBus.PublishAsync(new UserLoaded(ev.ContractId, ev.UserId, userName), cancellationToken);
+                    public Task<Model> Handle(Query request, CancellationToken cancellationToken)
+                    {
+                        return Task.FromResult(new Model(request.UserId, "rpopovici"));
+                    }
                 }
             }
 

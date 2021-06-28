@@ -3,8 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Messaging.Abstractions;
+using NBB.Core.Effects;
 using Xunit;
+using Unit = NBB.Core.Effects.Unit;
+using NBB.Messaging.Effects;
+using Mediator = NBB.Application.MediatR.Effects.Mediator;
 
 namespace NBB.ProjectR.Tests
 {
@@ -31,37 +34,36 @@ namespace NBB.ProjectR.Tests
 
                 public Maybe<Guid> Correlate(UserLoaded ev) => ev.ContractId;
 
-                public Projection Project(ContractCreated ev, Projection projection)
-                    => new(ev.ContractId, false, null, null);
+                public (Projection, Effect<Unit>) Project(ContractCreated ev, Projection projection)
+                    => (new(ev.ContractId, false, null, null), Cmd.None);
 
-                public Projection Project(ContractValidated ev, Projection projection)
-                    => projection with { IsValidated = true, ValidatedByUserId = ev.UserId };
+                public (Projection, Effect<Unit>) Project(ContractValidated ev, Projection projection)
+                    => (projection with { IsValidated = true, ValidatedByUserId = ev.UserId },
+                        Mediator.Send(new LoadUserById.Query(ev.UserId)).Then(x =>
+                            MessageBus.Publish(new UserLoaded(ev.ContractId, x.UserId, x.UserName))));
 
-                public Projection Project(UserLoaded ev, Projection projection)
-                    => projection with { ValidatedByUsername = ev.Username };
+                public (Projection, Effect<Unit>) Project(UserLoaded ev, Projection projection)
+                    => (projection with { ValidatedByUsername = ev.Username }, Cmd.None);
             }
 
-            class Handler :
-                INotificationHandler<ContractValidated>
+            class LoadUserById
             {
-                private readonly IMessageBus _messageBus;
+                public record Query(Guid UserId) : IRequest<Model>;
 
-                public Handler(IMessageBus messageBus)
+                public record Model(Guid UserId, string UserName);
+
+                class Handler : IRequestHandler<Query, Model>
                 {
-                    _messageBus = messageBus;
-                }
-
-                public async Task Handle(ContractValidated ev, CancellationToken cancellationToken)
-                {
-                    Task<string> LoadUserNameBy(Guid userId) => Task.FromResult("rpopovici");
-
-                    var userName = await LoadUserNameBy(ev.UserId);
-                    await _messageBus.PublishAsync(new UserLoaded(ev.ContractId, ev.UserId, userName), cancellationToken);
+                    public Task<Model> Handle(Query request, CancellationToken cancellationToken)
+                    {
+                        return Task.FromResult(new Model(request.UserId, "rpopovici"));
+                    }
                 }
             }
+
         }
-        
-        
+
+
         [Fact]
         public async Task Test1()
         {

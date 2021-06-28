@@ -23,7 +23,7 @@ namespace NBB.Application.Effects.Tests
 
             //Assert
             using var container = services.BuildServiceProvider();
-            var handler = container.GetService(typeof(MediatorSendQuery.Handler<TestQuery>));
+            var handler = container.GetService(typeof(MediatorEffects.Send.Handler<TestQuery>));
             handler.Should().NotBeNull();
         }
 
@@ -32,9 +32,9 @@ namespace NBB.Application.Effects.Tests
         {
             //Arrange
             var mediator = new Mock<IMediator>();
-            var sut = new MediatorSendQuery.Handler<TestResponse>(mediator.Object);
+            var sut = new MediatorEffects.Send.Handler<TestResponse>(mediator.Object);
             var query = new TestQuery();
-            var sideEffect = new MediatorSendQuery.SideEffect<TestResponse>(query);
+            var sideEffect = new MediatorEffects.Send.SideEffect<TestResponse>(query);
 
             //Act
             var result = await sut.Handle(sideEffect);

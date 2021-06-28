@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using NBB.Core.Effects;
 
 namespace NBB.ProjectR
 {
@@ -7,7 +8,7 @@ namespace NBB.ProjectR
 
     public interface IProjector<in TEvent, TProjection, TIdentity>
     {
-        TProjection Project(TEvent ev, TProjection projection);
+        (TProjection Projection, Effect<Unit> Effect) Project(TEvent ev, TProjection projection);
         Maybe<TIdentity> Correlate(TEvent ev);
     }
     
