@@ -10,14 +10,12 @@ namespace NBB.ProjectR
         where TProjection : IEquatable<TProjection>
         where TEvent : INotification
     {
-        private readonly IProject<TEvent, TProjection> _innerProject;
-        private readonly ICorrelate<TProjection, TIdentity> _correlate;
+        private readonly IProjector<TEvent, TProjection, TIdentity> _innerProjector;
         private readonly IProjectionStore<TProjection, TIdentity> _projectionStore;
 
-        public EventProjector(IProject<TEvent, TProjection> innerProject, ICorrelate<TProjection, TIdentity> correlate, IProjectionStore<TProjection, TIdentity> projectionStore)
+        public EventProjector(IProjector<TEvent, TProjection, TIdentity> innerProjector, IProjectionStore<TProjection, TIdentity> projectionStore)
         {
-            _innerProject = innerProject;
-            _correlate = correlate;
+            _innerProjector = innerProjector;
             _projectionStore = projectionStore;
 
         }
@@ -25,12 +23,12 @@ namespace NBB.ProjectR
 
         public async Task Handle(TEvent ev, CancellationToken cancellationToken)
         {
-            var id = _correlate.Correlate(ev);
+            var id = _innerProjector.Correlate(ev);
             if (!id.HasValue)
                 return;
             var projection = await _projectionStore.LoadById(id.Value, cancellationToken);
-            var newProjection = _innerProject.Project(ev, projection);
-            if (!projection.Equals(newProjection))
+            var newProjection = _innerProjector.Project(ev, projection);
+            if (projection!= null && !newProjection.Equals(projection))
                 await _projectionStore.Save(newProjection, cancellationToken);
         }
     }

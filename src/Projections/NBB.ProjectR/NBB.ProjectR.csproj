@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Core\NBB.Core.Effects\NBB.Core.Effects.csproj" />
   </ItemGroup>
 
   <ItemGroup>

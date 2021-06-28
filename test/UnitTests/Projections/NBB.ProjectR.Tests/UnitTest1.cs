@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Messaging.Abstractions;
@@ -15,17 +14,23 @@ namespace NBB.ProjectR.Tests
         record ContractValidated(Guid ContractId, Guid UserId) : INotification;
 
 
-        class Contract
+        class ContractProjection
         {
             record Projection(Guid ContractId, bool IsValidated, Guid? ValidatedByUserId, string ValidatedByUsername) : IHaveIdentityOf<Guid>;
 
             record UserLoaded(Guid ContractId, Guid UserId, string Username) : INotification;
 
             class Projector :
-                IProject<ContractCreated, Projection>,
-                IProject<ContractValidated, Projection>,
-                IProject<UserLoaded, Projection>
+                IProjector<ContractCreated, Projection, Guid>,
+                IProjector<ContractValidated, Projection, Guid>,
+                IProjector<UserLoaded, Projection, Guid>
             {
+                public Maybe<Guid> Correlate(ContractCreated ev) => ev.ContractId;
+
+                public Maybe<Guid> Correlate(ContractValidated ev) => ev.ContractId;
+
+                public Maybe<Guid> Correlate(UserLoaded ev) => ev.ContractId;
+
                 public Projection Project(ContractCreated ev, Projection projection)
                     => new(ev.ContractId, false, null, null);
 
@@ -54,18 +59,6 @@ namespace NBB.ProjectR.Tests
                     await _messageBus.PublishAsync(new UserLoaded(ev.ContractId, ev.UserId, userName), cancellationToken);
                 }
             }
-
-            class Correlation
-                : ICorrelate<Projection, Guid>
-            {
-                public Maybe<Guid> Correlate<TEvent>(TEvent ev) => ev switch
-                {
-                    ContractCreated { Value: >= 0 } cc => cc.ContractId,
-                    ContractValidated cv => cv.ContractId,
-                    UserLoaded e => e.ContractId,
-                    _ => Maybe<Guid>.Nothing
-                };
-            }
         }
         
         
@@ -75,6 +68,7 @@ namespace NBB.ProjectR.Tests
             //Arrange
             var services = new ServiceCollection();
             services.AddProjectR(GetType().Assembly);
+            services.AddMediatR(GetType().Assembly);
             await using var container = services.BuildServiceProvider();
             using var scope = container.CreateScope();
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();

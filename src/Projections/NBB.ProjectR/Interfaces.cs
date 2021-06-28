@@ -5,16 +5,12 @@ namespace NBB.ProjectR
 {
     public interface IHaveIdentityOf<TIdentity>{}
 
-    public interface IProject<in TEvent, TProjection>
+    public interface IProjector<in TEvent, TProjection, TIdentity>
     {
         TProjection Project(TEvent ev, TProjection projection);
+        Maybe<TIdentity> Correlate(TEvent ev);
     }
-
-    public interface ICorrelate<TProjection, TIdentity>
-    {
-        Maybe<TIdentity> Correlate<TEvent>(TEvent ev);
-    }
-
+    
     public interface IProjectionStore<TProjection, in TIdentity>
     {
         Task<TProjection> LoadById(TIdentity id, CancellationToken cancellationToken);

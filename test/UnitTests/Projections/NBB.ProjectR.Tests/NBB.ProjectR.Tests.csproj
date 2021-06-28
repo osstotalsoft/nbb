@@ -13,6 +13,7 @@
     <PackageReference Include="coverlet.collector" Version="1.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsPackageVersion)" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="$(MediatRPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
