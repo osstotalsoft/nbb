@@ -16,8 +16,9 @@ namespace NBB.Messaging.Host.Tests.Pipeline
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
-            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger);
-            var sentMessage = new { Field = "value"};
+            var mockedMessagePub = Mock.Of<IMessageBusPublisher>();
+            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, mockedMessagePub);
+            var sentMessage = new { Field = "value" };
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task next() => Task.CompletedTask;
@@ -34,8 +35,9 @@ namespace NBB.Messaging.Host.Tests.Pipeline
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
-            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger);
-            var sentMessage = new { Field = "value"};
+            var mockedMessagePub = Mock.Of<IMessageBusPublisher>();
+            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, mockedMessagePub);
+            var sentMessage = new { Field = "value" };
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
             Task next() => throw new ApplicationException();
@@ -58,8 +60,10 @@ namespace NBB.Messaging.Host.Tests.Pipeline
         public async void Should_callNextPipelineMiddleware()
         {
             //Arrange
-            var executionTimeMiddleware = new ExceptionHandlingMiddleware(Mock.Of<ILogger<ExceptionHandlingMiddleware>>());
-            var sentMessage = new { Field = "value"};
+
+            var executionTimeMiddleware = new ExceptionHandlingMiddleware(Mock.Of<ILogger<ExceptionHandlingMiddleware>>(),
+                Mock.Of<IMessageBusPublisher>());
+            var sentMessage = new { Field = "value" };
             bool isNextMiddlewareCalled = false;
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
