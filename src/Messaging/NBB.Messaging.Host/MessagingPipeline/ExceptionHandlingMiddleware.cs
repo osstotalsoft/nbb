@@ -44,7 +44,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
                     "Message of type {MessageType} could not be processed due to the following exception {Exception}.",
                     context.MessagingEnvelope.Payload.GetType().GetPrettyName(), ex);
 
-                await _messageBusPublisher.PublishAsync(new { ex.Message, ex.StackTrace, ex.Source },
+                await _messageBusPublisher.PublishAsync(new { ex.Message, ex.StackTrace, ex.Source, context.MessagingEnvelope },
                     MessagingPublisherOptions.Default with { TopicName = $"{context.TopicName}_error" }, cancellationToken);
             }
             finally
