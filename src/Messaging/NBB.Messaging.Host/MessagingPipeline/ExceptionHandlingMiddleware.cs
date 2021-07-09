@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
@@ -10,8 +9,6 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.Host.MessagingPipeline
 {
-
-    record MessagingProcessingError { }
     /// <summary>
     /// A messaging pipeline middleware that logs and swallows all exceptions.
     /// </summary>
