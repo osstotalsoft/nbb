@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Application.MediatR.Effects;
 using NBB.Core.Effects;
+using NBB.EventStore;
+using NBB.EventStore.InMemory;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Effects;
 using NBB.Messaging.InProcessMessaging.Extensions;
@@ -22,6 +24,9 @@ namespace NBB.ProjectR.Tests
                 .AddMessagingEffects()
                 .AddMediatorEffects();
             services.AddMessageBus().AddInProcessTransport();
+            services.AddEventStore()
+                .WithNewtownsoftJsonEventStoreSeserializer()
+                .WithInMemoryEventRepository();
             services.AddLogging();
             services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
 

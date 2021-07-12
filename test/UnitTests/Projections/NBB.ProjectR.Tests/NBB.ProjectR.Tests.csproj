@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.InMemory\NBB.EventStore.InMemory.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.InProcessMessaging\NBB.Messaging.InProcessMessaging.csproj" />
     <ProjectReference Include="..\..\..\..\src\Projections\NBB.ProjectR\NBB.ProjectR.csproj" />

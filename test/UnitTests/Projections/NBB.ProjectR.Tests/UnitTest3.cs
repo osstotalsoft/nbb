@@ -82,7 +82,7 @@ namespace NBB.ProjectR.Tests
             await using var container = _fixture.BuildServiceProvider();
             using var scope = container.CreateScope();
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-            var repo = scope.ServiceProvider
+            var projectionStore = scope.ServiceProvider
                 .GetRequiredService<IProjectionStore<ContractProjection.Projection>>();
             var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
             using var _ = await messageBus.SubscribeAsync<ContractProjection.UserLoaded>(msg =>
@@ -98,11 +98,17 @@ namespace NBB.ProjectR.Tests
             //Act
             await mediator.Publish(new ContractCreated(contractId, 100));
             await mediator.Publish(new ContractValidated(contractId, userId));
+            var (projection, loadedAtVersion) = await projectionStore.Load(contractId, CancellationToken.None);
+
 
 
             //Assert
-            var projection = await repo.Load(contractId, CancellationToken.None);
             projection.Should().NotBeNull();
+            projection.ContractId.Should().Be(contractId);
+            projection.IsValidated.Should().BeTrue();
+            projection.ValidatedByUserId.Should().Be(userId);
+            projection.ValidatedByUsername.Should().Be("rpopovici");
+
         }
     }
 
