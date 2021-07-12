@@ -8,6 +8,7 @@
     <ProjectReference Include="..\..\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.Effects\NBB.Core.Effects.csproj" />
+    <ProjectReference Include="..\..\EventStore\NBB.EventStore.Abstractions\NBB.EventStore.Abstractions.csproj" />
     <ProjectReference Include="..\..\Messaging\NBB.Messaging.Effects\NBB.Messaging.Effects.csproj" />
   </ItemGroup>
 
