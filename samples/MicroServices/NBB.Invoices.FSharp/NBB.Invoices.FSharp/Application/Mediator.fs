@@ -36,6 +36,6 @@ module Mediator =
         match box message with
         | :? ICommand as command -> sendCommand command
         | :? IEvent as event -> dispatchEvent event
-        | _ -> effect' { failwith "Invalid message" }
+        | _ -> effect { failwith "Invalid message" }
 
     let handleGetMediator (m: Mediator) (_: GetMediatorSideEffect) = m

@@ -15,7 +15,7 @@ type Benchmark() =
     [<Benchmark>]
     member this.RunLazy() =
         let mapper crt =    
-            effect' {
+            effect {
                 let! x = Effect.from (fun _ -> 1)
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
@@ -29,7 +29,7 @@ type Benchmark() =
     [<Benchmark>]
     member this.RunStrict() =
         let mapper crt =    
-            effect { 
+            Strict.effect { 
                 let! x = Effect.from (fun _ -> 1)
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
