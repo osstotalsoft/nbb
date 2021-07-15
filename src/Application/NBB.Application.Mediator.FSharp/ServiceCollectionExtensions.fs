@@ -26,4 +26,4 @@ module ServiceCollectionExtensions =
                   SendQuery = sendQuery
                   DispatchEvent = publishEvent }
 
-            this.AddSideEffectHandler(Mediator.handleGetMediator mediator)
+            this.AddSideEffectHandler(Mediator.handleGetMediator mediator)            

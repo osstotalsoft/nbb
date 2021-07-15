@@ -12,7 +12,10 @@
     <Compile Include="EventPipeline.fs" />
     <Compile Include="Mediator.fs" />
     <Compile Include="ServiceCollectionExtensions.fs" />
+    <None Include="Readme.md" />
   </ItemGroup>
+
+  <ItemGroup />
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\NBB.Core.Effects.FSharp\NBB.Core.Effects.FSharp.fsproj" />
