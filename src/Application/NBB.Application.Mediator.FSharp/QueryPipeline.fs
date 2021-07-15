@@ -18,7 +18,7 @@ module QueryHandler =
             | :? 'TQuery as query' -> query' |> queryHandler |> (Effect.map << Option.map) box
             | _ -> Effect.pure' None
 
-module QueryMidleware =
+module QueryMiddleware =
     let run (middleware: QueryMiddleware) (query: 'TQuery when 'TQuery :> IQuery<'TResponse>) = 
         query :> IQuery |> RequestMiddleware.run middleware |> Effect.map (Option.map (fun x -> x :?> 'TResponse))
 

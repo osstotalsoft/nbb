@@ -2,6 +2,7 @@
 
 open Giraffe
 open NBB.Invoices.FSharp.Application
+open NBB.Application.Mediator.FSharp
 
 module Invoice =
     let handler : HttpHandler = 

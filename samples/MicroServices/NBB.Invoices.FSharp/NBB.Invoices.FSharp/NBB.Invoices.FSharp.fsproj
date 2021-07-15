@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Compile Include="Domain\InvoiceAggregate.fs" />
-    <Compile Include="Application\Mediator.fs" />
     <Compile Include="Application\MessageBus.fs" />
     <Compile Include="Application\Invoice.fs" />
     <Compile Include="Application\Application.fs" />

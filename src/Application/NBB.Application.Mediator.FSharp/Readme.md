@@ -163,6 +163,46 @@ let eventPipeline = handleExceptions << logEvent
  - `EventMiddleware.lift` - lifts an event handler into an event middleware
  - `EventMiddleware.run` - transforms an event middleware into an event handler
 
+## Mediator
+ The pipelines cannot be directly referenced in other request/event handlers due to the cyclic dependency between the specific handler and the whole pipeline. Therefore we need a mediator abstraction in order to invert dependencies betwwen the handler and the pipeline
+
+### Mediator registration
+The mediator can be registered in the IoC container as follows:
+```fsharp
+let addServices (services: IServiceCollection) =
+    services.AddEffects() |> ignore
+    services.AddMediator(commandPipeline, queryPipeline, eventPipeline) |> ignore
+```
+
+### Mediator usage
+We can use the configured mediator to send commands and queryes or to dispatch events:
+```fsharp
+open NBB.Application.Mediator.FSharp
+let handle cmd =
+    effect {
+        ...
+
+        // send command
+        do! Mediator.sendCommand myCommand
+
+        // dispatch single event
+        do! Mediator.dispatchEvent myEvent
+
+        // send command or event
+        do! Mediator.sendMessage myCommandOrEvent
+
+        // dispatch multiple events
+        do! Mediator.dispatchEvents myEventList
+
+        // send query
+        let! result = Mediator.sendQuery myQuery
+
+        return Some()
+    }
+
+```
+
+
 ## Example application
 ```fsharp
 module Application
@@ -170,6 +210,9 @@ module Application
 open NBB.Core.Effects.FSharp
 open NBB.Application.Mediator.FSharp
 open System
+open Microsoft.Extensions.DependencyInjection
+open NBB.Core.Effects
+open NBB.Messaging.Effects
 
 type Command1 =
     { Code: string }
@@ -346,6 +389,8 @@ module WriteApplication =
             Command3.handle1 >=> Command3.handle2  |> upCast //handler composition
         ]
 
+    let private queryPipeline: QueryMiddleware = handlers []
+
     open EventMiddleware
     open EventHandler
 
@@ -361,6 +406,12 @@ module WriteApplication =
 
     let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
     let publishEvent (ev: 'TEvent) = EventMiddleware.run eventPipeline ev
+
+    let addServices (services: IServiceCollection) =
+        services.AddEffects() |> ignore
+        services.AddMessagingEffects() |> ignore
+
+        services.AddMediator(commandPipeline, queryPipeline, eventPipeline)
 
 module ReadApplication = 
     open RequestMiddleware
@@ -380,14 +431,22 @@ module ReadApplication =
          << logRequest
          << lift publishMessage
 
+    open EventMiddleware
+
+    let private eventPipeline : EventMiddleware = handlers []
+
     let sendQuery (query: 'TQuery) = QueryMiddleware.run queryPipeline query
     let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
 
+    let addServices (services: IServiceCollection) =
+        services.AddEffects() |> ignore
+        services.AddMessagingEffects() |> ignore
 
+        services.AddMediator(commandPipeline, queryPipeline, eventPipeline)
 
 
 //call site
-let cmdEff = WriteApplication.sendCommand { Command1.Code = "code" }
-let queryEff = ReadApplication.sendQuery { Query1.Code = "code" }
+let cmdEff = Mediator.sendCommand { Command1.Code = "code" }
+let queryEff = Mediator.sendQuery { Query1.Code = "code" }
 ```
 
