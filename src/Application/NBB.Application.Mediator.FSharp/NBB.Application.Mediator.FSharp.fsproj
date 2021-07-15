@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="PipelineUtils.fs" />
     <Compile Include="RequestPipeline.fs" />
     <Compile Include="CommandPipeline.fs" />
     <Compile Include="QueryPipeline.fs" />
