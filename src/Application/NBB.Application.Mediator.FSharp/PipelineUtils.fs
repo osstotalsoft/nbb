@@ -3,6 +3,7 @@ namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
 
+[<AutoOpen >]
 module PipelineUtils =
     let terminateRequest<'a> : (Effect<'a option> -> Effect<'a>) =
         Effect.map
