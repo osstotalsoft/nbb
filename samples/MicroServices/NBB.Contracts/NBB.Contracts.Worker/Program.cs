@@ -15,33 +15,21 @@ using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Nats;
 using Serilog;
 using Serilog.Events;
-using System.IO;
 using System.Threading.Tasks;
 using NBB.Messaging.Host.Builder;
 using Serilog.Sinks.MSSqlServer;
-using Microsoft.Extensions.Options;
 
 namespace NBB.Contracts.Worker
 {
     public class Program
     {
-        public static async Task Main(string[] _args)
+        public static async Task Main(string[] args)
         {
-            var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
-                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
-                {
-                    configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-                    configurationBuilder.AddJsonFile("appsettings.json", true);
-                    configurationBuilder.AddEnvironmentVariables();
-
-                    if (hostBuilderContext.HostingEnvironment.IsDevelopment())
-                    {
-                        configurationBuilder.AddUserSecrets<Program>();
-                    }
-                })
+            var builder = Host
+                .CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, loggingBuilder) =>
                 {
+                    var env = hostingContext.HostingEnvironment.IsDevelopment();
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
                     Log.Logger = new LoggerConfiguration()
@@ -75,7 +63,7 @@ namespace NBB.Contracts.Worker
 
                 });
 
-            var host = builder.UseConsoleLifetime().Build();
+            var host = builder.Build();
 
             await host.RunAsync();
         }

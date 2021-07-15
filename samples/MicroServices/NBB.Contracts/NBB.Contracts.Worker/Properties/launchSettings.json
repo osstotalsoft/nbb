@@ -3,7 +3,7 @@
     "NBB.Contracts.Worker": {
       "commandName": "Project",
       "environmentVariables": {
-        "NETCORE_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     }
   }

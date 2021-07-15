@@ -20,7 +20,7 @@ namespace NBB.Payments.Migrations
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            var environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
+            var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
             var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
 
             if (isDevelopment)

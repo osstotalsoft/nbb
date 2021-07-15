@@ -59,20 +59,9 @@ namespace ProcessManagerSample
         }
 
         public static IHost CreateHost(string[] args) =>
-            new HostBuilder()
+            Host
+                .CreateDefaultBuilder(args)
                 .ConfigureHostConfiguration(builder => { builder.AddEnvironmentVariables(); })
-                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
-                {
-                    configurationBuilder.SetBasePath(AppContext.BaseDirectory)
-                        .AddJsonFile("appsettings.json", optional: false)
-                        .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("environment") ?? "Production"}.json", optional: true)
-                        .AddEnvironmentVariables();
-
-                    if (hostBuilderContext.HostingEnvironment.IsDevelopment())
-                    {
-                        configurationBuilder.AddUserSecrets<Program>();
-                    }
-                })
                 .ConfigureServices(Startup.ConfigureServicesDelegate)
                 .UseSerilog()
                 .Build();
