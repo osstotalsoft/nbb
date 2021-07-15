@@ -98,6 +98,12 @@ namespace NBB.Core.Effects
         public static Effect<Unit> Sequence(IEnumerable<Effect<Unit>> effectList)
             => Sequence<Unit>(effectList).ToUnit();
 
+        public static Effect<T> TryWith<T>(Effect<T> innerEffect, Func<Exception, Effect<T>> exceptionHandler)
+            => Of<TryWith.SideEffect<T>, T>(Effects.TryWith.From(innerEffect, exceptionHandler));
+
+        public static Effect<T> TryFinally<T>(Effect<T> innerEffect, Action compensation)
+            => Of<TryFinally.SideEffect<T>, T>(Effects.TryFinally.From(innerEffect, compensation));
+
         public static Effect<TResult> Bind<T, TResult>(Effect<T> effect, Func<T, Effect<TResult>> computation)
             => effect.Bind(computation);
 

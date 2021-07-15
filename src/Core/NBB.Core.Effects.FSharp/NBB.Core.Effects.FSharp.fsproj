@@ -10,7 +10,10 @@
     <Compile Include="Data\ReaderEffect.fs" />
     <Compile Include="Data\StateEffect.fs" />
     <Compile Include="Data\ReaderStateEffect.fs" />
+    <None Include="README.md" />
   </ItemGroup>
+
+  <ItemGroup />
 
   <ItemGroup>
     <ProjectReference Include="..\NBB.Core.Effects\NBB.Core.Effects.csproj" />

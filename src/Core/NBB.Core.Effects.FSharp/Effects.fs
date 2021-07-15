@@ -75,6 +75,8 @@ module EffectList =
         |> Effect.bind (fun list -> List.foldBack folder list initState)
 
 module EffectBuilder =
+    let private safeDispose (resource: #IDisposable) = if (not (isNull resource)) then resource.Dispose()
+
     type LazyEffectBuilder() =
         member _.Bind(eff, func) = Effect.bind func eff
         member _.Return(value) = Effect.pure' value
@@ -85,7 +87,9 @@ module EffectBuilder =
         member _.Yield(value) = EffectList.return' value
         member _.YieldFrom(x) = EffectList.lift x
         member _.Delay(f) = f |> Effect.from |> Effect.flatten
-       
+        member _.TryWith(eff, handler) =  Effect.TryWith(eff, Func<_, _>(handler))
+        member _.TryFinally(eff, compensation) = Effect.TryFinally(eff, Action(compensation))
+        member _.Using(resource, expr) = Effect.TryFinally(expr resource, fun () -> safeDispose resource)
 
     type StrictEffectBuilder() =
         member _.Bind(eff, func) = Effect.bind func eff
@@ -98,13 +102,12 @@ module EffectBuilder =
         member _.YieldFrom(x) = EffectList.lift x
         member _.Delay(f) = f 
         member _.Run(f) = f ()
-        
+        member _.TryWith(expr, handler) = try expr() with ex -> handler ex
+        member _.TryFinally(expr, compensation) = try expr() finally compensation()
+        member _.Using(resource, expr) =  try expr resource finally safeDispose resource
         
 [<AutoOpen>]
 module Effects =
-    let effect = new EffectBuilder.StrictEffectBuilder()
-    let effect' = new EffectBuilder.LazyEffectBuilder()
-
     let (<!>) = Effect.map
     let (<*>) = Effect.apply
     let (>>=) eff func = Effect.bind func eff
@@ -128,4 +131,9 @@ module Effects =
 
         let sequence result = traverse id result
 
+[<AutoOpen>]
+module Lazy =
+    let effect = new EffectBuilder.LazyEffectBuilder()
 
+module Strict =
+    let effect = new EffectBuilder.StrictEffectBuilder()
