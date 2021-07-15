@@ -10,8 +10,8 @@ namespace NBB.Core.Effects
         public static IServiceCollection AddEffects(this IServiceCollection services)
         {
             services.AddSingleton(typeof(Thunk.Handler<>));
-            services.AddSingleton(typeof(Parallel.Handler<,>));
-            services.AddSingleton(typeof(Sequenced.Handler<>));
+            services.AddScoped(typeof(Parallel.Handler<,>));
+            services.AddScoped(typeof(Sequenced.Handler<>));
             services.AddScoped<ISideEffectBroker, SideEffectBroker>();
             services.AddScoped<IInterpreter, Interpreter>();
             return services;
