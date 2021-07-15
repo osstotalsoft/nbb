@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading;
@@ -51,9 +49,7 @@ namespace NBB.Todo.Worker
 
         public static IHost BuildConsoleHost(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureHostConfiguration(config => config.AddEnvironmentVariables("NETCORE_"))
                 .ConfigureLogging(ConfigureLogging)
-                .ConfigureAppConfiguration(ConfigureApp)
                 .ConfigureServices(ConfigureServices)
                 .UseSerilog()
                 .UseConsoleLifetime()
@@ -91,23 +87,6 @@ namespace NBB.Todo.Worker
                 .AddMultiTenantMessaging()
                 .AddDefaultMessagingTenantIdentification()
                 .AddTenantRepository<BasicTenantRepository>();
-        }
-
-        private static void ConfigureApp(HostBuilderContext ctx, IConfigurationBuilder configurationBuilder)
-        {
-            configurationBuilder
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile(
-                    $"appsettings.{Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT") ?? "Production"}.json",
-                    optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
-
-
-            if (ctx.HostingEnvironment.IsDevelopment())
-            {
-                configurationBuilder.AddUserSecrets<Program>();
-            }
         }
 
         private static void ConfigureLogging(HostBuilderContext ctx, ILoggingBuilder _builder)

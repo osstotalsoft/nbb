@@ -2,7 +2,6 @@ namespace NBB.Invoices.FSharp.Api
 
 open System
 open Microsoft.AspNetCore.Hosting
-open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.AspNetCore.Builder
@@ -14,7 +13,6 @@ open NBB.Invoices.FSharp.Data
 open NBB.Messaging.Abstractions
 open NBB.Messaging.Nats
 open Microsoft.AspNetCore.Cors.Infrastructure
-open System.Reflection
 
 module Program =
     let webApp =
@@ -69,22 +67,15 @@ module Program =
             //    NewtonsoftJsonSerializer(NewtonsoftJsonSerializer.DefaultSettings))
         |> ignore
 
-    let configureAppConfiguration  (context: HostBuilderContext) (config: IConfigurationBuilder) =  
-        config
-            .AddJsonFile("appsettings.json", false, true)
-            .AddJsonFile(sprintf "appsettings.%s.json" context.HostingEnvironment.EnvironmentName, true)
-            .AddUserSecrets(Assembly.GetExecutingAssembly())
-            .AddEnvironmentVariables() |> ignore
-
     let configureLogging (builder : ILoggingBuilder) =
         builder.AddFilter(fun l -> l.Equals LogLevel.Error)
                .AddConsole()
                .AddDebug() |> ignore
-            
+           
 
     [<EntryPoint>]
     let main args =
-        Host.CreateDefaultBuilder()
+        Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(
                 fun webHostBuilder ->
                     webHostBuilder
