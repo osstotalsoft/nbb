@@ -42,3 +42,10 @@ The blocks
 The samples
 ----------------
 Please see our [`samples`](./samples#README.md) folder to get you started with various architectures built with NBB.
+
+The templates
+-------------
+
+[`NBB templates`](https://github.com/osstotalsoft/nbb-templates#readme)
+is a collection of custom templates to be used by the dotnet cli (dotnet new command).
+
