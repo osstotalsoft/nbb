@@ -6,8 +6,6 @@ using NBB.Core.Effects;
 
 namespace NBB.ProjectR
 {
-    public interface IHaveIdentityOf<TIdentity> { }
-
     public interface IProjector<TProjection>
     {
         (TProjection Projection, Effect<Unit> Effect) Project(object ev, TProjection projection);

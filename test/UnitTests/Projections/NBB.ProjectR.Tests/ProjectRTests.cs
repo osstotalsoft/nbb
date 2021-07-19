@@ -13,10 +13,7 @@ using Unit = NBB.Core.Effects.Unit;
 
 namespace NBB.ProjectR.Tests
 {
-
-
-
-    public class UnitTest3 : IClassFixture<TestFixture>
+    public class ProjectRTests : IClassFixture<TestFixture>
     {
         record ContractCreated(Guid ContractId, decimal Value) : INotification;
 
@@ -26,7 +23,7 @@ namespace NBB.ProjectR.Tests
 
         public class ContractProjection
         {
-            public record Projection(Guid ContractId, bool IsValidated, Guid? ValidatedByUserId, string ValidatedByUsername) : IHaveIdentityOf<Guid>;
+            public record Projection(Guid ContractId, bool IsValidated, Guid? ValidatedByUserId, string ValidatedByUsername);
 
             public record UserLoaded(Guid ContractId, Guid UserId, string Username) : INotification;
 
@@ -70,13 +67,13 @@ namespace NBB.ProjectR.Tests
 
         private readonly TestFixture _fixture;
 
-        public UnitTest3(TestFixture fixture)
+        public ProjectRTests(TestFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
-        public async Task Test2()
+        public async Task SomeIntegrationTest()
         {
             //Arrange
             await using var container = _fixture.BuildServiceProvider();
@@ -85,8 +82,13 @@ namespace NBB.ProjectR.Tests
             var projectionStore = scope.ServiceProvider
                 .GetRequiredService<IProjectionStore<ContractProjection.Projection>>();
             var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-            using var _ = await messageBus.SubscribeAsync<ContractProjection.UserLoaded>(msg =>
-                mediator.Publish(msg.Payload, default)
+            var tcs = new TaskCompletionSource();
+            using var _ = await messageBus.SubscribeAsync<ContractProjection.UserLoaded>(
+                async msg =>
+                {
+                    await mediator.Publish(msg.Payload, default);
+                    tcs.SetResult();
+                }
             );
 
 
@@ -98,6 +100,7 @@ namespace NBB.ProjectR.Tests
             //Act
             await mediator.Publish(new ContractCreated(contractId, 100));
             await mediator.Publish(new ContractValidated(contractId, userId));
+            await tcs.Task;
             var (projection, loadedAtVersion) = await projectionStore.Load(contractId, CancellationToken.None);
 
 
