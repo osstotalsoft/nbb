@@ -20,8 +20,8 @@ namespace NBB.ProcessManager.Runtime
         public static void AddProcessManager(this IServiceCollection services, params Assembly[] assemblies)
         {
             services.AddProcessManagerDefinition(assemblies);
-            services.AddSingleton<ProcessExecutionCoordinator>();
-            services.AddSingleton<IInstanceDataRepository, InstanceDataRepository>();
+            services.AddScoped<ProcessExecutionCoordinator>();
+            services.AddScoped<IInstanceDataRepository, InstanceDataRepository>();
             services.AddEffects();
             services.AddTimeoutEffects();
             services.AddMessagingEffects();

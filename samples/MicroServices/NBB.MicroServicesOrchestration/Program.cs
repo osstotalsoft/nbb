@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using NBB.Messaging.Abstractions;
 using Serilog;
 using Serilog.Events;
-using System.IO;
 using System.Threading.Tasks;
 using Serilog.Sinks.MSSqlServer;
 using NBB.Correlation.Serilog;
@@ -23,21 +22,10 @@ namespace NBB.Contracts.Worker
 {
     public class Program
     {
-        public static async Task Main(string[] _args)
+        public static async Task Main(string[] args)
         {
-            var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
-                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
-                {
-                    configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-                    configurationBuilder.AddJsonFile("appsettings.json", true);
-                    configurationBuilder.AddEnvironmentVariables();
-
-                    if (hostBuilderContext.HostingEnvironment.IsDevelopment())
-                    {
-                        configurationBuilder.AddUserSecrets<Program>();
-                    }
-                })
+            var builder = Host
+                .CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, loggingBuilder) =>
                 {
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");

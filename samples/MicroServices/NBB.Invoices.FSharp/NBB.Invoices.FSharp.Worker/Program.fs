@@ -17,17 +17,6 @@ open NBB.Application.Mediator.FSharp
 [<EntryPoint>]
 let main argv =
 
-    // App configuration
-    let appConfig (context: HostBuilderContext) (configApp: IConfigurationBuilder) =
-        configApp
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional = true)
-            .AddJsonFile(sprintf "appsettings.%s.json" context.HostingEnvironment.EnvironmentName, optional = true)
-            .AddUserSecrets(Assembly.GetExecutingAssembly())
-            .AddEnvironmentVariables()
-            .AddCommandLine(argv)
-        |> ignore
-
     // Services configuration
     let serviceConfig (context: HostBuilderContext) (services: IServiceCollection) =
         services
@@ -67,9 +56,10 @@ let main argv =
     let loggingConfig (context: HostBuilderContext) (loggingBuilder: ILoggingBuilder) =
         loggingBuilder.AddConsole().AddDebug() |> ignore
 
+   
     let host =
-        HostBuilder()
-            .ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> appConfig)
+        Host
+            .CreateDefaultBuilder(argv)
             .ConfigureServices(Action<HostBuilderContext, IServiceCollection> serviceConfig)
             .ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> loggingConfig)
             .UseConsoleLifetime()
