@@ -48,22 +48,24 @@ The connection string used by the ADO.net repository is configured in section *E
 }
 ```
 
-Concurrency model
-----------------
+## Concurrency model
+
 The event store uses the concurrency model defined at the IEventRepository level (at the storage level).
 
 The *EfEventRepository* and *AdoNetEventRepository* offers optimistic concurrency based on the event's SequenceNumber.
 
 If two threads or processes want to save to events with the same sequence number to same stream of events, the last will fail with a *ConcurrencyException*.
 
-Snapshotting
-----------------
+## Snapshotting
+
 The package [`NBB.EventStore.Abstractions`](./NBB.EventStore.Abstractions#readme) contains *ISnapshotStore* a lightweight abstraction for any snapshot store client.
 
 The *SnapshotStore* delegates persistence responsibilities to the *ISnapshotRepository* implementations in order to decouple from any possible implementation.
 
 The package  [`NBB.EventStore.AdoNet`](./NBB.EventStore.AdoNet#AdoNet) offers an Ado.Net based implementation for *ISnapshotRepository*.
 
+## Effects
 
+The package [`NBB.EventStore.Effects`](./NBB.EventStore.Effects#readme) contains event-store side effects and handlers for the NBB effects infrastructure
 
 

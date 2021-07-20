@@ -13,8 +13,6 @@ namespace NBB.SQLStreamStore
             services.AddScoped<IEventStore, SqlStreamStore>();
             services.AddScoped<ISnapshotStore, NullSnapshotStore>();
             services.AddSingleton<ISerDes, SerDes>();
-            services.AddTransient<IEventStoreSubscriber, SqlStreamStoreSubscriber>();
-
 
             services.AddSingleton(sp =>
             {
