@@ -1,9 +1,7 @@
-﻿namespace NBB.Invoices.FSharp.Application
+﻿namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
 open NBB.Core.Effects
-open NBB.Application.Mediator.FSharp
-
 
 type Mediator =
     { DispatchEvent: IEvent -> Effect<unit>
