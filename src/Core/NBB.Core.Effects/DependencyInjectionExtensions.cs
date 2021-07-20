@@ -12,6 +12,8 @@ namespace NBB.Core.Effects
             services.AddSingleton(typeof(Thunk.Handler<>));
             services.AddScoped(typeof(Parallel.Handler<,>));
             services.AddScoped(typeof(Sequenced.Handler<>));
+            services.AddScoped(typeof(TryWith.Handler<>));
+            services.AddScoped(typeof(TryFinally.Handler<>));
             services.AddScoped<ISideEffectBroker, SideEffectBroker>();
             services.AddScoped<IInterpreter, Interpreter>();
             return services;

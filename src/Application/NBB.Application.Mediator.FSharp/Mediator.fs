@@ -1,9 +1,7 @@
-﻿namespace NBB.Invoices.FSharp.Application
+﻿namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
 open NBB.Core.Effects
-open NBB.Application.Mediator.FSharp
-
 
 type Mediator =
     { DispatchEvent: IEvent -> Effect<unit>
@@ -36,6 +34,6 @@ module Mediator =
         match box message with
         | :? ICommand as command -> sendCommand command
         | :? IEvent as event -> dispatchEvent event
-        | _ -> effect' { failwith "Invalid message" }
+        | _ -> effect { failwith "Invalid message" }
 
     let handleGetMediator (m: Mediator) (_: GetMediatorSideEffect) = m

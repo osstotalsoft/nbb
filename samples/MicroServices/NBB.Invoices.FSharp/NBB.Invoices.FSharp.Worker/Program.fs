@@ -12,6 +12,7 @@ open NBB.Messaging.Nats
 open Microsoft.Extensions.Logging
 open NBB.Messaging.Host.MessagingPipeline
 open NBB.Invoices.FSharp.Data
+open NBB.Application.Mediator.FSharp
 
 [<EntryPoint>]
 let main argv =
