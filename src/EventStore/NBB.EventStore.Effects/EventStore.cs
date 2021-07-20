@@ -65,19 +65,5 @@ namespace NBB.EventStore.Effects
             services.AddSingleton<ISideEffectHandler<GetEventsFromStream.SideEffect, List<object>>, GetEventsFromStream.Handler>();
             return services;
         }
-
-        public static void Sample()
-        {
-            var eff = EventStore.GetEventsFromStream("stream1");
-            var eff2 = EventStore.AppendEventsToStream("stream2", new object[] { new { Value = 1 } });
-            var eff3 =
-                EventStore.GetEventsFromStream("stream1").Then(
-                    events => EventStore.AppendEventsToStream("stream2", events));
-
-            var eff4 =
-                from events in EventStore.GetEventsFromStream("stream1")
-                from _ in EventStore.AppendEventsToStream("stream2", events)
-                select _;
-        }
     }
 }
