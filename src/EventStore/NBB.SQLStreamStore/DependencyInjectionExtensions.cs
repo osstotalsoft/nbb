@@ -1,16 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using NBB.EventStore.Abstractions;
+using NBB.SQLStreamStore;
 using NBB.SQLStreamStore.Internal;
 using SqlStreamStore;
 
-namespace NBB.SQLStreamStore
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
         public static void AddSqlStreamStore(this IServiceCollection services)
         {
-            services.AddScoped<IEventStore, SqlStreamStore>();
+            services.AddScoped<IEventStore, NBB.SQLStreamStore.SqlStreamStore>();
             services.AddScoped<ISnapshotStore, NullSnapshotStore>();
             services.AddSingleton<ISerDes, SerDes>();
 

@@ -5,15 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.MultiTenancy;
-using NBB.Messaging.Nats;
-using NBB.MultiTenancy.Abstractions.Hosting;
-using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.AspNet;
-using NBB.MultiTenancy.Identification.Http.Extensions;
 using NBB.Todos.Data;
 
 

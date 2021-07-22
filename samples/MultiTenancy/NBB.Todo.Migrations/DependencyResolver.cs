@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.Todos.Data;
 using System;
 using System.IO;

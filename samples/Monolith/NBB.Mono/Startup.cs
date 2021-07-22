@@ -10,24 +10,19 @@ using NBB.Contracts.WriteModel.Data;
 using NBB.Core.Abstractions;
 using NBB.Correlation.AspNet;
 using NBB.Domain.Abstractions;
-using NBB.EventStore;
 using NBB.EventStore.Abstractions;
-using NBB.EventStore.AdoNet;
 using NBB.Invoices.Application.CommandHandlers;
 using NBB.Invoices.Data;
-using NBB.Messaging.InProcessMessaging.Extensions;
 using NBB.Payments.Application.CommandHandlers;
 using NBB.Payments.Data;
-using NBB.Core.DependencyInjection;
 using NBB.Domain;
 using NBB.Messaging.Host;
 using Microsoft.Extensions.Hosting;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.Host.Builder;
-using NBB.ProcessManager.Runtime;
 using System.Linq;
 using MicroServicesOrchestration;
+using NBB.Core.DependencyInjection;
 
 namespace NBB.Mono
 {

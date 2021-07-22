@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
 using NBB.Data.Abstractions;
+using NBB.Data.EventSourcing;
 
-namespace NBB.Data.EventSourcing
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

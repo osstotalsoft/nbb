@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using  NBB.Data.EntityFramework.MultiTenancy;
 
-namespace NBB.Data.EntityFramework.MultiTenancy
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection    
 {
     public static class DependencyInjectionExtensions
     {

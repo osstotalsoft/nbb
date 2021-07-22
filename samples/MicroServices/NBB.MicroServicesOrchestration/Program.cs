@@ -2,21 +2,17 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Messaging.Abstractions;
 using Serilog;
 using Serilog.Events;
 using System.Threading.Tasks;
 using Serilog.Sinks.MSSqlServer;
 using NBB.Correlation.Serilog;
 using NBB.Messaging.Host;
-using NBB.Messaging.Nats;
 using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.MessagingPipeline;
 using System.Reflection;
 using System.Linq;
-using NBB.ProcessManager.Runtime;
-using NBB.EventStore;
-using NBB.EventStore.AdoNet;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NBB.Contracts.Worker
 {
