@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using NBB.Core.Abstractions;
 using NBB.Core.Effects;
+using NBB.EventStore.Abstractions;
 using NBB.Messaging.Abstractions;
 using Xunit;
 using Mediator = NBB.Application.MediatR.Effects.Mediator;
@@ -28,6 +30,7 @@ namespace NBB.ProjectR.Tests
             public record UserLoaded(Guid ContractId, Guid UserId, string Username) : INotification;
 
 
+            [SnapshotFrequency(2)]
             class Projector
                 : IProjector<Projection>,
                   ISubscribeTo<ContractCreated, ContractValidated, UserLoaded>
@@ -48,7 +51,7 @@ namespace NBB.ProjectR.Tests
                     select _;
             }
 
-            class LoadUserById
+            public class LoadUserById
             {
                 public record Query(Guid UserId) : IRequest<Model>;
 
@@ -94,6 +97,9 @@ namespace NBB.ProjectR.Tests
 
             var contractId = Guid.NewGuid();
             var userId = Guid.NewGuid();
+            
+            var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
+            var snapshotStore = scope.ServiceProvider.GetRequiredService<ISnapshotStore>();
 
 
 
@@ -111,6 +117,13 @@ namespace NBB.ProjectR.Tests
             projection.IsValidated.Should().BeTrue();
             projection.ValidatedByUserId.Should().Be(userId);
             projection.ValidatedByUsername.Should().Be("rpopovici");
+
+            var stream = $"PROJ::{typeof(ContractProjection.Projection).GetLongPrettyName()}::{contractId}";
+            var events = (await eventStore.GetEventsFromStreamAsync(stream, null));
+            events.Count.Should().Be(3);
+            var snapshot = await snapshotStore.LoadSnapshotAsync(stream);
+            snapshot?.Snapshot.Should().NotBeNull();
+
 
         }
     }

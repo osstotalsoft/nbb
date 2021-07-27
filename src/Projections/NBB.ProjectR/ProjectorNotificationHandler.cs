@@ -30,8 +30,8 @@ namespace NBB.ProjectR
                 return;
             
             var (projection, loadedAtVersion) = await _projectionStore.Load(id, cancellationToken);
-            var (_, effect) = _innerProjector.Project(ev, projection);
-            await _projectionStore.SaveEvent(ev, id, loadedAtVersion, cancellationToken);
+            var (newProjection, effect) = _innerProjector.Project(ev, projection);
+            await _projectionStore.Save(ev, id, loadedAtVersion, newProjection, cancellationToken);
             await _effectInterpreter.Interpret(effect, cancellationToken);
         }
     }
