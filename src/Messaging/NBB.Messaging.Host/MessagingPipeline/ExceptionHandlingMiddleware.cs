@@ -46,7 +46,7 @@ namespace NBB.Messaging.Host.MessagingPipeline
 
                 await _messageBusPublisher.PublishAsync(new
                 {
-                    ex.Message,
+                    ErrorMessage = ex.Message,
                     ex.StackTrace,
                     ex.Source,
                     Data = context.MessagingEnvelope,
@@ -58,7 +58,8 @@ namespace NBB.Messaging.Host.MessagingPipeline
                                                                          ? DateTime.TryParse(value, out var publishTime)
                                                                         ? publishTime
                                                                         : default
-                                                                    : default
+                                                                    : default,
+                    MessageId = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
                 },
                     MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
             }
