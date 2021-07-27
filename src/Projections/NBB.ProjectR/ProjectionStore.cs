@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
@@ -26,7 +27,7 @@ namespace NBB.ProjectR
             var snapshotEnvelope = await _snapshotStore.LoadSnapshotAsync(stream, cancellationToken);
             var events = await _eventStore.GetEventsFromStreamAsync(stream, snapshotEnvelope?.AggregateVersion + 1, cancellationToken);
             var projection = snapshotEnvelope?.Snapshot as TProjection;
-            foreach (var @event in events)
+            foreach (var @event in events.Cast<IMessage<TProjection>>())
             {
                 (projection, _) = _projector.Project(@event, projection);
             }
@@ -34,10 +35,10 @@ namespace NBB.ProjectR
             return (projection, events.Count);
         }
 
-        public async Task Save<TEvent>(TEvent ev, object id, int expectedVersion, TProjection projection, CancellationToken cancellationToken)
+        public async Task Save(IMessage<TProjection> message, object id, int expectedVersion, TProjection projection, CancellationToken cancellationToken)
         {
             var stream = GetStreamFrom(id);
-            await _eventStore.AppendEventsToStreamAsync(stream, new object[] {ev}, expectedVersion, cancellationToken);
+            await _eventStore.AppendEventsToStreamAsync(stream, new object[] {message}, expectedVersion, cancellationToken);
             var snapshotFrequency = _metadataAccessor.GetMetadataFor<TProjection>().SnapshotFrequency;
             var projectionVersion = expectedVersion + 1;
             if (projectionVersion % snapshotFrequency == 0)

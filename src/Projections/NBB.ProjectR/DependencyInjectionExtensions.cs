@@ -34,6 +34,7 @@ namespace NBB.ProjectR
             }
 
             services.AddSingleton(typeof(ProjectorMetadataAccessor), _ => new ProjectorMetadataAccessor(metadata));
+            services.AddScoped(typeof(ProjectMessage.Handler<>));
 
             return services;
         }

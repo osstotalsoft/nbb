@@ -27,28 +27,35 @@ namespace NBB.ProjectR.Tests
         {
             public record Projection(Guid ContractId, bool IsValidated, Guid? ValidatedByUserId, string ValidatedByUsername);
 
-            public record UserLoaded(Guid ContractId, Guid UserId, string Username) : INotification;
+            record CreateContract(Guid ContractId, decimal Value) : IMessage<Projection>;
+            record ValidateContract(Guid UserId) : IMessage<Projection>;
+            record SetUserName(string Username) : IMessage<Projection>;
 
 
             [SnapshotFrequency(2)]
             class Projector
-                : IProjector<Projection>,
-                  ISubscribeTo<ContractCreated, ContractValidated, UserLoaded>
+                : IProjector<Projection, ContractCreated, ContractValidated>
             {
-                public (Projection, Effect<Unit>) Project(object message, Projection projection) => message switch
+                public (Projection, Effect<Unit>) Project(IMessage<Projection> message, Projection projection) => (message, projection) switch
                 {
-                    ContractCreated ev => (new(ev.ContractId, false, null, null), Cmd.None),
-                    ContractValidated ev => (projection with { IsValidated = true, ValidatedByUserId = ev.UserId }, LoadUserName(ev)),
-                    UserLoaded ev => (projection with { ValidatedByUsername = ev.Username }, Cmd.None),
+                    (CreateContract msg, null) => (new(msg.ContractId, false, null, null), Cmd.None),
+                    (ValidateContract msg, { IsValidated: false }) => (projection with { IsValidated = true, ValidatedByUserId = msg.UserId }, LoadUserName(projection.ContractId, msg.UserId)),
+                    (SetUserName msg, not null) => (projection with { ValidatedByUsername = msg.Username }, Cmd.None),
                     _ => (projection, Cmd.None)
                 };
 
-                public object Correlate(object message) => (message as dynamic).ContractId;
+                public Effect<Unit> Subscribe(object @event) => @event switch
+                {
+                    ContractCreated ev => Cmd.Project(ev.ContractId, new CreateContract(ev.ContractId, ev.Value)),
+                    ContractValidated ev => Cmd.Project(ev.ContractId, new ValidateContract(ev.UserId)),
+                    _ => Cmd.None
+                };
 
-                private Effect<Unit> LoadUserName(ContractValidated ev) =>
-                    from x in Mediator.Send(new LoadUserById.Query(ev.UserId))
-                    from _ in MessageBus.Publish(new UserLoaded(ev.ContractId, x.UserId, x.UserName))
-                    select _;
+
+
+                private Effect<Unit> LoadUserName(Guid contractId, Guid userId) =>
+                    Mediator.Send(new LoadUserById.Query(userId)).Then(x =>
+                        Cmd.Project(contractId, new SetUserName(x.UserName)));
             }
 
             public class LoadUserById
@@ -84,20 +91,10 @@ namespace NBB.ProjectR.Tests
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
             var projectionStore = scope.ServiceProvider
                 .GetRequiredService<IProjectionStore<ContractProjection.Projection>>();
-            var messageBus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
-            var tcs = new TaskCompletionSource();
-            using var _ = await messageBus.SubscribeAsync<ContractProjection.UserLoaded>(
-                async msg =>
-                {
-                    await mediator.Publish(msg.Payload, default);
-                    tcs.SetResult();
-                }
-            );
-
 
             var contractId = Guid.NewGuid();
             var userId = Guid.NewGuid();
-            
+
             var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
             var snapshotStore = scope.ServiceProvider.GetRequiredService<ISnapshotStore>();
 
@@ -106,7 +103,6 @@ namespace NBB.ProjectR.Tests
             //Act
             await mediator.Publish(new ContractCreated(contractId, 100));
             await mediator.Publish(new ContractValidated(contractId, userId));
-            await tcs.Task;
             var (projection, loadedAtVersion) = await projectionStore.Load(contractId, CancellationToken.None);
 
 
@@ -119,7 +115,7 @@ namespace NBB.ProjectR.Tests
             projection.ValidatedByUsername.Should().Be("rpopovici");
 
             var stream = $"PROJ::{typeof(ContractProjection.Projection).GetLongPrettyName()}::{contractId}";
-            var events = (await eventStore.GetEventsFromStreamAsync(stream, null));
+            var events = await eventStore.GetEventsFromStreamAsync(stream, null);
             events.Count.Should().Be(3);
             var snapshot = await snapshotStore.LoadSnapshotAsync(stream);
             snapshot?.Snapshot.Should().NotBeNull();
