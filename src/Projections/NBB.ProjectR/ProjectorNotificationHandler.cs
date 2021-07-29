@@ -12,23 +12,27 @@ namespace NBB.ProjectR
         where TEvent : INotification
     {
         private readonly IProjector<TProjection> _projector;
+        private readonly IProjectionStore<TProjection> _projectionStore;
         private readonly IInterpreter _effectInterpreter;
 
-        public ProjectorNotificationHandler(IProjector<TProjection> projector, IInterpreter effectInterpreter)
+        public ProjectorNotificationHandler(IProjector<TProjection> projector, IInterpreter effectInterpreter, IProjectionStore<TProjection> projectionStore)
         {
             _projector = projector;
             _effectInterpreter = effectInterpreter;
+            _projectionStore = projectionStore;
         }
 
 
         public async Task Handle(TEvent ev, CancellationToken cancellationToken)
         {
-            var message = _projector.Subscribe(ev);
-            if (message is null)
-                return;
-
-            var effect = Cmd.Project(message);
-            await _effectInterpreter.Interpret(effect, cancellationToken);
+            var (projectionId, message)  = _projector.Subscribe(ev);
+            while (message is not null)
+            {
+                var (projection, loadedAtVersion) = await _projectionStore.Load(projectionId, cancellationToken);
+                var (newProjection, effect) = _projector.Project(message, projection);
+                await _projectionStore.Save(message, projectionId, loadedAtVersion, newProjection, cancellationToken);
+                message = await _effectInterpreter.Interpret(effect, cancellationToken);
+            }
         }
     }
 }

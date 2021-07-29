@@ -1,21 +1,19 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Abstractions;
 using NBB.Core.Effects;
 using NBB.EventStore.Abstractions;
-using NBB.Messaging.Abstractions;
 using Xunit;
 using Mediator = NBB.Application.MediatR.Effects.Mediator;
 using MessageBus = NBB.Messaging.Effects.MessageBus;
-using Unit = NBB.Core.Effects.Unit;
 
 namespace NBB.ProjectR.Tests
 {
+
     public class ProjectRTests : IClassFixture<TestFixture>
     {
         record ContractCreated(Guid ContractId, decimal Value) : INotification;
@@ -27,82 +25,77 @@ namespace NBB.ProjectR.Tests
 
         public class ContractProjection
         {
-            public record Projection(Guid ContractId, decimal Value, bool IsValidated = false, Guid? ValidatedByUserId = null, string ValidatedByUsername = null, bool IsSigned = false);
+            public record Model(Guid ContractId, decimal Value, bool IsValidated = false,
+                Guid? ValidatedByUserId = null, string ValidatedByUsername = null, bool IsSigned = false);
+
 
             //Messages
-            record CreateContract(Guid ContractId, decimal Value) : IMessage<Projection>;
+            record CreateContract(Guid ContractId, decimal Value) : IMessage<Model>;
 
-            record ValidateContract(Guid ContractId, Guid UserId) : IMessage<Projection>;
+            record ValidateContract(Guid ContractId, Guid UserId) : IMessage<Model>;
 
-            record SignContract(Guid ContractId, Guid SignerId) : IMessage<Projection>;
+            record SignContract(Guid ContractId, Guid SignerId) : IMessage<Model>;
 
-            record SetUserName(Guid ContractId, string Username) : IMessage<Projection>;
+            record SetUserName(Guid ContractId, string Username) : IMessage<Model>;
 
-            
 
             //Events
-            public record ContractProjectionCreated(Guid ContractId, decimal Value) : INotification;
-            public record ContractProjectionValidated(Guid ContractId, Guid? UserId, string Username) : INotification;
+            public record ContractProjectionCreated(Guid ContractId, decimal Value) : IEvent<Model>;
 
-            
-            //private static readonly Effect<IMessage<Projection>> Nothing = Effect.Pure<IMessage<Projection>>(null);
-            
+            public record ContractProjectionValidated(Guid ContractId, Guid? UserId, string Username) : IEvent<Model>;
+
 
             [SnapshotFrequency(2)]
             class Projector
-                : IProjector<Projection, ContractCreated, ContractValidated, ContractSigned>
+                : IProjector<Model, ContractCreated, ContractValidated, ContractSigned>
             {
-                public (Projection, Effect<Unit>) Project(IMessage<Projection> message, Projection projection) =>
-                    (message, projection) switch
+                public (Model Model, Effect<IMessage<Model>> Effect) Project(IMessage<Model> message, Model model)
+                    => (message, model) switch
                     {
                         (CreateContract msg, null) => (
                             new(msg.ContractId, msg.Value),
-                            MessageBus.Publish(new ContractProjectionCreated(msg.ContractId, msg.Value))),
+                            MessageBus.PublishEvent(new ContractProjectionCreated(msg.ContractId, msg.Value))),
 
-                        (ValidateContract msg, { IsValidated: false }) => (
-                            projection with { IsValidated = true, ValidatedByUserId = msg.UserId },
-                            LoadUserName(msg.ContractId, msg.UserId)),
+                        (ValidateContract msg, {IsValidated: false}) => (
+                            model with { IsValidated = true, ValidatedByUserId = msg.UserId },
+                            Mediator.Send(new LoadUserById.Query(msg.UserId), x =>
+                                new SetUserName(msg.ContractId, x.UserName))),
 
                         (SetUserName msg, not null) => (
-                            projection with { ValidatedByUsername = msg.Username },
-                            MessageBus.Publish(new ContractProjectionValidated(projection.ContractId, projection.ValidatedByUserId, msg.Username))),
+                            model with { ValidatedByUsername = msg.Username },
+                            MessageBus.PublishEvent(new ContractProjectionValidated(model.ContractId,
+                                model.ValidatedByUserId, msg.Username))),
 
-                        (SignContract, not null) => (projection with { IsSigned = true }, Cmd.None),
+                        (SignContract, not null) => (model with { IsSigned = true }, _none),
 
-                        _ => (projection, Cmd.None)
+                        _ => (model, _none)
                     };
 
-                public IMessage<Projection> Subscribe(object @event) => @event switch
+                public (object, IMessage<Model>) Subscribe(object @event) => @event switch
                 {
-                    ContractCreated ev => new CreateContract(ev.ContractId, ev.Value),
-                    ContractValidated ev => new ValidateContract(ev.ContractId, ev.UserId),
-                    ContractSigned ev => new SignContract(ev.ContractId, ev.SignerId),
-                    _ => null
+                    ContractCreated ev => (ev.ContractId, new CreateContract(ev.ContractId, ev.Value)),
+                    ContractValidated ev => (ev.ContractId, new ValidateContract(ev.ContractId, ev.UserId)),
+                    ContractSigned ev => (ev.ContractId, new SignContract(ev.ContractId, ev.SignerId)),
+                    _ => (default, default)
                 };
-                
-                public object Identify(IMessage<Projection> message)
-                    => (message as dynamic).ContractId;
 
-
-                private Effect<Unit> LoadUserName(Guid contractId, Guid userId) =>
-                    Mediator.Send(new LoadUserById.Query(userId)).Then(x => Cmd.Project(new SetUserName(contractId, x.UserName)));
+                private readonly Effect<IMessage<Model>> _none = null;
             }
+        }
 
-            public class LoadUserById
+        public class LoadUserById
+        {
+            public record Query(Guid UserId) : IRequest<Model>;
+
+            public record Model(Guid UserId, string UserName);
+
+            class Handler : IRequestHandler<Query, Model>
             {
-                public record Query(Guid UserId) : IRequest<Model>;
-
-                public record Model(Guid UserId, string UserName);
-
-                class Handler : IRequestHandler<Query, Model>
+                public Task<Model> Handle(Query request, CancellationToken cancellationToken)
                 {
-                    public Task<Model> Handle(Query request, CancellationToken cancellationToken)
-                    {
-                        return Task.FromResult(new Model(request.UserId, "rpopovici"));
-                    }
+                    return Task.FromResult(new Model(request.UserId, "rpopovici"));
                 }
             }
-
         }
 
         private readonly TestFixture _fixture;
@@ -120,7 +113,7 @@ namespace NBB.ProjectR.Tests
             using var scope = container.CreateScope();
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
             var projectionStore = scope.ServiceProvider
-                .GetRequiredService<IProjectionStore<ContractProjection.Projection>>();
+                .GetRequiredService<IProjectionStore<ContractProjection.Model>>();
 
             var contractId = Guid.NewGuid();
             var userId = Guid.NewGuid();
@@ -144,7 +137,7 @@ namespace NBB.ProjectR.Tests
             projection.ValidatedByUserId.Should().Be(userId);
             projection.ValidatedByUsername.Should().Be("rpopovici");
 
-            var stream = $"PROJ::{typeof(ContractProjection.Projection).GetLongPrettyName()}::{contractId}";
+            var stream = $"PROJ::{typeof(ContractProjection.Model).GetLongPrettyName()}::{contractId}";
             var events = await eventStore.GetEventsFromStreamAsync(stream, null);
             events.Count.Should().Be(3);
             var snapshot = await snapshotStore.LoadSnapshotAsync(stream);

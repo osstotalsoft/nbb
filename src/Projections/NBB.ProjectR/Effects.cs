@@ -1,44 +1,27 @@
-﻿using NBB.Core.Effects;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
+using NBB.Core.Effects;
+using MediatR;
 
 namespace NBB.ProjectR
 {
-    public static class Cmd
+    public static class Eff
     {
-        public static Effect<Unit> None => Effect.Pure(Unit.Value);
-
-        public static Effect<Unit> Project<TProjection>(IMessage<TProjection> message) =>
-            Effect.Of<ProjectMessage.SideEffect<TProjection>, Unit>(new ProjectMessage.SideEffect<TProjection>(message));
-
+        public static Effect<IMessage<TProjection>> None<TProjection>() => Effect.Pure<IMessage<TProjection>>(null);
+    }
+    
+    public static class MessageBus
+    {
+        public static Effect<IMessage<TProjection>> PublishEvent<TProjection>(IEvent<TProjection> ev)
+            => Messaging.Effects.MessageBus.Publish(ev).Then(Eff.None<TProjection>());
     }
 
-    public static class ProjectMessage
+    public static class Mediator
     {
-        public record SideEffect<TProjection>(IMessage<TProjection> Message) : ISideEffect, IAmHandledBy<Handler<TProjection>>;
-
-        public class Handler<TProjection> : ISideEffectHandler<SideEffect<TProjection>, Unit>
+        public static Effect<IMessage<TProjection>> Send<TProjection, TResponse>(IRequest<TResponse> query, Func<TResponse, IMessage<TProjection>> next = null)
         {
-            private readonly IProjector<TProjection> _projector;
-            private readonly IProjectionStore<TProjection> _projectionStore;
-            private readonly IInterpreter _effectInterpreter;
-
-            public Handler(IProjector<TProjection> projector, IProjectionStore<TProjection> projectionStore, IInterpreter effectInterpreter)
-            {
-                _projector = projector;
-                _projectionStore = projectionStore;
-                _effectInterpreter = effectInterpreter;
-            }
-
-            public async Task<Unit> Handle(SideEffect<TProjection> sideEffect, CancellationToken cancellationToken = default)
-            {
-                var projectionId = _projector.Identify(sideEffect.Message);
-                var (projection, loadedAtVersion) = await _projectionStore.Load(projectionId, cancellationToken);
-                var (newProjection, effect) = _projector.Project(sideEffect.Message, projection);
-                await _projectionStore.Save(sideEffect.Message, projectionId, loadedAtVersion, newProjection, cancellationToken);
-                await _effectInterpreter.Interpret(effect, cancellationToken);
-                return Unit.Value;
-            }
+            var eff = Application.MediatR.Effects.Mediator.Send(query);
+            return next != null ? eff.Then(next) : eff.Then(_ => Eff.None<TProjection>());
         }
     }
+
 }

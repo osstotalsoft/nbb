@@ -8,19 +8,10 @@ namespace NBB.ProjectR
     {
         public static IServiceCollection AddProjectR(this IServiceCollection services, params Assembly[] assemblies)
         {
-            services.Scan(scan => scan
-                .FromAssemblies(assemblies)
-                .AddClasses(classes => classes.AssignableTo(typeof(IProjector<>)))
-                .AsImplementedInterfaces()
-                .WithSingletonLifetime());
-
-
             var metadata = ProjectorMetadataService.ScanProjectorsMetadata(assemblies);
             foreach (var (projectorType, projectionType, eventTypes, snapshotFrequency) in metadata)
             {
                 services.AddSingleton(typeof(IProjector<>).MakeGenericType(projectionType), projectorType);
-                services.AddScoped(typeof(IProjectionStore<>).MakeGenericType(projectionType),
-                    typeof(ProjectionStore<>).MakeGenericType(projectionType));
 
                 foreach (var eventType in eventTypes)
                 {
@@ -32,9 +23,10 @@ namespace NBB.ProjectR
 
 
             }
+            
+            services.AddScoped(typeof(IProjectionStore<>), typeof(ProjectionStore<>));
 
             services.AddSingleton(typeof(ProjectorMetadataAccessor), _ => new ProjectorMetadataAccessor(metadata));
-            services.AddScoped(typeof(ProjectMessage.Handler<>));
 
             return services;
         }
