@@ -8,7 +8,8 @@ namespace NBB.ProjectR
     public interface IProjector<TProjection> : IProjector
     {
         (TProjection Projection, Effect<Unit> Effect) Project(IMessage<TProjection> message, TProjection projection);
-        Effect<Unit> Subscribe(object @event);
+        IMessage<TProjection> Subscribe(object @event);
+        object Identify(IMessage<TProjection> message);
     }
 
     public interface IProjector<TProjection, T1> : IProjector<TProjection> { }

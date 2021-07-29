@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,42 +21,71 @@ namespace NBB.ProjectR.Tests
         record ContractCreated(Guid ContractId, decimal Value) : INotification;
 
         record ContractValidated(Guid ContractId, Guid UserId) : INotification;
+        record ContractSigned(Guid ContractId, Guid SignerId) : INotification;
 
 
 
         public class ContractProjection
         {
-            public record Projection(Guid ContractId, bool IsValidated, Guid? ValidatedByUserId, string ValidatedByUsername);
+            public record Projection(Guid ContractId, decimal Value, bool IsValidated = false, Guid? ValidatedByUserId = null, string ValidatedByUsername = null, bool IsSigned = false);
 
+            //Messages
             record CreateContract(Guid ContractId, decimal Value) : IMessage<Projection>;
-            record ValidateContract(Guid UserId) : IMessage<Projection>;
-            record SetUserName(string Username) : IMessage<Projection>;
 
+            record ValidateContract(Guid ContractId, Guid UserId) : IMessage<Projection>;
+
+            record SignContract(Guid ContractId, Guid SignerId) : IMessage<Projection>;
+
+            record SetUserName(Guid ContractId, string Username) : IMessage<Projection>;
+
+            
+
+            //Events
+            public record ContractProjectionCreated(Guid ContractId, decimal Value) : INotification;
+            public record ContractProjectionValidated(Guid ContractId, Guid? UserId, string Username) : INotification;
+
+            
+            //private static readonly Effect<IMessage<Projection>> Nothing = Effect.Pure<IMessage<Projection>>(null);
+            
 
             [SnapshotFrequency(2)]
             class Projector
-                : IProjector<Projection, ContractCreated, ContractValidated>
+                : IProjector<Projection, ContractCreated, ContractValidated, ContractSigned>
             {
-                public (Projection, Effect<Unit>) Project(IMessage<Projection> message, Projection projection) => (message, projection) switch
-                {
-                    (CreateContract msg, null) => (new(msg.ContractId, false, null, null), Cmd.None),
-                    (ValidateContract msg, { IsValidated: false }) => (projection with { IsValidated = true, ValidatedByUserId = msg.UserId }, LoadUserName(projection.ContractId, msg.UserId)),
-                    (SetUserName msg, not null) => (projection with { ValidatedByUsername = msg.Username }, Cmd.None),
-                    _ => (projection, Cmd.None)
-                };
+                public (Projection, Effect<Unit>) Project(IMessage<Projection> message, Projection projection) =>
+                    (message, projection) switch
+                    {
+                        (CreateContract msg, null) => (
+                            new(msg.ContractId, msg.Value),
+                            MessageBus.Publish(new ContractProjectionCreated(msg.ContractId, msg.Value))),
 
-                public Effect<Unit> Subscribe(object @event) => @event switch
-                {
-                    ContractCreated ev => Cmd.Project(ev.ContractId, new CreateContract(ev.ContractId, ev.Value)),
-                    ContractValidated ev => Cmd.Project(ev.ContractId, new ValidateContract(ev.UserId)),
-                    _ => Cmd.None
-                };
+                        (ValidateContract msg, { IsValidated: false }) => (
+                            projection with { IsValidated = true, ValidatedByUserId = msg.UserId },
+                            LoadUserName(msg.ContractId, msg.UserId)),
 
+                        (SetUserName msg, not null) => (
+                            projection with { ValidatedByUsername = msg.Username },
+                            MessageBus.Publish(new ContractProjectionValidated(projection.ContractId, projection.ValidatedByUserId, msg.Username))),
+
+                        (SignContract, not null) => (projection with { IsSigned = true }, Cmd.None),
+
+                        _ => (projection, Cmd.None)
+                    };
+
+                public IMessage<Projection> Subscribe(object @event) => @event switch
+                {
+                    ContractCreated ev => new CreateContract(ev.ContractId, ev.Value),
+                    ContractValidated ev => new ValidateContract(ev.ContractId, ev.UserId),
+                    ContractSigned ev => new SignContract(ev.ContractId, ev.SignerId),
+                    _ => null
+                };
+                
+                public object Identify(IMessage<Projection> message)
+                    => (message as dynamic).ContractId;
 
 
                 private Effect<Unit> LoadUserName(Guid contractId, Guid userId) =>
-                    Mediator.Send(new LoadUserById.Query(userId)).Then(x =>
-                        Cmd.Project(contractId, new SetUserName(x.UserName)));
+                    Mediator.Send(new LoadUserById.Query(userId)).Then(x => Cmd.Project(new SetUserName(contractId, x.UserName)));
             }
 
             public class LoadUserById
@@ -103,7 +133,7 @@ namespace NBB.ProjectR.Tests
             //Act
             await mediator.Publish(new ContractCreated(contractId, 100));
             await mediator.Publish(new ContractValidated(contractId, userId));
-            var (projection, loadedAtVersion) = await projectionStore.Load(contractId, CancellationToken.None);
+            var (projection, _) = await projectionStore.Load(contractId, CancellationToken.None);
 
 
 

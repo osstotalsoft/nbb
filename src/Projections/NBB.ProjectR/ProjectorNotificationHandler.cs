@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using NBB.Core.Effects;
-using Unit = NBB.Core.Effects.Unit;
 
 namespace NBB.ProjectR
 {
@@ -24,7 +23,12 @@ namespace NBB.ProjectR
 
         public async Task Handle(TEvent ev, CancellationToken cancellationToken)
         {
-            await _effectInterpreter.Interpret(_projector.Subscribe(ev), cancellationToken);
+            var message = _projector.Subscribe(ev);
+            if (message is null)
+                return;
+
+            var effect = Cmd.Project(message);
+            await _effectInterpreter.Interpret(effect, cancellationToken);
         }
     }
 }
