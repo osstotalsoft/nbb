@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -32,11 +33,11 @@ namespace NBB.ProjectR.Tests
             //Messages
             record CreateContract(Guid ContractId, decimal Value) : IMessage<Model>;
 
-            record ValidateContract(Guid ContractId, Guid UserId) : IMessage<Model>;
+            record ValidateContract(Guid UserId) : IMessage<Model>;
 
-            record SignContract(Guid ContractId, Guid SignerId) : IMessage<Model>;
+            record SignContract(Guid SignerId) : IMessage<Model>;
 
-            record SetUserName(Guid ContractId, string Username) : IMessage<Model>;
+            record SetUserName(string Username) : IMessage<Model>;
 
 
             //Events
@@ -47,7 +48,7 @@ namespace NBB.ProjectR.Tests
 
             [SnapshotFrequency(2)]
             class Projector
-                : IProjector<Model, ContractCreated, ContractValidated, ContractSigned>
+                : IProjector<Model>
             {
                 public (Model Model, Effect<IMessage<Model>> Effect) Project(IMessage<Model> message, Model model)
                     => (message, model) switch
@@ -59,7 +60,7 @@ namespace NBB.ProjectR.Tests
                         (ValidateContract msg, {IsValidated: false}) => (
                             model with { IsValidated = true, ValidatedByUserId = msg.UserId },
                             Mediator.Send(new LoadUserById.Query(msg.UserId), x =>
-                                new SetUserName(msg.ContractId, x.UserName))),
+                                new SetUserName(x.UserName))),
 
                         (SetUserName msg, not null) => (
                             model with { ValidatedByUsername = msg.Username },
@@ -71,13 +72,23 @@ namespace NBB.ProjectR.Tests
                         _ => (model, _none)
                     };
 
-                public (object, IMessage<Model>) Subscribe(object @event) => @event switch
+                public (object Identity, IMessage<Model> Message) Subscribe(object @event) => @event switch
                 {
                     ContractCreated ev => (ev.ContractId, new CreateContract(ev.ContractId, ev.Value)),
-                    ContractValidated ev => (ev.ContractId, new ValidateContract(ev.ContractId, ev.UserId)),
-                    ContractSigned ev => (ev.ContractId, new SignContract(ev.ContractId, ev.SignerId)),
+                    ContractValidated ev => (ev.ContractId, new ValidateContract(ev.UserId)),
+                    ContractSigned ev => (ev.ContractId, new SignContract(ev.SignerId)),
                     _ => (default, default)
                 };
+
+                public IEnumerable<ISubscription<IMessage<Model>>> Subscribe()
+                {
+                    yield return (this as IProjector<Model>).AddSubscription<ContractCreated>(ev =>
+                        (ev.ContractId, new CreateContract(ev.ContractId, ev.Value)));
+                    yield return MessageBus.Subscribe<ContractValidated, Model>(ev =>
+                        (ev.ContractId, new ValidateContract(ev.UserId)));
+                    yield return MessageBus.Subscribe<ContractSigned, Model>(ev =>
+                        (ev.ContractId, new SignContract(ev.SignerId)));
+                }
 
                 private readonly Effect<IMessage<Model>> _none = null;
             }

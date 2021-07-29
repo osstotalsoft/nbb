@@ -25,6 +25,7 @@ namespace NBB.ProjectR
 
         public async Task Handle(TEvent ev, CancellationToken cancellationToken)
         {
+            var subs = _projector.Subscribe()
             var (projectionId, message)  = _projector.Subscribe(ev);
             while (message is not null)
             {

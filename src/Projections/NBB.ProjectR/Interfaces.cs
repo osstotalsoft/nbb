@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Effects;
+using NBB.EventStore.Abstractions;
 
 namespace NBB.ProjectR
 {
@@ -9,7 +11,11 @@ namespace NBB.ProjectR
     public interface IProjector<TModel> : IProjector
     {
         (TModel Model, Effect<IMessage<TModel>> Effect) Project(IMessage<TModel> message, TModel model);
-        (object Identity, IMessage<TModel>) Subscribe(object @event);
+        IEnumerable<ISubscription<IMessage<TModel>>> Subscribe();
+        
+        public MessagingSubscription<TEvent, TModel> AddSubscription<TEvent>(
+            Func<TEvent, (object Identity, IMessage<TModel>)> handler)
+            => new(handler);
     }
 
     public interface IProjector<TModel, T1> : IProjector<TModel> { }
@@ -28,6 +34,27 @@ namespace NBB.ProjectR
     public interface IEvent<TModel>
     {
 
+    }
+
+    public interface ISubscription<out T>
+    {
+    }
+
+    public class MessagingSubscription<TEvent, TModel> : ISubscription<IMessage<TModel>>
+    {
+        private readonly Func<TEvent, (object Identity, IMessage<TModel>)> _handler;
+
+        public MessagingSubscription(Func<TEvent, (object Identity, IMessage<TModel>)> handler)
+        {
+            this._handler = handler;
+        }
+    }
+
+    public static class MessageBusExt
+    {
+        public static MessagingSubscription<TEvent, TModel> Subscribe<TEvent, TModel>(
+            Func<TEvent, (object Identity, IMessage<TModel>)> handler)
+            => new(handler);
     }
 
     public interface IProjectionStore<TModel>

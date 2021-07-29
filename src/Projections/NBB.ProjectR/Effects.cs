@@ -13,6 +13,10 @@ namespace NBB.ProjectR
     {
         public static Effect<IMessage<TProjection>> PublishEvent<TProjection>(IEvent<TProjection> ev)
             => Messaging.Effects.MessageBus.Publish(ev).Then(Eff.None<TProjection>());
+        
+        public static MessagingSubscription<TEvent, TModel> Subscribe<TEvent, TModel>(
+            Func<TEvent, (object Identity, IMessage<TModel>)> handler)
+            => new(handler);
     }
 
     public static class Mediator
