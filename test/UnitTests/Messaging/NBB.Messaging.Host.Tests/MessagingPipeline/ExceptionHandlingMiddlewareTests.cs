@@ -2,12 +2,11 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.MessagingPipeline;
 using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace NBB.Messaging.Host.Tests.Pipeline
+namespace NBB.Messaging.Host.Tests.MessagingPipeline
 {
     public class ExceptionHandlingMiddlewareTests
     {
@@ -68,10 +67,10 @@ namespace NBB.Messaging.Host.Tests.Pipeline
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
 
-            Task next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
+            Task Next() { isNextMiddlewareCalled = true; return Task.CompletedTask; }
 
             //Act
-            await executionTimeMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, next);
+            await executionTimeMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
 
             //Assert
             isNextMiddlewareCalled.Should().BeTrue();

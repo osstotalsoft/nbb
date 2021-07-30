@@ -1,16 +1,10 @@
 ﻿open System
 open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.Configuration
-open System.Reflection
-open System.IO
 open Microsoft.Extensions.DependencyInjection
 open NBB.Invoices.FSharp.Application
 open NBB.Core.Effects
-open NBB.Messaging.Abstractions
 open NBB.Messaging.Host
-open NBB.Messaging.Nats
 open Microsoft.Extensions.Logging
-open NBB.Messaging.Host.MessagingPipeline
 open NBB.Invoices.FSharp.Data
 open NBB.Application.Mediator.FSharp
 

@@ -1,5 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-using NBB.Application.MediatR.Effects;
+﻿using NBB.Application.MediatR.Effects;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection

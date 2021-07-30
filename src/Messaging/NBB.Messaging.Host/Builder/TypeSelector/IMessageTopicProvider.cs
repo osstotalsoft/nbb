@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
-namespace NBB.Messaging.Host.Builder.TypeSelector
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public interface IMessageTopicProvider
     {

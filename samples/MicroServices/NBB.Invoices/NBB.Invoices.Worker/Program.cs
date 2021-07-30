@@ -8,21 +8,15 @@ using NBB.Core.Abstractions;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Domain.Abstractions;
-using NBB.EventStore;
 using NBB.EventStore.Abstractions;
-using NBB.EventStore.AdoNet;
 using NBB.Invoices.Application.CommandHandlers;
 using NBB.Invoices.Data;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Nats;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 using System.Threading;
 using System.Threading.Tasks;
-using NBB.Messaging.Abstractions;
 
 namespace NBB.Invoices.Worker
 {

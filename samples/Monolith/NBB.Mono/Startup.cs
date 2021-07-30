@@ -18,8 +18,6 @@ using NBB.Payments.Data;
 using NBB.Domain;
 using NBB.Messaging.Host;
 using Microsoft.Extensions.Hosting;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Host.Builder;
 using System.Linq;
 using MicroServicesOrchestration;
 using NBB.Core.DependencyInjection;

@@ -8,13 +8,11 @@ using System.Threading.Tasks;
 using Serilog.Sinks.MSSqlServer;
 using NBB.Correlation.Serilog;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
 using System.Reflection;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Contracts.Worker
+namespace NBB.MicroServicesOrchestration
 {
     public class Program
     {

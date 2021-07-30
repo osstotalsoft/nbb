@@ -4,8 +4,6 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.MessagingPipeline;
-using Polly;
 using Xunit;
 
 namespace NBB.Messaging.Host.Tests.MessagingPipeline
@@ -16,8 +14,6 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         public async void Should_callNextPipelineMiddleware()
         {
             //Arrange
-            var dummyPolicy = Policy.Handle<Exception>().RetryAsync(0);
-
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(
                 Mock.Of<ILogger<DefaultResiliencyMiddleware>>());
 
@@ -39,7 +35,6 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         public void Should_throwGenericException()
         {
             //Arrange
-            var dummyPolicy = Policy.Handle<ArgumentException>().RetryAsync(0);
             var mockedLogger = Mock.Of<ILogger<DefaultResiliencyMiddleware>>();
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(
                 mockedLogger);
@@ -63,7 +58,6 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         public void Should_throwPolicyException()
         {
             //Arrange
-            var dummyPolicy = Policy.Handle<ApplicationException>().RetryAsync(1);
             var mockedLogger = Mock.Of<ILogger<DefaultResiliencyMiddleware>>();
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(
                 mockedLogger);

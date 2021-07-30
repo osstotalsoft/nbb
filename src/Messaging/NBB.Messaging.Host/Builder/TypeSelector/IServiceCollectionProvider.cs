@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Messaging.Host.Builder.TypeSelector
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public interface IServiceCollectionProvider
     {

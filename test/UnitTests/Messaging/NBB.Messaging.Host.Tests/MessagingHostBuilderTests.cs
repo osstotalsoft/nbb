@@ -1,11 +1,8 @@
 ﻿using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Moq;
-using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.Builder;
 using System;
 using System.Collections.Generic;
 using System.Threading;

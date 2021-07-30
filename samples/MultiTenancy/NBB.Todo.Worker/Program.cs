@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading;
@@ -9,8 +8,6 @@ using MediatR;
 using NBB.Todos.Data;
 using NBB.Todo.Worker.Application;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
 using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using Serilog.Events;

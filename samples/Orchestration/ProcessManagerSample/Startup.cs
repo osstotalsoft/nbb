@@ -4,8 +4,6 @@ using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
 using ProcessManagerSample.MessageMiddlewares;
 using ProcessManagerSample.Queries;
 using System.Reflection;

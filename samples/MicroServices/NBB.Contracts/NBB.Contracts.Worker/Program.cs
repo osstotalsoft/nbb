@@ -8,12 +8,10 @@ using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.MessagingPipeline;
 using Serilog;
 using Serilog.Events;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Messaging.Host.Builder;
 using Serilog.Sinks.MSSqlServer;
 
 namespace NBB.Contracts.Worker
