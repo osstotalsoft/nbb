@@ -1,14 +1,17 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using NBB.EventStore;
 using NBB.EventStore.Abstractions;
 using NBB.EventStore.Infrastructure;
 using NBB.EventStore.Internal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using AbstractionsEventStoreOptions = NBB.EventStore.Abstractions.EventStoreOptions;
+using InfrastructureEventStoreOptions = NBB.EventStore.Infrastructure.EventStoreOptions;
 
-namespace NBB.EventStore
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
@@ -17,9 +20,9 @@ namespace NBB.EventStore
             services.AddSingleton<IEventStore, EventStore>();
             services.AddSingleton<ISnapshotStore, SnapshotStore>();
 
-            services.AddSingleton<IConfigureOptions<Abstractions.EventStoreOptions>, ConfigureEventStoreOptions>();
+            services.AddSingleton<IConfigureOptions<AbstractionsEventStoreOptions>, ConfigureEventStoreOptions>();
 
-            services.Add(new ServiceDescriptor(typeof(Infrastructure.EventStoreOptions),
+            services.Add(new ServiceDescriptor(typeof(InfrastructureEventStoreOptions),
                 serviceProvider =>
                 {
                     var builder = new EventStoreOptionsBuilder();
@@ -40,7 +43,7 @@ namespace NBB.EventStore
         }
     }
 
-    internal class ConfigureEventStoreOptions : IConfigureOptions<Abstractions.EventStoreOptions>
+    internal class ConfigureEventStoreOptions : IConfigureOptions<AbstractionsEventStoreOptions>
     {
         private readonly IConfiguration _configuration;
 
@@ -49,7 +52,7 @@ namespace NBB.EventStore
             _configuration = configuration;
         }
 
-        public void Configure(Abstractions.EventStoreOptions options) =>
+        public void Configure(AbstractionsEventStoreOptions options) =>
             _configuration.GetSection("EventStore").GetSection("NBB").Bind(options);
     }
 }

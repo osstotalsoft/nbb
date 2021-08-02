@@ -2,7 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Messaging.Host.Builder
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public interface IMessagingHostBuilder
     {

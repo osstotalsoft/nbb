@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Abstractions;
 using NBB.Data.Abstractions;
+using NBB.Data.EntityFramework;
 using NBB.Data.EntityFramework.Internal;
 
-namespace NBB.Data.EntityFramework
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Messaging.Host.Builder.TypeSelector
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public class TypeSourceSelector : ITypeSourceSelector, IMessageTypeProvider, IMessageTopicProvider, IServiceCollectionProvider
     {

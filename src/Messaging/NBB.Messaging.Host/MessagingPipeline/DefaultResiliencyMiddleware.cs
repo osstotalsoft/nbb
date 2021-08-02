@@ -8,7 +8,8 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBB.Messaging.Host.MessagingPipeline
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// A pipeline middleware that offers resiliency policies for "out of order" and concurrency exceptions.

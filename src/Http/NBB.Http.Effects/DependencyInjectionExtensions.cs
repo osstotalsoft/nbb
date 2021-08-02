@@ -1,8 +1,9 @@
 ﻿using System.Net.Http;
-using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Effects;
+using NBB.Http.Effects;
 
-namespace NBB.Http.Effects
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

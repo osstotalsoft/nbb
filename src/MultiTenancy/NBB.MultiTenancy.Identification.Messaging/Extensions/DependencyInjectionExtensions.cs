@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.Messaging.MultiTenancy;
-using NBB.MultiTenancy.Identification.Extensions;
+﻿using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Identification.Identifiers;
+using NBB.MultiTenancy.Identification.Messaging;
 
-namespace NBB.MultiTenancy.Identification.Messaging.Extensions
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

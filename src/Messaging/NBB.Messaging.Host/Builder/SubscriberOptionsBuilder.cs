@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace NBB.Messaging.Host.Builder
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Used to configure subscriber options

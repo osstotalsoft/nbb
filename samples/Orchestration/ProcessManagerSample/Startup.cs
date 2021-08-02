@@ -3,17 +3,10 @@ using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NBB.EventStore;
-using NBB.EventStore.AdoNet;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.InProcessMessaging.Extensions;
-using NBB.ProcessManager.Runtime;
 using ProcessManagerSample.MessageMiddlewares;
 using ProcessManagerSample.Queries;
 using System.Reflection;
-using NBB.Messaging.Abstractions;
 
 namespace ProcessManagerSample
 {

@@ -7,7 +7,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBB.Messaging.Host.MessagingPipeline
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// A messaging pipeline middleware that logs and swallows all exceptions.

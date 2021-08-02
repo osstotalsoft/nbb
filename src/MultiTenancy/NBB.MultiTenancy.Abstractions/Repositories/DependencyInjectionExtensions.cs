@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using NBB.MultiTenancy.Abstractions.Repositories;
 
-namespace NBB.MultiTenancy.Abstractions.Repositories
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.Messaging.Host.Builder.TypeSelector;
 using System;
 using System.Linq;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using System.Collections.Generic;
 
-namespace NBB.Messaging.Host.Builder
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public class MessagingHostConfigurationBuilder : IMessagingHostConfigurationBuilder, IMessagingHostOptionsBuilder,
         IMessagingHostPipelineBuilder

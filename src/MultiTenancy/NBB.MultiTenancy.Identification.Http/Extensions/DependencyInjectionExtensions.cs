@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.MultiTenancy.Identification.Identifiers;
-using NBB.MultiTenancy.Identification.Extensions;
+﻿using NBB.MultiTenancy.Identification.Identifiers;
+using NBB.MultiTenancy.Identification.Http;
 
-
-namespace NBB.MultiTenancy.Identification.Http.Extensions
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

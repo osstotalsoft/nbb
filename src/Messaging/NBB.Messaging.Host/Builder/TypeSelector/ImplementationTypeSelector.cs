@@ -4,7 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace NBB.Messaging.Host.Builder.TypeSelector
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public class ImplementationTypeSelector : IImplementationTypeSelector, IMessageTypeProvider
     {

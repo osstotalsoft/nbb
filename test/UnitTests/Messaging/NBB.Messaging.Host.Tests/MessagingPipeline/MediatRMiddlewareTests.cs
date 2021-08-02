@@ -4,7 +4,6 @@ using FluentAssertions;
 using MediatR;
 using Moq;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.MessagingPipeline;
 using Xunit;
 
 namespace NBB.Messaging.Host.Tests.MessagingPipeline

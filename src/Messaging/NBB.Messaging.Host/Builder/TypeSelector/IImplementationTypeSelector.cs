@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace NBB.Messaging.Host.Builder.TypeSelector
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Adds implementation classes (non-abstract) from the current message type source

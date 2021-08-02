@@ -4,7 +4,8 @@ using NBB.Core.Effects;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 
-namespace NBB.Messaging.Host.MessagingPipeline
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     public static class MessagingPipelineExtensions
     {

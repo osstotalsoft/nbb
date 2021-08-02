@@ -1,19 +1,16 @@
 ﻿using MediatR;
-using Microsoft.Extensions.DependencyInjection;
-using NBB.Application.MediatR.Effects;
 using NBB.Core.Effects;
-using NBB.Http.Effects;
-using NBB.Messaging.Effects;
-using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.SideEffects;
 using NBB.ProcessManager.Runtime.Persistence;
 using NBB.ProcessManager.Runtime.SideEffectHandlers;
 using NBB.ProcessManager.Runtime.Timeouts;
 using System;
 using System.Reflection;
+using NBB.ProcessManager.Runtime;
 using Unit = NBB.Core.Effects.Unit;
 
-namespace NBB.ProcessManager.Runtime
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

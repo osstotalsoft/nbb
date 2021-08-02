@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.Builder;
 using NBB.Messaging.Host.Internal;
 
 namespace NBB.Messaging.Host

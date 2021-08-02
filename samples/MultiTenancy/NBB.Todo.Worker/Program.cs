@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using MediatR;
 using NBB.Todos.Data;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.Nats;
 using NBB.Todo.Worker.Application;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Repositories;
-using NBB.MultiTenancy.Identification.Messaging.Extensions;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
 

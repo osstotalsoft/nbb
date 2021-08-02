@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace NBB.Messaging.Host.Builder.TypeSelector
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Scans assemblies for message types

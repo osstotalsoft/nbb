@@ -7,16 +7,11 @@ using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
-using NBB.EventStore;
-using NBB.EventStore.AdoNet;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Nats;
 using Serilog;
 using Serilog.Events;
 using System.Threading.Tasks;
-using NBB.Messaging.Host.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.MSSqlServer;
 
 namespace NBB.Contracts.Worker

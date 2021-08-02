@@ -1,11 +1,10 @@
 ﻿using Moq;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.MessagingPipeline;
 using System;
 using Xunit;
 
-namespace NBB.Messaging.Host.Tests.Pipeline
+namespace NBB.Messaging.Host.Tests.MessagingPipeline
 {
     public class MessagingPipelineExtensionsTests
     {
