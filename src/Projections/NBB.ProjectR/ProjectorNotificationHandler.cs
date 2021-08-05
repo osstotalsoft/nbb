@@ -6,16 +6,14 @@ using NBB.Core.Effects;
 
 namespace NBB.ProjectR
 {
-
-    class ProjectorNotificationHandler<TEvent, TProjection> : INotificationHandler<TEvent>
-        where TProjection : IEquatable<TProjection>
+    class ProjectorNotificationHandler<TEvent, TModel, TMessage, TIdentity> : INotificationHandler<TEvent>
         where TEvent : INotification
     {
-        private readonly IProjector<TProjection> _projector;
-        private readonly IProjectionStore<TProjection> _projectionStore;
+        private readonly IProjector<TModel, TMessage, TIdentity> _projector;
+        private readonly IProjectionStore<TModel, TMessage, TIdentity> _projectionStore;
         private readonly IInterpreter _effectInterpreter;
 
-        public ProjectorNotificationHandler(IProjector<TProjection> projector, IInterpreter effectInterpreter, IProjectionStore<TProjection> projectionStore)
+        public ProjectorNotificationHandler(IProjector<TModel, TMessage, TIdentity> projector, IInterpreter effectInterpreter, IProjectionStore<TModel, TMessage, TIdentity> projectionStore)
         {
             _projector = projector;
             _effectInterpreter = effectInterpreter;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using NBB.Core.Effects;
 
 namespace NBB.ProjectR
 {
@@ -21,7 +20,7 @@ namespace NBB.ProjectR
 
     
 
-    public record ProjectorMetadata(Type ProjectorType, Type ProjectionType, Type[] EventTypes, int SnapshotFrequency);
+    public record ProjectorMetadata(Type ProjectorType, Type ModelType, Type MessageType, Type IdentityType, Type[] SubscriptionTypes, int SnapshotFrequency);
 
     public class ProjectorMetadataAccessor
     {
@@ -32,8 +31,8 @@ namespace NBB.ProjectR
             this._metadata = metadata;
         }
 
-        public ProjectorMetadata GetMetadataFor<TProjection>()
-            => this._metadata.FirstOrDefault(m => m.ProjectionType == typeof(TProjection));
+        public ProjectorMetadata GetMetadataFor<TModel>()
+            => _metadata.FirstOrDefault(m => m.ModelType == typeof(TModel));
     }
 
     public static class ProjectorMetadataService
@@ -44,9 +43,9 @@ namespace NBB.ProjectR
                 .SelectMany(a => a.GetTypes())
                 .SelectMany(projectorType =>
                     projectorType.GetInterfaces()
-                        .Where(i => i.IsGenericType && typeof(IProjector).IsAssignableFrom(i) && i.GenericTypeArguments.Length > 1)
-                        .Select(i => i.GetGenericArguments().First())
-                        .Select(projectionType => new ProjectorMetadata(projectorType, projectionType, GetSubscriptionTypes(projectorType), GetSnapshotFrequency(projectorType))))
+                        .Where(i => i.IsGenericType && typeof(IProjector).IsAssignableFrom(i))
+                        .Select(i => i.GetGenericArguments()).Select(args => (ModelType: args[0], MessageType: args[1], IdentityType:args[2]))
+                        .Select(x => new ProjectorMetadata(projectorType, x.ModelType, x.MessageType, x.IdentityType, GetSubscriptionTypes(projectorType), GetSnapshotFrequency(projectorType))))
                 .ToArray();
 
         private static Type[] GetSubscriptionTypes(Type projectorType)
@@ -54,8 +53,8 @@ namespace NBB.ProjectR
 
             var types =
                 projectorType.GetInterfaces()
-                    .Where(i => i.IsGenericType && typeof(IProjector).IsAssignableFrom(i) && i.GenericTypeArguments.Length > 1)
-                    .SelectMany(i => i.GetGenericArguments().Skip(1))
+                    .Where(i => i.IsGenericType && typeof(ISubscribeTo).IsAssignableFrom(i))
+                    .SelectMany(i => i.GetGenericArguments())
                     .Distinct()
                     .ToArray();
 

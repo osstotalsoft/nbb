@@ -19,6 +19,7 @@ namespace NBB.ProjectR.Tests
         record ContractCreated(Guid ContractId, decimal Value) : INotification;
 
         record ContractValidated(Guid ContractId, Guid UserId) : INotification;
+
         record ContractSigned(Guid ContractId, Guid SignerId) : INotification;
 
 
@@ -30,48 +31,52 @@ namespace NBB.ProjectR.Tests
 
 
             //Messages
-            record CreateContract(Guid ContractId, decimal Value) : IMessage<Model>;
+            public interface IMessage { }
 
-            record ValidateContract(Guid ContractId, Guid UserId) : IMessage<Model>;
+            record CreateContract(Guid ContractId, decimal Value) : IMessage;
 
-            record SignContract(Guid ContractId, Guid SignerId) : IMessage<Model>;
+            record ValidateContract(Guid ContractId, Guid UserId) : IMessage;
 
-            record SetUserName(Guid ContractId, string Username) : IMessage<Model>;
+            record SignContract(Guid ContractId, Guid SignerId) : IMessage;
+
+            record SetUserName(Guid ContractId, string Username) : IMessage;
 
 
             //Events
-            public record ContractProjectionCreated(Guid ContractId, decimal Value) : IEvent<Model>;
+            public record ContractProjectionCreated(Guid ContractId, decimal Value);
 
-            public record ContractProjectionValidated(Guid ContractId, Guid? UserId, string Username) : IEvent<Model>;
+            public record ContractProjectionValidated(Guid ContractId, Guid? UserId, string Username);
 
 
             [SnapshotFrequency(2)]
-            class Projector
-                : IProjector<Model, ContractCreated, ContractValidated, ContractSigned>
+            class Projector: 
+                IProjector<Model, IMessage, Guid>,
+                ISubscribeTo<ContractCreated, ContractValidated, ContractSigned>
             {
-                public (Model Model, Effect<IMessage<Model>> Effect) Project(IMessage<Model> message, Model model)
+                public (Model Model, Effect<IMessage> Effect) Project(IMessage message, Model model)
                     => (message, model) switch
                     {
                         (CreateContract msg, null) => (
                             new(msg.ContractId, msg.Value),
-                            MessageBus.PublishEvent(new ContractProjectionCreated(msg.ContractId, msg.Value))),
+                            MessageBus.Publish(new ContractProjectionCreated(msg.ContractId, msg.Value))
+                                .Then(_ => Eff.None<IMessage>())),
 
-                        (ValidateContract msg, {IsValidated: false}) => (
+                        (ValidateContract msg, { IsValidated: false }) => (
                             model with { IsValidated = true, ValidatedByUserId = msg.UserId },
-                            Mediator.Send(new LoadUserById.Query(msg.UserId), x =>
-                                new SetUserName(msg.ContractId, x.UserName))),
+                            Mediator.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
+                                (IMessage)new SetUserName(msg.ContractId, x.UserName))),
 
                         (SetUserName msg, not null) => (
                             model with { ValidatedByUsername = msg.Username },
-                            MessageBus.PublishEvent(new ContractProjectionValidated(model.ContractId,
-                                model.ValidatedByUserId, msg.Username))),
+                            MessageBus.Publish(new ContractProjectionValidated(model.ContractId, model.ValidatedByUserId, msg.Username))
+                                .Then(_ => Eff.None<IMessage>())),
 
-                        (SignContract, not null) => (model with { IsSigned = true }, _none),
+                        (SignContract, not null) => (model with { IsSigned = true }, Eff.None<IMessage>()),
 
-                        _ => (model, _none)
+                        _ => (model, Eff.None<IMessage>())
                     };
 
-                public (object, IMessage<Model>) Subscribe(object @event) => @event switch
+                public (Guid Identity, IMessage Message) Subscribe(INotification @event) => @event switch
                 {
                     ContractCreated ev => (ev.ContractId, new CreateContract(ev.ContractId, ev.Value)),
                     ContractValidated ev => (ev.ContractId, new ValidateContract(ev.ContractId, ev.UserId)),
@@ -79,7 +84,6 @@ namespace NBB.ProjectR.Tests
                     _ => (default, default)
                 };
 
-                private readonly Effect<IMessage<Model>> _none = null;
             }
         }
 
@@ -113,7 +117,7 @@ namespace NBB.ProjectR.Tests
             using var scope = container.CreateScope();
             var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
             var projectionStore = scope.ServiceProvider
-                .GetRequiredService<IProjectionStore<ContractProjection.Model>>();
+                .GetRequiredService<IProjectionStore<ContractProjection.Model, ContractProjection.IMessage, Guid>>();
 
             var contractId = Guid.NewGuid();
             var userId = Guid.NewGuid();
