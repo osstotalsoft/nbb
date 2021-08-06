@@ -6,8 +6,9 @@ using NBB.EventStore.Abstractions;
 
 namespace NBB.ProjectR
 {
-    class ProjectionStore<TModel, TMessage, TIdentity> : IProjectionStore<TModel, TMessage, TIdentity> 
-        where TModel : class
+    class ProjectionStore<TModel, TMessage, TIdentity>: 
+        IProjectionStore<TModel, TMessage, TIdentity>,
+        IReadModelStore<TModel>
     {
         private readonly IEventStore _eventStore;
         private readonly ISnapshotStore _snapshotStore;
@@ -27,13 +28,19 @@ namespace NBB.ProjectR
             var stream = GetStreamFrom(id);
             var snapshotEnvelope = await _snapshotStore.LoadSnapshotAsync(stream, cancellationToken);
             var events = await _eventStore.GetEventsFromStreamAsync(stream, snapshotEnvelope?.AggregateVersion + 1, cancellationToken);
-            var projection = snapshotEnvelope?.Snapshot as TModel;
+            var projection = (TModel)snapshotEnvelope?.Snapshot;
             foreach (var @event in events.Cast<TMessage>())
             {
                 (projection, _) = _projector.Project(@event, projection);
             }
 
             return (projection, events.Count);
+        }
+
+        public async Task<TModel> Load(object id, CancellationToken cancellationToken)
+        {
+            var (model, _) = await Load((TIdentity) id, cancellationToken);
+            return model;
         }
 
         public async Task Save(TMessage message, TIdentity id, int expectedVersion, TModel projection, CancellationToken cancellationToken)

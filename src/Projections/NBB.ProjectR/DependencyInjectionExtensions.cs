@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
+using NBB.ProjectR;
 
-namespace NBB.ProjectR
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
@@ -20,6 +21,8 @@ namespace NBB.ProjectR
                         typeof(ProjectorNotificationHandler<,,,>).MakeGenericType(eventType, m.ModelType, m.MessageType, m.IdentityType);
                     services.AddScoped(serviceType, implementationType);
                 }
+                
+                services.AddScoped(typeof(IReadModelStore<>).MakeGenericType(m.ModelType), typeof(ProjectionStore<,,>).MakeGenericType(m.ModelType, m.MessageType, m.IdentityType));
             }
             
             services.AddScoped(typeof(IProjectionStore<,,>), typeof(ProjectionStore<,,>));
