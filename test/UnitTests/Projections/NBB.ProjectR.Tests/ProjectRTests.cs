@@ -59,17 +59,17 @@ namespace NBB.ProjectR.Tests
                         (CreateContract msg, null) => (
                             new(msg.ContractId, msg.Value),
                             MessageBus.Publish(new ContractProjectionCreated(msg.ContractId, msg.Value))
-                                .Then(_ => Eff.None<IMessage>())),
+                                .Then(Eff.None<IMessage>())),
 
                         (ValidateContract msg, { IsValidated: false }) => (
                             model with { IsValidated = true, ValidatedByUserId = msg.UserId },
                             Mediator.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
-                                (IMessage)new SetUserName(msg.ContractId, x.UserName))),
+                                Eff.OfMsg<IMessage>(new SetUserName(msg.ContractId, x.UserName)))),
 
                         (SetUserName msg, not null) => (
                             model with { ValidatedByUsername = msg.Username },
                             MessageBus.Publish(new ContractProjectionValidated(model.ContractId, model.ValidatedByUserId, msg.Username))
-                                .Then(_ => Eff.None<IMessage>())),
+                                .Then(Eff.None<IMessage>())),
 
                         (SignContract, not null) => (model with { IsSigned = true }, Eff.None<IMessage>()),
 
