@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.Messaging.Abstractions;
+﻿using NBB.Messaging.Abstractions;
+using NBB.Messaging.MultiTenancy;
 
-namespace NBB.Messaging.MultiTenancy
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
         public static IServiceCollection AddMultiTenantMessaging(this IServiceCollection services)
         {
-            services.Decorate<ITopicRegistry, MultiTenancyTopicRegistryDecorator>();
             services.Decorate<IMessageBusPublisher, MultiTenancyMessageBusPublisherDecorator>();
 
             return services;

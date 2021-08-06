@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using NBB.Core.Effects;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
+using Newtonsoft.Json;
 
 namespace NBB.ProcessManager.Runtime
 {
@@ -148,7 +149,7 @@ namespace NBB.ProcessManager.Runtime
 
         public string GetStreamFor(object identity)
         {
-            return _definition.GetType().FullName + ":" + Data.GetType().FullName + ":" + identity;
+            return $"{_definition.GetType().FullName}:{Data.GetType().FullName}:{JsonConvert.SerializeObject(identity)}";
         }
 
         public string GetStream()

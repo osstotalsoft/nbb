@@ -6,7 +6,7 @@ namespace NBB.EventStore.IntegrationTests
 {
     public class EnvironmentFixture : IDisposable
     {
-        private const string EnvironmentKey = "NETCORE_ENVIRONMENT";
+        private const string EnvironmentKey = "DOTNET_ENVIRONMENT";
         private readonly string _initialEnvironment;
         public EnvironmentFixture()
         {

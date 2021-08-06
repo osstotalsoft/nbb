@@ -8,7 +8,7 @@ dotnet add package NBB.Core.Pipeline
 ```
 
 ## Philosophy
-A pipeline is a function of some context, composed from one or multiple middlewares.
+A pipeline is a function of some context, composed from one or multiple middleware.
 Each middleware receives the context and the next middleware, and is responsible of how and when to invoke the next middleware.
 
 ## Design pattern

@@ -7,7 +7,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBB.Messaging.Host.MessagingPipeline
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// A messaging pipeline middleware that logs and swallows all exceptions.
@@ -16,10 +17,12 @@ namespace NBB.Messaging.Host.MessagingPipeline
     public class ExceptionHandlingMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+        private readonly IMessageBusPublisher _messageBusPublisher;
 
-        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger, IMessageBusPublisher messageBusPublisher)
         {
             _logger = logger;
+            _messageBusPublisher = messageBusPublisher;
         }
 
         public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
@@ -36,11 +39,30 @@ namespace NBB.Messaging.Host.MessagingPipeline
                     context.MessagingEnvelope.Payload.GetType().GetPrettyName(),
                     stopWatch.ElapsedMilliseconds);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(
                     "Message of type {MessageType} could not be processed due to the following exception {Exception}.",
                     context.MessagingEnvelope.Payload.GetType().GetPrettyName(), ex);
+
+                await _messageBusPublisher.PublishAsync(new
+                {
+                    ErrorMessage = ex.Message,
+                    ex.StackTrace,
+                    ex.Source,
+                    Data = context.MessagingEnvelope,
+                    OriginalTopic = context.TopicName,
+                    OriginalSystem = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
+                    CorrelationId = context.MessagingEnvelope.GetCorrelationId(),
+                    MessageType = context.MessagingEnvelope.GetMessageTypeId(),
+                    PublishTime = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
+                                                                         ? DateTime.TryParse(value, out var publishTime)
+                                                                        ? publishTime
+                                                                        : default
+                                                                    : default,
+                    MessageId = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
+                },
+                    MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
             }
             finally
             {

@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using NBB.Messaging.Host.Builder.TypeSelector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NBB.Messaging.Host.Builder
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Extend the <seealso cref="NBB.Messaging.Host.Builder.TypeSelector.ITypeSourceSelector" />

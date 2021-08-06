@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "NBB.Tasks.Worker": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

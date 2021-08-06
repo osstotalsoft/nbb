@@ -178,7 +178,7 @@ namespace TheBenchmarks
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            var environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
+            var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
             var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
 
             if (isDevelopment)
@@ -202,7 +202,7 @@ namespace TheBenchmarks
 
         private class TenantContextAccessorMock : ITenantContextAccessor
         {
-            private readonly TenantContext _tenantContext = new TenantContext(new Tenant(Guid.NewGuid(), null, false));
+            private readonly TenantContext _tenantContext = new TenantContext(new Tenant(Guid.NewGuid(), null));
             public TenantContext TenantContext { get => _tenantContext; set => throw new NotImplementedException(); }
 
             public TenantContextFlow ChangeTenantContext(TenantContext context)

@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using NBB.Messaging.DataContracts;
 using Xunit;
 
 namespace NBB.Messaging.Abstractions.Tests

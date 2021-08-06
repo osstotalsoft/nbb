@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using NBB.EventStore;
+using NBB.EventStore.AdoNet.Multitenancy;
 using NBB.EventStore.AdoNet.Multitenancy.Internal;
 
-namespace NBB.EventStore.AdoNet.Multitenancy
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
@@ -9,7 +11,7 @@ namespace NBB.EventStore.AdoNet.Multitenancy
         {
             services.AddSingleton<IEventRepository, AdoNetMultiTenantEventRepository>();
             services.AddSingleton<ISnapshotRepository, AdoNetMultitenantSnapshotRepository>();
-            services.AddSingleton<AdoNet.Internal.Scripts, Scripts>();
+            services.AddSingleton<NBB.EventStore.AdoNet.Internal.Scripts, Scripts>();
 
             return services;
         }

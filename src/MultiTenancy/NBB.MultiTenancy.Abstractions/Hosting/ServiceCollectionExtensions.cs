@@ -1,34 +1,29 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 
-namespace NBB.MultiTenancy.Abstractions.Hosting
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        private const string MessagingSectionName = "MultiTenancy";
+        private const string MultitenancySectionName = "MultiTenancy";
 
-        public static void AddMultitenancy(this IServiceCollection services, IConfiguration configuration,
-            Action<TenancyHostingOptions> addTenantAwareServices)
+        public static IServiceCollection AddMultitenancy(this IServiceCollection services, IConfiguration configuration)
         {
-            var configurationSection = configuration.GetSection(MessagingSectionName);
+            var configurationSection = configuration.GetSection(MultitenancySectionName);
             var tenancyOptions = configurationSection.Get<TenancyHostingOptions>();
-            services.Configure<TenancyHostingOptions>(configurationSection);
 
-            if (tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None)
+            if (tenancyOptions == null)
             {
-                return;
+                throw new Exception($"Tenancy not configured. Add the '{MultitenancySectionName}' section to the application configuration.");
             }
 
-            services.AddSingleton<IHostedService, TenancyHostingValidator>();
             services.Configure<TenancyHostingOptions>(configurationSection);
-
             services.AddSingleton<ITenantContextAccessor, TenantContextAccessor>();
 
-            addTenantAwareServices(tenancyOptions);
+            return services;
         }
     }
 }

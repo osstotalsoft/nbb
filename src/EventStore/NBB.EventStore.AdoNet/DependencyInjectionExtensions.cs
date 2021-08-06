@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using NBB.EventStore;
 using NBB.EventStore.AdoNet.Internal;
+using NBB.EventStore.AdoNet;
 
-namespace NBB.EventStore.AdoNet
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using NBB.Core.Abstractions;
+using NBB.Messaging.DataContracts;
 
 namespace NBB.Messaging.Abstractions
 {

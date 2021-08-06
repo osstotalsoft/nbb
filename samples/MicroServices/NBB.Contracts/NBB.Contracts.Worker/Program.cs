@@ -7,47 +7,24 @@ using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
-using NBB.EventStore;
-using NBB.EventStore.AdoNet;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
-using NBB.Messaging.Host.MessagingPipeline;
-using NBB.Messaging.Nats;
 using Serilog;
 using Serilog.Events;
-using System.IO;
 using System.Threading.Tasks;
-using NBB.Contracts.Worker.MultiTenancy;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.MultiTenancy;
-using NBB.MultiTenancy.Abstractions.Hosting;
-using NBB.MultiTenancy.Abstractions.Repositories;
-using NBB.MultiTenancy.Identification.Messaging.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.MSSqlServer;
-using Microsoft.Extensions.Options;
-using NBB.MultiTenancy.Abstractions.Options;
 
 namespace NBB.Contracts.Worker
 {
     public class Program
     {
-        public static async Task Main(string[] _args)
+        public static async Task Main(string[] args)
         {
-            var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
-                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
-                {
-                    configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-                    configurationBuilder.AddJsonFile("appsettings.json", true);
-                    configurationBuilder.AddEnvironmentVariables();
-
-                    if (hostBuilderContext.HostingEnvironment.IsDevelopment())
-                    {
-                        configurationBuilder.AddUserSecrets<Program>();
-                    }
-                })
+            var builder = Host
+                .CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, loggingBuilder) =>
                 {
+                    var env = hostingContext.HostingEnvironment.IsDevelopment();
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
 
                     Log.Logger = new LoggerConfiguration()
@@ -56,7 +33,7 @@ namespace NBB.Contracts.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
+                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -74,20 +51,14 @@ namespace NBB.Contracts.Worker
 
 
                     services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
+                        .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
 
                     services.AddMessagingHost(hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
-                    services.AddMultitenancy(hostingContext.Configuration, _ =>
-                    {
-                        services.AddMultiTenantMessaging()
-                            .AddDefaultMessagingTenantIdentification()
-                            .AddTenantRepository<TenantRepositoryMock>();
-                    });
                 });
 
-            var host = builder.UseConsoleLifetime().Build();
+            var host = builder.Build();
 
             await host.RunAsync();
         }
@@ -95,27 +66,17 @@ namespace NBB.Contracts.Worker
 
     class MessagingHostStartup : IMessagingHostStartup
     {
-        private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
-
-        public MessagingHostStartup(IOptions<TenancyHostingOptions> tenancyOptions)
-        {
-            _tenancyOptions = tenancyOptions;
-        }
-
         public Task Configure(IMessagingHostConfigurationBuilder hostConfigurationBuilder)
         {
-            var isMultiTenant = _tenancyOptions?.Value?.TenancyType != TenancyType.None;
-
             hostConfigurationBuilder
                 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
                     .FromMediatRHandledCommands().AddAllClasses())
                 .WithOptions(optionsBuilder => optionsBuilder
                     .ConfigureTransport(transportOptions =>
-                        transportOptions with {MaxConcurrentMessages = 2}))
+                        transportOptions with { MaxConcurrentMessages = 2 }))
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
-                    .When(isMultiTenant, x => x.UseTenantMiddleware())
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );

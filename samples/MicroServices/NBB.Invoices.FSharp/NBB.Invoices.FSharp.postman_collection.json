@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "db8219bd-50cb-4bce-ad84-3a5fc4cb95b4",
+		"name": "NBB.Invoices.FSharp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create invoice",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ClientId\": \"46f88cd6-a96c-4707-ab17-0e6e172564f7\",\n  \"ContractId\": \"717336fb-de3a-4fa2-b843-1004b6bc95a6\",\n  \"Amount\": 1350\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/invoices/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"invoices",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pay invoice",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"InvoiceId\": \"82ebc820-64b5-49df-8403-6cda76297533\",\n  \"PaymentId\": \"9d47c132-d72f-44fb-84d6-15c89f0bad56\"  \n}"
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/invoices/pay",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"invoices",
+						"pay"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

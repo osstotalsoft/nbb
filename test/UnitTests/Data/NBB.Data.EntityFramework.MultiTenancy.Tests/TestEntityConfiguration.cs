@@ -7,7 +7,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
     {
         public void Configure(EntityTypeBuilder<TestEntity> builder)
         {
-            builder.HasKey(x => x.Id);
+            builder.IsMultiTenant().HasKey(x => x.Id);
         }
     }
 }

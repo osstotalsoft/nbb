@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NBB.Core.Effects;
+﻿using NBB.Core.Effects;
+using NBB.Messaging.Effects;
 
-namespace NBB.Messaging.Effects
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

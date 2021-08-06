@@ -4,6 +4,5 @@
     {
         public const string MultiTenantAnnotation = "nbb:multitenant";
         public const string TenantIdProp = "TenantId";
-
     }
 }

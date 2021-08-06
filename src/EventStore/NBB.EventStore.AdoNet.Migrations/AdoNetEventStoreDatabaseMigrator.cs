@@ -14,26 +14,26 @@ namespace NBB.EventStore.AdoNet.Migrations
         private readonly string _connectionString;
         private readonly Internal.Scripts _scripts;
 
-        public AdoNetEventStoreDatabaseMigrator(bool forceMultiTenant = false)
+        public AdoNetEventStoreDatabaseMigrator(bool forceMultiTenant = false, bool isTestHost = false)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            var environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
+            var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
             var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
 
             if (isDevelopment)
             {
-                configurationBuilder.AddUserSecrets(Assembly.GetEntryAssembly());
+                configurationBuilder.AddUserSecrets(isTestHost ? Assembly.GetCallingAssembly() : Assembly.GetEntryAssembly());
             }
 
             var configuration = configurationBuilder.Build();
             _connectionString = configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
             var tenancySection = configuration.GetSection("MultiTenancy");
             var tenancyOptions = tenancySection.Get<TenancyHostingOptions>();
-            if ((tenancyOptions == null || tenancyOptions.TenancyType == TenancyType.None) && !forceMultiTenant)
+            if ((tenancyOptions == null) && !forceMultiTenant)
             {
                 _scripts = new Internal.Scripts();
             }

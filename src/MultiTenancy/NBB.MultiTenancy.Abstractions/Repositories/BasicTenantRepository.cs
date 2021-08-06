@@ -12,7 +12,7 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
 
         public Task<Tenant> Get(Guid id, CancellationToken token = default)
         {
-            var tenant = new Tenant(id, id.ToString(), true);
+            var tenant = new Tenant(id, id.ToString());
             return Task.FromResult(tenant);
         }
 

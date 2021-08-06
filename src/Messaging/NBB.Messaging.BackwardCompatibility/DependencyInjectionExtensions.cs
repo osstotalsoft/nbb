@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using NBB.Messaging.Abstractions;
+using NBB.Messaging.BackwardCompatibility;
 
-namespace NBB.Messaging.BackwardCompatibility
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {

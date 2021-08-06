@@ -11,21 +11,13 @@ namespace NBB.Data.EntityFramework.MultiTenancy
             tenantProp.CurrentValue = tenantId;
         }
 
-        public static Guid? GetTenantId(this EntityEntry e)
+        public static Guid GetTenantId(this EntityEntry e)
         {
             var tenantProp = e.Property(MultiTenancy.TenantIdProp);
-            return (Guid?) tenantProp.CurrentValue;
+            return (Guid)tenantProp.CurrentValue;
         }
 
         public static bool IsMultiTenant(this EntityEntry e)
-        {
-            var annotation = e.Metadata.FindAnnotation(MultiTenancy.MultiTenantAnnotation);
-            if (annotation != null)
-            {
-                return (bool)annotation.Value;
-            }
-
-            return false;
-        }
+            => e.Metadata.IsMultiTenant();
     }
 }

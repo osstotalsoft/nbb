@@ -1,4 +1,5 @@
-﻿namespace NBB.Messaging.Host.Builder.TypeSelector
+﻿// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Specifies the sources of message types/topics for creating subscribers

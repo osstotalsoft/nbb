@@ -1,6 +1,6 @@
 # NBB.Core.Evented.FSharp
 
-F# writter monad for evented computations
+F# writer monad for evented computations
 
 ## NuGet install
 ```
@@ -53,14 +53,14 @@ module Sample =
             return payment
         }
 
-    let cancell payment = 
+    let cancel payment = 
         evented{
             let payment' = {payment with Cancelled=true}
             do! addEvent <| Cancelled payment.Id
             return payment'
         }
 
-    let createCancelled = create >=> cancell
+    let createCancelled = create >=> cancel
 ```
 
 

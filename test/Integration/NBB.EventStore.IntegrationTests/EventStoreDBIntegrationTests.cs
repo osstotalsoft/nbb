@@ -3,12 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.EventStore.Abstractions;
-using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
-using NBB.EventStore.AdoNet.Multitenancy;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +42,7 @@ namespace NBB.EventStore.IntegrationTests
                         try
                         {
                             eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] {new TestEvent(Guid.NewGuid())}, streamVersion,
+                                    new[] { new TestEvent(Guid.NewGuid()) }, streamVersion,
                                     CancellationToken.None)
                                 .Wait();
                         }
@@ -89,7 +86,7 @@ namespace NBB.EventStore.IntegrationTests
                     var t = new Thread(() =>
                     {
                         eventStore.AppendEventsToStreamAsync(stream,
-                            new[] {new TestEvent(Guid.NewGuid())}, null, CancellationToken.None).Wait();
+                            new[] { new TestEvent(Guid.NewGuid()) }, null, CancellationToken.None).Wait();
                     });
                     t.Start();
                     threads.Add(t);
@@ -112,7 +109,7 @@ namespace NBB.EventStore.IntegrationTests
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            var environment = Environment.GetEnvironmentVariable("NETCORE_ENVIRONMENT");
+            var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
             var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
 
             if (isDevelopment)
@@ -132,12 +129,10 @@ namespace NBB.EventStore.IntegrationTests
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
 
-            services.AddMultitenancy(configuration, _ =>
-            {
-                services.AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, false))));
-                services.WithMultiTenantAdoNetEventRepository();
-            });
+            services.AddMultitenancy(configuration)
+                .AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
+                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null))))
+                .WithMultiTenantAdoNetEventRepository();
 
 
             var container = services.BuildServiceProvider();
@@ -146,7 +141,7 @@ namespace NBB.EventStore.IntegrationTests
 
         private static void PrepareDb()
         {
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(null).Wait();
+            new AdoNetEventStoreDatabaseMigrator(isTestHost: true).ReCreateDatabaseObjects(null).Wait();
         }
     }
 

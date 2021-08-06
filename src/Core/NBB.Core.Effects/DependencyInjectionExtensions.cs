@@ -1,17 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using NBB.Core.Effects;
+using Parallel = NBB.Core.Effects.Parallel;
 
-namespace NBB.Core.Effects
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
         public static IServiceCollection AddEffects(this IServiceCollection services)
         {
             services.AddSingleton(typeof(Thunk.Handler<>));
-            services.AddSingleton(typeof(Parallel.Handler<,>));
-            services.AddSingleton(typeof(Sequenced.Handler<>));
+            services.AddScoped(typeof(Parallel.Handler<,>));
+            services.AddScoped(typeof(Sequenced.Handler<>));
+            services.AddScoped(typeof(TryWith.Handler<>));
+            services.AddScoped(typeof(TryFinally.Handler<>));
             services.AddScoped<ISideEffectBroker, SideEffectBroker>();
             services.AddScoped<IInterpreter, Interpreter>();
             return services;

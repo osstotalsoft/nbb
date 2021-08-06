@@ -4,17 +4,18 @@ namespace NBB.MultiTenancy.Abstractions
 {
     public class Tenant
     {
-        public Guid TenantId { get; }
+        public Guid TenantId { get; init; }
 
-        public string Code { get; }
+        public string Code { get; init; }
 
-        public bool IsShared { get; }
+        public Tenant() { }
 
-        public Tenant(Guid tenantId, string code, bool isShared)
+        public Tenant(Guid tenantId, string code)
         {
             TenantId = tenantId;
             Code = code;
-            IsShared = isShared;
         }
+
+        public static Tenant Default { get; } = new Tenant(default, "default");
     }
 }

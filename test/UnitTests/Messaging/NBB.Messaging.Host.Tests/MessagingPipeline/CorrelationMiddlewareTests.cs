@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NBB.Correlation;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.Host.MessagingPipeline;
 using Xunit;
 
 namespace NBB.Messaging.Host.Tests.MessagingPipeline

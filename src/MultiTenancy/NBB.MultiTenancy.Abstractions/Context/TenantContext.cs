@@ -13,7 +13,7 @@ namespace NBB.MultiTenancy.Abstractions.Context
 
         public TenantContext Clone()
         {
-            return new TenantContext(new Tenant(Tenant.TenantId, Tenant.Code, Tenant.IsShared));
+            return new TenantContext(new Tenant(Tenant.TenantId, Tenant.Code));
         }
     }
 }

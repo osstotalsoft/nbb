@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>NBB_Invoices_c9e28d3a-7681-452a-9dbe-a52a9b6a0900</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Handlers\Common.fs" />
+    <Compile Include="Handlers\Invoice.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Giraffe" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
+    <ProjectReference Include="..\NBB.Invoices.FSharp\NBB.Invoices.FSharp.fsproj" />
+  </ItemGroup>
+
+</Project>

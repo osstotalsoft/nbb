@@ -5,7 +5,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBB.Messaging.Host.MessagingPipeline
+// ReSharper disable once CheckNamespace
+namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Pipeline middleware used to create a correlation scope from the correlation id received in the message headers.

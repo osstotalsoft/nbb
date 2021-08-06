@@ -1,7 +1,6 @@
 ﻿module Application
 
 open NBB.Core.Effects.FSharp
-open NBB.Core.Abstractions
 open NBB.Application.Mediator.FSharp
 open System
 
@@ -214,7 +213,7 @@ module ReadApplication =
          << logRequest
          << lift publishMessage
 
-    let sendQuery (query: 'TQuery) = QueryMidleware.run queryPipeline query
+    let sendQuery (query: 'TQuery) = QueryMiddleware.run queryPipeline query
     let sendCommand (cmd: 'TCommand) = CommandMiddleware.run commandPipeline cmd
 
 

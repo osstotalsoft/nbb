@@ -2,42 +2,24 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Messaging.Abstractions;
 using Serilog;
 using Serilog.Events;
-using System.IO;
 using System.Threading.Tasks;
 using Serilog.Sinks.MSSqlServer;
 using NBB.Correlation.Serilog;
 using NBB.Messaging.Host;
-using NBB.Messaging.Nats;
-using NBB.Messaging.Host.Builder;
-using NBB.Messaging.Host.MessagingPipeline;
 using System.Reflection;
 using System.Linq;
-using NBB.ProcessManager.Runtime;
-using NBB.EventStore;
-using NBB.EventStore.AdoNet;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace NBB.Contracts.Worker
+namespace NBB.MicroServicesOrchestration
 {
     public class Program
     {
-        public static async Task Main(string[] _args)
+        public static async Task Main(string[] args)
         {
-            var builder = new HostBuilder()
-                .ConfigureHostConfiguration(config => { config.AddEnvironmentVariables("NETCORE_"); })
-                .ConfigureAppConfiguration((hostBuilderContext, configurationBuilder) =>
-                {
-                    configurationBuilder.SetBasePath(Directory.GetCurrentDirectory());
-                    configurationBuilder.AddJsonFile("appsettings.json", true);
-                    configurationBuilder.AddEnvironmentVariables();
-
-                    if (hostBuilderContext.HostingEnvironment.IsDevelopment())
-                    {
-                        configurationBuilder.AddUserSecrets<Program>();
-                    }
-                })
+            var builder = Host
+                .CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, loggingBuilder) =>
                 {
                     var connectionString = hostingContext.Configuration.GetConnectionString("Logs");

@@ -9,10 +9,14 @@ dotnet add package NBB.Core.Effects.FSharp
 
 ## Effect computation expressions
 Lets you compose effects the fsharp way.
-There is one, more performant, strict computation expression *effect* and a lazy one *effect'*
+There is one, more efficient, strict computation expression *Strict.effect* and a lazy one *Lazy.effect'*
 
-### Strict computation expression effect
+### Lazy computation expression effect
+The default effect computation expression is `Lazy.effect`. The `Lazy` module import/qualification can be ommited since it is automatically opened.
+
 ```fsharp
+open NBB.Core.Effects.FSharp
+
 let handler (IncrementCommand id) = 
     effect {
         let! agg = loadById id
@@ -20,15 +24,21 @@ let handler (IncrementCommand id) =
         do! save agg'
     }
 ```
-### Lazy computation expression effect'
+
+### Strict computation expression effect
+To use the strict version of the computation expression you can open the `NBB.Core.Effects.FSharp.Strict` module, or qualify the computation expression (`Strict.effect`)
+
 ```fsharp
+NBB.Core.Effects.FSharp.Strict
+
 let handler (IncrementCommand id) = 
-    effect' {
+    effect {
         let! agg = loadById id
         let agg' = agg |> increment
         do! save agg'
     }
 ```
+
 
 ## Lifting side-effects into effects
 Use *Effect.Of* function to lift side-effects into effects
