@@ -38,6 +38,7 @@ The blocks
 * [`NBB.Correlation`](./src/Correlation#readme) - facilitates the grouping of all requests, messages, logs, and traces belonging to a business flow
 * [`NBB.ProcessManager`](./src/Orchestration#readme) - a way of orchestrating your events
 * [`NBB.MultiTenancy`](./src/MultiTenancy#readme) -  building blocks for multi-tenant applications
+* [`NBB.ProjectR`](./src/Projections/NBB.ProjectR#readme) - functional style read-model projections inspired by [Elm](https://guide.elm-lang.org/)
 
 The samples
 ----------------

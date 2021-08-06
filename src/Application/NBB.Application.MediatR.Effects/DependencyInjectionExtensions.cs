@@ -1,4 +1,5 @@
 ﻿using NBB.Application.MediatR.Effects;
+using NBB.Core.Effects;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -7,7 +8,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddMediatorEffects(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(MediatorSendQuery.Handler<>));
+            services.AddSingleton(typeof(MediatorEffects.Send.Handler<>));
+            services.AddSingleton<ISideEffectHandler<MediatorEffects.Publish.SideEffect, Unit>, MediatorEffects.Publish.Handler>();
             return services;
         }
     }
