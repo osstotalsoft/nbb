@@ -50,3 +50,6 @@ The templates
 [`NBB templates`](https://github.com/osstotalsoft/nbb-templates#readme)
 is a collection of custom templates to be used by the dotnet cli (dotnet new command).
 
+## License
+
+.NET (including the runtime repo) is licensed under the [MIT](LICENSE) license.
