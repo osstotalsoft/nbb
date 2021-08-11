@@ -27,7 +27,8 @@ namespace NBB.Messaging.Rx.Tests
 
             _handlers.Add(envelope =>
                 handler(new MessagingEnvelope<TMessage>(envelope.Headers, (TMessage)envelope.Payload)));
-            return null;
+
+            return Task.FromResult<IDisposable>(null);
         }
 
         public void Start()
@@ -37,7 +38,7 @@ namespace NBB.Messaging.Rx.Tests
             {
                 foreach (var h in _handlers)
                 {
-                    h(new MessagingEnvelope(null, nr));
+                    h(new MessagingEnvelope(new Dictionary<string,string>(), nr));
                 }
             }
         }
