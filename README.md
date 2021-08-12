@@ -52,4 +52,4 @@ is a collection of custom templates to be used by the dotnet cli (dotnet new com
 
 ## License
 
-.NET (including the runtime repo) is licensed under the [MIT](LICENSE) license.
+NBB is licensed under the [MIT](LICENSE) license.
