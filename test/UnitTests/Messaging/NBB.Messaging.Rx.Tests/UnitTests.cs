@@ -13,24 +13,55 @@ namespace NBB.Messaging.Rx.Tests
     {
 
         [Fact]
-        public void Should_deserialize_messages_using_constructor_with_optional_params()
+        public void multiple_subscribers()
         {
             //Arrange
-            var sub = new RangeMockSubscriber(1, 100);
-            var obs1 = sub.Observe<int>();
-            var obs2 = sub.Observe<int>();
+            var sub = new RangeMockSubscriber(1, 10);
 
             //Act
-            var dis =
-                sub.Observe<int>()
-                    .Select(x => x.Payload)
-                    .Select(x => obs2)
-                    .Concat()
-                    .Subscribe();
+            var result1 = new List<int>();
+            var result2 = new List<int>();
+
+            var obs1 = sub.Observe<int>()
+                .Select(x => x.Payload)
+                .Where(x => x % 2 == 0);
+
+            using var disp1 = obs1.Subscribe();
+            using var disp2 = obs1.Subscribe(t => { result1.Add(t); });
+            using var disp3 = obs1
+                .Select(x => x * 2)
+                .Where(x => x > 10)
+                .Subscribe(t => { result2.Add(t); });
 
             sub.Start();
 
             //Assert
+            result1.Should().BeEquivalentTo(2, 4, 6, 8, 10);
+            result2.Should().BeEquivalentTo(12, 16, 20);
+        }
+
+        [Fact]
+        public void combine_two_streams()
+        {
+            //Arrange
+            var sub = new RangeMockSubscriber(1, 10);
+            var obs2 = sub.Observe<int>();
+
+            //Act
+            var result1 = new List<string>();
+
+            using var disp = sub.Observe<int>()
+                .Select(x => x.Payload)
+                .Where(x => x % 2 == 0)
+                .Select(x => obs2.Select(y=> $"{x}-{y.Payload}"))
+                .Concat()
+                .Subscribe(t => { result1.Add(t); });
+
+            sub.Start();
+
+            //Assert
+            //result1.Should().BeEquivalentTo(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
         }
     }
 }
