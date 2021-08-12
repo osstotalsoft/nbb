@@ -1,11 +1,14 @@
-﻿namespace NBB.Core.Evented.FSharp.Tests
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.Evented.FSharp.Tests
 
 open NBB.Core.Evented.FSharp
 open FSharpPlus
 
 module Domain =
     type AggRoot = AggRoot of int
-    type DomainEvent = 
+    type DomainEvent =
         | Added
         | Updated
 

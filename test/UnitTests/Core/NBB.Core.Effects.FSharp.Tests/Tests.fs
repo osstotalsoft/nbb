@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 module Tests
 open Xunit
 open FsUnit.Xunit
@@ -7,14 +10,14 @@ open NBB.Core.Effects.FSharp.Interpreter
 [<Fact>]
 let ``Pure(1) + Pure(2) should equal Pure(3)`` () =
     let interpreter = createInterpreter()
-    let eff = 
+    let eff =
         Strict.effect {
             let! x = Effect.pure' 1
             let! y = Effect.pure' 2
             return x + y
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal 3
@@ -22,16 +25,16 @@ let ``Pure(1) + Pure(2) should equal Pure(3)`` () =
 [<Fact>]
 let ``Lazy effect with try/with expression catches exception`` () =
     let interpreter = createInterpreter()
-    let eff = 
+    let eff =
         effect {
-            try 
+            try
                 let! x = Effect.pure' 1
                 return Result.Ok (x/0)
             with
                 e -> return Result.Error(e.Message)
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,string>.Error((System.DivideByZeroException()).Message))
@@ -39,16 +42,16 @@ let ``Lazy effect with try/with expression catches exception`` () =
 [<Fact>]
 let ``Strict effect with try/with expression catches exception`` () =
     let interpreter = createInterpreter()
-    let eff = 
+    let eff =
         Strict.effect {
-            try 
+            try
                 let! x = Effect.pure' 1
                 return Result.Ok (x/0)
             with
                 e -> return Result.Error(e.Message)
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,string>.Error((System.DivideByZeroException()).Message))
@@ -58,16 +61,16 @@ let ``Strict effect with try/with expression catches exception`` () =
 let ``Lazy effect with try/finally expresion`` () =
     let interpreter = createInterpreter()
     let mutable finallyCalled = false
-    let eff = 
+    let eff =
         effect {
-            try 
+            try
                 let! x = Effect.pure' 1
                 return Result.Ok x
             finally
                 finallyCalled <- true
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,obj>.Ok 1)
@@ -78,16 +81,16 @@ let ``Lazy effect with try/finally expresion`` () =
 let ``Strict effect with try/finally expresion`` () =
     let interpreter = createInterpreter()
     let mutable finallyCalled = false
-    let eff = 
+    let eff =
         Strict.effect {
-            try 
+            try
                 let! x = Effect.pure' 1
                 return Result.Ok x
             finally
                 finallyCalled <- true
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,obj>.Ok 1)
@@ -98,16 +101,16 @@ let ``Strict effect with try/finally expresion`` () =
 [<Fact>]
 let ``Lazy effect with try/with block success branch`` () =
     let interpreter = createInterpreter()
-    let eff = 
+    let eff =
         effect {
-            try 
+            try
                 let! x = Effect.pure' 1
                 return Result.Ok x
             with
                 e -> return Result.Error(e.Message)
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,string>.Ok(1))
@@ -115,16 +118,16 @@ let ``Lazy effect with try/with block success branch`` () =
 [<Fact>]
 let ``Strict effect with try/with block success branch`` () =
     let interpreter = createInterpreter()
-    let eff = 
+    let eff =
         Strict.effect {
-            try 
+            try
                 let! x = Effect.pure' 1
                 return Result.Ok x
             with
                 e -> return Result.Error(e.Message)
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,string>.Ok(1))
@@ -137,18 +140,18 @@ let ``Lazy effect with using block`` () =
         new System.IDisposable with
             member _.Dispose() = disposeCalled <- true
     }
-        
-    let eff = 
+
+    let eff =
         effect {
             use! _disposable = Effect.pure' resource
             return Result.Ok 1
         }
-        
-    eff 
+
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,obj>.Ok(1))
-        
+
     disposeCalled |> should equal true
 
 [<Fact>]
@@ -160,13 +163,13 @@ let ``Strict effect with using block`` () =
             member _.Dispose() = disposeCalled <- true
     }
 
-    let eff = 
+    let eff =
         Strict.effect {
             use! _disposable = Effect.pure' resource
             return Result.Ok 1
         }
 
-    eff 
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal (Result<int,obj>.Ok(1))
@@ -177,18 +180,18 @@ let ``Strict effect with using block`` () =
 let ``Effect computations are lazy evaluated`` () =
     let interpreter = createInterpreter()
     let mutable printfnWasCalled = false
-    let printfn _str = 
+    let printfn _str =
         printfnWasCalled <- true
 
-    let eff = 
+    let eff =
         effect {
             printfn "Execute side effect"
         }
 
     eff |> ignore
     printfnWasCalled |> should equal false
-        
-    eff 
+
+    eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
         |> should equal ()
@@ -197,7 +200,7 @@ let ``Effect computations are lazy evaluated`` () =
 
 [<Fact>]
 let ``Sequenced effect computations`` () =
-    let mapper crt =    
+    let mapper crt =
         Strict.effect {
             let! x = Effect.from (fun _ -> 1)
             let! y = Effect.from (fun _ -> 2)
@@ -207,8 +210,8 @@ let ``Sequenced effect computations`` () =
 
     use interpreter = createInterpreter()
 
-    let result = 
-        eff 
+    let result =
+        eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
@@ -217,7 +220,7 @@ let ``Sequenced effect computations`` () =
 [<Fact>]
 let ``Sequenced effect computations with CE`` () =
 
-    let eff = 
+    let eff =
         effect {
             for x in effect { return [1..5000] } do
             yield x+1
@@ -225,8 +228,8 @@ let ``Sequenced effect computations with CE`` () =
 
     use interpreter = createInterpreter()
 
-    let result = 
-        eff 
+    let result =
+        eff
         |> Effect.interpret interpreter
         |> Async.RunSynchronously
 

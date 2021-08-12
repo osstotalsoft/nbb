@@ -1,4 +1,7 @@
-﻿namespace NBB.Application.Mediator.FSharp
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Application.Mediator.FSharp
 
 open Microsoft.Extensions.DependencyInjection
 open NBB.Core.Effects
@@ -7,7 +10,7 @@ open PipelineUtils
 [<AutoOpen>]
 module ServiceCollectionExtensions =
     type IServiceCollection with
-        member this.AddMediator(commandPipeline, queryPipeline, eventPipeline) = 
+        member this.AddMediator(commandPipeline, queryPipeline, eventPipeline) =
 
             let sendCommand (cmd: 'TCommand) =
                 CommandMiddleware.run commandPipeline cmd
@@ -26,4 +29,4 @@ module ServiceCollectionExtensions =
                   SendQuery = sendQuery
                   DispatchEvent = publishEvent }
 
-            this.AddSideEffectHandler(Mediator.handleGetMediator mediator)            
+            this.AddSideEffectHandler(Mediator.handleGetMediator mediator)

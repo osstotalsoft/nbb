@@ -1,4 +1,7 @@
-﻿namespace NBB.Invoices.FSharp.Application
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Invoices.FSharp.Application
 
 open System
 open NBB.Invoices.FSharp.Domain

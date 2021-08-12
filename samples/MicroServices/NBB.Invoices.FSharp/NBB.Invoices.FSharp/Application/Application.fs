@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 namespace NBB.Invoices.FSharp.Application
 
 open NBB.Application.Mediator.FSharp
@@ -44,7 +47,7 @@ module WriteApplication =
     open EventMiddleware
 
     let private eventPipeline : EventMiddleware = (*log << *)handlers []
-    
+
 
     let addServices (services: IServiceCollection) =
         services.AddEffects() |> ignore

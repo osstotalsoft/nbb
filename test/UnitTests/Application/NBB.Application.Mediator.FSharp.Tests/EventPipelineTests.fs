@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 module EventPipelineTests
 
 open Xunit
@@ -11,7 +14,7 @@ open Mox
 type SomeEvent =
     { Code: string; EventId: System.Guid }
     interface IEvent
-        
+
 
 type SomeOtherEvent =
     { Name: string; EventId: System.Guid }
@@ -28,7 +31,7 @@ let ``EventHandler.choose should call the handlers until one returns some`` () =
     let handle2 = mock (fun (_:SomeEvent) -> effect { return Some ()})
     let handle3 = mock (fun (_:SomeEvent) -> effect { return Some ()})
 
-    let eventHandler= 
+    let eventHandler=
         choose [
             handle1.Fn
             handle2.Fn
@@ -105,10 +108,10 @@ let ``EventHandler.append should call both handlers`` () =
 let ``EventHandler.append left identity law `` (f: SomeEvent->unit option) (req: SomeEvent) =
     let f' = f >> Effect.pure'
     let interpreter = createInterpreter()
-    let run h = 
-        req 
-        |> h 
-        |> Effect.interpret interpreter 
+    let run h =
+        req
+        |> h
+        |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
     run (empty ++ f') = run f'
@@ -117,10 +120,10 @@ let ``EventHandler.append left identity law `` (f: SomeEvent->unit option) (req:
 let ``EventHandler.append right identity law`` (f: SomeEvent->unit option) (req: SomeEvent) =
     let f' = f >> Effect.pure'
     let interpreter = createInterpreter()
-    let run h = 
-        req 
-        |> h 
-        |> Effect.interpret interpreter 
+    let run h =
+        req
+        |> h
+        |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
     run (f' ++ empty) = run f'
@@ -131,10 +134,10 @@ let ``EventHandler.append associativity law`` (f: SomeEvent->unit option) (g: So
     let g' = g >> Effect.pure'
     let h' = h >> Effect.pure'
     let interpreter = createInterpreter()
-    let run h = 
-        req 
-        |> h 
-        |> Effect.interpret interpreter 
+    let run h =
+        req
+        |> h
+        |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
     run ((f' ++ g') ++ h') = run (f' ++ (g' ++ h'))
@@ -176,7 +179,7 @@ let ``EventMiddleware.handlers should call each handler until one returns Some``
     ]
 
     let interpreter = createInterpreter()
-    
+
     //act
     {Code=""; EventId = System.Guid.NewGuid()}
         |> run eventPipeline

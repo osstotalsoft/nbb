@@ -1,4 +1,7 @@
-﻿open System
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+open System
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open NBB.Invoices.FSharp.Application
@@ -50,7 +53,7 @@ let main argv =
     let loggingConfig (context: HostBuilderContext) (loggingBuilder: ILoggingBuilder) =
         loggingBuilder.AddConsole().AddDebug() |> ignore
 
-   
+
     let host =
         Host
             .CreateDefaultBuilder(argv)

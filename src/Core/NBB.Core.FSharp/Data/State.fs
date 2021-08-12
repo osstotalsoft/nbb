@@ -1,34 +1,37 @@
-﻿namespace NBB.Core.FSharp.Data.State
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.FSharp.Data.State
 
 type State<'s, 't> = 's -> 't * 's
 module State =
-    let run (x: State<'s, 't>) : 's -> 't * 's = 
-        x 
+    let run (x: State<'s, 't>) : 's -> 't * 's =
+        x
 
-    let map (f: 't->'u) (m : State<'s, 't>) : State<'s,'u> = 
+    let map (f: 't->'u) (m : State<'s, 't>) : State<'s,'u> =
         fun s -> let (a, s') = run m s in (f a, s')
 
-    let bind (f: 't-> State<'s, 'u>) (m : State<'s, 't>) : State<'s, 'u> = 
+    let bind (f: 't-> State<'s, 'u>) (m : State<'s, 't>) : State<'s, 'u> =
         fun s -> let (a, s') = run m s in run (f a) s'
 
-    let apply (f: State<'s, ('t -> 'u)>) (m: State<'s, 't>) : State<'s, 'u> = 
+    let apply (f: State<'s, ('t -> 'u)>) (m: State<'s, 't>) : State<'s, 'u> =
         fun s -> let (f, s') = run f s in let (a, s'') = run m s' in (f a, s'')
 
-    let pure' x = 
+    let pure' x =
         fun s -> (x, s)
 
     let composeK f g x = bind g (f x)
 
-    let get : State<'s, 's> = 
-        fun s -> (s, s)   
+    let get : State<'s, 's> =
+        fun s -> (s, s)
 
-    let put (x: 's) : State<'s, unit> = 
+    let put (x: 's) : State<'s, unit> =
         fun _ -> ((), x)
 
     let modify (f: 's -> 's) : State<'s, unit> =
          get |> bind (put << f)
 
-    
+
 
 module StateBulder =
     type StateBulder() =
@@ -52,16 +55,16 @@ module StateExtensions =
         let traverseState f list =
             let pure' = State.pure'
             let (<*>) = State.apply
-            let cons head tail = head :: tail  
+            let cons head tail = head :: tail
             let initState = pure' []
             let folder head tail = pure' cons <*> (f head) <*> tail
             List.foldBack folder list initState
 
         let sequenceState list = traverseState id list
-  
+
     [<RequireQualifiedAccess>]
-    module Result = 
-          let traverseState (f: 'a-> State<'s, 'b>) (result:Result<'a,'e>) : State<'s, Result<'b, 'e>> = 
+    module Result =
+          let traverseState (f: 'a-> State<'s, 'b>) (result:Result<'a,'e>) : State<'s, Result<'b, 'e>> =
               match result with
                   |Error err -> State.map Result.Error (State.pure' err)
                   |Ok v -> State.map Result.Ok (f v)

@@ -1,4 +1,7 @@
-﻿namespace NBB.Core.Effects.FSharp
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.Effects.FSharp
 
 open System
 open NBB.Core.Effects
@@ -6,7 +9,7 @@ open NBB.Core.Effects
 type Effect<'a> = NBB.Core.Effects.Effect<'a>
 
 [<RequireQualifiedAccess>]
-module Effect = 
+module Effect =
     let map func eff = Effect.Map(Func<'a, 'b>(func), eff)
 
     let bind func eff = Effect.Bind(eff, Func<'a, Effect<'b>>(func))
@@ -100,12 +103,12 @@ module EffectBuilder =
         member _.For(coll, f) = coll |> EffectList.bind f
         member _.Yield(value) = EffectList.return' value
         member _.YieldFrom(x) = EffectList.lift x
-        member _.Delay(f) = f 
+        member _.Delay(f) = f
         member _.Run(f) = f ()
         member _.TryWith(expr, handler) = try expr() with ex -> handler ex
         member _.TryFinally(expr, compensation) = try expr() finally compensation()
         member _.Using(resource, expr) =  try expr resource finally safeDispose resource
-        
+
 [<AutoOpen>]
 module Effects =
     let (<!>) = Effect.map
@@ -123,8 +126,8 @@ module Effects =
         let sequence_ list = sequence list |> Effect.ignore
 
     [<RequireQualifiedAccess>]
-    module Result = 
-        let traverse (f: 'a-> Effect<'c>) (result:Result<'a,'e>) : Effect<Result<'c, 'e>> = 
+    module Result =
+        let traverse (f: 'a-> Effect<'c>) (result:Result<'a,'e>) : Effect<Result<'c, 'e>> =
             match result with
                 | Error err -> Effect.pure' (Error err)
                 | Ok v -> Effect.map Ok (f v)
