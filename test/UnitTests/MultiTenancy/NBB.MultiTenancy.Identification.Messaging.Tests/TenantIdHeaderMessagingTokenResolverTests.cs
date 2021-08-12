@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using System.Collections.Generic;
 using FluentAssertions;
 using NBB.Messaging.Abstractions;
 using Xunit;

@@ -1,4 +1,7 @@
-﻿using NBB.Correlation;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Correlation;
 using NBB.Messaging.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;

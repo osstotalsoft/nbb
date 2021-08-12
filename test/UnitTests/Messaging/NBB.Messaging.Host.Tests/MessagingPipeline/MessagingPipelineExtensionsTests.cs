@@ -1,4 +1,7 @@
-﻿using Moq;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Moq;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using System;

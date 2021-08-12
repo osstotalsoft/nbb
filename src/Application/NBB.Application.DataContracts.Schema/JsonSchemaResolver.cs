@@ -1,4 +1,7 @@
-﻿using NBB.Application.DataContracts.Schema.Sample;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Application.DataContracts.Schema.Sample;
 using Newtonsoft.Json;
 using NJsonSchema;
 using System;

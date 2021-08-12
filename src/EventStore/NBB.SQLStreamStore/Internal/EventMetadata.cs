@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using System;
 using Newtonsoft.Json;
 
 namespace NBB.SQLStreamStore.Internal

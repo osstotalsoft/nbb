@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
 using System.Threading;

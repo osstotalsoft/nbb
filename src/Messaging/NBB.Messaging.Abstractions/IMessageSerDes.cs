@@ -1,4 +1,7 @@
-﻿namespace NBB.Messaging.Abstractions
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Messaging.Abstractions
 {
     public interface IMessageSerDes
     {

@@ -1,4 +1,7 @@
-﻿namespace NBB.ProcessManager.Definition
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.ProcessManager.Definition
 {
     public struct InstanceData<TData>
     {

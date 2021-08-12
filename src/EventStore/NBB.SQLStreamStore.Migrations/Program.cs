@@ -1,4 +1,7 @@
-﻿namespace NBB.SQLStreamStore.Migrations
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.SQLStreamStore.Migrations
 {
     class Program
     {

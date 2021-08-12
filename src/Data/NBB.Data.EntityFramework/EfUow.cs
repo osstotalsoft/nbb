@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using System.Collections.Generic;

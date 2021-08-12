@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.Serilog;

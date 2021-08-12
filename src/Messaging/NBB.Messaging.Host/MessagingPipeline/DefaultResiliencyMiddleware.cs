@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;

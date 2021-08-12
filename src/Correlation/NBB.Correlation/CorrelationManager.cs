@@ -1,4 +1,7 @@
-﻿using NBB.Correlation.Internal;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Correlation.Internal;
 using System;
 using System.Threading;
 

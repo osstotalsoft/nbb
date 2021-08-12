@@ -1,4 +1,7 @@
-﻿using ReflectionMagic;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using ReflectionMagic;
 
 namespace NBB.Domain
 {

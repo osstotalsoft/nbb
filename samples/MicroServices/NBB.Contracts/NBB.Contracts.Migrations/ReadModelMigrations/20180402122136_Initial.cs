@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 
 namespace NBB.Contracts.Migrations.ReadModelMigrations

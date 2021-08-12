@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 using FluentAssertions;
 using NBB.ProcessManager.Definition.Builder;
 using NBB.ProcessManager.Runtime;

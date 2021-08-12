@@ -1,4 +1,7 @@
-﻿using NBB.Core.Pipeline;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.OpenTracing.Subscriber

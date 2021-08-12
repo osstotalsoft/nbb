@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.AspNetCore.Http;
 using NBB.MultiTenancy.Identification.Resolvers;
 using System.Threading.Tasks;
 

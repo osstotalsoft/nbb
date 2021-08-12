@@ -1,4 +1,7 @@
-﻿using NBB.Contracts.Migrations;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Contracts.Migrations;
 using NBB.EventStore.AdoNet.Migrations;
 using NBB.Invoices.Migrations;
 using NBB.Payments.Migrations;

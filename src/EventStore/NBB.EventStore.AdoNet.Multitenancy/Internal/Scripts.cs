@@ -1,4 +1,7 @@
-﻿namespace NBB.EventStore.AdoNet.Multitenancy.Internal
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.EventStore.AdoNet.Multitenancy.Internal
 {
     public class Scripts : AdoNet.Internal.Scripts
     {

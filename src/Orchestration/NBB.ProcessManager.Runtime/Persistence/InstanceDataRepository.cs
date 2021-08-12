@@ -1,4 +1,7 @@
-﻿using NBB.Core.Abstractions;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.ProcessManager.Definition;
 using System.Linq;

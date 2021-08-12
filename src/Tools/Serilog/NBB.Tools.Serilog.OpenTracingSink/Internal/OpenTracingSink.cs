@@ -1,4 +1,7 @@
-﻿using OpenTracing;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using OpenTracing;
 using OpenTracing.Util;
 using Serilog.Core;
 using Serilog.Events;

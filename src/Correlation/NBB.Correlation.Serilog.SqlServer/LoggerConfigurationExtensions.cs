@@ -1,4 +1,7 @@
-﻿using Serilog;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 using System;

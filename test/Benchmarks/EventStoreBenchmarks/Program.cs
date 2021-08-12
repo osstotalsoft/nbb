@@ -1,4 +1,7 @@
-﻿using BenchmarkDotNet.Running;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using BenchmarkDotNet.Running;
 namespace TheBenchmarks
 {
     class Program

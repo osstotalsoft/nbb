@@ -1,4 +1,7 @@
-﻿using NBB.Core.Abstractions.Paging;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Core.Abstractions.Paging;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

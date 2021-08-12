@@ -1,4 +1,7 @@
-﻿using NBB.Core.Effects;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Core.Effects;
 
 namespace NBB.Messaging.Effects
 {

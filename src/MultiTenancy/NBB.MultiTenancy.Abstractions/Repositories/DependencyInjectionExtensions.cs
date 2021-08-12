@@ -1,4 +1,7 @@
-﻿using NBB.MultiTenancy.Abstractions.Repositories;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.MultiTenancy.Abstractions.Repositories;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection

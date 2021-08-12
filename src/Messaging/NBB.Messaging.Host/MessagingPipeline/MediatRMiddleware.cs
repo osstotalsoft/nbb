@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using MediatR;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using System;

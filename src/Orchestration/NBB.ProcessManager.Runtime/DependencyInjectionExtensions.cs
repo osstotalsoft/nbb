@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using MediatR;
 using NBB.Core.Effects;
 using NBB.ProcessManager.Definition.SideEffects;
 using NBB.ProcessManager.Runtime.Persistence;
