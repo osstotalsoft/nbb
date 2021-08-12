@@ -1,4 +1,7 @@
-﻿module EffectBenchmark
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+module EffectBenchmark
 
 open BenchmarkDotNet.Attributes
 open NBB.Core.Effects.FSharp
@@ -9,12 +12,12 @@ type Benchmark() =
     let interpreter = createInterpreter()
 
     [<Params(50, 500, 5000)>]
-    [<DefaultValue>] 
+    [<DefaultValue>]
     val mutable N : int
 
     [<Benchmark>]
     member this.RunLazy() =
-        let mapper crt =    
+        let mapper crt =
             effect {
                 let! x = Effect.from (fun _ -> 1)
                 let! y = Effect.from (fun _ -> 2)
@@ -22,21 +25,21 @@ type Benchmark() =
             }
         let eff = [1..this.N] |> List.traverse mapper
 
-        eff 
+        eff
             |> Effect.interpret interpreter
             |> Async.RunSynchronously
 
     [<Benchmark>]
     member this.RunStrict() =
-        let mapper crt =    
-            Strict.effect { 
+        let mapper crt =
+            Strict.effect {
                 let! x = Effect.from (fun _ -> 1)
                 let! y = Effect.from (fun _ -> 2)
                 return x + y + crt
             }
         let eff = [1..this.N] |> List.traverse mapper
 
-        eff 
+        eff
             |> Effect.interpret interpreter
             |> Async.RunSynchronously
 
