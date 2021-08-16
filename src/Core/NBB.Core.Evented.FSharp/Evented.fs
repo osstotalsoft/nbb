@@ -1,12 +1,15 @@
-﻿namespace NBB.Core.Evented.FSharp
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.Evented.FSharp
 
 type Evented<'a, 'e> = Evented of payload:'a * events:'e list
 
 [<RequireQualifiedAccess>]
-module Evented = 
+module Evented =
     let map func (Evented(value, events)) = Evented(func value, events)
 
-    let bind func (Evented(value, events)) = 
+    let bind func (Evented(value, events)) =
         let (Evented(result, events')) = func value
         Evented(result, events @ events')
 
@@ -51,7 +54,7 @@ module EventedExtensions =
 [<RequireQualifiedAccess>]
 module List =
     let traverseEvented f list =
-        let cons head tail = head :: tail      
+        let cons head tail = head :: tail
         let initState = Evented.pure' []
         let folder head tail = Evented.pure' cons <*> (f head) <*> tail
         List.foldBack folder list initState
@@ -59,8 +62,8 @@ module List =
     let sequenceEvented list = traverseEvented id list
 
 [<RequireQualifiedAccess>]
-module Result = 
-    let traverseEvented f result = 
+module Result =
+    let traverseEvented f result =
         match result with
             | Error err -> Evented.pure' (Error err)
             | Ok v -> Evented.map Ok (f v)

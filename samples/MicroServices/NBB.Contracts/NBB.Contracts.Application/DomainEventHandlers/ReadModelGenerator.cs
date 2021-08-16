@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using MediatR;
 using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Contracts.ReadModel;
 using NBB.Data.Abstractions;

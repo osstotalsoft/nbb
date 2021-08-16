@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 namespace NBB.Invoices.FSharp.Api
 
 open System
@@ -62,7 +65,7 @@ module Program =
 
         services
             .AddCors()
-            .AddGiraffe() 
+            .AddGiraffe()
             //.AddSingleton<Giraffe.IJsonSerializer>(
             //    NewtonsoftJsonSerializer(NewtonsoftJsonSerializer.DefaultSettings))
         |> ignore
@@ -71,7 +74,7 @@ module Program =
         builder.AddFilter(fun l -> l.Equals LogLevel.Error)
                .AddConsole()
                .AddDebug() |> ignore
-           
+
 
     [<EntryPoint>]
     let main args =

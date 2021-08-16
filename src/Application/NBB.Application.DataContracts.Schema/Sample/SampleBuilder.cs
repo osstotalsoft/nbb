@@ -1,4 +1,7 @@
-﻿using AutoFixture;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using AutoFixture;
 using System;
 
 namespace NBB.Application.DataContracts.Schema.Sample

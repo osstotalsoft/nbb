@@ -1,4 +1,7 @@
-﻿using NBB.MultiTenancy.Abstractions;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.MultiTenancy.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -1,4 +1,7 @@
-﻿namespace NBB.Core.Abstractions.Paging
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.Abstractions.Paging
 {
     public class PageRequest
     {

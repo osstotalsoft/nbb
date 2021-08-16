@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp

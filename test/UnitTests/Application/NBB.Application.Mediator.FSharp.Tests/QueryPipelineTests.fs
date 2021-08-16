@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 module QueryPipelineTests
 
 open Xunit
@@ -8,13 +11,13 @@ open NBB.Core.Effects.FSharp.Interpreter
 open Mox
 open QueryHandler
 
-type SomeQuery = 
-    { Code: string } 
+type SomeQuery =
+    { Code: string }
     interface IQuery<bool>
-        
 
-type SomeOtherQuery = 
-    { Name: string } 
+
+type SomeOtherQuery =
+    { Name: string }
     interface IQuery<bool>
 
 

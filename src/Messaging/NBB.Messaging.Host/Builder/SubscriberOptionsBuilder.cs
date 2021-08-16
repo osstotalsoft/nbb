@@ -1,4 +1,7 @@
-﻿using NBB.Messaging.Abstractions;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

@@ -1,4 +1,7 @@
-﻿namespace NBB.Messaging.OpenTracing
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Messaging.OpenTracing
 {
     public static class MessagingTags
     {

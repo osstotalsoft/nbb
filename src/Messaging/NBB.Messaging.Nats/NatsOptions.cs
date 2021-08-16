@@ -1,4 +1,7 @@
-﻿namespace NBB.Messaging.Nats
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Messaging.Nats
 {
     public class NatsOptions
     {

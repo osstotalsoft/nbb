@@ -1,4 +1,7 @@
-﻿using NBB.Tools.Serilog.OpenTracingSink.Internal;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Tools.Serilog.OpenTracingSink.Internal;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;

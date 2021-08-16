@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using System;
 using Microsoft.Extensions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;

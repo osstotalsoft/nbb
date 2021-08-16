@@ -1,4 +1,7 @@
-﻿namespace NBB.Application.Mediator.FSharp
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
 
@@ -10,7 +13,7 @@ type EventMiddleware<'TEvent when 'TEvent :> IEvent> = EventHandler<'TEvent> -> 
 type EventMiddleware = EventMiddleware<IEvent>
 
 
-module EventHandler = 
+module EventHandler =
     let rec choose (handlers : EventHandler<'TEvent> list) : EventHandler<'TEvent> =
         fun (ev : 'TEvent) ->
             effect {
@@ -23,7 +26,7 @@ module EventHandler =
                     | None   -> return! choose tail ev
             }
 
-    let upCast (handler: EventHandler<'TEvent>) : EventHandler = 
+    let upCast (handler: EventHandler<'TEvent>) : EventHandler =
         fun ev ->
             match ev with
             | :? 'TEvent as ev' -> handler ev'
@@ -37,7 +40,7 @@ module EventHandler =
                 if r1 || r2 then return Some () else return None
             }
 
-    let empty : EventHandler<'TEvent> = 
+    let empty : EventHandler<'TEvent> =
         fun _ -> Effect.pure' None
 
     let (++) = append

@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
@@ -11,7 +13,7 @@ type CommandMiddleware<'TCommand when 'TCommand :> ICommand> = RequestMiddleware
 type CommandMiddleware = CommandMiddleware<ICommand>
 
 module CommandHandler =
-    let upCast (commandHandler: CommandHandler<'TCommand>) : CommandHandler = 
+    let upCast (commandHandler: CommandHandler<'TCommand>) : CommandHandler =
         fun cmd ->
             match cmd with
             | :? 'TCommand as cmd' -> commandHandler cmd'

@@ -1,4 +1,7 @@
-﻿using System.Net.Http;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using System.Net.Http;
 using NBB.Core.Effects;
 
 namespace NBB.Http.Effects

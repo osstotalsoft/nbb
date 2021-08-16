@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 module Tests
 
 open System
@@ -6,7 +9,7 @@ open FsUnit.Xunit
 open NBB.Core.Evented.FSharp
 
 type AggRoot = AggRoot of int
-type DomainEvent = 
+type DomainEvent =
     | Added
     | Updated
 
@@ -16,23 +19,23 @@ let increment (AggRoot x) = Evented(AggRoot(x+1), [Updated])
 
 [<Fact>]
 let ``Evented workflow test`` () =
-    let (Evented(entity, events)) = 
+    let (Evented(entity, events)) =
         evented {
             let! x = create 1
             return! increment x
         }
-    
+
     entity|> should equal (AggRoot 2)
     events|> should equal [Added; Updated]
 
 
 [<Fact>]
 let ``Pure evented values should contain no events`` () =
-    let (Evented(_, events)) = 
+    let (Evented(_, events)) =
         evented {
             return 1
         }
-    
+
     events|> should equal []
 
 [<Fact>]
@@ -58,4 +61,4 @@ let ``List sequence evented should accumulate events`` () =
     let (Evented(_, events)) = xs |> List.sequenceEvented
 
     events|> should equal [Added;Updated]
-        
+

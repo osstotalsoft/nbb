@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NBB.Messaging.Abstractions;
 using NBB.Todo.Data;

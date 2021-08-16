@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using System.Threading;
 
 namespace NBB.MultiTenancy.Abstractions.Context
 {

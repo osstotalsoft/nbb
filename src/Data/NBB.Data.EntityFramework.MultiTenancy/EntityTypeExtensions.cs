@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
 {

@@ -1,4 +1,7 @@
-﻿namespace NBB.Application.DataContracts.Schema
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Application.DataContracts.Schema
 {
     public class SchemaDefinition
     {

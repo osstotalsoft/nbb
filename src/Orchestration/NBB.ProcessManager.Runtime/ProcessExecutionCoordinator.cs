@@ -1,4 +1,7 @@
-﻿using NBB.ProcessManager.Definition;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Runtime.Persistence;
 using System;
 using System.Collections.Generic;

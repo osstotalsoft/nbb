@@ -1,4 +1,7 @@
-﻿namespace NBB.ProcessManager.Runtime.Events
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.ProcessManager.Runtime.Events
 {
     public record EventReceived(object ReceivedEvent, string ReceivedEventType);
 

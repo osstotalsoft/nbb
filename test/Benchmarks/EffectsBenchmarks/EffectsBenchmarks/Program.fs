@@ -1,4 +1,7 @@
-﻿// Learn more about F# at http://fsharp.org
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+// Learn more about F# at http://fsharp.org
 
 open System
 open BenchmarkDotNet.Running

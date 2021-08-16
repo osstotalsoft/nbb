@@ -1,4 +1,7 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Abstractions;

@@ -1,4 +1,7 @@
-﻿namespace NBB.Core.Evented.FSharp.Tests
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.Evented.FSharp.Tests
 
 open NBB.Core.Evented.FSharp
 
@@ -9,18 +12,18 @@ module Sample2 =
         Cancelled: bool
     }
 
-    type DomainEvent = 
+    type DomainEvent =
         | Added of Id:int * Amount:decimal
         | Cancelled of Id:int
 
-    let create (id,amount) = 
+    let create (id,amount) =
         evented{
             let payment = {Id=id; Amount=amount; Cancelled=false}
             do! addEvent <| Added(id,amount)
             return payment
         }
 
-    let cancell payment = 
+    let cancell payment =
         evented{
             let payment' = {payment with Cancelled=true}
             do! addEvent <| Cancelled payment.Id

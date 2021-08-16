@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using AutoMapper;
 using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.Builder;
 using ProcessManagerSample.Commands;

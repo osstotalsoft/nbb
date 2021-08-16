@@ -1,4 +1,7 @@
-﻿using NBB.Application.MediatR.Effects;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Application.MediatR.Effects;
 using NBB.Core.Effects;
 
 // ReSharper disable once CheckNamespace

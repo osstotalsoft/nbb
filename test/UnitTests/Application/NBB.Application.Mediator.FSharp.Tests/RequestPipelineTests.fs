@@ -1,3 +1,6 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
 module RequestPipelineTests
 
 open Xunit
@@ -20,7 +23,7 @@ let ``RequestHandler.choose should call the handlers until one returns some`` ()
     let handle2 = mock (fun (_:SomeRequest) -> effect { return Some ()})
     let handle3 = mock (fun (_:SomeRequest) -> effect { return Some ()})
 
-    let requestHandler = 
+    let requestHandler =
         choose [
             handle1.Fn
             handle2.Fn
@@ -49,7 +52,7 @@ let ``RequestHandler.compose should call the second handler only if the first on
 
     let requestHandler = handle1.Fn >=> handle2.Fn >=> handle3.Fn
     let interpreter = createInterpreter()
-    
+
     //act
     {Code=""}
         |> requestHandler
@@ -66,10 +69,10 @@ let ``RequestHandler.compose should call the second handler only if the first on
 let ``RequestHandler.compose left identity law `` (f: int->int option) (req: int) =
     let f' = f >> Effect.pure'
     let interpreter = createInterpreter()
-    let run h = 
-        req 
-        |> h 
-        |> Effect.interpret interpreter 
+    let run h =
+        req
+        |> h
+        |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
     run (identity >=> f') = run f'
@@ -78,10 +81,10 @@ let ``RequestHandler.compose left identity law `` (f: int->int option) (req: int
 let ``RequestHandler.compose right identity law`` (f: int->int option) (req: int) =
     let f' = f >> Effect.pure'
     let interpreter = createInterpreter()
-    let run h = 
-        req 
-        |> h 
-        |> Effect.interpret interpreter 
+    let run h =
+        req
+        |> h
+        |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
     run (f' >=> identity) = run f'
@@ -92,10 +95,10 @@ let ``RequestHandler.compose associativity law`` (f: int->int option) (g: int->i
     let g' = g >> Effect.pure'
     let h' = h >> Effect.pure'
     let interpreter = createInterpreter()
-    let run h = 
-        req 
-        |> h 
-        |> Effect.interpret interpreter 
+    let run h =
+        req
+        |> h
+        |> Effect.interpret interpreter
         |> Async.RunSynchronously
 
     run ((f' >=> g') >=> h') = run (f' >=> (g' >=> h'))
@@ -111,7 +114,7 @@ let ``RequestMiddleware.lift should call the next handler only if the lifted han
 
     let requestHandler = lift handler1.Fn <| lift handler2.Fn next.Fn
     let interpreter = createInterpreter()
-    
+
     //act
     {Code=""}
         |> requestHandler
@@ -138,7 +141,7 @@ let ``RequestMiddleware.handlers should call each handler until one returns Some
     ]
 
     let interpreter = createInterpreter()
-    
+
     //act
     {Code=""}
         |> run requestPipeline

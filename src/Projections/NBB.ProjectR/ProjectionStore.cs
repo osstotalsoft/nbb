@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Abstractions;

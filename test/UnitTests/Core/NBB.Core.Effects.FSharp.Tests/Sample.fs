@@ -1,4 +1,7 @@
-﻿module Sample
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+module Sample
 
 open System
 open NBB.Core.Effects.FSharp
@@ -14,10 +17,10 @@ module Data =
 
 module Application =
     open Domain
-    open Data    
+    open Data
     type IncrementCommand = IncrementCommand of int
-  
-    let handler (IncrementCommand id) = 
+
+    let handler (IncrementCommand id) =
         effect {
             let! agg = loadById id
             let agg' = agg |> increment
@@ -26,7 +29,7 @@ module Application =
 
     let handler' (IncrementCommand id) = id |> loadById |> Effect.map increment >>= save
 
-    let handler'' (IncrementCommand id) = 
+    let handler'' (IncrementCommand id) =
         let handle = loadById >> Effect.map increment >> Effect.bind save
         handle id
 

@@ -1,4 +1,7 @@
-﻿using NBB.MultiTenancy.Identification.Extensions;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.MultiTenancy.Identification.Extensions;
 
 
 // ReSharper disable once CheckNamespace

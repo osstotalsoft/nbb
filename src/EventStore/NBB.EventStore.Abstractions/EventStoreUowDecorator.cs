@@ -1,4 +1,7 @@
-﻿using NBB.Core.Abstractions;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.Core.Abstractions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

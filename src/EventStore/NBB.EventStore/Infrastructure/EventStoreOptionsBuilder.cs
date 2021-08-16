@@ -1,4 +1,7 @@
-﻿namespace NBB.EventStore.Infrastructure
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.EventStore.Infrastructure
 {
     public class EventStoreOptionsBuilder
     {

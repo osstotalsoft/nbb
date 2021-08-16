@@ -1,4 +1,7 @@
-﻿namespace NBB.Core.Effects.FSharp.Data.ReaderStateEffect
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Core.Effects.FSharp.Data.ReaderStateEffect
 
 open NBB.Core.Effects.FSharp
 open NBB.Core.FSharp.Data
@@ -10,14 +13,14 @@ open NBB.Core.Effects.FSharp.Data.StateEffect
 
 type ReaderStateEffect<'r, 's, 'a> = 'r -> 's -> Effect<'a * 's>
 module ReaderStateEffect =
-    let run (x: ReaderStateEffect<'r, 's, 'a>) : 'r -> 's -> Effect<'a * 's> = 
-        x 
+    let run (x: ReaderStateEffect<'r, 's, 'a>) : 'r -> 's -> Effect<'a * 's> =
+        x
 
-    let map (f: 'a -> 'b) (m : ReaderStateEffect<'r, 's, 'a>) : ReaderStateEffect<'r, 's, 'b> = 
-        fun r s -> run m r s |> Effect.map (fun (a, s') -> (f a, s')) 
+    let map (f: 'a -> 'b) (m : ReaderStateEffect<'r, 's, 'a>) : ReaderStateEffect<'r, 's, 'b> =
+        fun r s -> run m r s |> Effect.map (fun (a, s') -> (f a, s'))
 
-    let bind (f: 'a-> ReaderStateEffect<'r, 's, 'b>) (m : ReaderStateEffect<'r, 's, 'a>) : ReaderStateEffect<'r, 's, 'b> = 
-        fun r s -> run m r s |> Effect.bind (fun (a, s') -> run (f a) r s') 
+    let bind (f: 'a-> ReaderStateEffect<'r, 's, 'b>) (m : ReaderStateEffect<'r, 's, 'a>) : ReaderStateEffect<'r, 's, 'b> =
+        fun r s -> run m r s |> Effect.bind (fun (a, s') -> run (f a) r s')
 
     let apply (f: ReaderStateEffect<'r, 's, ('a -> 'b)>) (m: ReaderStateEffect<'r, 's, 'a>) : ReaderStateEffect<'r, 's, 'b> =
         fun r s ->
@@ -27,25 +30,25 @@ module ReaderStateEffect =
                 return (f' a, s'')
             }
 
-    let ask () : ReaderStateEffect<'r, 's, 'r> = 
+    let ask () : ReaderStateEffect<'r, 's, 'r> =
         fun r s -> Effect.pure' (r, s)
 
-    let get () : ReaderStateEffect<'r, 's, 's> = 
+    let get () : ReaderStateEffect<'r, 's, 's> =
         fun _r s -> Effect.pure' (s, s)
 
-    let put (s: 's) : ReaderStateEffect<'r, 's, unit> = 
+    let put (s: 's) : ReaderStateEffect<'r, 's, unit> =
         fun _r  _s -> Effect.pure' ((), s)
 
     let modify (f: 's -> 's) : ReaderStateEffect<'r, 's, unit> =
         get() |> bind (put << f)
 
-    let join (m: ReaderStateEffect<'r, 's, ReaderStateEffect<'r, 's, 'a>>) : ReaderStateEffect<'r, 's, 'a> = 
-        m |> bind id 
+    let join (m: ReaderStateEffect<'r, 's, ReaderStateEffect<'r, 's, 'a>>) : ReaderStateEffect<'r, 's, 'a> =
+        m |> bind id
 
     let lift (eff : Effect<'a>) : ReaderStateEffect<'r, 's, 'a> =
         fun _r s -> eff |> Effect.map (fun a -> (a, s))
 
-    let pure' (a:'a) : ReaderStateEffect<'r, 's, 'a> = 
+    let pure' (a:'a) : ReaderStateEffect<'r, 's, 'a> =
         a |> Effect.pure' |> lift
 
 
@@ -74,7 +77,7 @@ module ReaderStateEffectExtensions =
         let traverseReaderStateEffect f list =
             let pure' = ReaderStateEffect.pure'
             let (<*>) = ReaderStateEffect.apply
-            let cons head tail = head :: tail  
+            let cons head tail = head :: tail
             let initState = pure' []
             let folder head tail = pure' cons <*> (f head) <*> tail
             List.foldBack folder list initState
@@ -82,8 +85,8 @@ module ReaderStateEffectExtensions =
         let sequenceReaderStateEffect list = traverseReaderStateEffect id list
 
     [<RequireQualifiedAccess>]
-    module Result = 
-          let traverseReaderStateEffect (f: 'a-> ReaderStateEffect<'r, 's, 'b>) (result:Result<'a,'e>) : ReaderStateEffect<'r, 's, Result<'b, 'e>> = 
+    module Result =
+          let traverseReaderStateEffect (f: 'a-> ReaderStateEffect<'r, 's, 'b>) (result:Result<'a,'e>) : ReaderStateEffect<'r, 's, Result<'b, 'e>> =
               match result with
                   | Error err -> ReaderStateEffect.pure' (Error err)
                   | Ok v -> ReaderStateEffect.map Result.Ok (f v)
@@ -95,5 +98,5 @@ module ReaderStateEffectExtensions =
         let addCaching (key: 'k) (readerStateEff: ReaderStateEffect<'r, Map<'k, 'v>, 'v>) : ReaderStateEffect<'r, Map<'k, 'v>, 'v> =
             reader {
                 let! stateEff = readerStateEff
-                return stateEff |> StateEffect.addCaching key 
+                return stateEff |> StateEffect.addCaching key
             }

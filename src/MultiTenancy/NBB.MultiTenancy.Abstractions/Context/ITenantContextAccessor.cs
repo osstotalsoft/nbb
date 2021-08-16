@@ -1,4 +1,7 @@
-﻿namespace NBB.MultiTenancy.Abstractions.Context
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.MultiTenancy.Abstractions.Context
 {
     public interface ITenantContextAccessor
     {

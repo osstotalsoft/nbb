@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Primitives;
 using System;
 

@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using MediatR;
 using NBB.Data.Abstractions;
 using NBB.Invoices.Domain.InvoiceAggregate;
 using NBB.Invoices.PublishedLanguage;

@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;

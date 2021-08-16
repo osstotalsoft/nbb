@@ -1,8 +1,11 @@
-﻿module Mox
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+module Mox
 type Mock<'a, 'b> (fn: 'a -> 'b) =
     let mutable wasCalled = false
-    member _.Fn = 
-        fun (a:'a) -> 
+    member _.Fn =
+        fun (a:'a) ->
             wasCalled <- true
             fn a
     member _.WasCalled = wasCalled

@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NBB.EventStore;
 using NBB.EventStore.Abstractions;

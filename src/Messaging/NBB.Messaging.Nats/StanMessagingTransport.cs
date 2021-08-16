@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Nats.Internal;
 using STAN.Client;

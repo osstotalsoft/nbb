@@ -1,4 +1,7 @@
-﻿namespace NBB.Application.Mediator.FSharp
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
 
@@ -6,7 +9,7 @@ open NBB.Core.Effects.FSharp
 type RequestHandler<'TRequest, 'TResponse> = 'TRequest -> Effect<'TResponse option>
 type RequestMiddleware<'TRequest, 'TResponse> = RequestHandler<'TRequest, 'TResponse> -> RequestHandler<'TRequest, 'TResponse>
 
-module RequestHandler = 
+module RequestHandler =
     let rec choose (handlers : RequestHandler<'i, 'o> list) : RequestHandler<'i, 'o> =
         fun (req : 'i) ->
             effect {
@@ -19,7 +22,7 @@ module RequestHandler =
                     | None   -> return! choose tail req
             }
 
-    let empty : RequestHandler<'TRequest, 'TResponse> = 
+    let empty : RequestHandler<'TRequest, 'TResponse> =
         fun _ -> Effect.pure' None
 
     let identity : RequestHandler<'TRequest, 'TRequest> =
@@ -60,7 +63,7 @@ module RequestMiddleware =
 
 
 
-    
+
 
 
 

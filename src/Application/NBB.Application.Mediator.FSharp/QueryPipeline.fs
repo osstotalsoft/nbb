@@ -1,9 +1,12 @@
-﻿namespace NBB.Application.Mediator.FSharp
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Application.Mediator.FSharp
 
 open NBB.Core.Effects.FSharp
 
 type IQuery = interface end
-type IQuery<'TResponse> = 
+type IQuery<'TResponse> =
     inherit IQuery
 
 type QueryHandler<'TQuery, 'TResponse when 'TQuery :> IQuery> = RequestHandler<'TQuery, 'TResponse>
@@ -12,13 +15,13 @@ type QueryMiddleware<'TQuery, 'TResponse when 'TQuery :> IQuery> = RequestMiddle
 type QueryMiddleware = QueryMiddleware<IQuery, obj>
 
 module QueryHandler =
-    let upCast (queryHandler: QueryHandler<'TQuery, 'TResponse>) : QueryHandler = 
+    let upCast (queryHandler: QueryHandler<'TQuery, 'TResponse>) : QueryHandler =
         fun query ->
             match query with
             | :? 'TQuery as query' -> query' |> queryHandler |> (Effect.map << Option.map) box
             | _ -> Effect.pure' None
 
 module QueryMiddleware =
-    let run (middleware: QueryMiddleware) (query: 'TQuery when 'TQuery :> IQuery<'TResponse>) = 
+    let run (middleware: QueryMiddleware) (query: 'TQuery when 'TQuery :> IQuery<'TResponse>) =
         query :> IQuery |> RequestMiddleware.run middleware |> Effect.map (Option.map (fun x -> x :?> 'TResponse))
 

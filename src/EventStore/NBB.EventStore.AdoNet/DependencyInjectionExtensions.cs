@@ -1,4 +1,7 @@
-﻿using NBB.EventStore;
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using NBB.EventStore;
 using NBB.EventStore.AdoNet.Internal;
 using NBB.EventStore.AdoNet;
 

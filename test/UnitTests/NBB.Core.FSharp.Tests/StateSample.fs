@@ -1,17 +1,20 @@
-﻿module StateSample
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+module StateSample
 
 open NBB.Core.FSharp.Data.State
 
 let inc x = x + 1
 
-let add x = 
+let add x =
     state {
         let! s = State.get
         do! State.modify inc
         return x + s
     }
 
-let mult x = 
+let mult x =
     state {
         let! s = State.get
         do! State.modify inc

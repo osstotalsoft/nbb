@@ -1,4 +1,7 @@
-﻿namespace NBB.Invoices.FSharp.Api.Handlers
+﻿// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+namespace NBB.Invoices.FSharp.Api.Handlers
 
 open NBB.Correlation
 open NBB.Application.Mediator.FSharp
@@ -20,7 +23,7 @@ module HandlerUtils =
     type Effect<'a> = FSharp.Effect<'a>
     module Effect = FSharp.Effect
 
-    let setError errorText = 
+    let setError errorText =
         (clearResponse >=> setStatusCode 500 >=> text errorText)
 
     let interpret<'TResult> (resultHandler: 'TResult -> HttpHandler) (effect: Effect<'TResult>) : HttpHandler =
@@ -29,7 +32,7 @@ module HandlerUtils =
                 let interpreter = ctx.RequestServices.GetRequiredService<IInterpreter>()
                 let! result = interpreter.Interpret(effect)
                 return! (result |> resultHandler) next ctx
-            }   
+            }
 
     let jsonResult = function
         | Ok value -> json value
@@ -41,17 +44,17 @@ module HandlerUtils =
 
     let commandResult (command : ICommand) : HttpHandler =
         fun (next : HttpFunc) (ctx : HttpContext) ->
-            let result = {| 
-                CommandId = System.Guid.NewGuid() 
-                CorrelationId = CorrelationManager.GetCorrelationId() 
+            let result = {|
+                CommandId = System.Guid.NewGuid()
+                CorrelationId = CorrelationManager.GetCorrelationId()
             |}
 
             Successful.OK result next ctx
 
-    let interpretCommand handler command = 
+    let interpretCommand handler command =
         let resultHandler _ = commandResult command
         command |> handler |> interpret resultHandler
 
-    let publishCommand : (ICommand -> HttpHandler) = 
-        MessageBus.publish |> interpretCommand 
+    let publishCommand : (ICommand -> HttpHandler) =
+        MessageBus.publish |> interpretCommand
 
