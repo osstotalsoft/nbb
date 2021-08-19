@@ -30,7 +30,10 @@ exec { & dotnet clean -c Release }
 
 exec { & dotnet build -c Release }
 
-exec { & dotnet test -c Release -r $artifacts --no-build -l trx --verbosity=normal }
+Get-ChildItem ./test/UnitTests -Include *.csproj, *.fsproj -Recurse |
+    ForEach-Object { 
+        exec { & dotnet test $_.FullName -c Release -r $artifacts --no-build -l trx --verbosity=normal }
+    }
 
 Get-ChildItem ./src -Filter *.csproj -Recurse | 
     ForEach-Object { 
