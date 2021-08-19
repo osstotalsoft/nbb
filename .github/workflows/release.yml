@@ -6,11 +6,10 @@ on:
     - '*.*.*'
 jobs:
   build:
-    # strategy:
-    #  fail-fast: false
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Build and Test
       run: ./Build.ps1
       shell: pwsh
@@ -20,8 +19,8 @@ jobs:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
       run: ./Push.ps1
       shell: pwsh
-    - name: Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifacts
-        path: artifacts/**/*
+    #- name: Artifacts
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: artifacts
+    #    path: artifacts/**/*

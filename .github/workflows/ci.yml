@@ -9,11 +9,10 @@ on:
       - master
 jobs:
   build:
-    #strategy:
-    #  fail-fast: false
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -21,8 +20,8 @@ jobs:
     - name: Build and Test
       run: ./Build.ps1
       shell: pwsh
-    - name: Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifacts
-        path: artifacts/**/*
+    #- name: Artifacts
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: artifacts
+    #    path: artifacts/**/*
