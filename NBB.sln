@@ -95,14 +95,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Payments.Worker", "samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB7B0468-DE25-4350-80AD-50E7C4D09120}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		Build.ps1 = Build.ps1
-		.editorconfig = .editorconfig
 		dependencies.props = dependencies.props
 		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 		nuget-push.ps1 = nuget-push.ps1
 		NuGet.config = NuGet.config
+		Push.ps1 = Push.ps1
 		README.md = README.md
 		UpgradeToNBB5.md = UpgradeToNBB5.md
 	EndProjectSection
@@ -222,7 +223,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.OpenTracing",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F57779EB-9107-427D-A65C-5AA262C348E1}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
 		.github\release-drafter.yml = .github\release-drafter.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Correlation.Serilog.SqlServer", "src\Correlation\NBB.Correlation.Serilog.SqlServer\NBB.Correlation.Serilog.SqlServer.csproj", "{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}"
@@ -326,7 +329,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{729F9B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{B951278D-3864-4239-A2CF-769953E827EC}"
 	ProjectSection(SolutionItems) = preProject
-		assets\img\appicon.png = assets\img\appicon.png
+		assets\img\icon.png = assets\img\icon.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.DataContracts", "src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj", "{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}"
