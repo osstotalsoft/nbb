@@ -1,4 +1,4 @@
-NBB [![Build status](https://dev.azure.com/totalsoft//NBB/_apis/build/status/NBB-CI-GitHub)](https://dev.azure.com/totalsoft/NBB/_build/latest?definitionId=35)
+NBB [![CI](https://github.com/osstotalsoft/nbb/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/osstotalsoft/nbb/actions/workflows/ci.yml)
 ===============
 >.Net Building Blocks
 
