@@ -2,7 +2,7 @@ NBB [![CI](https://github.com/osstotalsoft/nbb/actions/workflows/ci.yml/badge.sv
 ===============
 >.Net Building Blocks
 
-![Building blocks](assets/img/appicon.png)
+![Building blocks](assets/img/icon.png)
 
 Our philosophy
 ----------------

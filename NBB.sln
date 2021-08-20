@@ -329,7 +329,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{729F9B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{B951278D-3864-4239-A2CF-769953E827EC}"
 	ProjectSection(SolutionItems) = preProject
-		assets\img\appicon.png = assets\img\appicon.png
+		assets\img\icon.png = assets\img\icon.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.DataContracts", "src\Messaging\NBB.Messaging.DataContracts\NBB.Messaging.DataContracts.csproj", "{BC30AED1-5A8C-4100-A32F-1F8EDE84F2CB}"
