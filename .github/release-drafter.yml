@@ -8,6 +8,8 @@ categories:
   - title: 🛠️ Maintenance
     label: chore
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+commitish: 'support/4.x'
+filter-by-commitish: true
 template: |
   ## Changes
 
