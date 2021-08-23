@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - 'support/4.x'
+  pull_request:
+    branches:
+      - 'support/4.x'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Build and Test
+      run: ./Build.ps1
+      shell: pwsh
+    #- name: Artifacts
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: artifacts
+    #    path: artifacts/**/*

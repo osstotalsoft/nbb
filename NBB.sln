@@ -85,10 +85,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Payments.Worker", "samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB7B0468-DE25-4350-80AD-50E7C4D09120}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Build.ps1 = Build.ps1
 		dependencies.props = dependencies.props
 		Directory.Build.props = Directory.Build.props
 		nuget-push.ps1 = nuget-push.ps1
 		NuGet.config = NuGet.config
+		Push.ps1 = Push.ps1
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -369,7 +372,14 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Application.Mediator.FS
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "NBB.Application.Mediator.FSharp.Tests", "test\UnitTests\Application\NBB.Application.Mediator.FSharp.Tests\NBB.Application.Mediator.FSharp.Tests.fsproj", "{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "EffectsBenchmarks", "test\Benchmarks\EffectsBenchmarks\EffectsBenchmarks\EffectsBenchmarks.fsproj", "{FFC30800-0595-4F67-9497-4A818C87CA00}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "EffectsBenchmarks", "test\Benchmarks\EffectsBenchmarks\EffectsBenchmarks\EffectsBenchmarks.fsproj", "{FFC30800-0595-4F67-9497-4A818C87CA00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{27FD8281-6183-4DC4-9EFD-D3455B191411}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\release-drafter.yml = .github\workflows\release-drafter.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1042,6 +1052,7 @@ Global
 		{1C636C6F-12F4-47BF-B681-004706DB7D74} = {4DCC0E0D-52D8-4F97-9B26-C3F9CB76F16F}
 		{5E3FBE02-EA05-4666-9A23-21E9C53AC0CF} = {404998FD-60A3-414E-A30F-FAE46AE28158}
 		{FFC30800-0595-4F67-9497-4A818C87CA00} = {BE777108-64EF-4E35-93DD-A90B93A631B9}
+		{27FD8281-6183-4DC4-9EFD-D3455B191411} = {F57779EB-9107-427D-A65C-5AA262C348E1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
