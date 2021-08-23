@@ -28,6 +28,6 @@ jobs:
           name: v${{ steps.gitversion.outputs.semVer }}
           tag: v${{ steps.gitversion.outputs.semVer }}
           version: v${{ steps.gitversion.outputs.semVer }}
-          commitish: 'support/4.x'
+          commitish:  ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
