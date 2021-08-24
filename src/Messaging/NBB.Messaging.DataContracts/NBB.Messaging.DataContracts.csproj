@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <Description>This package helps us formalize and instrument messaging data contracts.</Description>
   </PropertyGroup>
 
   <ItemGroup>
