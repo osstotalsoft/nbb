@@ -220,9 +220,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.OpenTracing",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F57779EB-9107-427D-A65C-5AA262C348E1}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\ci.yml = .github\workflows\ci.yml
 		.github\release-drafter.yml = .github\release-drafter.yml
-		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Correlation.Serilog.SqlServer", "src\Correlation\NBB.Correlation.Serilog.SqlServer\NBB.Correlation.Serilog.SqlServer.csproj", "{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}"
@@ -367,6 +365,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projections", "Projections", "{7665D483-5A83-4E03-B8D6-77C7A1784867}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProjectR.Tests", "test\UnitTests\Projections\NBB.ProjectR.Tests\NBB.ProjectR.Tests.csproj", "{DEE1C2A9-6787-4101-9D64-9614BBA470D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E7A719C2-1F6B-47DB-9708-3313EB2DBB4F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\release-drafter.yml = .github\workflows\release-drafter.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -979,6 +984,7 @@ Global
 		{051481A2-B720-48A0-A811-595FDD00AF02} = {F9DAE019-CA73-419E-83AE-47AF6AE6D736}
 		{7665D483-5A83-4E03-B8D6-77C7A1784867} = {90E022FB-CA1B-49DD-9BEA-CE7F8E74E8BB}
 		{DEE1C2A9-6787-4101-9D64-9614BBA470D1} = {7665D483-5A83-4E03-B8D6-77C7A1784867}
+		{E7A719C2-1F6B-47DB-9708-3313EB2DBB4F} = {F57779EB-9107-427D-A65C-5AA262C348E1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
