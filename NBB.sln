@@ -95,17 +95,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Payments.Worker", "samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB7B0468-DE25-4350-80AD-50E7C4D09120}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		Build.ps1 = Build.ps1
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
 		dependencies.props = dependencies.props
 		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
-		nuget-push.ps1 = nuget-push.ps1
 		NuGet.config = NuGet.config
 		Push.ps1 = Push.ps1
 		README.md = README.md
-		UpgradeToNBB5.md = UpgradeToNBB5.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{83E383BB-C9D9-4F5F-BAAF-FF1ADFF0B151}"
@@ -143,8 +144,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventStoreBenchmarks", "test\Benchmarks\EventStoreBenchmarks\EventStoreBenchmarks.csproj", "{A648A670-0A7B-49BC-8017-E3462A89916D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.EventStore.AdoNet", "src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj", "{25A21016-7DF7-4884-9241-AC21D7D35ABE}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{C5410077-1E20-4DC2-8AB2-AB40CA80C4AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Nats", "src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj", "{3C1C5EBB-A1C4-4B27-A3B2-C99DF646273E}"
 EndProject
@@ -201,8 +200,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.DependencyInjectio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Host", "src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj", "{B15B9803-EB9D-4BA2-9B09-ACAE8F11252D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DocFx", "docs\DocFx\DocFx.csproj", "{7C3851B7-151E-4DB4-8DC8-DED438D2A998}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.DataContracts.Tests", "test\UnitTests\Messaging\NBB.Messaging.DataContracts.Tests\NBB.Messaging.DataContracts.Tests.csproj", "{D4F5F69C-9A9F-425C-8DBA-B8053AE506B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Host.Tests", "test\UnitTests\Messaging\NBB.Messaging.Host.Tests\NBB.Messaging.Host.Tests.csproj", "{E6C9D6ED-2405-45C6-898A-EE7CE9D7D5B2}"
@@ -223,9 +220,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.OpenTracing",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F57779EB-9107-427D-A65C-5AA262C348E1}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\ci.yml = .github\workflows\ci.yml
 		.github\release-drafter.yml = .github\release-drafter.yml
-		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Correlation.Serilog.SqlServer", "src\Correlation\NBB.Correlation.Serilog.SqlServer\NBB.Correlation.Serilog.SqlServer.csproj", "{F442DC3C-D2E9-468F-A6E3-D639E6F5D168}"
@@ -370,6 +365,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projections", "Projections", "{7665D483-5A83-4E03-B8D6-77C7A1784867}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.ProjectR.Tests", "test\UnitTests\Projections\NBB.ProjectR.Tests\NBB.ProjectR.Tests.csproj", "{DEE1C2A9-6787-4101-9D64-9614BBA470D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E7A719C2-1F6B-47DB-9708-3313EB2DBB4F}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\release-drafter.yml = .github\workflows\release-drafter.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -593,8 +595,6 @@ Global
 		{B15B9803-EB9D-4BA2-9B09-ACAE8F11252D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B15B9803-EB9D-4BA2-9B09-ACAE8F11252D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B15B9803-EB9D-4BA2-9B09-ACAE8F11252D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7C3851B7-151E-4DB4-8DC8-DED438D2A998}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C3851B7-151E-4DB4-8DC8-DED438D2A998}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4F5F69C-9A9F-425C-8DBA-B8053AE506B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D4F5F69C-9A9F-425C-8DBA-B8053AE506B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4F5F69C-9A9F-425C-8DBA-B8053AE506B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -910,7 +910,6 @@ Global
 		{329C3A29-B023-478C-9D73-91621B101F81} = {F031DBDA-5D3F-4CE6-B133-09CE7E212584}
 		{4B368840-DA86-48FA-969D-A086F016BB7A} = {14726095-DA28-43A6-A9A9-F16C605932E1}
 		{B15B9803-EB9D-4BA2-9B09-ACAE8F11252D} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
-		{7C3851B7-151E-4DB4-8DC8-DED438D2A998} = {C5410077-1E20-4DC2-8AB2-AB40CA80C4AF}
 		{D4F5F69C-9A9F-425C-8DBA-B8053AE506B5} = {A4361674-5AB7-442D-8DA7-7187C9BCA38F}
 		{E6C9D6ED-2405-45C6-898A-EE7CE9D7D5B2} = {A4361674-5AB7-442D-8DA7-7187C9BCA38F}
 		{0058E23D-59A0-422F-826B-F3027BFC6738} = {14726095-DA28-43A6-A9A9-F16C605932E1}
@@ -985,6 +984,7 @@ Global
 		{051481A2-B720-48A0-A811-595FDD00AF02} = {F9DAE019-CA73-419E-83AE-47AF6AE6D736}
 		{7665D483-5A83-4E03-B8D6-77C7A1784867} = {90E022FB-CA1B-49DD-9BEA-CE7F8E74E8BB}
 		{DEE1C2A9-6787-4101-9D64-9614BBA470D1} = {7665D483-5A83-4E03-B8D6-77C7A1784867}
+		{E7A719C2-1F6B-47DB-9708-3313EB2DBB4F} = {F57779EB-9107-427D-A65C-5AA262C348E1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
