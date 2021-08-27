@@ -14,20 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0    
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.10
-        with:
-          versionSpec: '5.x'
-      - name: Determine Version
-        id:   gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.10
+          fetch-depth: 0
       # Drafts your next Release notes as Pull Requests are merged into "feature/support4.x"
       - uses: release-drafter/release-drafter@v5
         with:
-          name: v${{ steps.gitversion.outputs.semVer }}
-          tag: v${{ steps.gitversion.outputs.semVer }}
-          version: v${{ steps.gitversion.outputs.semVer }}
-          commitish:  ${{ github.ref }}
+          config-name: release-drafter-v4.x.yml # located in .github/ in default branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
