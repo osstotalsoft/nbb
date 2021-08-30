@@ -15,15 +15,17 @@ namespace NBB.Messaging.Abstractions
         private readonly ITopicRegistry _topicRegistry;
         private readonly IMessageSerDes _messageSerDes;
         private readonly ILogger<MessageBusSubscriber> _logger;
+        private readonly IMessageBusPublisher _messageBusPublisher;
 
         public MessageBusSubscriber(IMessagingTransport messagingTransport, ITopicRegistry topicRegistry,
             IMessageSerDes messageSerDes,
-            ILogger<MessageBusSubscriber> logger)
+            ILogger<MessageBusSubscriber> logger, IMessageBusPublisher messageBusPublisher)
         {
             _messagingTransport = messagingTransport;
             _topicRegistry = topicRegistry;
             _messageSerDes = messageSerDes;
             _logger = logger;
+            _messageBusPublisher = messageBusPublisher;
         }
 
         public async Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
@@ -70,11 +72,11 @@ namespace NBB.Messaging.Abstractions
                         MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
                     };
 
-                    var envelope = new MessagingEnvelope(messageEnvelope.Headers, payload);
-                    var errorMessage = _messageSerDes.SerializeMessageEnvelope(envelope);
+                    //var envelope = new MessagingEnvelope(messageEnvelope.Headers, payload);
+                    //var errorMessage = _messageSerDes.SerializeMessageEnvelope(envelope);
 
-                    var errorTopicName = _topicRegistry.GetTopicForName("_error");
-                    await _messagingTransport.PublishAsync(errorTopicName, errorMessage, cancellationToken);
+                    //var errorTopicName = _topicRegistry.GetTopicForName("_error");
+                    await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
                 }
             }
 
