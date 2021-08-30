@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,6 +50,31 @@ namespace NBB.Messaging.Abstractions
                         topicName, ex);
 
                     //TODO: push to DLQ
+
+                    var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(messageData);
+                    var payload = new
+                    {
+                        ErrorMessage = ex.Message,
+                        ex.StackTrace,
+                        ex.Source,
+                        Data = messageEnvelope,
+                        OriginalTopic = topicName,
+                        OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
+                        CorrelationId = messageEnvelope.GetCorrelationId(),
+                        MessageType = messageEnvelope.GetMessageTypeId(),
+                        PublishTime = messageEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
+                                                                         ? DateTime.TryParse(value, out var publishTime)
+                                                                        ? publishTime
+                                                                        : default
+                                                                    : default,
+                        MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
+                    };
+
+                    var envelope = new MessagingEnvelope(messageEnvelope.Headers, payload);
+                    var errorMessage = _messageSerDes.SerializeMessageEnvelope(envelope);
+
+                    var errorTopicName = _topicRegistry.GetTopicForName("_error");
+                    await _messagingTransport.PublishAsync(errorTopicName, errorMessage, cancellationToken);
                 }
             }
 

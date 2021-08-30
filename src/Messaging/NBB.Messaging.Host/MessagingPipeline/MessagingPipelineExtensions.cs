@@ -38,6 +38,14 @@ namespace NBB.Messaging.Host
             => UseMiddleware<ExceptionHandlingMiddleware>(pipelineBuilder);
 
         /// <summary>
+        /// Adds to the pipeline a middleware that logs and validate outgoing message's schema.
+        /// </summary>
+        /// <param name="pipelineBuilder">The pipeline builder.</param>
+        /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
+        public static IPipelineBuilder<MessagingContext> UseSchemaMessageValidatorMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
+            => UseMiddleware<SchemaMessageValidatorMiddleware>(pipelineBuilder);
+
+        /// <summary>
         /// Adds to the pipeline a middleware that sends/publishes messages that are events, commands or queries to mediatR.
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>
