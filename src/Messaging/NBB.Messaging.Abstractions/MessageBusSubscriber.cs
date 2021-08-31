@@ -94,9 +94,9 @@ namespace NBB.Messaging.Abstractions
                         await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
                     }
 
-                    catch (Exception)
+                    catch (Exception exception)
                     {
-                        _logger.LogError("The error message could not be published to Soter application!");
+                        _logger.LogError($"The error message could not be published to Soter application due to {exception}");
                     }
                 }
             }
