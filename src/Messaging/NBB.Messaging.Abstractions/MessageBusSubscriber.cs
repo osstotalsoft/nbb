@@ -2,8 +2,8 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -53,30 +53,46 @@ namespace NBB.Messaging.Abstractions
 
                     //TODO: push to DLQ
 
-                    var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(messageData);
-                    var payload = new
+                    try
                     {
-                        ErrorMessage = ex.Message,
-                        ex.StackTrace,
-                        ex.Source,
-                        Data = messageEnvelope,
-                        OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
-                        OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
-                        CorrelationId = messageEnvelope.GetCorrelationId(),
-                        MessageType = messageEnvelope.GetMessageTypeId(),
-                        PublishTime = messageEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
-                                                                         ? DateTime.TryParse(value, out var publishTime)
-                                                                        ? publishTime
-                                                                        : default
-                                                                    : default,
-                        MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
-                    };
+                        var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(messageData);
+                      
+                        var payload = new
+                        {
+                            ErrorMessage = ex.Message,
+                            ex.StackTrace,
+                            ex.Source,
+                            Data = messageEnvelope,
+                            OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
+                            OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
+                            CorrelationId = messageEnvelope.GetCorrelationId(),
+                            MessageType = messageEnvelope.GetMessageTypeId(),
+                            PublishTime = messageEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
+                                                                             ? DateTime.TryParse(value, out var publishTime)
+                                                                            ? publishTime
+                                                                            : default
+                                                                        : default,
+                            MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
+                        };
 
-                    //var envelope = new MessagingEnvelope(messageEnvelope.Headers, payload);
-                    //var errorMessage = _messageSerDes.SerializeMessageEnvelope(envelope);
+                        await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
+                    }
+                    catch (JsonReaderException jsonReaderException)
+                    {
+                        var envelopeString = System.Text.Encoding.UTF8.GetString(messageData);
+                        var payload = new
+                        {
+                            ErrorMessage = jsonReaderException.Message,
+                            jsonReaderException.StackTrace,
+                            jsonReaderException.Source,
+                            OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
+                            OriginalSystem =  string.Empty,
+                            PublishTime = DateTime.Now,
+                            MessageId =  string.Empty
+                        };
 
-                    //var errorTopicName = _topicRegistry.GetTopicForName("_error");
-                    await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
+                        await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
+                    }
                 }
             }
 
