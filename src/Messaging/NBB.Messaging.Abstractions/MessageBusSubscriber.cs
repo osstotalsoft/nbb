@@ -96,7 +96,7 @@ namespace NBB.Messaging.Abstractions
 
                     catch (Exception)
                     {
-                        _logger.LogError("The error message could not been published to Soter application!");
+                        _logger.LogError("The error message could not be published to Soter application!");
                     }
                 }
             }
