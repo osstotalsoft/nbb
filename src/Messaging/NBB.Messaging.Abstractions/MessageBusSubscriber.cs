@@ -56,7 +56,7 @@ namespace NBB.Messaging.Abstractions
                     try
                     {
                         var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(messageData);
-                      
+
                         var payload = new
                         {
                             ErrorMessage = ex.Message,
@@ -86,12 +86,17 @@ namespace NBB.Messaging.Abstractions
                             jsonReaderException.StackTrace,
                             jsonReaderException.Source,
                             OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
-                            OriginalSystem =  string.Empty,
+                            OriginalSystem = string.Empty,
                             PublishTime = DateTime.Now,
-                            MessageId =  string.Empty
+                            MessageId = string.Empty
                         };
 
                         await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
+                    }
+
+                    catch (Exception)
+                    {
+                        _logger.LogError("The error message could not been published to Soter application!");
                     }
                 }
             }
