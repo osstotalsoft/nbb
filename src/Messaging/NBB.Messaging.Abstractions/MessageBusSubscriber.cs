@@ -60,7 +60,7 @@ namespace NBB.Messaging.Abstractions
                         ex.StackTrace,
                         ex.Source,
                         Data = messageEnvelope,
-                        OriginalTopic = topicName,
+                        OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
                         OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
                         CorrelationId = messageEnvelope.GetCorrelationId(),
                         MessageType = messageEnvelope.GetMessageTypeId(),
