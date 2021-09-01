@@ -82,6 +82,7 @@ namespace NBB.Messaging.Abstractions
                         var envelopeString = System.Text.Encoding.UTF8.GetString(messageData);
                         var payload = new
                         {
+                            Data = envelopeString,
                             ErrorMessage = jsonReaderException.Message,
                             jsonReaderException.StackTrace,
                             jsonReaderException.Source,
