@@ -31,9 +31,6 @@ namespace NBB.Messaging.Host
             if (!context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var _))
                 throw new Exception($"Message of type {context.MessagingEnvelope.Payload.GetType().GetPrettyName()} does not contain {MessagingHeaders.PublishTime} header.");
 
-            if (!context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.StreamId, out var _))
-                throw new Exception($"Message of type {context.MessagingEnvelope.Payload.GetType().GetPrettyName()} does not contain {MessagingHeaders.StreamId} header.");
-
             if (!context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var _))
                 throw new Exception($"Message of type {context.MessagingEnvelope.Payload.GetType().GetPrettyName()} does not contain {MessagingHeaders.Source} header.");
 
