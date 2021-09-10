@@ -23,7 +23,7 @@ namespace NBB.Messaging.Abstractions
         {
             options ??= MessageSerDesOptions.Default;
             var payload = Deserialize<JObject>(payloadBytes);
-            var messageTypeId = (metadata?.TryGetValue(MessagingHeaders.MessageType, out var value) ?? false) ? value : null;
+            var messageTypeId = new MessagingEnvelope(null, metadata).GetMessageTypeId();
             var outputType = ResolveOutputType<TMessage>(messageTypeId, typeof(TMessage), options);
 
             return (TMessage)payload.ToObject(outputType);
