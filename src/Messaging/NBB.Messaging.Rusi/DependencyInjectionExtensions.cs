@@ -3,6 +3,7 @@
 
 using System;
 using Grpc.Core;
+using Grpc.Core.Interceptors;
 using Grpc.Net.Client.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -21,10 +22,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure<RusiOptions>(configuration.GetSection("Messaging").GetSection("Rusi"));
 
             services.AddGrpcClient<Rusi.RusiClient>((sp, o) =>
-            {
-                var opts = sp.GetRequiredService<IOptions<RusiOptions>>();
-                o.Address = new Uri(opts.Value.RusiUrl);
-                o.ChannelOptionsActions.Add(options =>
+                {
+                    var opts = sp.GetRequiredService<IOptions<RusiOptions>>();
+                    o.Address = new Uri(opts.Value.RusiUrl);
+                })
+                .ConfigureChannel(options =>
                 {
                     options.MaxRetryAttempts = 200;
                     options.ServiceConfig = new ServiceConfig
@@ -46,7 +48,6 @@ namespace Microsoft.Extensions.DependencyInjection
                         }
                     };
                 });
-            });
 
             services.AddSingleton<IMessageBusSubscriber, RusiMessageBusSubscriber>();
             //services.AddSingleton<IMessageBusPublisher, RusiMessageBusPublisher>();

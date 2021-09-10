@@ -32,7 +32,7 @@ namespace NBB.Messaging.Rusi
             _logger = logger;
         }
 
-        public async Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
+        public Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
             MessagingSubscriberOptions options = null,
             CancellationToken cancellationToken = default)
         {
@@ -68,29 +68,16 @@ namespace NBB.Messaging.Rusi
             });
 
 
-            //if awaited, blocks 
-            readStreamAsync(subscription, MsgHandler, cancellationToken);
+            //if awaited, blocks
+            _ = Task.Run(async () =>
+                {
+                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
+                    {
+                        await MsgHandler(msg);
+                    }
+                });
 
-            return Disposable.Empty;
-        }
-
-        private async Task readStreamAsync(AsyncServerStreamingCall<ReceivedMessage> subscription,
-            Func<ReceivedMessage, Task> handler,
-            CancellationToken token)
-        {
-            await foreach (var msg in subscription.ResponseStream.ReadAllAsync(token))
-            {
-                await handler(msg);
-            }
-        }
-
-        private class Disposable : IDisposable
-        {
-            public static readonly Disposable Empty = new ();
-            public void Dispose()
-            {
-                
-            }
+            return Task.FromResult<IDisposable>(subscription);
         }
     }
 }

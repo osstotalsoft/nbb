@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package rusi.proto.runtime.v1;
 
-import "google/protobuf/any.proto";
+// import "google/protobuf/any.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "pkg/proto/runtime/v1";
 option csharp_namespace = "Proto.V1";
@@ -14,7 +16,7 @@ service Rusi {
   rpc Publish(PublishRequest) returns (google.protobuf.Empty);
 
   // Subscribe pushes events on the stream
-  rpc Subscribe(SubscribeRequest) returns ( stream ReceivedMessage);
+  rpc Subscribe(SubscribeRequest) returns (stream ReceivedMessage);
 
 }
 
@@ -33,7 +35,7 @@ message PublishRequest {
   //
   // metadata property:
   // - key : the key of the message.
-  map<string,string> metadata = 4;
+  map<string, string> metadata = 4;
 }
 
 message SubscribeRequest {
@@ -41,16 +43,20 @@ message SubscribeRequest {
   string pubsub_name = 1;
   // The pubsub topic
   string topic = 2;
+  SubscriptionOptions options = 3;
+}
+
+message SubscriptionOptions {
+  google.protobuf.StringValue durable = 1;
+  google.protobuf.BoolValue qGroup = 2;
+  google.protobuf.Int32Value maxConcurrentMessages = 3;
+  google.protobuf.BoolValue deliverNewMessagesOnly = 4;
+  google.protobuf.Duration ackWaitTime = 5;
 }
 
 
 message ReceivedMessage {
   // The data which will be published to topic.
   bytes data = 1;
-
-  // The metadata passing to pub components
-  //
-  // metadata property:
-  // - key : the key of the message.
-  map<string,string> metadata = 2;
+  map<string, string> metadata = 2;
 }
