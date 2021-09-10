@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -17,26 +18,33 @@ namespace NBB.Messaging.Abstractions
             _messageTypeRegistry = messageTypeRegistry;
         }
 
-        public TMessage DeserializeMessage<TMessage>(byte[] payloadBytes, string messageTypeId = null,
+        public TMessage DeserializePayload<TMessage>(byte[] payloadBytes, IDictionary<string, string> metadata = null,
             MessageSerDesOptions options = null)
         {
-            var payloadString = System.Text.Encoding.UTF8.GetString(payloadBytes);
-            var (payload, runtimeType) = DeserializePayload(payloadString, typeof(TMessage), messageTypeId, options);
-
-            var outputType = runtimeType ??
-                             (typeof(TMessage) == typeof(object) ? typeof(ExpandoObject) : typeof(TMessage));
+            options ??= MessageSerDesOptions.Default;
+            var payload = Deserialize<JObject>(payloadBytes);
+            var messageTypeId = (metadata?.TryGetValue(MessagingHeaders.MessageType, out var value) ?? false) ? value : null;
+            var outputType = ResolveOutputType<TMessage>(messageTypeId, typeof(TMessage), options);
 
             return (TMessage)payload.ToObject(outputType);
+        }
+
+        public (byte[] payloadBytes, IDictionary<string, string> additionalMetadata)
+            SerializePayload<TMessage>(TMessage message, MessageSerDesOptions options = null)
+        {
+            var messageTypeId = _messageTypeRegistry.GetTypeId(message.GetType());
+            var additionalMetadata = new Dictionary<string, string> { { MessagingHeaders.MessageType, messageTypeId } };
+
+            return (Serialize(message), additionalMetadata);
         }
 
         public MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(byte[] envelopeData,
             MessageSerDesOptions options = null)
         {
-            var envelopeString = System.Text.Encoding.UTF8.GetString(envelopeData);
-            var (partialEnvelope, runtimeType) = DeserializePartialEnvelope(envelopeString, typeof(TMessage), options);
-
-            var outputType = runtimeType ??
-                             (typeof(TMessage) == typeof(object) ? typeof(ExpandoObject) : typeof(TMessage));
+            options ??= MessageSerDesOptions.Default;
+            var partialEnvelope = Deserialize<MessagingEnvelope<JObject>>(envelopeData);
+            var messageTypeId = partialEnvelope.GetMessageTypeId();
+            var outputType = ResolveOutputType<TMessage>(messageTypeId, typeof(TMessage), options);
 
             return new MessagingEnvelope<TMessage>(partialEnvelope.Headers,
                 (TMessage)partialEnvelope.Payload.ToObject(outputType));
@@ -47,72 +55,55 @@ namespace NBB.Messaging.Abstractions
             var messageTypeId = _messageTypeRegistry.GetTypeId(message.Payload.GetType());
             message.SetHeader(MessagingHeaders.MessageType, messageTypeId, true);
 
+            return Serialize(message);
+        }
+        private Type ResolveOutputType<TMessage>(string messageTypeId, Type expectedType, MessageSerDesOptions options = null)
+        {
+            var runtimeType = ResolveRuntimeType(messageTypeId, expectedType, options);
+
+            return runtimeType ?? (typeof(TMessage) == typeof(object) ? typeof(ExpandoObject) : typeof(TMessage));
+        }
+
+        private Type ResolveRuntimeType(string messageTypeId, Type expectedType, MessageSerDesOptions options = null)
+        {
+            if (!options.UseDynamicDeserialization)
+                return null;
+
+            if (messageTypeId == null)
+            {
+                if (expectedType == null || expectedType.IsAbstract || expectedType.IsInterface)
+                    throw new Exception("Type information was not found in MessageType header");
+
+                return null;
+            }
+
+            var runtimeType =
+                _messageTypeRegistry.ResolveType(messageTypeId, options.DynamicDeserializationScannedAssemblies);
+
+            if (runtimeType == null)
+                return null;
+
+            if (expectedType != null && !expectedType.IsAssignableFrom(runtimeType))
+                throw new Exception($"Incompatible types: expected {expectedType} and found {runtimeType}");
+
+            return runtimeType;
+        }
+
+        private T Deserialize<T>(byte[] data)
+        {
+            var envelopeString = System.Text.Encoding.UTF8.GetString(data);
+
+            return JsonConvert.DeserializeObject<T>(envelopeString);
+        }
+
+        private byte[] Serialize<T>(T message)
+        {
             var json = JsonConvert.SerializeObject(message, new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
             return System.Text.Encoding.UTF8.GetBytes(json);
-        }
-
-        private (MessagingEnvelope<JObject> envelope, Type runtimeType) DeserializePartialEnvelope(
-            string envelopeString, Type expectedType = null, MessageSerDesOptions options = null)
-        {
-            options ??= MessageSerDesOptions.Default;
-            var partialEnvelope = JsonConvert.DeserializeObject<MessagingEnvelope<JObject>>(envelopeString);
-
-            if (!options.UseDynamicDeserialization)
-                return (partialEnvelope, null);
-
-            var messageTypeId = partialEnvelope.GetMessageTypeId();
-            if (messageTypeId == null)
-            {
-                if (expectedType == null || expectedType.IsAbstract || expectedType.IsInterface)
-                    throw new Exception("Type information was not found in MessageType header");
-
-                return (partialEnvelope, null);
-            }
-
-            var runtimeType =
-                _messageTypeRegistry.ResolveType(messageTypeId, options.DynamicDeserializationScannedAssemblies);
-
-            if (runtimeType == null)
-                return (partialEnvelope, null);
-
-            if (expectedType != null && !expectedType.IsAssignableFrom(runtimeType))
-                throw new Exception($"Incompatible types: expected {expectedType} and found {runtimeType}");
-
-            return (partialEnvelope, runtimeType);
-        }
-
-        private (JObject payload, Type runtimeType) DeserializePayload(
-            string payloadString, Type expectedType, string messageTypeId, MessageSerDesOptions options = null)
-        {
-            options ??= MessageSerDesOptions.Default;
-            var payload = JsonConvert.DeserializeObject<JObject>(payloadString);
-
-            if (!options.UseDynamicDeserialization)
-                return (payload, null);
-
-            if (messageTypeId == null)
-            {
-                if (expectedType == null || expectedType.IsAbstract || expectedType.IsInterface)
-                    throw new Exception("Type information was not found in MessageType header");
-
-                return (payload, null);
-            }
-
-            var runtimeType =
-                _messageTypeRegistry.ResolveType(messageTypeId, options.DynamicDeserializationScannedAssemblies);
-
-            if (runtimeType == null)
-                return (payload, null);
-
-            if (expectedType != null && !expectedType.IsAssignableFrom(runtimeType))
-                throw new Exception($"Incompatible types: expected {expectedType} and found {runtimeType}");
-
-            return (payload, runtimeType);
-
         }
     }
 }

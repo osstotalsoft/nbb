@@ -46,7 +46,7 @@ namespace NBB.Messaging.Rusi
 
                 try
                 {
-                    var payload = _messageSerDes.DeserializeMessage<TMessage>(messageData.Data.ToByteArray());
+                    var payload = _messageSerDes.DeserializePayload<TMessage>(messageData.Data.ToByteArray(), messageData.Metadata);
                     var messageEnvelope = new MessagingEnvelope<TMessage>(messageData.Metadata, payload);
 
                     await handler(messageEnvelope);
