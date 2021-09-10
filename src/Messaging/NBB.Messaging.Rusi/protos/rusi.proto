@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package rusi.proto.runtime.v1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "pkg/proto/runtime/v1";
+option csharp_namespace = "Proto.V1";
+
+service Rusi {
+
+  // Publishes events to the specific topic.
+  rpc Publish(PublishRequest) returns (google.protobuf.Empty);
+
+  // Subscribe pushes events on the stream
+  rpc Subscribe(SubscribeRequest) returns ( stream ReceivedMessage);
+
+}
+
+// PublishRequest is the message to publish data to pubsub topic
+message PublishRequest {
+  // The name of the pubsub component
+  string pubsub_name = 1;
+
+  // The pubsub topic
+  string topic = 2;
+
+  // The data which will be published to topic.
+  bytes data = 3;
+
+  // The metadata passing to pub components
+  //
+  // metadata property:
+  // - key : the key of the message.
+  map<string,string> metadata = 4;
+}
+
+message SubscribeRequest {
+  // The name of the pubsub component
+  string pubsub_name = 1;
+  // The pubsub topic
+  string topic = 2;
+}
+
+
+message ReceivedMessage {
+  // The data which will be published to topic.
+  bytes data = 1;
+
+  // The metadata passing to pub components
+  //
+  // metadata property:
+  // - key : the key of the message.
+  map<string,string> metadata = 2;
+}

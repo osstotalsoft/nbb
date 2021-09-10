@@ -8,11 +8,11 @@ namespace NBB.Messaging.Abstractions
 {
     public record MessagingEnvelope
     {
-        public Dictionary<string, string> Headers { get; }
+        public IDictionary<string, string> Headers { get; }
 
         public object Payload { get; }
 
-        public MessagingEnvelope(Dictionary<string, string> headers, object payload)
+        public MessagingEnvelope(IDictionary<string, string> headers, object payload)
         {
             Headers = headers ?? throw new ArgumentNullException(nameof(headers));
             Payload = payload ?? throw new ArgumentNullException(nameof(payload));
@@ -21,7 +21,7 @@ namespace NBB.Messaging.Abstractions
 
     public record MessagingEnvelope<TMessage> : MessagingEnvelope
     {
-        public MessagingEnvelope(Dictionary<string, string> headers, TMessage payload)
+        public MessagingEnvelope(IDictionary<string, string> headers, TMessage payload)
             : base(headers, payload)
         {
         }

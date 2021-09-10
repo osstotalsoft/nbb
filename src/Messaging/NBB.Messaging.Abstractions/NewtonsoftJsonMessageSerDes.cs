@@ -17,7 +17,20 @@ namespace NBB.Messaging.Abstractions
             _messageTypeRegistry = messageTypeRegistry;
         }
 
-        public MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(byte[] envelopeData, MessageSerDesOptions options = null)
+        public TMessage DeserializeMessage<TMessage>(byte[] payloadBytes, string messageTypeId = null,
+            MessageSerDesOptions options = null)
+        {
+            var payloadString = System.Text.Encoding.UTF8.GetString(payloadBytes);
+            var (payload, runtimeType) = DeserializePayload(payloadString, typeof(TMessage), messageTypeId, options);
+
+            var outputType = runtimeType ??
+                             (typeof(TMessage) == typeof(object) ? typeof(ExpandoObject) : typeof(TMessage));
+
+            return (TMessage)payload.ToObject(outputType);
+        }
+
+        public MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(byte[] envelopeData,
+            MessageSerDesOptions options = null)
         {
             var envelopeString = System.Text.Encoding.UTF8.GetString(envelopeData);
             var (partialEnvelope, runtimeType) = DeserializePartialEnvelope(envelopeString, typeof(TMessage), options);
@@ -26,7 +39,7 @@ namespace NBB.Messaging.Abstractions
                              (typeof(TMessage) == typeof(object) ? typeof(ExpandoObject) : typeof(TMessage));
 
             return new MessagingEnvelope<TMessage>(partialEnvelope.Headers,
-                (TMessage) partialEnvelope.Payload.ToObject(outputType));
+                (TMessage)partialEnvelope.Payload.ToObject(outputType));
         }
 
         public byte[] SerializeMessageEnvelope(MessagingEnvelope message, MessageSerDesOptions options = null)
@@ -70,6 +83,36 @@ namespace NBB.Messaging.Abstractions
                 throw new Exception($"Incompatible types: expected {expectedType} and found {runtimeType}");
 
             return (partialEnvelope, runtimeType);
+        }
+
+        private (JObject payload, Type runtimeType) DeserializePayload(
+            string payloadString, Type expectedType, string messageTypeId, MessageSerDesOptions options = null)
+        {
+            options ??= MessageSerDesOptions.Default;
+            var payload = JsonConvert.DeserializeObject<JObject>(payloadString);
+
+            if (!options.UseDynamicDeserialization)
+                return (payload, null);
+
+            if (messageTypeId == null)
+            {
+                if (expectedType == null || expectedType.IsAbstract || expectedType.IsInterface)
+                    throw new Exception("Type information was not found in MessageType header");
+
+                return (payload, null);
+            }
+
+            var runtimeType =
+                _messageTypeRegistry.ResolveType(messageTypeId, options.DynamicDeserializationScannedAssemblies);
+
+            if (runtimeType == null)
+                return (payload, null);
+
+            if (expectedType != null && !expectedType.IsAssignableFrom(runtimeType))
+                throw new Exception($"Incompatible types: expected {expectedType} and found {runtimeType}");
+
+            return (payload, runtimeType);
+
         }
     }
 }

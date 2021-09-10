@@ -6,17 +6,15 @@
       "src\\Messaging\\NBB.Messaging.Effects\\NBB.Messaging.Effects.csproj",
       "src\\Messaging\\NBB.Messaging.Host\\NBB.Messaging.Host.csproj",
       "src\\Messaging\\NBB.Messaging.InProcessMessaging\\NBB.Messaging.InProcessMessaging.csproj",
-      "src\\Messaging\\NBB.Messaging.Kafka\\NBB.Messaging.Kafka.csproj",
       "src\\Messaging\\NBB.Messaging.MultiTenancy\\NBB.Messaging.MultiTenancy.csproj",
       "src\\Messaging\\NBB.Messaging.Nats\\NBB.Messaging.Nats.csproj",
       "src\\Messaging\\NBB.Messaging.OpenTracing\\NBB.Messaging.OpenTracing.csproj",
-      "test\\Benchmarks\\MessagingBenchmarks\\MessagingBenchmarks.csproj",
+      "src\\Messaging\\NBB.Messaging.Rusi\\NBB.Messaging.Rusi.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.Abstractions.Tests\\NBB.Messaging.Abstractions.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.DataContracts.Tests\\NBB.Messaging.DataContracts.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.Effects.Tests\\NBB.Messaging.Effects.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.Host.Tests\\NBB.Messaging.Host.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.InProcessMessaging.Tests\\NBB.Messaging.InProcessMessaging.Tests.csproj",
-      "test\\UnitTests\\Messaging\\NBB.Messaging.Kafka.Tests\\NBB.Messaging.Kafka.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.MultiTenancy.Tests\\NBB.Messaging.MultiTenancy.Tests.csproj"
     ]
   }

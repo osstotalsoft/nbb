@@ -7,6 +7,9 @@ namespace NBB.Messaging.Abstractions
     {
         byte[] SerializeMessageEnvelope(MessagingEnvelope envelope, MessageSerDesOptions options = null);
 
+        public TMessage DeserializeMessage<TMessage>(byte[] payloadBytes, string messageTypeId = null,
+            MessageSerDesOptions options = null);
+
         MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(byte[] envelopeData,
             MessageSerDesOptions options = null);
 
