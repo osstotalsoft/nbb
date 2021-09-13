@@ -24,7 +24,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddGrpcClient<Rusi.RusiClient>((sp, o) =>
                 {
                     var opts = sp.GetRequiredService<IOptions<RusiOptions>>();
-                    o.Address = new Uri(opts.Value.RusiUrl);
+
+                    if (string.IsNullOrEmpty(opts.Value.RusiPort))
+                        throw new ArgumentNullException("RusiPort");
+
+                    o.Address = new Uri(opts.Value.RusiPort);
                 })
                 .ConfigureChannel(options =>
                 {
@@ -50,7 +54,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
 
             services.AddSingleton<IMessageBusSubscriber, RusiMessageBusSubscriber>();
-            //services.AddSingleton<IMessageBusPublisher, RusiMessageBusPublisher>();
+            services.AddSingleton<IMessageBusPublisher, RusiMessageBusPublisher>();
+
+            services.PostConfigureAll<RusiOptions>(options =>
+            {
+                options.RusiPort = Environment.GetEnvironmentVariable("RUSI_GRPC_PORT");
+
+                if (string.IsNullOrEmpty(options.PubsubName))
+                    throw new ArgumentNullException("Rusi.PubsubName");
+
+                if (string.IsNullOrEmpty(options.RusiPort))
+                    throw new ArgumentNullException("Rusi.RusiPort");
+            });
 
             return services;
         }

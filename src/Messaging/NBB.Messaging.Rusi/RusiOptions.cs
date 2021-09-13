@@ -5,10 +5,10 @@ namespace NBB.Messaging.Rusi
 {
     public class RusiOptions
     {
-        public string RusiUrl { get; set; }
+        public string RusiPort { get; set; }
 
         public string PubsubName { get; set; }
-        //public string Certificate { get; set; }
 
+        //public string Certificate { get; set; }
     }
 }

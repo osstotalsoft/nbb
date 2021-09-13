@@ -15,7 +15,8 @@
       "test\\UnitTests\\Messaging\\NBB.Messaging.Effects.Tests\\NBB.Messaging.Effects.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.Host.Tests\\NBB.Messaging.Host.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.InProcessMessaging.Tests\\NBB.Messaging.InProcessMessaging.Tests.csproj",
-      "test\\UnitTests\\Messaging\\NBB.Messaging.MultiTenancy.Tests\\NBB.Messaging.MultiTenancy.Tests.csproj"
+      "test\\UnitTests\\Messaging\\NBB.Messaging.MultiTenancy.Tests\\NBB.Messaging.MultiTenancy.Tests.csproj",
+      "test\\UnitTests\\Messaging\\NBB.Messaging.Rusi.Tests\\NBB.Messaging.Rusi.Tests.csproj"
     ]
   }
 }

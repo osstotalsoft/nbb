@@ -9,6 +9,7 @@ using Proto.V1;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Google.Protobuf.WellKnownTypes;
 
 namespace NBB.Messaging.Rusi
 {
@@ -40,13 +41,53 @@ namespace NBB.Messaging.Rusi
             var topicName = _topicRegistry.GetTopicForName(options?.TopicName) ??
                             _topicRegistry.GetTopicForMessageType(typeof(TMessage));
 
-            async Task MsgHandler(ReceivedMessage messageData)
+
+            var transport = options?.Transport ?? SubscriptionTransportOptions.Default;
+            var subscriptionOptions = new SubscriptionOptions()
+            {
+                DeliverNewMessagesOnly = transport.DeliverNewMessagesOnly,
+                MaxConcurrentMessages = transport.MaxConcurrentMessages,
+                QGroup = transport.UseGroup,
+                Durable = transport.IsDurable ? "durable" : null
+            };
+
+            if (transport.AckWait.HasValue)
+                subscriptionOptions.AckWaitTime =
+                    Duration.FromTimeSpan(TimeSpan.FromMilliseconds(transport.AckWait.Value));
+
+            var subscription = _client.Subscribe(new SubscribeRequest()
+            {
+                PubsubName = _options.Value.PubsubName,
+                Topic = topicName,
+                Options = subscriptionOptions
+            });
+
+            var msgHandler = GetHandler(handler, topicName, options);
+
+            //if awaited, blocks
+            _ = Task.Run(async () =>
+            {
+                await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
+                {
+                    await msgHandler(msg);
+                }
+            });
+
+            return Task.FromResult<IDisposable>(subscription);
+        }
+
+        public Func<ReceivedMessage, Task> GetHandler<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
+            string topicName, MessagingSubscriberOptions options)
+        {
+            return async messageData =>
             {
                 _logger.LogDebug("Messaging subscriber received message from subject {Subject}", topicName);
 
                 try
                 {
-                    var payload = _messageSerDes.DeserializePayload<TMessage>(messageData.Data.ToByteArray(), messageData.Metadata);
+                    var payload =
+                        _messageSerDes.DeserializePayload<TMessage>(messageData.Data.ToByteArray(),
+                            messageData.Metadata, options?.SerDes);
                     var messageEnvelope = new MessagingEnvelope<TMessage>(messageData.Metadata, payload);
 
                     await handler(messageEnvelope);
@@ -59,25 +100,7 @@ namespace NBB.Messaging.Rusi
 
                     //TODO: push to DLQ
                 }
-            }
-
-            var subscription = _client.Subscribe(new SubscribeRequest()
-            {
-                PubsubName = _options.Value.PubsubName,
-                Topic = topicName
-            });
-
-
-            //if awaited, blocks
-            _ = Task.Run(async () =>
-                {
-                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
-                    {
-                        await MsgHandler(msg);
-                    }
-                });
-
-            return Task.FromResult<IDisposable>(subscription);
+            };
         }
     }
 }
