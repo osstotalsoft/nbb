@@ -53,8 +53,8 @@ namespace NBB.Messaging.Rusi.Tests
             //Assert
             publishRequest.Data.ToStringUtf8().Should().Be("{\"TestProp\":\"test1\"}");
             publishRequest.Topic.Should().Be(topicReg.GetTopicForMessageType(message.GetType()));
-            publishRequest.Metadata.Should().ContainKey("nbb-messageType");
-            publishRequest.Metadata.Should().ContainKey("nbb-corrrelationId");
+            publishRequest.Metadata.Should().ContainKey(MessagingHeaders.MessageType);
+            publishRequest.Metadata.Should().ContainKey(MessagingHeaders.CorrelationId);
 
         }
 
