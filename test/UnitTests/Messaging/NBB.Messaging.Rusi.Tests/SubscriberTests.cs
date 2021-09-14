@@ -20,7 +20,7 @@ namespace NBB.Messaging.Rusi.Tests
         [Fact]
         public async Task TestSubscriber()
         {
-            /// Arrange
+            // Arrange
             var msgCount = 3;
             var msg = new ReceivedMessage()
             {
