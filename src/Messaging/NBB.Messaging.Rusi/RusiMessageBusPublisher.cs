@@ -1,13 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Google.Protobuf;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -16,6 +9,11 @@ using NBB.Core.Abstractions;
 using NBB.Correlation;
 using NBB.Messaging.Abstractions;
 using Proto.V1;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NBB.Messaging.Rusi
 {
@@ -67,6 +65,7 @@ namespace NBB.Messaging.Rusi
                 PubsubName = _options.Value.PubsubName,
                 Topic = newTopicName,
                 Data = ByteString.CopyFrom(payload),
+                DataContentType = "application/json;charset=utf-8",
                 Metadata = { outgoingEnvelope.Headers }
             };
         }

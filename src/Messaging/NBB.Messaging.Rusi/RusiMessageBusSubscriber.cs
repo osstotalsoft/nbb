@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,7 +10,6 @@ using Proto.V1;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
 
 namespace NBB.Messaging.Rusi
 {
@@ -48,7 +48,7 @@ namespace NBB.Messaging.Rusi
                 DeliverNewMessagesOnly = transport.DeliverNewMessagesOnly,
                 MaxConcurrentMessages = transport.MaxConcurrentMessages,
                 QGroup = transport.UseGroup,
-                Durable = transport.IsDurable ? "durable" : null
+                Durable = transport.IsDurable
             };
 
             if (transport.AckWait.HasValue)

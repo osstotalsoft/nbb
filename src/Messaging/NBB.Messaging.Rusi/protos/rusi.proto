@@ -31,11 +31,14 @@ message PublishRequest {
   // The data which will be published to topic.
   bytes data = 3;
 
+  // The content type for the data (optional).
+  string data_content_type = 4;
+
   // The metadata passing to pub components
   //
   // metadata property:
   // - key : the key of the message.
-  map<string, string> metadata = 4;
+  map<string, string> metadata = 5;
 }
 
 message SubscribeRequest {
@@ -47,7 +50,7 @@ message SubscribeRequest {
 }
 
 message SubscriptionOptions {
-  google.protobuf.StringValue durable = 1;
+  google.protobuf.BoolValue durable = 1;
   google.protobuf.BoolValue qGroup = 2;
   google.protobuf.Int32Value maxConcurrentMessages = 3;
   google.protobuf.BoolValue deliverNewMessagesOnly = 4;
