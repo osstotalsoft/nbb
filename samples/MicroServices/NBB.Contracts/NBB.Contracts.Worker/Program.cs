@@ -47,6 +47,7 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
+                    //services.AddRusiMessageBus(hostingContext.Configuration);
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
                     services.AddContractsWriteModelDataAccess();
