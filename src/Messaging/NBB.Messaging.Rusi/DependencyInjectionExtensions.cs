@@ -16,10 +16,19 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection AddRusiTransport(this IServiceCollection services,
+
+        public static IServiceCollection AddRusiMessageBus(this IServiceCollection services,
             IConfiguration configuration)
         {
             services.Configure<RusiOptions>(configuration.GetSection("Messaging").GetSection("Rusi"));
+
+            services.AddSingleton<IMessageBusSubscriber, RusiMessageBusSubscriber>();
+            services.AddSingleton<IMessageBusPublisher, RusiMessageBusPublisher>();
+
+            services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();
+            services.AddSingleton<IMessageSerDes, NewtonsoftJsonMessageSerDes>();
+            services.AddSingleton<IMessageTypeRegistry, DefaultMessageTypeRegistry>();
+            services.AddSingleton<IMessageBus, MessageBus>();
 
             services.AddGrpcClient<Rusi.RusiClient>((sp, o) =>
                 {
@@ -28,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     if (string.IsNullOrEmpty(opts.Value.RusiPort))
                         throw new ArgumentNullException("RusiPort");
 
-                    o.Address = new Uri(opts.Value.RusiPort);
+                    o.Address = new Uri($"http://localhost:{opts.Value.RusiPort}");
                 })
                 .ConfigureChannel(options =>
                 {
@@ -53,12 +62,11 @@ namespace Microsoft.Extensions.DependencyInjection
                     };
                 });
 
-            services.AddSingleton<IMessageBusSubscriber, RusiMessageBusSubscriber>();
-            services.AddSingleton<IMessageBusPublisher, RusiMessageBusPublisher>();
 
             services.PostConfigureAll<RusiOptions>(options =>
             {
-                options.RusiPort = Environment.GetEnvironmentVariable("RUSI_GRPC_PORT");
+                if (string.IsNullOrEmpty(options.RusiPort))
+                    options.RusiPort = Environment.GetEnvironmentVariable("RUSI_GRPC_PORT");
 
                 if (string.IsNullOrEmpty(options.PubsubName))
                     throw new ArgumentNullException("Rusi.PubsubName");
