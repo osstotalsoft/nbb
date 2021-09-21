@@ -59,6 +59,7 @@ namespace NBB.Messaging.Abstractions
 
                         var payload = new
                         {
+                            ExceptionType = ex.GetType(),
                             ErrorMessage = ex.Message,
                             ex.StackTrace,
                             ex.Source,
@@ -82,6 +83,7 @@ namespace NBB.Messaging.Abstractions
                         var envelopeString = System.Text.Encoding.UTF8.GetString(messageData);
                         var payload = new
                         {
+                            ExceptionType = jsonReaderException.GetType(),
                             Data = envelopeString,
                             ErrorMessage = jsonReaderException.Message,
                             jsonReaderException.StackTrace,
