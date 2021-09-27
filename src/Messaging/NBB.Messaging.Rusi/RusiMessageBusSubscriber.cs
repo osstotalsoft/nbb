@@ -57,40 +57,50 @@ namespace NBB.Messaging.Rusi
                 subscriptionOptions.AckWaitTime =
                     Duration.FromTimeSpan(TimeSpan.FromMilliseconds(transport.AckWait.Value));
 
+            var subRequest = new SubscribeRequest()
+            {
+                PubsubName = _options.Value.PubsubName,
+                Topic = topicName,
+                Options = subscriptionOptions
+            };
+
+            var subscription = _client.Subscribe(subRequest);
+            var returnDisposable = new DisposableSubscriptionWrapper() { InternalSubscription = subscription };
+
             var policy = Policy
                 .Handle<RpcException>(ex => ex.StatusCode == StatusCode.Unavailable)
-                .WaitAndRetryAsync(20, i => TimeSpan.FromSeconds(Math.Pow(i, 2)));
+                .WaitAndRetryAsync(20, i => TimeSpan.FromSeconds(Math.Pow(i, 2)),
+                    (exception, span) => { returnDisposable.InternalSubscription = null; });
+
+            var msgHandler = GetHandler(handler, topicName, options);
 
             //if awaited, blocks
             _ = Task.Run(async () =>
             {
-                var result = await policy.ExecuteAndCaptureAsync(async (_) =>
+                await policy.ExecuteAsync(async (_) =>
                 {
-                    var subscription = _client.Subscribe(new SubscribeRequest()
-                    {
-                        PubsubName = _options.Value.PubsubName,
-                        Topic = topicName,
-                        Options = subscriptionOptions
-                    });
-
-                    var msgHandler = GetHandler(handler, topicName, options);
-
-                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
+                    returnDisposable.InternalSubscription ??= _client.Subscribe(subRequest);
+                    await foreach (var msg in returnDisposable.InternalSubscription.ResponseStream.ReadAllAsync())
                     {
                         await msgHandler(msg);
                     }
 
                 }, cancellationToken);
 
-                if (result.Outcome == OutcomeType.Failure)
-                {
-                    // TODO send to DLQ
-                    ExceptionDispatchInfo.Capture(result.FinalException).Throw();
-                }
-
+                // TODO send to DLQ
             });
 
-            return Task.FromResult<IDisposable>(subscription);
+            return Task.FromResult<IDisposable>(returnDisposable);
+        }
+
+        private class DisposableSubscriptionWrapper : IDisposable
+        {
+            internal AsyncServerStreamingCall<Proto.V1.ReceivedMessage> InternalSubscription { set; get; }
+
+            public void Dispose()
+            {
+                InternalSubscription?.Dispose();
+            }
         }
 
         public Func<ReceivedMessage, Task> GetHandler<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
