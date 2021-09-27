@@ -8,8 +8,10 @@ using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
 using Proto.V1;
 using System;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
 
 namespace NBB.Messaging.Rusi
 {
@@ -55,22 +57,37 @@ namespace NBB.Messaging.Rusi
                 subscriptionOptions.AckWaitTime =
                     Duration.FromTimeSpan(TimeSpan.FromMilliseconds(transport.AckWait.Value));
 
-            var subscription = _client.Subscribe(new SubscribeRequest()
-            {
-                PubsubName = _options.Value.PubsubName,
-                Topic = topicName,
-                Options = subscriptionOptions
-            });
-
-            var msgHandler = GetHandler(handler, topicName, options);
+            var policy = Policy
+                .Handle<RpcException>(ex => ex.StatusCode == StatusCode.Unavailable)
+                .WaitAndRetryAsync(20, i => TimeSpan.FromSeconds(Math.Pow(i, 2)));
 
             //if awaited, blocks
             _ = Task.Run(async () =>
             {
-                await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
+                var result = await policy.ExecuteAndCaptureAsync(async (_) =>
                 {
-                    await msgHandler(msg);
+                    var subscription = _client.Subscribe(new SubscribeRequest()
+                    {
+                        PubsubName = _options.Value.PubsubName,
+                        Topic = topicName,
+                        Options = subscriptionOptions
+                    });
+
+                    var msgHandler = GetHandler(handler, topicName, options);
+
+                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
+                    {
+                        await msgHandler(msg);
+                    }
+
+                }, cancellationToken);
+
+                if (result.Outcome == OutcomeType.Failure)
+                {
+                    // TODO send to DLQ
+                    ExceptionDispatchInfo.Capture(result.FinalException).Throw();
                 }
+
             });
 
             return Task.FromResult<IDisposable>(subscription);
