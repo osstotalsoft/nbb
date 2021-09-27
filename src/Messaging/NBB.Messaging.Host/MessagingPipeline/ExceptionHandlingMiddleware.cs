@@ -50,6 +50,7 @@ namespace NBB.Messaging.Host
 
                 await _messageBusPublisher.PublishAsync(new
                 {
+                    ExceptionType = ex.GetType(),
                     ErrorMessage = ex.Message,
                     ex.StackTrace,
                     ex.Source,

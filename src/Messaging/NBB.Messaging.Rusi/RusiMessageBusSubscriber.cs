@@ -81,9 +81,9 @@ namespace NBB.Messaging.Rusi
                 {
                     returnDisposable.InternalSubscription ??= _client.Subscribe(subRequest);
                     await foreach (var msg in returnDisposable.InternalSubscription.ResponseStream.ReadAllAsync())
-                    {
-                        await msgHandler(msg);
-                    }
+                {
+                    await msgHandler(msg);
+                }
 
                 }, cancellationToken);
 
