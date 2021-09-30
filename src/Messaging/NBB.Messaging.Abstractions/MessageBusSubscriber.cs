@@ -2,8 +2,8 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,97 +14,83 @@ namespace NBB.Messaging.Abstractions
         private readonly IMessagingTransport _messagingTransport;
         private readonly ITopicRegistry _topicRegistry;
         private readonly IMessageSerDes _messageSerDes;
+        private readonly IDeadLetterQueue _deadLetterQueue;
         private readonly ILogger<MessageBusSubscriber> _logger;
-        private readonly IMessageBusPublisher _messageBusPublisher;
 
         public MessageBusSubscriber(IMessagingTransport messagingTransport, ITopicRegistry topicRegistry,
-            IMessageSerDes messageSerDes,
-            ILogger<MessageBusSubscriber> logger, IMessageBusPublisher messageBusPublisher)
+            IMessageSerDes messageSerDes, IDeadLetterQueue deadLetterQueue,
+            ILogger<MessageBusSubscriber> logger)
         {
             _messagingTransport = messagingTransport;
             _topicRegistry = topicRegistry;
             _messageSerDes = messageSerDes;
+            _deadLetterQueue = deadLetterQueue;
             _logger = logger;
-            _messageBusPublisher = messageBusPublisher;
         }
 
         public async Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
             MessagingSubscriberOptions options = null,
             CancellationToken cancellationToken = default)
         {
-            var topicName = _topicRegistry.GetTopicForName(options?.TopicName) ??
-                        _topicRegistry.GetTopicForMessageType(typeof(TMessage));
+            var topicNameWithoutPrefix = _topicRegistry.GetTopicForName(options?.TopicName, false) ??
+                        _topicRegistry.GetTopicForMessageType(typeof(TMessage), false);
 
-            async Task MsgHandler(byte[] messageData)
+            var topicName = _topicRegistry.GetTopicForName(topicNameWithoutPrefix);
+
+            void logSubscriberError(Exception exception) =>
+                _logger.LogError("Messaging consumer encountered an error when handling a message from subject {Subject}.\n {Error}",
+                        topicName, exception);
+
+            async Task MsgHandler(TransportReceiveContext messageData)
             {
                 _logger.LogDebug("Messaging subscriber received message from subject {Subject}", topicName);
+                var messageEnvelope = messageData.EnvelopeAccessor.Invoke() as MessagingEnvelope<TMessage>;
 
                 try
                 {
-                    var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope<TMessage>(messageData);
-
                     await handler(messageEnvelope);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(
-                        "Messaging consumer encountered an error when handling a message from subject {Subject}.\n {Error}",
-                        topicName, ex);
+                    logSubscriberError(ex);
 
-                    //TODO: push to DLQ
-
-                    try
-                    {
-                        var messageEnvelope = _messageSerDes.DeserializeMessageEnvelope(messageData);
-
-                        var payload = new
-                        {
-                            ExceptionType = ex.GetType(),
-                            ErrorMessage = ex.Message,
-                            ex.StackTrace,
-                            ex.Source,
-                            Data = messageEnvelope,
-                            OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
-                            OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
-                            CorrelationId = messageEnvelope.GetCorrelationId(),
-                            MessageType = messageEnvelope.GetMessageTypeId(),
-                            PublishTime = messageEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
-                                                                             ? DateTime.TryParse(value, out var publishTime)
-                                                                            ? publishTime
-                                                                            : default
-                                                                        : default,
-                            MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
-                        };
-
-                        await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
-                    }
-                    catch (JsonReaderException jsonReaderException)
-                    {
-                        var envelopeString = System.Text.Encoding.UTF8.GetString(messageData);
-                        var payload = new
-                        {
-                            ExceptionType = jsonReaderException.GetType(),
-                            Data = envelopeString,
-                            ErrorMessage = jsonReaderException.Message,
-                            jsonReaderException.StackTrace,
-                            jsonReaderException.Source,
-                            OriginalTopic = _topicRegistry.GetTopicForName(options?.TopicName, false) ?? _topicRegistry.GetTopicForMessageType(typeof(TMessage), false),
-                            OriginalSystem = string.Empty,
-                            PublishTime = DateTime.Now,
-                            MessageId = string.Empty
-                        };
-
-                        await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
-                    }
-
-                    catch (Exception exception)
-                    {
-                        _logger.LogError($"The error message could not be published to Soter application due to {exception}");
-                    }
+                    if (messageEnvelope != null)
+                        _deadLetterQueue.Push(messageEnvelope, topicNameWithoutPrefix, ex);
                 }
             }
 
-            return await _messagingTransport.SubscribeAsync(topicName, MsgHandler, options?.Transport, cancellationToken);
+            TransportReceiveContext EnvelopeFactory(byte[] envelopeData)
+            {
+                MessagingEnvelope<TMessage> envelope = null;
+                try
+                {
+                    envelope = _messageSerDes.DeserializeMessageEnvelope<TMessage>(envelopeData, options?.SerDes);
+                }
+                catch (Exception ex)
+                {
+                    logSubscriberError(ex);
+                    _deadLetterQueue.Push(envelopeData, topicNameWithoutPrefix, ex);
+                }
+                return new TransportReceiveContext(EnvelopeAccessor: () => envelope);
+            }
+
+            TransportReceiveContext PayloadFactory(byte[] payloadData, IDictionary<string, string> headers)
+            {
+                TMessage payload = default;
+                try
+                {
+                    payload = _messageSerDes.DeserializePayload<TMessage>(payloadData, headers, options?.SerDes);
+                }
+                catch (Exception ex)
+                {
+                    logSubscriberError(ex);
+                    _deadLetterQueue.Push(payloadData, headers, topicNameWithoutPrefix, ex);
+                }
+                return new TransportReceiveContext(EnvelopeAccessor: () => new MessagingEnvelope<TMessage>(headers, payload));
+            }
+
+            var receiveContextFactory = new TransportReceiveContextFactory(FromEnvelopeBytes: EnvelopeFactory, FromPayloadBytesAndHeaders: PayloadFactory);
+            return await _messagingTransport.SubscribeAsync(topicName, MsgHandler, receiveContextFactory, options?.Transport, cancellationToken);
         }
     }
 }

@@ -35,12 +35,16 @@ namespace NBB.Messaging.Abstractions
             CancellationToken cancellationToken = default)
         {
             var outgoingEnvelope = PrepareMessageEnvelope(message, publisherOptions?.EnvelopeCustomizer);
-            var envelopeData = _messageSerDes.SerializeMessageEnvelope(outgoingEnvelope);
+            var sendContext = new TransportSendContext(
+                PayloadBytesAccessor: () => _messageSerDes.SerializePayload(outgoingEnvelope.Payload),
+                EnvelopeBytesAccessor: () => _messageSerDes.SerializeMessageEnvelope(outgoingEnvelope),
+                HeadersAccessor: () => outgoingEnvelope.Headers
+            );
 
             var newTopicName = _topicRegistry.GetTopicForName(publisherOptions?.TopicName) ??
                                _topicRegistry.GetTopicForMessageType(message.GetType());
 
-            await _messagingTransport.PublishAsync(newTopicName, envelopeData, cancellationToken);
+            await _messagingTransport.PublishAsync(newTopicName, sendContext, cancellationToken);
 
             _logger.LogDebug("Messaging publisher sent a message for subject {Subject}", newTopicName);
             await Task.Yield();

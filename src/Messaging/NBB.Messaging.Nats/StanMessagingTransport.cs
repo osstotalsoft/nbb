@@ -22,7 +22,8 @@ namespace NBB.Messaging.Nats
             _natsOptions = natsOptions;
         }
 
-        public Task<IDisposable> SubscribeAsync(string topic, Func<byte[], Task> handler,
+        public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+            TransportReceiveContextFactory receiveContextFactory,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
@@ -51,7 +52,10 @@ namespace NBB.Messaging.Nats
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                await handler(args.Message.Data);
+                var receiveContext = receiveContextFactory.FromEnvelopeBytes(args.Message.Data);
+
+                await handler(receiveContext);
+
                 args.Message.Ack();
             }
 
@@ -66,10 +70,12 @@ namespace NBB.Messaging.Nats
             return Task.FromResult(subscription);
         }
 
-        public Task PublishAsync(string topic, byte[] message, CancellationToken cancellationToken = default)
+        public Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
         {
+            var envelopeData = sendContext.EnvelopeBytesAccessor.Invoke();
+
             return _stanConnectionManager.ExecuteAsync(
-                async connection => await connection.PublishAsync(topic, message));
+                async connection => await connection.PublishAsync(topic, envelopeData));
         }
     }
 }

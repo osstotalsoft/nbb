@@ -4,7 +4,6 @@
 using FluentAssertions;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Messaging.Abstractions;
@@ -25,14 +24,11 @@ namespace NBB.Messaging.Rusi.Tests
         {
             //Arrange
             var config = new ConfigurationBuilder().Build();
-            var message = new TestMessage { TestProp = "test1" };
+            var payloadString = "{\"TestProp\":\"test1\"}";
+            var topic = "topic";
             var rusiClient = Mock.Of<Proto.V1.Rusi.RusiClient>();
-            var topicReg = new DefaultTopicRegistry(config);
-            var serdes = new NewtonsoftJsonMessageSerDes(new DefaultMessageTypeRegistry());
-            var publisher = new RusiMessageBusPublisher(rusiClient,
-                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }),
-                serdes, topicReg, new NullLogger<RusiMessageBusPublisher>(),
-                config);
+            var publisher = new RusiMessagingTransport(rusiClient,
+                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }));
 
             PublishRequest publishRequest = null;
 
@@ -46,24 +42,19 @@ namespace NBB.Messaging.Rusi.Tests
                 .Returns(() => new AsyncUnaryCall<Empty>(Task.FromResult(new Empty()),
                     null, null, null, null, null));
 
+            var sendContext = new TransportSendContext(
+                PayloadBytesAccessor: () => (Google.Protobuf.ByteString.CopyFromUtf8(payloadString).ToByteArray(), new Dictionary<string, string>() { ["h1"] = "v1" }),
+                EnvelopeBytesAccessor: () => null,
+                HeadersAccessor: () => new Dictionary<string, string>() { ["h2"] = "v2" });
 
             //Act     
-            await publisher.PublishAsync(message, MessagingPublisherOptions.Default);
+            await publisher.PublishAsync(topic, sendContext);
 
             //Assert
-            publishRequest.Data.ToStringUtf8().Should().Be("{\"TestProp\":\"test1\"}");
-            publishRequest.Topic.Should().Be(topicReg.GetTopicForMessageType(message.GetType()));
-            publishRequest.Metadata.Should().ContainKey(MessagingHeaders.MessageType);
-            publishRequest.Metadata.Should().ContainKey(MessagingHeaders.CorrelationId);
-
+            publishRequest.Data.ToStringUtf8().Should().Be(payloadString);
+            publishRequest.Topic.Should().Be(topic);
+            publishRequest.Metadata.Should().ContainKey("h1");
+            publishRequest.Metadata.Should().ContainKey("h2");
         }
-
-
-
-        public class TestMessage
-        {
-            public string TestProp { set; get; }
-        }
-
     }
 }

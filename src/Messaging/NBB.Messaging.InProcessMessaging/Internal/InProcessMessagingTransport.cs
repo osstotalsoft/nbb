@@ -21,7 +21,8 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             _logger = logger;
         }
 
-        public async Task<IDisposable> SubscribeAsync(string topic, Func<byte[], Task> handler,
+        public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+            TransportReceiveContextFactory receiveContextFactory,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
@@ -29,7 +30,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             {
                 try
                 {
-                    await handler(msg);
+                    await handler(receiveContextFactory.FromEnvelopeBytes(msg));
                 }
                 catch (Exception ex)
                 {
@@ -45,10 +46,11 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             return new Subscription();
         }
 
-        public Task PublishAsync(string topic, byte[] message, CancellationToken cancellationToken = default)
+        public Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Start();
+            var message = sendContext.EnvelopeBytesAccessor();
             _storage.Enqueue(message, topic);
             stopWatch.Stop();
 

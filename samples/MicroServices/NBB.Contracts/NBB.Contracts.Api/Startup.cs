@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
+using System;
 
 namespace NBB.Contracts.Api
 {
@@ -35,8 +36,20 @@ namespace NBB.Contracts.Api
             services.AddSingleton(Configuration);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            //services.AddRusiMessageBus(Configuration);
-            services.AddMessageBus().AddNatsTransport(Configuration);
+            var transport = Configuration.GetValue("Messaging:Transport", "NATS");
+            if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
+            {
+                services.AddMessageBus().AddNatsTransport(Configuration).UseTopicResolutionBackwardCompatibility(Configuration);
+            }
+            else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
+            {
+
+                services.AddMessageBus().AddRusiTransport(Configuration).UseTopicResolutionBackwardCompatibility(Configuration);
+            }
+            else
+            {
+                throw new Exception($"Messaging:Transport={transport} not supported");
+            }
 
             services.AddContractsReadModelDataAccess();
         }

@@ -16,6 +16,7 @@ using Serilog.Events;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.MSSqlServer;
+using System;
 
 namespace NBB.Contracts.Worker
 {
@@ -47,8 +48,20 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
-                    //services.AddRusiMessageBus(hostingContext.Configuration);
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+                    var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
+                    if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        services.AddMessageBus().AddNatsTransport(hostingContext.Configuration).UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
+                    }
+                    else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
+                    {
+
+                        services.AddMessageBus().AddRusiTransport(hostingContext.Configuration).UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
+                    }
+                    else
+                    {
+                        throw new Exception($"Messaging:Transport={transport} not supported");
+                    }
 
                     services.AddContractsWriteModelDataAccess();
                     services.AddContractsReadModelDataAccess();

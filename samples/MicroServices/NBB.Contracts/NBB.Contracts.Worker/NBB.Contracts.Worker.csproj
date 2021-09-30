@@ -35,6 +35,7 @@
         <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />
         <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
         <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore\NBB.EventStore.csproj" />
+        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />

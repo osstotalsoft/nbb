@@ -16,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMessageSerDes, NewtonsoftJsonMessageSerDes>();
             services.AddSingleton<IMessageTypeRegistry, DefaultMessageTypeRegistry>();
             services.AddSingleton<IMessageBus, MessageBus>();
+            services.AddSingleton<IDeadLetterQueue, DefaultDeadLetterQueue>();
 
             return services;
         }

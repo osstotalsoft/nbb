@@ -17,18 +17,12 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class DependencyInjectionExtensions
     {
 
-        public static IServiceCollection AddRusiMessageBus(this IServiceCollection services,
+        public static IServiceCollection AddRusiTransport(this IServiceCollection services,
             IConfiguration configuration)
         {
             services.Configure<RusiOptions>(configuration.GetSection("Messaging").GetSection("Rusi"));
 
-            services.AddSingleton<IMessageBusSubscriber, RusiMessageBusSubscriber>();
-            services.AddSingleton<IMessageBusPublisher, RusiMessageBusPublisher>();
-
-            services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();
-            services.AddSingleton<IMessageSerDes, NewtonsoftJsonMessageSerDes>();
-            services.AddSingleton<IMessageTypeRegistry, DefaultMessageTypeRegistry>();
-            services.AddSingleton<IMessageBus, MessageBus>();
+            services.AddSingleton<IMessagingTransport, RusiMessagingTransport>();
 
             services.AddGrpcClient<Rusi.RusiClient>((sp, o) =>
                 {

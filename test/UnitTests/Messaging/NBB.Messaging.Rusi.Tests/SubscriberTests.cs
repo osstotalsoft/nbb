@@ -2,16 +2,15 @@
 // This source code is licensed under the MIT license.
 
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Messaging.Abstractions;
 using Proto.V1;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Xunit;
 using Google.Protobuf;
+using System.Text;
 
 namespace NBB.Messaging.Rusi.Tests
 {
@@ -22,10 +21,11 @@ namespace NBB.Messaging.Rusi.Tests
         {
             // Arrange
             var msgCount = 3;
+            var payload = "{\"TestProp\":\"test1\"}";
             var msg = new ReceivedMessage()
             {
                 Metadata = { { "aaa", "bbb" } },
-                Data = ByteString.CopyFromUtf8("{\"TestProp\":\"test1\"}")
+                Data = ByteString.CopyFromUtf8(payload)
             };
 
             var mockResponseStream = Mock.Of<IAsyncStreamReader<ReceivedMessage>>(x => x.Current == msg);
@@ -38,27 +38,30 @@ namespace NBB.Messaging.Rusi.Tests
                 .Setup(m => m.Subscribe(It.IsAny<SubscribeRequest>(), null, null, default))
                 .Returns(new AsyncServerStreamingCall<ReceivedMessage>(mockResponseStream, Task.FromResult(new Metadata()), () => Status.DefaultSuccess, () => new Metadata(), () => { }));
 
-            var topicReg = new DefaultTopicRegistry(Mock.Of<IConfiguration>());
-            var expectedTopic = topicReg.GetTopicForMessageType(typeof(TestMessage));
-            var serdes = new NewtonsoftJsonMessageSerDes(Mock.Of<IMessageTypeRegistry>());
-            var subscriber = new RusiMessageBusSubscriber(rusiClient,
-                                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }),
-                                topicReg, serdes, new NullLogger<RusiMessageBusSubscriber>());
+            var topic = "topic";
+            var subscriber = new RusiMessagingTransport(rusiClient,
+                                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }));
 
-            var handler = Mock.Of<Func<MessagingEnvelope<TestMessage>, Task>>();
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+
+            var receiveContextFactory = new TransportReceiveContextFactory(
+                FromEnvelopeBytes: _ => null,
+                FromPayloadBytesAndHeaders: (payloadBytes, headers) => new TransportReceiveContext(() => new MessagingEnvelope(headers, Encoding.UTF8.GetString(payloadBytes)))
+            );
 
             // Act
-            using var subscription = await subscriber.SubscribeAsync(handler);
+            using var subscription = await subscriber.SubscribeAsync(topic, handler, receiveContextFactory);
             await Task.Delay(100); //TODO: use more reliable awaiting
 
             // Assert
             Mock.Get(rusiClient)
-                .Verify(x => x.Subscribe(It.Is<SubscribeRequest>(req => req.Topic == expectedTopic), null, null, default));
+                .Verify(x => x.Subscribe(It.Is<SubscribeRequest>(req => req.Topic == topic), null, null, default));
 
             Mock.Get(handler)
                 .Verify(
-                    handler => handler(It.Is<MessagingEnvelope<TestMessage>>(
-                            m => m.Payload.TestProp == "test1" && m.Headers["aaa"] == "bbb")),
+                    handler => handler(It.Is<TransportReceiveContext>(m =>
+                            m.EnvelopeAccessor.Invoke().Payload as string == payload &&
+                            m.EnvelopeAccessor.Invoke().Headers["aaa"] == "bbb")),
                     Times.Exactly(3));
         }
 
