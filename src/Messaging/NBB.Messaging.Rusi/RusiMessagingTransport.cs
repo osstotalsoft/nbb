@@ -47,7 +47,6 @@ namespace NBB.Messaging.Rusi
         }
 
         public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
-            TransportReceiveContextFactory receiveContextFactory,
             SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default)
         {
             var transport = options ?? SubscriptionTransportOptions.Default;
@@ -88,7 +87,9 @@ namespace NBB.Messaging.Rusi
                     returnDisposable.InternalSubscription ??= _client.Subscribe(subRequest);
                     await foreach (var msg in returnDisposable.InternalSubscription.ResponseStream.ReadAllAsync())
                     {
-                        var receiveContext = receiveContextFactory.FromPayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata);
+                        var receiveContext = new TransportReceiveContext(
+                            new TransportReceivedData.PayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata));
+
                         await handler(receiveContext);
                     }
 

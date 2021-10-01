@@ -19,7 +19,6 @@ namespace NBB.Messaging.Abstractions
         /// <param name="cancellationToken"></param>
         /// <returns>An object that when disposed unsubscribes the handler from the topic</returns>
         Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
-            TransportReceiveContextFactory receiveContextFactory,
             SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -37,9 +36,13 @@ namespace NBB.Messaging.Abstractions
         Func<byte[]> EnvelopeBytesAccessor,
         Func<IDictionary<string, string>> HeadersAccessor);
 
-    public record TransportReceiveContext(Func<MessagingEnvelope> EnvelopeAccessor);
+    public record TransportReceiveContext(TransportReceivedData ReceivedData);
 
-    public record TransportReceiveContextFactory(
-        Func<byte[], TransportReceiveContext> FromEnvelopeBytes,
-        Func<byte[], IDictionary<string, string>, TransportReceiveContext> FromPayloadBytesAndHeaders);
+    
+    public abstract record TransportReceivedData
+    {
+        public record EnvelopeBytes(byte[] Bytes) : TransportReceivedData;
+        public record PayloadBytesAndHeaders(byte[] PayloadBytes, IDictionary<string, string> headers) : TransportReceivedData;
+    }
+
 }

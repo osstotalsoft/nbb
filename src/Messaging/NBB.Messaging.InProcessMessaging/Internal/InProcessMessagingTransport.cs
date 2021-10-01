@@ -22,7 +22,6 @@ namespace NBB.Messaging.InProcessMessaging.Internal
         }
 
         public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
-            TransportReceiveContextFactory receiveContextFactory,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
@@ -30,7 +29,9 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             {
                 try
                 {
-                    await handler(receiveContextFactory.FromEnvelopeBytes(msg));
+                    var receiveConetxt = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(msg));
+
+                    await handler(receiveConetxt);
                 }
                 catch (Exception ex)
                 {

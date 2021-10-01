@@ -44,13 +44,8 @@ namespace NBB.Messaging.Rusi.Tests
 
             var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
 
-            var receiveContextFactory = new TransportReceiveContextFactory(
-                FromEnvelopeBytes: _ => null,
-                FromPayloadBytesAndHeaders: (payloadBytes, headers) => new TransportReceiveContext(() => new MessagingEnvelope(headers, Encoding.UTF8.GetString(payloadBytes)))
-            );
-
             // Act
-            using var subscription = await subscriber.SubscribeAsync(topic, handler, receiveContextFactory);
+            using var subscription = await subscriber.SubscribeAsync(topic, handler);
             await Task.Delay(100); //TODO: use more reliable awaiting
 
             // Assert
@@ -60,8 +55,8 @@ namespace NBB.Messaging.Rusi.Tests
             Mock.Get(handler)
                 .Verify(
                     handler => handler(It.Is<TransportReceiveContext>(m =>
-                            m.EnvelopeAccessor.Invoke().Payload as string == payload &&
-                            m.EnvelopeAccessor.Invoke().Headers["aaa"] == "bbb")),
+                        Encoding.UTF8.GetString(((TransportReceivedData.PayloadBytesAndHeaders)m.ReceivedData).PayloadBytes) == payload &&
+                        ((TransportReceivedData.PayloadBytesAndHeaders)m.ReceivedData).headers["aaa"] == "bbb")),
                     Times.Exactly(3));
         }
 

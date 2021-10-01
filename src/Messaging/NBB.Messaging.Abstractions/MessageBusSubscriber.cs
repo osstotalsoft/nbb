@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,60 +36,38 @@ namespace NBB.Messaging.Abstractions
 
             var topicName = _topicRegistry.GetTopicForName(topicNameWithoutPrefix);
 
-            void logSubscriberError(Exception exception) =>
-                _logger.LogError("Messaging consumer encountered an error when handling a message from subject {Subject}.\n {Error}",
-                        topicName, exception);
-
-            async Task MsgHandler(TransportReceiveContext messageData)
+            async Task MsgHandler(TransportReceiveContext receiveContext)
             {
                 _logger.LogDebug("Messaging subscriber received message from subject {Subject}", topicName);
-                var messageEnvelope = messageData.EnvelopeAccessor.Invoke() as MessagingEnvelope<TMessage>;
 
+                MessagingEnvelope<TMessage> messageEnvelope = null;
                 try
                 {
+                    messageEnvelope = receiveContext.ReceivedData switch
+                    {
+                        TransportReceivedData.EnvelopeBytes(var messsageBytes)
+                            => _messageSerDes.DeserializeMessageEnvelope<TMessage>(messsageBytes, options?.SerDes),
+                        TransportReceivedData.PayloadBytesAndHeaders(var payloadBytes, var headers)
+                            => new MessagingEnvelope<TMessage>(headers, _messageSerDes.DeserializePayload<TMessage>(payloadBytes, headers, options?.SerDes)),
+                        _ => throw new Exception("Invalid received message data")
+                    };
+
                     await handler(messageEnvelope);
                 }
                 catch (Exception ex)
                 {
-                    logSubscriberError(ex);
+                    _logger.LogError("Messaging consumer encountered an error when handling a message from subject {Subject}.\n {Error}",
+                       topicName, ex);
 
                     if (messageEnvelope != null)
                         _deadLetterQueue.Push(messageEnvelope, topicNameWithoutPrefix, ex);
+                    else
+                        _deadLetterQueue.Push(receiveContext.ReceivedData, topicNameWithoutPrefix, ex);
+
                 }
             }
 
-            TransportReceiveContext EnvelopeFactory(byte[] envelopeData)
-            {
-                MessagingEnvelope<TMessage> envelope = null;
-                try
-                {
-                    envelope = _messageSerDes.DeserializeMessageEnvelope<TMessage>(envelopeData, options?.SerDes);
-                }
-                catch (Exception ex)
-                {
-                    logSubscriberError(ex);
-                    _deadLetterQueue.Push(envelopeData, topicNameWithoutPrefix, ex);
-                }
-                return new TransportReceiveContext(EnvelopeAccessor: () => envelope);
-            }
-
-            TransportReceiveContext PayloadFactory(byte[] payloadData, IDictionary<string, string> headers)
-            {
-                TMessage payload = default;
-                try
-                {
-                    payload = _messageSerDes.DeserializePayload<TMessage>(payloadData, headers, options?.SerDes);
-                }
-                catch (Exception ex)
-                {
-                    logSubscriberError(ex);
-                    _deadLetterQueue.Push(payloadData, headers, topicNameWithoutPrefix, ex);
-                }
-                return new TransportReceiveContext(EnvelopeAccessor: () => new MessagingEnvelope<TMessage>(headers, payload));
-            }
-
-            var receiveContextFactory = new TransportReceiveContextFactory(FromEnvelopeBytes: EnvelopeFactory, FromPayloadBytesAndHeaders: PayloadFactory);
-            return await _messagingTransport.SubscribeAsync(topicName, MsgHandler, receiveContextFactory, options?.Transport, cancellationToken);
+            return await _messagingTransport.SubscribeAsync(topicName, MsgHandler, options?.Transport, cancellationToken);
         }
     }
 }

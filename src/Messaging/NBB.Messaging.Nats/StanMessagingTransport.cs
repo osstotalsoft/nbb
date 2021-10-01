@@ -23,7 +23,6 @@ namespace NBB.Messaging.Nats
         }
 
         public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
-            TransportReceiveContextFactory receiveContextFactory,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
@@ -52,7 +51,7 @@ namespace NBB.Messaging.Nats
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                var receiveContext = receiveContextFactory.FromEnvelopeBytes(args.Message.Data);
+                var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(args.Message.Data));
 
                 await handler(receiveContext);
 

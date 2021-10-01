@@ -50,7 +50,23 @@ namespace NBB.Messaging.Abstractions
                     .ContinueWith(t => _logger.LogError(t.Exception, "Error publishing to dead letter queue"), TaskContinuationOptions.OnlyOnFaulted);
 
         }
-        public void Push(byte[] messageData, string topicName, Exception ex)
+
+        public void Push(TransportReceivedData messageData, string topicName, Exception ex)
+        {
+            switch (messageData)
+            {
+                case TransportReceivedData.EnvelopeBytes(var envelopeBytes):
+                    Push(envelopeBytes, topicName, ex);
+                    break;
+                case TransportReceivedData.PayloadBytesAndHeaders(var payloadBytes, var headers):
+                    Push(payloadBytes, headers, topicName, ex);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid transport received data", nameof(messageData));
+            }
+        }
+
+        private void Push(byte[] messageData, string topicName, Exception ex)
         {
             try
             {
@@ -81,8 +97,17 @@ namespace NBB.Messaging.Abstractions
                     .ContinueWith(t => _logger.LogError(t.Exception, "Error publishing to dead letter queue"), TaskContinuationOptions.OnlyOnFaulted);
         }
 
-        public void Push(byte[] payloadData, IDictionary<string, string> headers, string topicName, Exception ex)
+        private void Push(byte[] payloadData, IDictionary<string, string> headers, string topicName, Exception ex)
         {
+            try
+            {
+                // Try untyped deserialization
+                var untypedPayload = _messageSerDes.DeserializePayload<object>(payloadData, headers);
+                Push(new MessagingEnvelope(headers, untypedPayload), topicName, ex);
+                return;
+            }
+            catch { } // ignore untyped deserialization exception
+
             var payloadString = Encoding.UTF8.GetString(payloadData);
 
             Push(new MessagingEnvelope(headers, payloadString), topicName, ex);
