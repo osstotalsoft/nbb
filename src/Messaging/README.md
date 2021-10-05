@@ -45,3 +45,4 @@ Other packages
 * *NBB.Messaging.Effects* - messaging side effects and handlers for the NBB effects infrastructure
 * *NBB.Messaging.MultiTenancy* - support for messaging in multi-tenant environments
 * *NBB.Messaging.OpenTracing* - support for *OpenTracing* in messaging publishers and subscribers
+* *NBB.Messaging.Rusi* - it's a transport implementation for https://github.com/osstotalsoft/rusi, which will handle some messaging concerns externally 
