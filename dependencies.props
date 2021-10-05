@@ -12,6 +12,7 @@
     <MicrosoftExtensionsPackagesVersion>5.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>5.0.0</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
+    <PollyVersion>7.2.1</PollyVersion>
     <SerilogPackageVersion>2.10.0</SerilogPackageVersion>
     <SerilogExtensionsLoggingPackageVersion>3.0.1</SerilogExtensionsLoggingPackageVersion>
     <SerilogSinksMSSqlServerPackageVersion>5.6.0</SerilogSinksMSSqlServerPackageVersion>

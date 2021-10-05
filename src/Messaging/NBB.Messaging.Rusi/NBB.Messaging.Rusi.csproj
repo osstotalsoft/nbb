@@ -19,6 +19,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(MicrosoftExtensionsPackagesVersion)" />
+        <PackageReference Include="Polly" Version="$(PollyVersion)" />
         <PackageReference Include="Google.Protobuf" Version="3.17.3" />
         <PackageReference Include="Grpc.Net.ClientFactory" Version="2.39.0" />
         <PackageReference Include="Grpc.Tools" Version="2.39.1">
@@ -34,6 +35,12 @@
 
     <ItemGroup>
         <Protobuf Include="protos/rusi.proto" GrpcServices="Client" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>$(AssemblyName).Tests</_Parameter1>
+        </AssemblyAttribute>
     </ItemGroup>
 
 </Project>

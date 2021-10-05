@@ -21,11 +21,13 @@ namespace NBB.Messaging.Host
     {
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
         private readonly IMessageBusPublisher _messageBusPublisher;
+        private readonly IDeadLetterQueue _deadLetterQueue;
 
-        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger, IMessageBusPublisher messageBusPublisher)
+        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger, IMessageBusPublisher messageBusPublisher, IDeadLetterQueue deadLetterQueue)
         {
             _logger = logger;
             _messageBusPublisher = messageBusPublisher;
+            _deadLetterQueue = deadLetterQueue;
         }
 
         public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
@@ -48,25 +50,7 @@ namespace NBB.Messaging.Host
                     "Message of type {MessageType} could not be processed due to the following exception {Exception}.",
                     context.MessagingEnvelope.Payload.GetType().GetPrettyName(), ex);
 
-                await _messageBusPublisher.PublishAsync(new
-                {
-                    ExceptionType = ex.GetType(),
-                    ErrorMessage = ex.Message,
-                    ex.StackTrace,
-                    ex.Source,
-                    Data = context.MessagingEnvelope,
-                    OriginalTopic = context.TopicName,
-                    OriginalSystem = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
-                    CorrelationId = context.MessagingEnvelope.GetCorrelationId(),
-                    MessageType = context.MessagingEnvelope.GetMessageTypeId(),
-                    PublishTime = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
-                                                                         ? DateTime.TryParse(value, out var publishTime)
-                                                                        ? publishTime
-                                                                        : default
-                                                                    : default,
-                    MessageId = context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
-                },
-                    MessagingPublisherOptions.Default with { TopicName = "_error" }, cancellationToken);
+                _deadLetterQueue.Push(context.MessagingEnvelope, context.TopicName, ex);
             }
             finally
             {

@@ -42,7 +42,6 @@ namespace NBB.Messaging.Abstractions
             return topic;
         }
 
-
         private string GetTopicNameFromAttribute(Type messageType)
         {
             var topicNameResolver = messageType.GetCustomAttributes(typeof(TopicNameResolverAttribute), true).FirstOrDefault() as TopicNameResolverAttribute;
