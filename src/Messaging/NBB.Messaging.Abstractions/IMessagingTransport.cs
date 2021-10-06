@@ -31,32 +31,11 @@ namespace NBB.Messaging.Abstractions
     }
 
 
+    public delegate void TransportErrorHandler(Exception ex);
+
     public interface ITransportMonitor
     {
-        public void OnError(Exception error);
-    }
-
-    public interface ITransportMonitorHandler
-    {
-        public void OnError(Exception error);
-    }
-
-    public class DefaultTransportMonitor : ITransportMonitor
-    {
-        private readonly IEnumerable<ITransportMonitorHandler> _hadlers;
-
-        public DefaultTransportMonitor(IEnumerable<ITransportMonitorHandler> hadlers)
-        {
-            _hadlers = hadlers;
-        }
-
-        public void OnError(Exception error)
-        {
-            foreach (var handler in _hadlers)
-            {
-                handler.OnError(error);
-            }
-        }
+        event TransportErrorHandler OnError;
     }
 
     public record TransportSendContext(

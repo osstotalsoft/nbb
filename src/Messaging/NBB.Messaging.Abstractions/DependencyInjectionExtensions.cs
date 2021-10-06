@@ -17,7 +17,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IMessageTypeRegistry, DefaultMessageTypeRegistry>();
             services.AddSingleton<IMessageBus, MessageBus>();
             services.AddSingleton<IDeadLetterQueue, DefaultDeadLetterQueue>();
-            services.AddSingleton<ITransportMonitor, DefaultTransportMonitor>();
 
             return services;
         }

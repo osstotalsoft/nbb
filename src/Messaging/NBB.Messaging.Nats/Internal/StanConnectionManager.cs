@@ -12,21 +12,20 @@ using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.Nats.Internal
 {
-    public class StanConnectionProvider : IDisposable
+    public class StanConnectionProvider : IDisposable, ITransportMonitor
     {
         private readonly IOptions<NatsOptions> _natsOptions;
         private readonly ILogger<StanConnectionProvider> _logger;
-        private readonly ITransportMonitor _transportMonitor;
         private IStanConnection _connection;
         private Exception _unrecoverableException;
         private AtomicLazy<IStanConnection> _lazyConnection;
 
-        public StanConnectionProvider(IOptions<NatsOptions> natsOptions, ILogger<StanConnectionProvider> logger,
-            ITransportMonitor transportMonitor)
+        public event TransportErrorHandler OnError;
+
+        public StanConnectionProvider(IOptions<NatsOptions> natsOptions, ILogger<StanConnectionProvider> logger)
         {
             _natsOptions = natsOptions;
             _logger = logger;
-            _transportMonitor = transportMonitor;
             _lazyConnection = new AtomicLazy<IStanConnection>(GetConnection);
         }
 
@@ -83,11 +82,11 @@ namespace NBB.Messaging.Nats.Internal
             if (existingException != null)
                 return;
 
-            _logger.LogCritical(exception, "NATS connection unrecoverable");
+            _logger.LogError(exception, "NATS connection unrecoverable");
 
             ResetConnection();
 
-            _transportMonitor.OnError(exception);
+            OnError?.Invoke(exception);
         }
 
         private void ResetConnection()

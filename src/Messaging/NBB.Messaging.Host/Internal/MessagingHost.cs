@@ -10,16 +10,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Polly;
 using Microsoft.Extensions.Hosting;
+using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.Host.Internal
 {
-    internal class MessagingHost : IMessagingHost
+    internal class MessagingHost : IMessagingHost, IDisposable
     {
         private readonly ILogger<MessagingHost> _logger;
         private readonly IEnumerable<IMessagingHostStartup> _configurators;
         private readonly IServiceProvider _serviceProvider;
         private readonly IServiceCollection _serviceCollection;
         private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly ITransportMonitor _transportMonitor;
         private readonly List<HostedSubscription> _subscriptions = new();
         private readonly ExecutionMonitor _executionMonitor = new();
 
@@ -30,13 +32,16 @@ namespace NBB.Messaging.Host.Internal
         private bool _isStarting;
 
         public MessagingHost(ILogger<MessagingHost> logger, IEnumerable<IMessagingHostStartup> configurators,
-            IServiceProvider serviceProvider, IServiceCollection serviceCollection, IHostApplicationLifetime applicationLifetime)
+            IServiceProvider serviceProvider, IServiceCollection serviceCollection, IHostApplicationLifetime applicationLifetime, ITransportMonitor transportMonitor)
         {
             _logger = logger;
             _configurators = configurators;
             _serviceProvider = serviceProvider;
             _serviceCollection = serviceCollection;
             _applicationLifetime = applicationLifetime;
+            _transportMonitor = transportMonitor;
+
+            _transportMonitor.OnError += OnTransportError;
         }
 
         public void ScheduleRestart(TimeSpan delay = default)
@@ -85,6 +90,15 @@ namespace NBB.Messaging.Host.Internal
             {
                 _logger.LogError(ex, "Message host could not be gracefully stopped");
             }
+        }
+
+        private void OnTransportError(Exception ex)
+        {
+            var delay = TimeSpan.FromSeconds(10);
+
+            _logger.LogInformation($"Restarting host in {delay}");
+
+            ScheduleRestart(delay);
         }
 
         private async Task StartAsyncInternal(CancellationToken cancellationToken = default)
@@ -165,6 +179,11 @@ namespace NBB.Messaging.Host.Internal
 
             // Run the cancellation token callbacks
             cancel.Cancel(throwOnFirstException: false);
+        }
+
+        public void Dispose()
+        {
+            _transportMonitor.OnError -= OnTransportError;
         }
     }
 }

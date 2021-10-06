@@ -15,21 +15,21 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.Rusi
 {
-    internal class RusiMessagingTransport : IMessagingTransport
+    internal class RusiMessagingTransport : IMessagingTransport, ITransportMonitor
     {
         private readonly Proto.V1.Rusi.RusiClient _client;
         private readonly IOptions<RusiOptions> _options;
-        private readonly ITransportMonitor _transportMonitor;
         private readonly ILogger<RusiMessagingTransport> _logger;
 
         public RusiMessagingTransport(Proto.V1.Rusi.RusiClient client, IOptions<RusiOptions> options,
-            ITransportMonitor transportMonitor, ILogger<RusiMessagingTransport> logger)
+            ILogger<RusiMessagingTransport> logger)
         {
             _client = client;
             _options = options;
-            _transportMonitor = transportMonitor;
             _logger = logger;
         }
+
+        public event TransportErrorHandler OnError;
 
         public async Task PublishAsync(string topic, TransportSendContext sendContext,
             CancellationToken cancellationToken = default)
@@ -106,7 +106,7 @@ namespace NBB.Messaging.Rusi
                 {
                     _logger.LogError(ex, "Rusi transport unrecoverable exception");
 
-                    _transportMonitor.OnError(ex);
+                    OnError?.Invoke(ex);
                 }
                 catch (Exception ex)
                 {
