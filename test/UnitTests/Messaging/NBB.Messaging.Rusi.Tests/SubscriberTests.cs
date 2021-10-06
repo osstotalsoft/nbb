@@ -43,7 +43,7 @@ namespace NBB.Messaging.Rusi.Tests
 
             var topic = "topic";
             var subscriber = new RusiMessagingTransport(rusiClient,
-                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }));
+                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }), Mock.Of<ITransportMonitor>(), null);
 
             var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
 

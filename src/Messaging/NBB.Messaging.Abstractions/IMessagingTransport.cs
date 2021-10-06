@@ -31,6 +31,34 @@ namespace NBB.Messaging.Abstractions
     }
 
 
+    public interface ITransportMonitor
+    {
+        public void OnError(Exception error);
+    }
+
+    public interface ITransportMonitorHandler
+    {
+        public void OnError(Exception error);
+    }
+
+    public class DefaultTransportMonitor : ITransportMonitor
+    {
+        private readonly IEnumerable<ITransportMonitorHandler> _hadlers;
+
+        public DefaultTransportMonitor(IEnumerable<ITransportMonitorHandler> hadlers)
+        {
+            _hadlers = hadlers;
+        }
+
+        public void OnError(Exception error)
+        {
+            foreach (var handler in _hadlers)
+            {
+                handler.OnError(error);
+            }
+        }
+    }
+
     public record TransportSendContext(
         Func<(byte[] payloadData, IDictionary<string, string> additionalHeaders)> PayloadBytesAccessor,
         Func<byte[]> EnvelopeBytesAccessor,
