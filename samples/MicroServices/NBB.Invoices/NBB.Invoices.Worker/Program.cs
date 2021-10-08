@@ -56,7 +56,9 @@ namespace NBB.Invoices.Worker
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
                         .WithAdoNetEventRepository();
 
-                    services.AddMessagingHost(hostBuilder => hostBuilder
+                    services.AddMessagingHost(
+                        hostingContext.Configuration,
+                        hostBuilder => hostBuilder
                         .Configure(configBuilder =>  configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
                                 .FromMediatRHandledCommands().AddAllClasses()

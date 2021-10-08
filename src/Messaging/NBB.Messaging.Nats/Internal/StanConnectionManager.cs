@@ -125,29 +125,30 @@ namespace NBB.Messaging.Nats.Internal
             ex is StanMaxPingsException;
 
         public void Dispose() => _connection?.Dispose();
+
+        private class AtomicLazy<T>
+        {
+            private readonly Func<T> _factory;
+
+            private T _value;
+
+            private bool _initialized;
+
+            private object _lock;
+
+            public AtomicLazy(Func<T> factory)
+            {
+                _factory = factory;
+            }
+
+            public AtomicLazy(T value)
+            {
+                _value = value;
+                _initialized = true;
+            }
+
+            public T Value => LazyInitializer.EnsureInitialized(ref _value, ref _initialized, ref _lock, _factory);
+        }
     }
 
-    public class AtomicLazy<T>
-    {
-        private readonly Func<T> _factory;
-
-        private T _value;
-
-        private bool _initialized;
-
-        private object _lock;
-
-        public AtomicLazy(Func<T> factory)
-        {
-            _factory = factory;
-        }
-
-        public AtomicLazy(T value)
-        {
-            _value = value;
-            _initialized = true;
-        }
-
-        public T Value => LazyInitializer.EnsureInitialized(ref _value, ref _initialized, ref _lock, _factory);
-    }
 }

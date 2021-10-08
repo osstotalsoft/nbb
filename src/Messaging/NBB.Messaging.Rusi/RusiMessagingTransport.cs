@@ -89,16 +89,28 @@ namespace NBB.Messaging.Rusi
                         var receiveContext = new TransportReceiveContext(
                             new TransportReceivedData.PayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata));
 
-                        //handle request
-                        //this should never throw, application errors should be caught upstream
-                        await handler(receiveContext);
-
-                        //send ack
-                        //async call, does not wait for pubsub ack
-                        var ack = new AckRequest() { MessageId = msg.Id };
-                        await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
+                        _ = Task.Run(async () =>
                         {
-                            AckRequest = ack
+                            try
+                            {
+                                await handler(receiveContext);
+
+                                //send ack
+                                //async call, does not wait for pubsub ack
+                                await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
+                                {
+                                    AckRequest = new AckRequest() { MessageId = msg.Id }
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
+                                {
+                                    AckRequest = new AckRequest { MessageId = msg.Id, Error = ex.Message }
+                                });
+
+                                throw;
+                            }
                         });
                     }
                 }
@@ -108,11 +120,6 @@ namespace NBB.Messaging.Rusi
 
                     OnError?.Invoke(ex);
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Rusi transport exception");
-                }
-
             }, cancellationToken);
 
             return Task.FromResult<IDisposable>(subscription);

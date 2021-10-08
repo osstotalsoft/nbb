@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Polly;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace NBB.Messaging.Host.Internal
 {
@@ -22,6 +23,7 @@ namespace NBB.Messaging.Host.Internal
         private readonly IServiceCollection _serviceCollection;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly ITransportMonitor _transportMonitor;
+        private readonly IOptions<MessagingHostOptions> _hostOptions;
         private readonly List<HostedSubscription> _subscriptions = new();
         private readonly ExecutionMonitor _executionMonitor = new();
 
@@ -32,7 +34,9 @@ namespace NBB.Messaging.Host.Internal
         private bool _isStarting;
 
         public MessagingHost(ILogger<MessagingHost> logger, IEnumerable<IMessagingHostStartup> configurators,
-            IServiceProvider serviceProvider, IServiceCollection serviceCollection, IHostApplicationLifetime applicationLifetime, ITransportMonitor transportMonitor)
+            IServiceProvider serviceProvider, IServiceCollection serviceCollection,
+            IHostApplicationLifetime applicationLifetime, ITransportMonitor transportMonitor,
+            IOptions<MessagingHostOptions> hostOptions)
         {
             _logger = logger;
             _configurators = configurators;
@@ -40,7 +44,7 @@ namespace NBB.Messaging.Host.Internal
             _serviceCollection = serviceCollection;
             _applicationLifetime = applicationLifetime;
             _transportMonitor = transportMonitor;
-
+            _hostOptions = hostOptions;
             _transportMonitor.OnError += OnTransportError;
         }
 
@@ -65,10 +69,13 @@ namespace NBB.Messaging.Host.Internal
         {
             var policy = Policy
                 .Handle<Exception>()
-                .WaitAndRetryAsync(20, _ => TimeSpan.FromSeconds(10),
-                    async (_, _, retryCount, _) => {
-                        _logger.LogInformation("Retrying message host start");
+                .WaitAndRetryAsync(_hostOptions.Value.StartRetryCount,
+                    retryCount => TimeSpan.FromSeconds(Math.Min(0.1 * Math.Pow(2, retryCount - 1), 60)),
+                    async (exception, _, retryCount, _) =>
+                    {
+                        _logger.LogError(exception, $"Messaging host failed to start");
                         await TryStopAsync();
+                        _logger.LogInformation($"Retrying message host start, atempt {retryCount}");
                     });
 
             var result = await policy.ExecuteAndCaptureAsync(StartAsyncInternal, cancellationToken);
@@ -94,11 +101,18 @@ namespace NBB.Messaging.Host.Internal
 
         private void OnTransportError(Exception ex)
         {
-            var delay = TimeSpan.FromSeconds(10);
+            var strategy = _hostOptions.Value.TransportErrorStrategy;
 
-            _logger.LogInformation($"Restarting host in {delay}");
-
-            ScheduleRestart(delay);
+            if (strategy == TransportErrorStrategy.Retry)
+            {
+                _logger.LogInformation($"Restarting host");
+                ScheduleRestart();
+            }
+            else if (strategy == TransportErrorStrategy.Throw)
+            {
+                _logger.LogCritical(ex, "Critical transport connection error, shutting down");
+                _applicationLifetime.StopApplication();
+            }
         }
 
         private async Task StartAsyncInternal(CancellationToken cancellationToken = default)
@@ -143,7 +157,7 @@ namespace NBB.Messaging.Host.Internal
             finally
             {
                 _isStarting = false;
-            }            
+            }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default)

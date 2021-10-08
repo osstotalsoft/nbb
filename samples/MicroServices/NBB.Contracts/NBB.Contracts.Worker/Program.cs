@@ -71,7 +71,7 @@ namespace NBB.Contracts.Worker
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
 
-                    services.AddMessagingHost(hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
+                    services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
                 });
 

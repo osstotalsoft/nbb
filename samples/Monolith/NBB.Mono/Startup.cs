@@ -63,7 +63,9 @@ namespace NBB.Mono
                 typeof(NBB.Payments.PublishedLanguage.PayableCreated).Assembly,
             };
 
-            services.AddMessagingHost(hostBuilder => hostBuilder
+            services.AddMessagingHost(
+                Configuration,
+                hostBuilder => hostBuilder
                 .Configure(configBuilder => configBuilder
                     .AddSubscriberServices(subscriberBuiler => subscriberBuiler
                         .FromMediatRHandledCommands().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))

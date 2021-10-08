@@ -31,7 +31,9 @@ namespace ProcessManagerSample
                 .WithNewtownsoftJsonEventStoreSeserializer()
                 .WithAdoNetEventRepository();
 
-            services.AddMessagingHost(hostBuilder => hostBuilder
+            services.AddMessagingHost(
+                context.Configuration,
+                hostBuilder => hostBuilder
                 .Configure(configBuilder => configBuilder
                     .AddSubscriberServices(subscriberBulder => subscriberBulder
                         .FromMediatRHandledCommands().AddAllClasses()

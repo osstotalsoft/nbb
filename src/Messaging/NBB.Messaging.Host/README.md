@@ -9,7 +9,9 @@ dotnet add package NBB.Messaging.Host
 
 **Sample usage:**
 ```csharp
-services.AddMessagingHost(hostBuilder => hostBuilder
+services.AddMessagingHost(
+    Configuration,
+    hostBuilder => hostBuilder
     .Configure(configBuilder => configBuilder
         .AddSubscriberServices(subscriberBuilder => subscriberBuilder
             .FromMediatRHandledCommands().AddAllClasses()
@@ -36,7 +38,9 @@ services.AddMessagingHost(hostBuilder => hostBuilder
 You can configure the subscribers, options and pipelines using the *Configure* method of the host builder
 
 ```csharp
-services.AddMessagingHost(hostBuilder => hostBuilder
+services.AddMessagingHost(
+    Configuration, 
+    hostBuilder => hostBuilder
     .Configure(configBuilder => configBuilder
         .AddSubscriberServices(...)
         .WithOptions(...)
@@ -52,20 +56,23 @@ In case you need different settings for specific groups of subscribers (eg. diff
 
 ```csharp
 
-services.AddMessagingHost(hostBuilder =>
-{
-    hostBuilder.Configure(configBuilder => configBuilder
-        .AddSubscriberServices(...)
-        .WithOptions(...)
-        .UsePipeline(...)
-    );
+services.AddMessagingHost(
+    Configuration,
+    hostBuilder =>
+    {
+        hostBuilder.Configure(configBuilder => configBuilder
+            .AddSubscriberServices(...)
+            .WithOptions(...)
+            .UsePipeline(...)
+        );
 
-    hostBuilder.Configure(configBuilder => configBuilder
-        .AddSubscriberServices(...)
-        .WithOptions(...)
-        .UsePipeline(...)
-    );
-});
+        hostBuilder.Configure(configBuilder => configBuilder
+            .AddSubscriberServices(...)
+            .WithOptions(...)
+            .UsePipeline(...)
+        );
+    }
+);
 ```      
 
 #### Advanced scenarios
@@ -74,7 +81,9 @@ There is an overload of the *Configure* method that allows async/await operation
 If you need to resolve services from the DI container you can use the *ApplicationServices* property of the config builder.
 
 ```csharp
-services.AddMessagingHost(hostBuilder => hostBuilder
+services.AddMessagingHost(
+    Configuration,
+    hostBuilder => hostBuilder
     .Configure(async configBuilder =>
     {
         var repository = configBuilder.ApplicationServices.GetRequiredService<IMyRepository>();
@@ -360,3 +369,25 @@ public class MyHandler : IRequestHandler<MyCommand>
     }
 }
 ```
+
+## connection error handler
+The messaging host provides two builtin connection error strategies:
+ - Retry: tries to restart the messaging host for 10 times before throwing an error and shutting down the host. You can set the number of retries in 'appsettings.json' by setting the `Messaging.Host.StartRetryCount` environment variable
+ - Throw: throws an error and shuts down the host
+
+You can set one or the other in 'appsettings.json' by setting`Messaging.Host.TransportErrorStrategy`. By default it uses the `TransportErrorStrategy.Retry` handler.
+
+Sample host configuration in `appsettings.json
+
+```json
+{  
+    "Messaging": {
+        ...   
+        "Host": {
+            "TransportErrorStrategy": "Retry",
+            "StartRetryCount": 10
+        }
+    }
+}
+```
+

@@ -56,7 +56,9 @@ namespace NBB.MicroServicesOrchestration
                         typeof(NBB.Payments.PublishedLanguage.PayableCreated).Assembly,
                     };
 
-                    services.AddMessagingHost(hostBuilder => hostBuilder
+                    services.AddMessagingHost(
+                        hostingContext.Configuration,
+                        hostBuilder => hostBuilder
                         .Configure(configBuilder => configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
                                 .FromMediatRHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))

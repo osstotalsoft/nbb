@@ -45,14 +45,14 @@ namespace Microsoft.Extensions.DependencyInjection
                             new MethodConfig()
                             {
                                 Names = { MethodName.Default },
-                                RetryPolicy = new RetryPolicy()
-                                {
-                                    MaxAttempts = 200,
-                                    InitialBackoff = TimeSpan.FromSeconds(10),
-                                    MaxBackoff = TimeSpan.FromMinutes(30),
-                                    BackoffMultiplier = 1.5,
-                                    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
-                                }
+                                //RetryPolicy = new RetryPolicy()
+                                //{
+                                //    MaxAttempts = 200,
+                                //    InitialBackoff = TimeSpan.FromSeconds(10),
+                                //    MaxBackoff = TimeSpan.FromMinutes(30),
+                                //    BackoffMultiplier = 1.5,
+                                //    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
+                                //}
                             }
                         }
                     };
