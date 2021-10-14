@@ -37,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 })
                 .ConfigureChannel(options =>
                 {
-                    options.MaxRetryAttempts = 200;
+                    options.MaxRetryAttempts = 5;
                     options.ServiceConfig = new ServiceConfig
                     {
                         MethodConfigs =
@@ -45,14 +45,14 @@ namespace Microsoft.Extensions.DependencyInjection
                             new MethodConfig()
                             {
                                 Names = { MethodName.Default },
-                                //RetryPolicy = new RetryPolicy()
-                                //{
-                                //    MaxAttempts = 200,
-                                //    InitialBackoff = TimeSpan.FromSeconds(10),
-                                //    MaxBackoff = TimeSpan.FromMinutes(30),
-                                //    BackoffMultiplier = 1.5,
-                                //    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
-                                //}
+                                RetryPolicy = new RetryPolicy()
+                                {
+                                    MaxAttempts = 5,
+                                    InitialBackoff = TimeSpan.FromSeconds(0.1),
+                                    MaxBackoff = TimeSpan.FromSeconds(1),
+                                    BackoffMultiplier = 1.5,
+                                    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
+                                }
                             }
                         }
                     };
