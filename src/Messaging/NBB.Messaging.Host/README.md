@@ -370,8 +370,8 @@ public class MyHandler : IRequestHandler<MyCommand>
 }
 ```
 
-## connection error handler
-The messaging host provides two builtin connection error strategies:
+## Transport error handler
+The messaging host provides two builtin transport error strategies:
  - Retry: tries to restart the messaging host for 10 times before throwing an error and shutting down the host. You can set the number of retries in 'appsettings.json' by setting the `Messaging.Host.StartRetryCount` environment variable
  - Throw: throws an error and shuts down the host
 
