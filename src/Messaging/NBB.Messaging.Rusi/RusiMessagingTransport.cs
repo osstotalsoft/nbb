@@ -4,9 +4,9 @@
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
-using Polly;
 using Proto.V1;
 using System;
 using System.Linq;
@@ -15,16 +15,21 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.Rusi
 {
-    internal class RusiMessagingTransport : IMessagingTransport
+    internal class RusiMessagingTransport : IMessagingTransport, ITransportMonitor
     {
         private readonly Proto.V1.Rusi.RusiClient _client;
         private readonly IOptions<RusiOptions> _options;
+        private readonly ILogger<RusiMessagingTransport> _logger;
 
-        public RusiMessagingTransport(Proto.V1.Rusi.RusiClient client, IOptions<RusiOptions> options)
+        public RusiMessagingTransport(Proto.V1.Rusi.RusiClient client, IOptions<RusiOptions> options,
+            ILogger<RusiMessagingTransport> logger)
         {
             _client = client;
             _options = options;
+            _logger = logger;
         }
+
+        public event TransportErrorHandler OnError;
 
         public async Task PublishAsync(string topic, TransportSendContext sendContext,
             CancellationToken cancellationToken = default)
@@ -74,46 +79,47 @@ namespace NBB.Messaging.Rusi
             await subscription.RequestStream.WriteAsync(new SubscribeRequest() { SubscriptionRequest = subRequest });
             var returnDisposable = new DisposableSubscriptionWrapper() { InternalSubscription = subscription };
 
-            var policy = Policy
-                    .Handle<RpcException>(ex => ex.StatusCode == StatusCode.Unavailable)
-                    .WaitAndRetryAsync(20, i => TimeSpan.FromSeconds(i * 2),
-                        (exception, span) =>
-                        {
-                            returnDisposable.InternalSubscription?.Dispose();
-                            returnDisposable.InternalSubscription = null;
-                        })
-                ;
-
             //if awaited, blocks
-            _ = policy.ExecuteAsync(async (_) =>
+            _ = Task.Run(async () =>
             {
-                if (returnDisposable.InternalSubscription == null)
+                try
                 {
-                    returnDisposable.InternalSubscription = _client.Subscribe();
-
-                    //async call, does not wait for subscription
-                    await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
-                        { SubscriptionRequest = subRequest });
-                }
-
-                await foreach (var msg in returnDisposable.InternalSubscription.ResponseStream.ReadAllAsync())
-                {
-                    var receiveContext = new TransportReceiveContext(
-                        new TransportReceivedData.PayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata));
-
-                    //handle request
-                    //this should never throw, application errors should be caught upstream
-                    await handler(receiveContext);
-
-                    //send ack
-                    //async call, does not wait for pubsub ack
-                    var ack = new AckRequest() { MessageId = msg.Id };
-                    await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
+                    await foreach (var msg in returnDisposable.InternalSubscription.ResponseStream.ReadAllAsync())
                     {
-                        AckRequest = ack
-                    });
-                }
+                        var receiveContext = new TransportReceiveContext(
+                            new TransportReceivedData.PayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata));
 
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await handler(receiveContext);
+
+                                //send ack
+                                //async call, does not wait for pubsub ack
+                                await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
+                                {
+                                    AckRequest = new AckRequest() { MessageId = msg.Id }
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
+                                {
+                                    AckRequest = new AckRequest { MessageId = msg.Id, Error = ex.Message }
+                                });
+
+                                throw;
+                            }
+                        });
+                    }
+                }
+                catch (RpcException ex)
+                {
+                    _logger.LogError(ex, "Rusi transport unrecoverable exception");
+
+                    OnError?.Invoke(ex);
+                }
             }, cancellationToken);
 
             return Task.FromResult<IDisposable>(subscription);

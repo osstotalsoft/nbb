@@ -62,7 +62,9 @@ namespace NBB.Todo.Worker
             // Messaging
             services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
-            services.AddMessagingHost(hostBuilder => hostBuilder
+            services.AddMessagingHost(
+                hostingContext.Configuration,
+                hostBuilder => hostBuilder
                 .Configure(configBuilder => configBuilder
                         .AddSubscriberServices(selector => selector
                             .FromMediatRHandledCommands().AddAllClasses())

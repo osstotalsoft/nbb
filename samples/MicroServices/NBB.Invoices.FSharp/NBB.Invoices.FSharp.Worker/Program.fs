@@ -27,7 +27,8 @@ let main argv =
         |> ignore
 
         services.AddMessagingHost
-            (fun hostBuilder ->
+            (context.Configuration,
+            fun hostBuilder ->
                 hostBuilder.Configure
                     (fun configBuilder ->
                         configBuilder

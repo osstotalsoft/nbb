@@ -28,7 +28,7 @@ namespace NBB.Messaging.Rusi.Tests
             var topic = "topic";
             var rusiClient = Mock.Of<Proto.V1.Rusi.RusiClient>();
             var publisher = new RusiMessagingTransport(rusiClient,
-                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }));
+                new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }), null);
 
             PublishRequest publishRequest = null;
 

@@ -22,7 +22,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.Configure<RusiOptions>(configuration.GetSection("Messaging").GetSection("Rusi"));
 
-            services.AddSingleton<IMessagingTransport, RusiMessagingTransport>();
+            services.AddSingleton<RusiMessagingTransport>();
+            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<RusiMessagingTransport>());
+            services.AddSingleton<IMessagingTransport>(sp => sp.GetRequiredService<RusiMessagingTransport>());
 
             services.AddGrpcClient<Rusi.RusiClient>((sp, o) =>
                 {
@@ -43,14 +45,14 @@ namespace Microsoft.Extensions.DependencyInjection
                             new MethodConfig()
                             {
                                 Names = { MethodName.Default },
-                                RetryPolicy = new RetryPolicy()
-                                {
-                                    MaxAttempts = 200,
-                                    InitialBackoff = TimeSpan.FromSeconds(10),
-                                    MaxBackoff = TimeSpan.FromMinutes(30),
-                                    BackoffMultiplier = 1.5,
-                                    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
-                                }
+                                //RetryPolicy = new RetryPolicy()
+                                //{
+                                //    MaxAttempts = 200,
+                                //    InitialBackoff = TimeSpan.FromSeconds(10),
+                                //    MaxBackoff = TimeSpan.FromMinutes(30),
+                                //    BackoffMultiplier = 1.5,
+                                //    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
+                                //}
                             }
                         }
                     };

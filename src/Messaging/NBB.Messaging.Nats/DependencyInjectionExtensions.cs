@@ -16,6 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure<NatsOptions>(configuration.GetSection("Messaging").GetSection("Nats"));
             services.AddSingleton<StanConnectionProvider>();
             services.AddSingleton<IMessagingTransport, StanMessagingTransport>();
+            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<StanConnectionProvider>());
 
             return services;
         }

@@ -54,7 +54,7 @@ namespace NBB.Messaging.Nats
                 var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(args.Message.Data));
 
                 await handler(receiveContext);
-
+                
                 args.Message.Ack();
             }
 

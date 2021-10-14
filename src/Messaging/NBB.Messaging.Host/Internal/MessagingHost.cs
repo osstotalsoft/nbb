@@ -8,15 +8,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Polly;
+using Microsoft.Extensions.Hosting;
+using NBB.Messaging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace NBB.Messaging.Host.Internal
 {
-    internal class MessagingHost : IMessagingHost
+    internal class MessagingHost : IMessagingHost, IDisposable
     {
         private readonly ILogger<MessagingHost> _logger;
         private readonly IEnumerable<IMessagingHostStartup> _configurators;
         private readonly IServiceProvider _serviceProvider;
         private readonly IServiceCollection _serviceCollection;
+        private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly ITransportMonitor _transportMonitor;
+        private readonly IOptions<MessagingHostOptions> _hostOptions;
         private readonly List<HostedSubscription> _subscriptions = new();
         private readonly ExecutionMonitor _executionMonitor = new();
 
@@ -27,22 +34,30 @@ namespace NBB.Messaging.Host.Internal
         private bool _isStarting;
 
         public MessagingHost(ILogger<MessagingHost> logger, IEnumerable<IMessagingHostStartup> configurators,
-            IServiceProvider serviceProvider, IServiceCollection serviceCollection)
+            IServiceProvider serviceProvider, IServiceCollection serviceCollection,
+            IHostApplicationLifetime applicationLifetime, ITransportMonitor transportMonitor,
+            IOptions<MessagingHostOptions> hostOptions)
         {
             _logger = logger;
             _configurators = configurators;
             _serviceProvider = serviceProvider;
             _serviceCollection = serviceCollection;
+            _applicationLifetime = applicationLifetime;
+            _transportMonitor = transportMonitor;
+            _hostOptions = hostOptions;
+            _transportMonitor.OnError += OnTransportError;
         }
 
-        public void ScheduleRestart()
+        public void ScheduleRestart(TimeSpan delay = default)
         {
             Task.Run(async () =>
             {
+                await Task.Delay(delay);
+
                 if (!ExecutionContext.IsFlowSuppressed())
                     ExecutionContext.SuppressFlow();
 
-                await StopAsync();
+                await TryStopAsync();
 
                 _stoppingSource = new CancellationTokenSource();
 
@@ -51,6 +66,56 @@ namespace NBB.Messaging.Host.Internal
         }
 
         public async Task StartAsync(CancellationToken cancellationToken = default)
+        {
+            var policy = Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(_hostOptions.Value.StartRetryCount,
+                    retryCount => TimeSpan.FromSeconds(Math.Min(0.1 * Math.Pow(2, retryCount - 1), 60)),
+                    async (exception, _, retryCount, _) =>
+                    {
+                        _logger.LogError(exception, $"Messaging host failed to start");
+                        await TryStopAsync();
+                        _logger.LogInformation($"Retrying message host start, atempt {retryCount}");
+                    });
+
+            var result = await policy.ExecuteAndCaptureAsync(StartAsyncInternal, cancellationToken);
+
+            if (result.Outcome == OutcomeType.Failure)
+            {
+                _logger.LogCritical(result.FinalException, "Messaging host could not start");
+                _applicationLifetime.StopApplication();
+            }
+        }
+
+        private async Task TryStopAsync()
+        {
+            try
+            {
+                await StopAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Message host could not be gracefully stopped");
+            }
+        }
+
+        private void OnTransportError(Exception ex)
+        {
+            var strategy = _hostOptions.Value.TransportErrorStrategy;
+
+            if (strategy == TransportErrorStrategy.Retry)
+            {
+                _logger.LogInformation($"Restarting host");
+                ScheduleRestart();
+            }
+            else if (strategy == TransportErrorStrategy.Throw)
+            {
+                _logger.LogCritical(ex, "Critical transport connection error, shutting down");
+                _applicationLifetime.StopApplication();
+            }
+        }
+
+        private async Task StartAsyncInternal(CancellationToken cancellationToken = default)
         {
             // TODO: Add synchronization
             if (_isStarted || _isStarting)
@@ -85,15 +150,14 @@ namespace NBB.Messaging.Host.Internal
 
                     _subscriptions.Add(subscription);
                 }
+
+                _logger.LogInformation("Messaging host has started");
+                _isStarted = true;
             }
             finally
             {
                 _isStarting = false;
             }
-
-            _logger.LogInformation("Messaging host has started");
-
-            _isStarted = true;
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default)
@@ -129,6 +193,11 @@ namespace NBB.Messaging.Host.Internal
 
             // Run the cancellation token callbacks
             cancel.Cancel(throwOnFirstException: false);
+        }
+
+        public void Dispose()
+        {
+            _transportMonitor.OnError -= OnTransportError;
         }
     }
 }

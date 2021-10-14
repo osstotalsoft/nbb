@@ -31,6 +31,13 @@ namespace NBB.Messaging.Abstractions
     }
 
 
+    public delegate void TransportErrorHandler(Exception ex);
+
+    public interface ITransportMonitor
+    {
+        event TransportErrorHandler OnError;
+    }
+
     public record TransportSendContext(
         Func<(byte[] payloadData, IDictionary<string, string> additionalHeaders)> PayloadBytesAccessor,
         Func<byte[]> EnvelopeBytesAccessor,
