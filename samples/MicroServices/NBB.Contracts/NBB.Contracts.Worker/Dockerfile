@@ -1,6 +1,6 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
 
 RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
@@ -38,6 +38,7 @@ COPY ["src/Messaging/NBB.Messaging.Nats/NBB.Messaging.Nats.csproj", "src/Messagi
 COPY ["src/EventStore/NBB.EventStore.AdoNet/NBB.EventStore.AdoNet.csproj", "src/EventStore/NBB.EventStore.AdoNet/"]
 COPY ["src/Correlation/NBB.Correlation.Serilog/NBB.Correlation.Serilog.csproj", "src/Correlation/NBB.Correlation.Serilog/"]
 COPY ["src/Messaging/NBB.Messaging.BackwardCompatibility/NBB.Messaging.BackwardCompatibility.csproj", "src/Messaging/NBB.Messaging.BackwardCompatibility/"]
+COPY ["src/Messaging/NBB.Messaging.OpenTracing/NBB.Messaging.OpenTracing.csproj", "src/Messaging/NBB.Messaging.OpenTracing/"]
 COPY ["samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/NBB.Contracts.ReadModel.Data.csproj", "samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/"]
 COPY ["src/Data/NBB.Data.EntityFramework/NBB.Data.EntityFramework.csproj", "src/Data/NBB.Data.EntityFramework/"]
 RUN dotnet restore "samples/MicroServices/NBB.Contracts/NBB.Contracts.Worker/NBB.Contracts.Worker.csproj"
