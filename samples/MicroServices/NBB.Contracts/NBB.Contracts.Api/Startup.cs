@@ -1,6 +1,10 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Jaeger;
+using Jaeger.Reporters;
+using Jaeger.Samplers;
+using Jaeger.Senders.Thrift;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,10 +12,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.Abstractions;
+using NBB.Messaging.OpenTracing.Publisher;
+using OpenTracing;
+using OpenTracing.Noop;
+using OpenTracing.Util;
 using System;
+using System.Reflection;
 
 namespace NBB.Contracts.Api
 {
@@ -52,6 +63,35 @@ namespace NBB.Contracts.Api
             }
 
             services.AddContractsReadModelDataAccess();
+
+            services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+
+            // OpenTracing
+            services.AddOpenTracingCoreServices(builder => builder.AddAspNetCore().AddHttpHandler().AddGenericDiagnostics().AddMicrosoftSqlClient());
+
+            services.AddSingleton<ITracer>(serviceProvider =>
+            {
+                if (!Configuration.GetValue<bool>("OpenTracing:Jaeger:IsEnabled"))
+                {
+                    return NoopTracerFactory.Create();
+                }
+
+                string serviceName = Assembly.GetEntryAssembly().GetName().Name;
+
+                ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+
+                ITracer tracer = new Tracer.Builder(serviceName)
+                    .WithLoggerFactory(loggerFactory)
+                    .WithSampler(new ConstSampler(true))
+                    .WithReporter(new RemoteReporter.Builder()
+                        .WithSender(new HttpSender(Configuration.GetValue<string>("OpenTracing:Jaeger:CollectorUrl")))
+                        .Build())
+                    .Build();
+
+                GlobalTracer.Register(tracer);
+
+                return tracer;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -21,12 +21,16 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+        <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" />
+        <PackageReference Include="Jaeger.Senders.Thrift" Version="$(JaegerPackageVersion)" />
+        <PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
+        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />
         <ProjectReference Include="..\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
         <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />

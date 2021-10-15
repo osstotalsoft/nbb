@@ -17,6 +17,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog.Sinks.MSSqlServer;
 using System;
+using OpenTracing;
+using OpenTracing.Noop;
+using System.Reflection;
+using Jaeger;
+using Jaeger.Samplers;
+using Jaeger.Reporters;
+using Jaeger.Senders.Thrift;
+using OpenTracing.Util;
+using NBB.Messaging.OpenTracing.Subscriber;
+using NBB.Messaging.Abstractions;
+using NBB.Messaging.OpenTracing.Publisher;
 
 namespace NBB.Contracts.Worker
 {
@@ -48,6 +59,7 @@ namespace NBB.Contracts.Worker
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
 
+
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -71,8 +83,37 @@ namespace NBB.Contracts.Worker
                         .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
                         .WithAdoNetEventRepository();
 
+                    services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
+                    // OpenTracing
+                    services.AddOpenTracingCoreServices(builder => builder.AddGenericDiagnostics().AddMicrosoftSqlClient());
+
+
+                    services.AddSingleton<ITracer>(serviceProvider =>
+                    {
+                        if (!hostingContext.Configuration.GetValue<bool>("OpenTracing:Jaeger:IsEnabled"))
+                        {
+                            return NoopTracerFactory.Create();
+                        }
+
+                        string serviceName = Assembly.GetEntryAssembly().GetName().Name;
+
+                        ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+
+                        ITracer tracer = new Tracer.Builder(serviceName)
+                            .WithLoggerFactory(loggerFactory)
+                            .WithSampler(new ConstSampler(true))
+                            .WithReporter(new RemoteReporter.Builder()
+                                .WithSender(new HttpSender(hostingContext.Configuration.GetValue<string>("OpenTracing:Jaeger:CollectorUrl")))
+                                .Build())
+                            .Build();
+
+                        GlobalTracer.Register(tracer);
+
+                        return tracer;
+                    });
+        
                 });
 
             var host = builder.Build();
@@ -94,6 +135,7 @@ namespace NBB.Contracts.Worker
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
+                    .UseMiddleware<OpenTracingMiddleware>()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );
