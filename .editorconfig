@@ -16,3 +16,6 @@ trim_trailing_whitespace = true
 # IDE0073: File header
 dotnet_diagnostic.IDE0073.severity = warning
 file_header_template = Copyright (c) TotalSoft.\nThis source code is licensed under the MIT license.
+
+[{*.csproj, *.fsproj, *.props, *.xml}]
+indent_size = 2

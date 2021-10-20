@@ -31,6 +31,9 @@
         <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
         <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
         <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
+        <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" />
+        <PackageReference Include="Jaeger.Senders.Thrift" Version="$(JaegerPackageVersion)" />
+        <PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" />
     </ItemGroup>
 
     <ItemGroup>
@@ -40,6 +43,7 @@
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
+        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />
         <ProjectReference Include="..\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
         <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />

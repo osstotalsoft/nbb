@@ -21,5 +21,7 @@
     <OpenTracingPackageVersion>0.12.1</OpenTracingPackageVersion>
     <NJsonSchemaPackageVersion>10.3.11</NJsonSchemaPackageVersion>
     <AutoFixturePackageVersion>4.15.0</AutoFixturePackageVersion>
+    <OpenTracingContribPackageVersion>0.7.1</OpenTracingContribPackageVersion>
+    <JaegerPackageVersion>0.4.2</JaegerPackageVersion>
   </PropertyGroup>
 </Project>
