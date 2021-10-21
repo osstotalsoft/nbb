@@ -11,6 +11,7 @@ using Proto.V1;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace NBB.Messaging.Rusi
@@ -75,16 +76,24 @@ namespace NBB.Messaging.Rusi
                 Options = subscriptionOptions
             };
 
-            var subscription = _client.Subscribe();
-            await subscription.RequestStream.WriteAsync(new SubscribeRequest() { SubscriptionRequest = subRequest });
-            var returnDisposable = new DisposableSubscriptionWrapper() { InternalSubscription = subscription };
+            var ackChannel = Channel.CreateUnbounded<AckRequest>(new() { SingleReader = true, SingleWriter = false });
+            var subscription = _client.Subscribe(cancellationToken: cancellationToken);
+            await subscription.RequestStream.WriteAsync(new() { SubscriptionRequest = subRequest });
+
+            _ = Task.Run(async () =>
+            {
+                await foreach (var ack in ackChannel.Reader.ReadAllAsync(cancellationToken))
+                {
+                    await subscription?.RequestStream.WriteAsync(new() { AckRequest = ack });
+                }
+            }, cancellationToken);
 
             //if awaited, blocks
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    await foreach (var msg in returnDisposable.InternalSubscription.ResponseStream.ReadAllAsync())
+                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
                     {
                         var receiveContext = new TransportReceiveContext(
                             new TransportReceivedData.PayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata));
@@ -94,21 +103,11 @@ namespace NBB.Messaging.Rusi
                             try
                             {
                                 await handler(receiveContext);
-
-                                //send ack
-                                //async call, does not wait for pubsub ack
-                                await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
-                                {
-                                    AckRequest = new AckRequest() { MessageId = msg.Id }
-                                });
+                                await ackChannel.Writer.WriteAsync(new() { MessageId = msg.Id });
                             }
                             catch (Exception ex)
                             {
-                                await returnDisposable.InternalSubscription.RequestStream.WriteAsync(new SubscribeRequest()
-                                {
-                                    AckRequest = new AckRequest { MessageId = msg.Id, Error = ex.Message }
-                                });
-
+                                await ackChannel.Writer.WriteAsync(new() { MessageId = msg.Id, Error = ex.Message });
                                 throw;
                             }
                         });
@@ -123,16 +122,6 @@ namespace NBB.Messaging.Rusi
             }, cancellationToken);
 
             return Task.FromResult<IDisposable>(subscription);
-        }
-
-        private class DisposableSubscriptionWrapper : IDisposable
-        {
-            internal AsyncDuplexStreamingCall<SubscribeRequest, ReceivedMessage> InternalSubscription { set; get; }
-
-            public void Dispose()
-            {
-                InternalSubscription?.Dispose();
-            }
         }
     }
 }
