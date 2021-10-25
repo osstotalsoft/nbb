@@ -64,9 +64,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (string.IsNullOrEmpty(options.RusiPort))
                     options.RusiPort = Environment.GetEnvironmentVariable("RUSI_GRPC_PORT");
 
-                if (string.IsNullOrEmpty(options.PubsubName))
-                    throw new ArgumentNullException("Rusi.PubsubName");
-
                 if (string.IsNullOrEmpty(options.RusiPort))
                     throw new ArgumentNullException("Rusi.RusiPort");
             });
