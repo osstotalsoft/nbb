@@ -63,12 +63,17 @@ namespace NBB.Contracts.Worker
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        services.AddMessageBus().AddNatsTransport(hostingContext.Configuration).UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
+                        services
+                            .AddMessageBus()
+                            .AddNatsTransport(hostingContext.Configuration)
+                            .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
                     }
                     else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
                     {
-
-                        services.AddMessageBus().AddRusiTransport(hostingContext.Configuration).UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
+                        services
+                            .AddMessageBus()
+                            .AddRusiTransport(hostingContext.Configuration.GetSection("Messaging").GetSection("Rusi"))
+                            .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
                     }
                     else
                     {

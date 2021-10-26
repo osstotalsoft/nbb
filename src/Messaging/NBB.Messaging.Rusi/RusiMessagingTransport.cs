@@ -28,6 +28,11 @@ namespace NBB.Messaging.Rusi
             _client = client;
             _options = options;
             _logger = logger;
+
+            if (string.IsNullOrEmpty(_options.Value.PubsubName))
+            {
+                logger.LogWarning("no PubsubName provided, using default rusi pubsub name");
+            }
         }
 
         public event TransportErrorHandler OnError;

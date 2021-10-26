@@ -50,12 +50,18 @@ namespace NBB.Contracts.Api
             var transport = Configuration.GetValue("Messaging:Transport", "NATS");
             if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
             {
-                services.AddMessageBus().AddNatsTransport(Configuration).UseTopicResolutionBackwardCompatibility(Configuration);
+                services
+                    .AddMessageBus()
+                    .AddNatsTransport(Configuration)
+                    .UseTopicResolutionBackwardCompatibility(Configuration);
             }
             else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
             {
 
-                services.AddMessageBus().AddRusiTransport(Configuration).UseTopicResolutionBackwardCompatibility(Configuration);
+                services
+                    .AddMessageBus()
+                    .AddRusiTransport(Configuration.GetSection("Messaging").GetSection("Rusi"))
+                    .UseTopicResolutionBackwardCompatibility(Configuration);
             }
             else
             {
