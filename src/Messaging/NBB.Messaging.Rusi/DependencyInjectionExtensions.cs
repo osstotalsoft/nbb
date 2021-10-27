@@ -20,7 +20,10 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddRusiTransport(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.Configure<RusiOptions>(configuration.GetSection("Messaging").GetSection("Rusi"));
+            services.AddOptions<RusiOptions>()
+                .Bind(configuration.GetSection("Messaging").GetSection("Rusi"))
+                .Validate(options => !string.IsNullOrEmpty(options.RusiPort),
+                    "missing RusiPort, try add RUSI_GRPC_PORT environment variable");
 
             services.AddSingleton<RusiMessagingTransport>();
             services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<RusiMessagingTransport>());
@@ -29,10 +32,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddGrpcClient<Rusi.RusiClient>((sp, o) =>
                 {
                     var opts = sp.GetRequiredService<IOptions<RusiOptions>>();
-
-                    if (string.IsNullOrEmpty(opts.Value.RusiPort))
-                        throw new ArgumentNullException("RusiPort");
-
                     o.Address = new Uri($"http://localhost:{opts.Value.RusiPort}");
                 })
                 .ConfigureChannel(options =>
@@ -63,9 +62,6 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (string.IsNullOrEmpty(options.RusiPort))
                     options.RusiPort = Environment.GetEnvironmentVariable("RUSI_GRPC_PORT");
-
-                if (string.IsNullOrEmpty(options.RusiPort))
-                    throw new ArgumentNullException("Rusi.RusiPort");
             });
 
             return services;
