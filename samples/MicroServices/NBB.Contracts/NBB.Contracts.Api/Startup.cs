@@ -60,7 +60,7 @@ namespace NBB.Contracts.Api
 
                 services
                     .AddMessageBus()
-                    .AddRusiTransport(Configuration.GetSection("Messaging").GetSection("Rusi"))
+                    .AddRusiTransport(Configuration)
                     .UseTopicResolutionBackwardCompatibility(Configuration);
             }
             else

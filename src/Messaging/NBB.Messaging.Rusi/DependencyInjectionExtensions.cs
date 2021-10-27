@@ -18,10 +18,10 @@ namespace Microsoft.Extensions.DependencyInjection
     {
 
         public static IServiceCollection AddRusiTransport(this IServiceCollection services,
-            IConfigurationSection configuration)
+            IConfiguration configuration)
         {
             services.AddOptions<RusiOptions>()
-                .Bind(configuration)
+                .Bind(configuration.GetSection("Messaging").GetSection("Rusi"))
                 .Validate(options => !string.IsNullOrEmpty(options.RusiPort),
                     "missing RusiPort, try add RUSI_GRPC_PORT environment variable");
 

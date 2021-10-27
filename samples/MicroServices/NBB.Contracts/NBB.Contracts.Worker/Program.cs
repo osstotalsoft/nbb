@@ -1,8 +1,13 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Jaeger;
+using Jaeger.Reporters;
+using Jaeger.Samplers;
+using Jaeger.Senders.Thrift;
 using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NBB.Contracts.Application.CommandHandlers;
@@ -10,24 +15,19 @@ using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
-using Serilog;
-using Serilog.Events;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog.Sinks.MSSqlServer;
-using System;
+using NBB.Messaging.OpenTracing.Publisher;
+using NBB.Messaging.OpenTracing.Subscriber;
 using OpenTracing;
 using OpenTracing.Noop;
-using System.Reflection;
-using Jaeger;
-using Jaeger.Samplers;
-using Jaeger.Reporters;
-using Jaeger.Senders.Thrift;
 using OpenTracing.Util;
-using NBB.Messaging.OpenTracing.Subscriber;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTracing.Publisher;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace NBB.Contracts.Worker
 {
@@ -72,7 +72,7 @@ namespace NBB.Contracts.Worker
                     {
                         services
                             .AddMessageBus()
-                            .AddRusiTransport(hostingContext.Configuration.GetSection("Messaging").GetSection("Rusi"))
+                            .AddRusiTransport(hostingContext.Configuration)
                             .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
                     }
                     else
