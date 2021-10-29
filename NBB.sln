@@ -377,6 +377,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Rusi", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Rusi.Tests", "test\UnitTests\Messaging\NBB.Messaging.Rusi.Tests\NBB.Messaging.Rusi.Tests.csproj", "{2E1525F5-9FF4-47C0-94C1-2BA295A5AD20}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Http", "src\Messaging\NBB.Messaging.Http\NBB.Messaging.Http.csproj", "{206DF29C-A88E-4ABA-AC8B-C4DAD5B68B92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -843,6 +845,10 @@ Global
 		{2E1525F5-9FF4-47C0-94C1-2BA295A5AD20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E1525F5-9FF4-47C0-94C1-2BA295A5AD20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E1525F5-9FF4-47C0-94C1-2BA295A5AD20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{206DF29C-A88E-4ABA-AC8B-C4DAD5B68B92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{206DF29C-A88E-4ABA-AC8B-C4DAD5B68B92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{206DF29C-A88E-4ABA-AC8B-C4DAD5B68B92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{206DF29C-A88E-4ABA-AC8B-C4DAD5B68B92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -999,6 +1005,7 @@ Global
 		{E7A719C2-1F6B-47DB-9708-3313EB2DBB4F} = {F57779EB-9107-427D-A65C-5AA262C348E1}
 		{7E449958-2939-473F-9713-2AB80CA020B7} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 		{2E1525F5-9FF4-47C0-94C1-2BA295A5AD20} = {A4361674-5AB7-442D-8DA7-7187C9BCA38F}
+		{206DF29C-A88E-4ABA-AC8B-C4DAD5B68B92} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
