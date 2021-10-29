@@ -140,37 +140,31 @@ namespace TheBenchmarks
 
         public TAggregateRoot LoadAggregate<TAggregateRoot>() where TAggregateRoot : TestAggregate
         {
-            using (var scope = _container.CreateScope())
-            {
-                var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
-                var aggregate = repository.GetByIdAsync(_loadTestAggregateId, default).GetAwaiter().GetResult();
+            using var scope = _container.CreateScope();
+            var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
+            var aggregate = repository.GetByIdAsync(_loadTestAggregateId, default).GetAwaiter().GetResult();
 
-                if (aggregate?.AggregateId == default(Guid))
-                    aggregate.AggregateId = _loadTestAggregateId;
+            if (aggregate?.AggregateId == default(Guid))
+                aggregate.AggregateId = _loadTestAggregateId;
 
-                return aggregate;
-            }
+            return aggregate;
         }
 
         public void TryLoadRandomAggregate<TAggregateRoot>() where TAggregateRoot : TestAggregate
         {
-            using (var scope = _container.CreateScope())
-            {
-                var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
-                var aggregate = repository.GetByIdAsync(Guid.NewGuid(), default).GetAwaiter().GetResult();
-            }
+            using var scope = _container.CreateScope();
+            var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
+            var aggregate = repository.GetByIdAsync(Guid.NewGuid(), default).GetAwaiter().GetResult();
         }
 
         public void SaveAggregate<TAggregateRoot>(TAggregateRoot aggregate) where TAggregateRoot : TestAggregate, new()
         {
-            using (var scope = _container.CreateScope())
-            {
-                var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
-                aggregate.DoAction($"Event {Guid.NewGuid()}");
-                aggregate.DoAction($"Event {Guid.NewGuid()}");
-                repository.SaveAsync(aggregate).GetAwaiter().GetResult();
-                _loadedAggregate = aggregate;
-            }
+            using var scope = _container.CreateScope();
+            var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
+            aggregate.DoAction($"Event {Guid.NewGuid()}");
+            aggregate.DoAction($"Event {Guid.NewGuid()}");
+            repository.SaveAsync(aggregate).GetAwaiter().GetResult();
+            _loadedAggregate = aggregate;
         }
 
         private void SeedEventRepository<TAggregateRoot>(bool useJunkData = false) where TAggregateRoot : TestAggregate, new()
@@ -192,32 +186,30 @@ namespace TheBenchmarks
 
         private void SeedAggregates<TAggregateRoot>(int eventNo, params Guid[] aggregateIds) where TAggregateRoot : TestAggregate, new()
         {
-            using (var scope = _container.CreateScope())
+            using var scope = _container.CreateScope();
+            var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
+
+            foreach (var aggregateId in aggregateIds)
             {
-                var repository = scope.ServiceProvider.GetService<IEventSourcedRepository<TAggregateRoot>>();
-
-                foreach (var aggregateId in aggregateIds)
+                var aggregate = new TAggregateRoot() { AggregateId = aggregateId };
+                for (int i = 0; i < eventNo; i++)
                 {
-                    var aggregate = new TAggregateRoot() { AggregateId = aggregateId };
-                    for (int i = 0; i < eventNo; i++)
-                    {
-                        aggregate.DoAction($"Value {i + 1}");
+                    aggregate.DoAction($"Value {i + 1}");
 
-                        if ((i + 1) % _snapshotFrequency == 0)
-                            repository.SaveAsync(aggregate).GetAwaiter().GetResult();
-                    }
-
-                    repository.SaveAsync(aggregate).GetAwaiter().GetResult();
-
-                    aggregate.DoAction($"AdditionlValue 1");
-                    aggregate.DoAction($"AdditionlValue 2");
-                    aggregate.DoAction($"AdditionlValue 3");
-
-                    repository.SaveAsync(aggregate).GetAwaiter().GetResult();
-
-                    if (aggregateId == _loadTestAggregateId)
-                        _loadedAggregate = aggregate;
+                    if ((i + 1) % _snapshotFrequency == 0)
+                        repository.SaveAsync(aggregate).GetAwaiter().GetResult();
                 }
+
+                repository.SaveAsync(aggregate).GetAwaiter().GetResult();
+
+                aggregate.DoAction($"AdditionlValue 1");
+                aggregate.DoAction($"AdditionlValue 2");
+                aggregate.DoAction($"AdditionlValue 3");
+
+                repository.SaveAsync(aggregate).GetAwaiter().GetResult();
+
+                if (aggregateId == _loadTestAggregateId)
+                    _loadedAggregate = aggregate;
             }
         }
 

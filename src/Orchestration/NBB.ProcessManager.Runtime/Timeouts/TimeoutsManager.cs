@@ -18,7 +18,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
         static readonly TimeSpan MaxNextRetrievalDelay = TimeSpan.FromMinutes(1);
         static readonly TimeSpan NextRetrievalPollSleep = TimeSpan.FromMilliseconds(1000);
         readonly Func<DateTime> _currentTimeProvider;
-        readonly object _lockObject = new object();
+        readonly object _lockObject = new();
         public DateTime NextRetrieval { get; private set; }
         DateTime _startSlice;
 
@@ -106,19 +106,20 @@ namespace NBB.ProcessManager.Runtime.Timeouts
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; 
+        private bool _disposedValue = false; 
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {         
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
         public void Dispose()
         {           
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

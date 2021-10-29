@@ -71,7 +71,7 @@ namespace NBB.ProcessManager.Tests
 
 
         [Fact]
-        public void setStateHandler_on_first_event()
+        public void SetStateHandler_on_first_event()
         {
             var @event = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
             var definition = new OrderProcessManager2();
@@ -101,7 +101,7 @@ namespace NBB.ProcessManager.Tests
         }
 
         [Fact]
-        public void setStateHandler_with_two_events()
+        public void SetStateHandler_with_two_events()
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
@@ -146,7 +146,7 @@ namespace NBB.ProcessManager.Tests
         }
 
         [Fact]
-        public void should_not_start_when_event_with_false_predicate()
+        public void Should_not_start_when_event_with_false_predicate()
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
@@ -169,7 +169,7 @@ namespace NBB.ProcessManager.Tests
         }
 
         [Fact]
-        public void complete_with_false_predicate()
+        public void Complete_with_false_predicate()
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
@@ -224,7 +224,7 @@ namespace NBB.ProcessManager.Tests
 
 
         [Fact]
-        public void process_event_after_completion()
+        public void Process_event_after_completion()
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);
@@ -266,7 +266,7 @@ namespace NBB.ProcessManager.Tests
         }
 
         [Fact]
-        public void when_predicate_false_should_not_complete()
+        public void When_predicate_false_should_not_complete()
         {
             var orderId = Guid.NewGuid();
             var orderCreated = new OrderCreated(orderId, 100, 0, 0);

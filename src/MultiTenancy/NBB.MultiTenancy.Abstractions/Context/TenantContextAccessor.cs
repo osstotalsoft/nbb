@@ -7,7 +7,7 @@ namespace NBB.MultiTenancy.Abstractions.Context
 {
     public class TenantContextAccessor : ITenantContextAccessor
     {
-        private static readonly AsyncLocal<TenantContext> ContextCurrent = new AsyncLocal<TenantContext>();
+        private static readonly AsyncLocal<TenantContext> ContextCurrent = new();
 
         public TenantContext TenantContext
         {

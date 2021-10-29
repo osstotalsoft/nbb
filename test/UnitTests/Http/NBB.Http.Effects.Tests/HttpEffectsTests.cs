@@ -56,7 +56,7 @@ namespace NBB.Http.Effects.Tests
 
     public class MockHttpMessageHandler : HttpMessageHandler
     {
-        private readonly List<HttpRequestMessage> _requests = new List<HttpRequestMessage>();
+        private readonly List<HttpRequestMessage> _requests = new();
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)

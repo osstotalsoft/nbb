@@ -10,8 +10,8 @@ namespace NBB.ProcessManager.Definition.Builder
 {
     public abstract class AbstractDefinition<TData> : IDefinition<TData>
     {
-        private readonly List<IEventActivitySet<TData>> _eventActivities = new List<IEventActivitySet<TData>>();
-        private readonly Dictionary<Type, EventCorrelation<object, TData>> _eventCorrelations = new Dictionary<Type, EventCorrelation<object, TData>>();
+        private readonly List<IEventActivitySet<TData>> _eventActivities = new();
+        private readonly Dictionary<Type, EventCorrelation<object, TData>> _eventCorrelations = new();
 
 
         public EventActivitySetBuilder<TEvent, TData> StartWith<TEvent>(EventPredicate<TEvent, TData> predicate = null)

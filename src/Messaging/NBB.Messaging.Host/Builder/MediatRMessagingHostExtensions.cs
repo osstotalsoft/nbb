@@ -17,9 +17,9 @@ namespace NBB.Messaging.Host
     {
         private record TypeInfo(Type GenericTypeDef, Func<Type[], bool> Condition);
 
-        private static readonly TypeInfo eventType = new TypeInfo(typeof(INotificationHandler<>), _ => true);
-        private static readonly TypeInfo commandType = new TypeInfo(typeof(IRequestHandler<,>), types => types[1] == typeof(Unit));
-        private static readonly TypeInfo queryType = new TypeInfo(typeof(IRequestHandler<,>), types => types[1] != typeof(Unit));
+        private static readonly TypeInfo EventType = new(typeof(INotificationHandler<>), _ => true);
+        private static readonly TypeInfo CommandType = new(typeof(IRequestHandler<,>), types => types[1] == typeof(Unit));
+        private static readonly TypeInfo QueryType = new(typeof(IRequestHandler<,>), types => types[1] != typeof(Unit));
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled messages types (commands, queries and events).
@@ -28,7 +28,7 @@ namespace NBB.Messaging.Host
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledMessages(
             this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { eventType, commandType, queryType });
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { EventType, CommandType, QueryType });
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled events.
@@ -36,7 +36,7 @@ namespace NBB.Messaging.Host
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledEvents(this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { eventType });
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { EventType });
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled commands.
@@ -44,7 +44,7 @@ namespace NBB.Messaging.Host
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledCommands(this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { commandType });
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { CommandType });
 
         /// <summary>
         /// Scans the the MediatR IoC registrations for handled queries.
@@ -52,7 +52,7 @@ namespace NBB.Messaging.Host
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
         public static IImplementationTypeSelector FromMediatRHandledQueries(this ITypeSourceSelector typeSourceSelector)
-            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { queryType });
+            => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { QueryType });
 
         private static IImplementationTypeSelector FromMediatRHandledMessagesInternal(
             ITypeSourceSelector typeSourceSelector, IEnumerable<TypeInfo> handlerTypes)

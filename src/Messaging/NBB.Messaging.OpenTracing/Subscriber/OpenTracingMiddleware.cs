@@ -28,25 +28,22 @@ namespace NBB.Messaging.OpenTracing.Subscriber
             var extractedSpanContext = _tracer.Extract(BuiltinFormats.TextMap, new TextMapExtractAdapter(context.MessagingEnvelope.Headers));
             string operationName = $"Subscriber {context.MessagingEnvelope.Payload.GetType().GetPrettyName()}";
 
-            using (var scope = _tracer.BuildSpan(operationName)
+            using var scope = _tracer.BuildSpan(operationName)
                 .AddReference(References.FollowsFrom, extractedSpanContext)
                 .WithTag(Tags.Component, "NBB.Messaging")
                 .WithTag(Tags.SpanKind, Tags.SpanKindConsumer)
                 .WithTag(Tags.PeerService,
                     context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var value) ? value : default)
                 .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
-                .StartActive(true))
+                .StartActive(true);
+            try
             {
-
-                try
-                {
-                    await next();
-                }
-                catch (Exception exception)
-                {
-                    scope.Span.SetException(exception);
-                    throw;
-                }
+                await next();
+            }
+            catch (Exception exception)
+            {
+                scope.Span.SetException(exception);
+                throw;
             }
         }
     }

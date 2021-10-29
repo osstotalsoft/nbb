@@ -124,7 +124,20 @@ namespace NBB.Messaging.Nats.Internal
             ex is StanConnectRequestException ||
             ex is StanMaxPingsException;
 
-        public void Dispose() => _connection?.Dispose();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _connection?.Dispose();
+            }
+        }
+
 
         private class AtomicLazy<T>
         {

@@ -79,13 +79,11 @@ namespace NBB.EventStore.AdoNet
                     cmd.Parameters.Add(param);
                 }
 
-                using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
+                await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+                while (await reader.ReadAsync(cancellationToken))
                 {
-                    while (reader.Read())
-                    {
-                        var ed = new EventDescriptor(reader.GetGuid(0), reader.GetString(1), reader.GetString(2), stream, reader.IsDBNull(3) ? (Guid?)null : reader.GetGuid(3));
-                        eventDescriptors.Add(ed);
-                    }
+                    var ed = new EventDescriptor(reader.GetGuid(0), reader.GetString(1), reader.GetString(2), stream, reader.IsDBNull(3) ? (Guid?)null : reader.GetGuid(3));
+                    eventDescriptors.Add(ed);
                 }
             }
 
@@ -107,47 +105,42 @@ namespace NBB.EventStore.AdoNet
 
             var sqlDataRecords = CreateSqlDataRecords(eventDescriptors);
 
-            using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
+            await using var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString);
+            await cnx.OpenAsync(cancellationToken);
+
+            var cmd = new SqlCommand(_scripts.AppendEventsToStreamExpectedVersion, cnx);
+            cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
             {
-                cnx.Open();
+                Value = streamId
+            });
+            cmd.Parameters.Add(new SqlParameter("@ExpectedVersion", SqlDbType.Int)
+            {
+                Value = expectedVersion
+            });
+            foreach (var param in GetGlobalFilterParams())
+            {
+                cmd.Parameters.Add(param);
+            }
 
-                var cmd = new SqlCommand(_scripts.AppendEventsToStreamExpectedVersion, cnx);
-                cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
+
+            var eventsParam = CreateNewEventsSqlParameter(sqlDataRecords);
+            cmd.Parameters.Add(eventsParam);
+
+            try
+            {
+                await cmd.ExecuteNonQueryAsync(cancellationToken);
+            }
+            catch (SqlException ex)
+            {
+                var sqlError = ex.Errors[0];
+                if (sqlError.Message != "WrongExpectedVersion") throw;
+                if (expectedVersion == 0)
                 {
-                    Value = streamId
-                });
-                cmd.Parameters.Add(new SqlParameter("@ExpectedVersion", SqlDbType.Int)
-                {
-                    Value = expectedVersion
-                });
-                foreach (var param in GetGlobalFilterParams())
-                {
-                    cmd.Parameters.Add(param);
+                    throw new ConcurrencyUnrecoverableException("EventStore unrecoverable concurrency exception", ex);
                 }
 
+                throw new ConcurrencyException("EventStore concurrency exception", ex);
 
-                var eventsParam = CreateNewEventsSqlParameter(sqlDataRecords);
-                cmd.Parameters.Add(eventsParam);
-
-                try
-                {
-                    await cmd.ExecuteNonQueryAsync(cancellationToken);
-                }
-                catch (SqlException ex)
-                {
-                    var sqlError = ex.Errors[0];
-                    if (sqlError.Message == "WrongExpectedVersion")
-                    {
-                        if (expectedVersion == 0)
-                        {
-                            throw new ConcurrencyUnrecoverableException("EventStore unrecoverable concurrency exception", ex);
-                        }
-
-                        throw new ConcurrencyException("EventStore concurrency exception", ex);
-                    }
-
-                    throw;
-                }
             }
         }
 
@@ -158,25 +151,23 @@ namespace NBB.EventStore.AdoNet
 
             var sqlDataRecords = CreateSqlDataRecords(eventDescriptors);
 
-            using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
+            await using var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString);
+            await cnx.OpenAsync(cancellationToken);
+
+            var cmd = new SqlCommand(_scripts.AppendEventsToStreamExpectedVersionAny, cnx);
+            cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
             {
-                cnx.Open();
-
-                var cmd = new SqlCommand(_scripts.AppendEventsToStreamExpectedVersionAny, cnx);
-                cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200)
-                {
-                    Value = streamId
-                });
-                foreach (var param in GetGlobalFilterParams())
-                {
-                    cmd.Parameters.Add(param);
-                }
-
-                var eventsParam = CreateNewEventsSqlParameter(sqlDataRecords);
-                cmd.Parameters.Add(eventsParam);
-
-                await cmd.ExecuteNonQueryAsync(cancellationToken);
+                Value = streamId
+            });
+            foreach (var param in GetGlobalFilterParams())
+            {
+                cmd.Parameters.Add(param);
             }
+
+            var eventsParam = CreateNewEventsSqlParameter(sqlDataRecords);
+            cmd.Parameters.Add(eventsParam);
+
+            await cmd.ExecuteNonQueryAsync(cancellationToken);
         }
 
         private SqlParameter CreateNewEventsSqlParameter(SqlDataRecord[] sqlDataRecords)

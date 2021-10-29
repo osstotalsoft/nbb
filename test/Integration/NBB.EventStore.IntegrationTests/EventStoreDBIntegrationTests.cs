@@ -33,41 +33,39 @@ namespace NBB.EventStore.IntegrationTests
 
             var concurrencyExceptionCount = 0;
 
-            using (var scope = container.CreateScope())
+            using var scope = container.CreateScope();
+            var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
+
+            for (var i = 0; i < threadCount; i++)
             {
-                var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
-
-                for (var i = 0; i < threadCount; i++)
+                var t = new Thread(() =>
                 {
-                    var t = new Thread(() =>
+                    //var newVersion = Interlocked.Increment(ref streamVersion);
+                    try
                     {
-                        //var newVersion = Interlocked.Increment(ref streamVersion);
-                        try
-                        {
-                            eventStore.AppendEventsToStreamAsync(stream,
-                                    new[] { new TestEvent(Guid.NewGuid()) }, streamVersion,
-                                    CancellationToken.None)
-                                .Wait();
-                        }
-                        catch (Exception)
-                        {
-                            Interlocked.Increment(ref concurrencyExceptionCount);
-                        }
-                    });
-                    t.Start();
-                    threads.Add(t);
-                }
-
-                foreach (var thread in threads)
-                {
-                    thread.Join();
-                }
-
-                var events = eventStore.GetEventsFromStreamAsync(stream, null, CancellationToken.None).Result;
-
-                events.Count.Should().Be(1);
-                concurrencyExceptionCount.Should().Be(threadCount - 1);
+                        eventStore.AppendEventsToStreamAsync(stream,
+                                new[] { new TestEvent(Guid.NewGuid()) }, streamVersion,
+                                CancellationToken.None)
+                            .Wait();
+                    }
+                    catch (Exception)
+                    {
+                        Interlocked.Increment(ref concurrencyExceptionCount);
+                    }
+                });
+                t.Start();
+                threads.Add(t);
             }
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+
+            var events = eventStore.GetEventsFromStreamAsync(stream, null, CancellationToken.None).Result;
+
+            events.Count.Should().Be(1);
+            concurrencyExceptionCount.Should().Be(threadCount - 1);
         }
 
         [Fact]
@@ -80,30 +78,28 @@ namespace NBB.EventStore.IntegrationTests
             var threads = new List<Thread>();
 
 
-            using (var scope = container.CreateScope())
+            using var scope = container.CreateScope();
+            var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
+
+            for (var i = 0; i < threadCount; i++)
             {
-                var eventStore = scope.ServiceProvider.GetRequiredService<IEventStore>();
-
-                for (var i = 0; i < threadCount; i++)
+                var t = new Thread(() =>
                 {
-                    var t = new Thread(() =>
-                    {
-                        eventStore.AppendEventsToStreamAsync(stream,
-                            new[] { new TestEvent(Guid.NewGuid()) }, null, CancellationToken.None).Wait();
-                    });
-                    t.Start();
-                    threads.Add(t);
-                }
-
-                foreach (var thread in threads)
-                {
-                    thread.Join();
-                }
-
-                var events = eventStore.GetEventsFromStreamAsync(stream, null, CancellationToken.None).Result;
-
-                events.Count.Should().Be(threadCount);
+                    eventStore.AppendEventsToStreamAsync(stream,
+                        new[] { new TestEvent(Guid.NewGuid()) }, null, CancellationToken.None).Wait();
+                });
+                t.Start();
+                threads.Add(t);
             }
+
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
+
+            var events = eventStore.GetEventsFromStreamAsync(stream, null, CancellationToken.None).Result;
+
+            events.Count.Should().Be(threadCount);
         }
 
         private static IServiceProvider BuildAdoRepoServiceProvider()

@@ -18,13 +18,11 @@ namespace NBB.Todo.Api.Controllers
     [Route("api/[controller]")]
     public class TodoController : ControllerBase
     {
-        private readonly ILogger<TodoController> _logger;
         private readonly TodoDbContext _todoDbContext;
         private readonly IMessageBus _messageBus;
 
-        public TodoController(ILogger<TodoController> logger, TodoDbContext todoDbContext, IMessageBus messageBus)
+        public TodoController(TodoDbContext todoDbContext, IMessageBus messageBus)
         {
-            _logger = logger;
             _todoDbContext = todoDbContext;
             _messageBus = messageBus;
         }

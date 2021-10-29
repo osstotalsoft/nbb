@@ -52,12 +52,9 @@ namespace TheBenchmarks
         //[Benchmark]
         public void AdoNetEventRepositorySave()
         {
-            using (var scope = _container.CreateScope())
-            {
-                var repository = scope.ServiceProvider.GetService<IEventRepository>();
-                repository.AppendEventsToStreamAsync("stream", new[] { new EventDescriptor(Guid.NewGuid(), "some event type", "jsdjf wefkjwe hfjwehfj", "stream", null) }, null, CancellationToken.None).Wait();
-            }
-
+            using var scope = _container.CreateScope();
+            var repository = scope.ServiceProvider.GetService<IEventRepository>();
+            repository.AppendEventsToStreamAsync("stream", new[] { new EventDescriptor(Guid.NewGuid(), "some event type", "jsdjf wefkjwe hfjwehfj", "stream", null) }, null, CancellationToken.None).Wait();
         }
 
         [GlobalSetup(Target = nameof(AdoNetEventRepositoryLoad))]
@@ -101,12 +98,9 @@ namespace TheBenchmarks
         [Benchmark]
         public void AdoNetEventRepositoryLoad()
         {
-            using (var scope = _container.CreateScope())
-            {
-                var repository = scope.ServiceProvider.GetService<IEventRepository>();
-                repository.GetEventsFromStreamAsync("73", null, CancellationToken.None).Wait();
-            }
-
+            using var scope = _container.CreateScope();
+            var repository = scope.ServiceProvider.GetService<IEventRepository>();
+            repository.GetEventsFromStreamAsync("73", null, CancellationToken.None).Wait();
         }
 
 

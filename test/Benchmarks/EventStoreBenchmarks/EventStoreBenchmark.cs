@@ -36,7 +36,7 @@ namespace TheBenchmarks
         [GlobalSetup(Target = nameof(NBBEventStoreSave))]
         public void GlobalSetupNBBEventStoreSave()
         {
-            MigrateNBBEventStore(false);
+            MigrateNbbEventStore(false);
 
             _container = BuildServiceProvider((services, _) =>
                 services.AddEventStore()
@@ -47,7 +47,7 @@ namespace TheBenchmarks
         [GlobalSetup(Target = nameof(NBBMultiTenantEventStoreSave))]
         public void GlobalSetupNBBMultiTenantEventStoreSave()
         {
-            MigrateNBBEventStore(true);
+            MigrateNbbEventStore(true);
 
             _container = BuildServiceProvider((services, configuration) =>
                 services.AddEventStore()
@@ -127,20 +127,16 @@ namespace TheBenchmarks
 
         public void EventStoreSave()
         {
-            using (var scope = _container.CreateScope())
-            {
-                var eventStore = scope.ServiceProvider.GetService<IEventStore>();
-                eventStore.AppendEventsToStreamAsync(Guid.NewGuid().ToString(), new List<object> { GetATestEvent() }, null, CancellationToken.None).Wait();
-            }
+            using var scope = _container.CreateScope();
+            var eventStore = scope.ServiceProvider.GetService<IEventStore>();
+            eventStore.AppendEventsToStreamAsync(Guid.NewGuid().ToString(), new List<object> { GetATestEvent() }, null, CancellationToken.None).Wait();
         }
 
         public void EventStoreLoad()
         {
-            using (var scope = _container.CreateScope())
-            {
-                var eventStore = scope.ServiceProvider.GetService<IEventStore>();
-                eventStore.GetEventsFromStreamAsync(_loadTestStream, null, CancellationToken.None).Wait();
-            }
+            using var scope = _container.CreateScope();
+            var eventStore = scope.ServiceProvider.GetService<IEventStore>();
+            eventStore.GetEventsFromStreamAsync(_loadTestStream, null, CancellationToken.None).Wait();
         }
 
 
@@ -149,16 +145,14 @@ namespace TheBenchmarks
             var events = Enumerable.Range(0, 100)
                 .Select(r => GetATestEvent());
 
-            using (var scope = _container.CreateScope())
-            {
-                var eventStore = scope.ServiceProvider.GetService<IEventStore>();
-                eventStore.AppendEventsToStreamAsync(stream, events, null, CancellationToken.None).Wait();
-            }
+            using var scope = _container.CreateScope();
+            var eventStore = scope.ServiceProvider.GetService<IEventStore>();
+            eventStore.AppendEventsToStreamAsync(stream, events, null, CancellationToken.None).Wait();
         }
 
 
 
-        private static void MigrateNBBEventStore(bool forceMultiTenant)
+        private static void MigrateNbbEventStore(bool forceMultiTenant)
         {
             new AdoNetEventStoreDatabaseMigrator(forceMultiTenant).ReCreateDatabaseObjects(default).Wait();
         }
@@ -205,7 +199,7 @@ namespace TheBenchmarks
 
         private class TenantContextAccessorMock : ITenantContextAccessor
         {
-            private readonly TenantContext _tenantContext = new TenantContext(new Tenant(Guid.NewGuid(), null));
+            private readonly TenantContext _tenantContext = new(new Tenant(Guid.NewGuid(), null));
             public TenantContext TenantContext { get => _tenantContext; set => throw new NotImplementedException(); }
 
             public TenantContextFlow ChangeTenantContext(TenantContext context)

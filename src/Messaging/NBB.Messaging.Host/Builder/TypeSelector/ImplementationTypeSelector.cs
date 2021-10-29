@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host
     {
         private readonly  ITypeSourceSelector _inner;
         private readonly  IEnumerable<Type> _types;
-        private readonly List<Type> _selectedTypes = new List<Type>();
+        private readonly List<Type> _selectedTypes = new();
 
         public ImplementationTypeSelector(ITypeSourceSelector inner, IEnumerable<Type> types)
         {

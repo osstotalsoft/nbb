@@ -10,10 +10,9 @@ namespace NBB.EventStore.AdoNet.Internal
 {
     public class Scripts
     {
-        private readonly ConcurrentDictionary<string, string> _scripts
-            = new ConcurrentDictionary<string, string>();
-        private readonly Assembly scriptsAssembly;
-        private readonly string scriptsResourcePath;
+        private readonly ConcurrentDictionary<string, string> _scripts = new();
+        private readonly Assembly _scriptsAssembly;
+        private readonly string _scriptsResourcePath;
 
         public Scripts()
             : this(typeof(Scripts).Assembly, "NBB.EventStore.AdoNet.Internal.SqlScripts")
@@ -22,8 +21,8 @@ namespace NBB.EventStore.AdoNet.Internal
 
         protected Scripts(Assembly scriptsAssembly, string scriptsResourcePath)
         {
-            this.scriptsAssembly = scriptsAssembly;
-            this.scriptsResourcePath = scriptsResourcePath;
+            this._scriptsAssembly = scriptsAssembly;
+            this._scriptsResourcePath = scriptsResourcePath;
         }
 
         public string AppendEventsToStreamExpectedVersion => GetScript(nameof(AppendEventsToStreamExpectedVersion));
@@ -39,18 +38,15 @@ namespace NBB.EventStore.AdoNet.Internal
             return _scripts.GetOrAdd(name,
                 key =>
                 {
-                    using (Stream stream = scriptsAssembly.GetManifestResourceStream($"{scriptsResourcePath}.{key}.sql"))
+                    using var stream = _scriptsAssembly.GetManifestResourceStream($"{_scriptsResourcePath}.{key}.sql");
+                    if (stream == null)
                     {
-                        if (stream == null)
-                        {
-                            throw new Exception($"Embedded resource, {name}, not found.");
-                        }
-                        using (StreamReader reader = new StreamReader(stream))
-                        {
-                            return reader
-                                .ReadToEnd();
-                        }
+                        throw new Exception($"Embedded resource, {name}, not found.");
                     }
+
+                    using var reader = new StreamReader(stream);
+                    return reader
+                        .ReadToEnd();
                 });
         }
     }

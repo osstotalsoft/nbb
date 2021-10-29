@@ -31,6 +31,6 @@ namespace NBB.Application.DataContracts
             CreationDate = creationDate;
         }
 
-        public static EventMetadata Default() => new EventMetadata(Guid.NewGuid(), DateTime.UtcNow);
+        public static EventMetadata Default() => new(Guid.NewGuid(), DateTime.UtcNow);
     }
 }

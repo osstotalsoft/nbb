@@ -12,9 +12,9 @@ namespace NBB.ProcessManager.Runtime.Timeouts
     public class InMemoryTimeoutRepository : ITimeoutsRepository, IDisposable
     {
         private readonly Func<DateTime> _currentTimeProvider;
-        private readonly ReaderWriterLockSlim _readerWriterLock = new ReaderWriterLockSlim();
-        private readonly List<TimeoutRecord> _storage = new List<TimeoutRecord>();
-        public readonly static TimeSpan EmptyResultsNextTimeToRunQuerySpan = TimeSpan.FromMinutes(1);
+        private readonly ReaderWriterLockSlim _readerWriterLock = new();
+        private readonly List<TimeoutRecord> _storage = new();
+        public static readonly TimeSpan EmptyResultsNextTimeToRunQuerySpan = TimeSpan.FromMinutes(1);
 
         public InMemoryTimeoutRepository(Func<DateTime> currentTimeProvider)
         {
@@ -147,6 +147,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

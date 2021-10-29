@@ -22,8 +22,8 @@ namespace NBB.ProcessManager.Runtime
         public InstanceStates State { get; private set; }
         public object InstanceId { get; private set; }
 
-        private readonly List<object> _changes = new List<object>();
-        private readonly List<Effect<Unit>> _effects = new List<Effect<Unit>>();
+        private readonly List<object> _changes = new();
+        private readonly List<Effect<Unit>> _effects = new();
         public int Version { get; internal set; }
 
         public IEnumerable<object> GetUncommittedChanges() => _changes;

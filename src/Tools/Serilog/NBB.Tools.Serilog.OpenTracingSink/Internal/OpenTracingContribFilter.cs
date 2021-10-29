@@ -9,7 +9,7 @@ namespace NBB.Tools.Serilog.OpenTracingSink.Internal
 {
     internal static class OpenTracingContribFilter
     {
-        private static List<string> ExcludedLogSources = new List<string>()
+        private static List<string> ExcludedLogSources = new()
         {
             "Microsoft.EntityFrameworkCore",
             "Microsoft.AspNetCore.Hosting"
@@ -21,8 +21,8 @@ namespace NBB.Tools.Serilog.OpenTracingSink.Internal
             const string sourceContextPropertyName = global::Serilog.Core.Constants.SourceContextPropertyName;
 
             if (!logEvent.Properties.TryGetValue(sourceContextPropertyName, out var source) ||
-                !(source is ScalarValue scalarSource) ||
-                !(scalarSource.Value is string stringValue))
+                source is not ScalarValue scalarSource ||
+                scalarSource.Value is not string stringValue)
             {
                 return false;
             }
