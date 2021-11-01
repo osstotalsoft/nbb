@@ -21,7 +21,7 @@ namespace NBB.Messaging.Abstractions
                 ? Guid.TryParse(value, out var guidValue)
                     ? guidValue
                     : default(Guid?)
-                : default(Guid?);
+                : default;
         }
 
         public static void TransferHeaderTo(this MessagingEnvelope envelope, MessagingEnvelope destinationEnvelope, string header, bool overwrite = false)

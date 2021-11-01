@@ -7,7 +7,7 @@ namespace NBB.Messaging.Abstractions
 {
     public class MessagingContextAccessor
     {
-        private static readonly AsyncLocal<MessagingContext> AsyncLocal = new AsyncLocal<MessagingContext>();
+        private static readonly AsyncLocal<MessagingContext> AsyncLocal = new();
 
         public MessagingContext MessagingContext
         {

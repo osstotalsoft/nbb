@@ -20,7 +20,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
             var mockedMessagePub = Mock.Of<IMessageBusPublisher>();
             var deadLetterQueue = Mock.Of<IDeadLetterQueue>();
-            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, mockedMessagePub, deadLetterQueue);
+            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, deadLetterQueue);
             var sentMessage = new { Field = "value" };
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
@@ -38,9 +38,8 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
-            var mockedMessagePub = Mock.Of<IMessageBusPublisher>();
             var deadLetterQueue = Mock.Of<IDeadLetterQueue>();
-            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, mockedMessagePub, deadLetterQueue);
+            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, deadLetterQueue);
             var sentMessage = new { Field = "value" };
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
 
@@ -65,8 +64,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         {
             //Arrange
 
-            var executionTimeMiddleware = new ExceptionHandlingMiddleware(Mock.Of<ILogger<ExceptionHandlingMiddleware>>(),
-                Mock.Of<IMessageBusPublisher>(), Mock.Of<IDeadLetterQueue>());
+            var executionTimeMiddleware = new ExceptionHandlingMiddleware(Mock.Of<ILogger<ExceptionHandlingMiddleware>>(), Mock.Of<IDeadLetterQueue>());
             var sentMessage = new { Field = "value" };
             bool isNextMiddlewareCalled = false;
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);

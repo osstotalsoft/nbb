@@ -12,7 +12,7 @@ namespace NBB.EventStore.InMemory
     public class InMemoryRepository : IEventRepository
     {
         private readonly ConcurrentDictionary<string, EventDescriptorCollection> _storage =
-            new ConcurrentDictionary<string, EventDescriptorCollection>();
+            new();
 
         public Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {

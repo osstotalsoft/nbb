@@ -27,7 +27,7 @@ namespace NBB.Messaging.Host.Internal
         private readonly List<HostedSubscription> _subscriptions = new();
         private readonly ExecutionMonitor _executionMonitor = new();
 
-        private CancellationTokenSource _stoppingSource = new CancellationTokenSource();
+        private CancellationTokenSource _stoppingSource = new();
         private CancellationTokenSource _subscriberStopSource;
 
         private bool _isStarted;

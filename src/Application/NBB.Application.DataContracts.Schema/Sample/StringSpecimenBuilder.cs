@@ -1,25 +1,22 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using AutoFixture.Kernel;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using AutoFixture;
-using AutoFixture.Kernel;
 
 namespace NBB.Application.DataContracts.Schema.Sample
 {
     public class StringSpecimenBuilder : ISpecimenBuilder
     {
-        private Random random = new Random();
+        private readonly Random _random = new();
         
         public string RandomString(int length)
         {
             const string chars = "abcdefghijklmnopqrstwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
+              .Select(s => s[_random.Next(s.Length)]).ToArray());
         }
 
         public object Create(object request, ISpecimenContext context)

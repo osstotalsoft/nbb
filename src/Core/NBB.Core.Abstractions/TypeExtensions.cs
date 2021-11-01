@@ -11,7 +11,7 @@ namespace NBB.Core.Abstractions
     {
         public static string GetPrettyName( this Type type)
         {
-            StringBuilder retType = new StringBuilder();
+            var retType = new StringBuilder();
 
             if (type.IsGenericType)
             {
@@ -19,7 +19,7 @@ namespace NBB.Core.Abstractions
                 // We will build the type here.
                 Type[] arguments = type.GetGenericArguments();
 
-                StringBuilder argList = new StringBuilder();
+                var argList = new StringBuilder();
                 foreach (Type t in arguments)
                 {
                     // Let's make sure we get the argument list.
@@ -49,7 +49,7 @@ namespace NBB.Core.Abstractions
 
         public static string GetLongPrettyName( this Type type)
         {
-            StringBuilder retType = new StringBuilder();
+            var retType = new StringBuilder();
 
             if (type.IsGenericType)
             {
@@ -57,7 +57,7 @@ namespace NBB.Core.Abstractions
                 // We will build the type here.
                 Type[] arguments = type.GetGenericArguments();
 
-                StringBuilder argList = new StringBuilder();
+                var argList = new StringBuilder();
                 foreach (Type t in arguments)
                 {
                     // Let's make sure we get the argument list.

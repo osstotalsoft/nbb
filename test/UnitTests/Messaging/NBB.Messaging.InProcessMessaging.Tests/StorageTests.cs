@@ -27,19 +27,17 @@ namespace NBB.Messaging.InProcessMessaging.Tests
             var topic = "x";
             var sut = new Storage();
             var msg = System.Text.Encoding.UTF8.GetBytes("ala bala ");
-            using (var tokenSource = new CancellationTokenSource())
+            using var tokenSource = new CancellationTokenSource();
+            //Act
+            sut.Enqueue(msg, topic);
+            await sut.AddSubscription(topic, message =>
             {
-                //Act
-                sut.Enqueue(msg, topic);
-                await sut.AddSubscription(topic, message =>
-                {
                 //Assert
                 message.Should().AllBeEquivalentTo(msg);
 
-                    tokenSource.Cancel();
-                    return Task.CompletedTask;
-                }, tokenSource.Token);
-            }
+                tokenSource.Cancel();
+                return Task.CompletedTask;
+            }, tokenSource.Token);
         }
     }
 }

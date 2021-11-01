@@ -46,23 +46,21 @@ namespace NBB.Messaging.OpenTracing.Publisher
                                      _topicRegistry.GetTopicForMessageType(message.GetType());
             var operationName = $"Publisher {message.GetType().GetPrettyName()}";
 
-            using (var scope = _tracer.BuildSpan(operationName)
+            using var scope = _tracer.BuildSpan(operationName)
                 .WithTag(Tags.Component, MessagingTags.ComponentMessaging)
                 .WithTag(Tags.SpanKind, Tags.SpanKindProducer)
                 .WithTag(Tags.MessageBusDestination, formattedTopicName)
                 .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
-                .StartActive(true))
+                .StartActive(true);
+            try
             {
-                try
-                {
-                    return _inner.PublishAsync(message, options with {EnvelopeCustomizer = NewCustomizer},
-                        cancellationToken);
-                }
-                catch (Exception exception)
-                {
-                    scope.Span.SetException(exception);
-                    throw;
-                }
+                return _inner.PublishAsync(message, options with { EnvelopeCustomizer = NewCustomizer },
+                    cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                scope.Span.SetException(exception);
+                throw;
             }
         }
     }

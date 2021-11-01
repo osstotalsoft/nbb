@@ -11,7 +11,7 @@ namespace NBB.EventStore.InMemory
     public class InMemorySnapshotRepository : ISnapshotRepository
     {
         private readonly ConcurrentDictionary<string, SnapshotDescriptor> _storage =
-            new ConcurrentDictionary<string, SnapshotDescriptor>();
+            new();
 
         public Task<SnapshotDescriptor> LoadSnapshotAsync(string stream, CancellationToken cancellationToken = default)
         {

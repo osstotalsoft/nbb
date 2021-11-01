@@ -12,7 +12,7 @@ namespace NBB.Messaging.Host
 {
     public class TypeSourceSelector : ITypeSourceSelector, IMessageTypeProvider, IMessageTopicProvider, IServiceCollectionProvider
     {
-        private readonly List<IMessageTypeProvider> _typeSelectors = new List<IMessageTypeProvider>();
+        private readonly List<IMessageTypeProvider> _typeSelectors = new();
         private readonly IList<IEnumerable<string>> _selectedTopics = new List<IEnumerable<string>>();
         private readonly IServiceCollection _serviceCollection;
 

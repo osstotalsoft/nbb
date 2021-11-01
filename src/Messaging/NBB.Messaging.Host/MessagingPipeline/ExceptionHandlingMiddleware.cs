@@ -20,13 +20,11 @@ namespace NBB.Messaging.Host
     public class ExceptionHandlingMiddleware : IPipelineMiddleware<MessagingContext>
     {
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
-        private readonly IMessageBusPublisher _messageBusPublisher;
         private readonly IDeadLetterQueue _deadLetterQueue;
 
-        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger, IMessageBusPublisher messageBusPublisher, IDeadLetterQueue deadLetterQueue)
+        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger, IDeadLetterQueue deadLetterQueue)
         {
             _logger = logger;
-            _messageBusPublisher = messageBusPublisher;
             _deadLetterQueue = deadLetterQueue;
         }
 

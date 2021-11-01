@@ -5,6 +5,7 @@ using System;
 
 namespace NBB.Messaging.Abstractions
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class MessageTypeIdAttribute : Attribute
     {
         public string MessageTypeId { get; }

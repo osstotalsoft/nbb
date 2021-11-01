@@ -20,7 +20,7 @@ namespace NBB.Data.EntityFramework.Internal
         public Expression<Func<TEntity, bool>> BuildPrimaryKeyExpressionFromModel<TEntity>(IModel model, object keyValues)
             where TEntity : class
         {
-            IList<object> values = (keyValues is object[] list) ? list.ToList() : new List<object> {keyValues};
+            IList<object> values = (keyValues is object[] list) ? list.ToList() : new List<object> { keyValues };
 
             var keyProperties = model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties;
             var lambda = BuildPrimaryKeyExpression<TEntity>(keyProperties, values);
@@ -31,16 +31,16 @@ namespace NBB.Data.EntityFramework.Internal
 
         public Expression<Func<TEntity, bool>> BuildPrimaryKeyExpression<TEntity>(IReadOnlyList<IProperty> keyProperties, IList<object> keyValues)
             where TEntity : class
-        {            
+        {
             var entityParam = Expression.Parameter(typeof(TEntity), "entity");
 
-            Expression filterExpression = null;
+            Expression filterExpression;
 
             if (keyValues.Count > 1)
             {
-                
+
                 filterExpression =
-                    Expression.AndAlso(GetExpression(entityParam, keyProperties.First(), keyValues.First()),
+                    Expression.AndAlso(GetExpression(entityParam, keyProperties[0], keyValues.First()),
                         GetExpression(entityParam, keyProperties[1], keyValues[1]));
                 for (int i = 2; i < keyValues.Count; i++)
                 {
@@ -49,7 +49,7 @@ namespace NBB.Data.EntityFramework.Internal
             }
             else
             {
-                filterExpression = GetExpression(entityParam, keyProperties.First(), keyValues.First());
+                filterExpression = GetExpression(entityParam, keyProperties[0], keyValues.First());
             }
 
             var lambda = Expression.Lambda<Func<TEntity, bool>>(

@@ -45,7 +45,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             if (e != null)
             {
                 e.Amount = @event.NewAmount;
-                e.Version = e.Version + 1;
+                e.Version += 1;
 
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
             }
@@ -63,7 +63,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
                     var contractLine = new ContractLineReadModel(@event.ContractLineId, @event.Product, @event.Price,
                         @event.Quantity, @event.ContractId);
                     e.ContractLines.Add(contractLine);
-                    e.Version = e.Version + 1;
+                    e.Version += 1;
 
                     await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
                 }
@@ -80,7 +80,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             if (contract != null)
             {
                 contract.IsValidated = true;
-                contract.Version = contract.Version + 1;
+                contract.Version += 1;
                 await _contractReadModelRepository.SaveChangesAsync(cancellationToken);
             }
         }

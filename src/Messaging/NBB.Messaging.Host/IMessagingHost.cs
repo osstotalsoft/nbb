@@ -26,7 +26,7 @@ namespace NBB.Messaging.Host
         /// <returns>The <see cref="Task"/> that represents the asynchronous operation.</returns>
         public static async Task StopAsync(this IMessagingHost host, TimeSpan timeout)
         {
-            using CancellationTokenSource cts = new CancellationTokenSource(timeout);
+            using var cts = new CancellationTokenSource(timeout);
             await host.StopAsync(cts.Token).ConfigureAwait(false);
         }
     }

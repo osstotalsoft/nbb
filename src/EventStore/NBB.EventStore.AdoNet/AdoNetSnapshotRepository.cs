@@ -55,13 +55,11 @@ namespace NBB.EventStore.AdoNet
                     cmd.Parameters.Add(param);
                 }
 
-                using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
+                await using var reader = await cmd.ExecuteReaderAsync(cancellationToken);
+                if (reader.Read())
                 {
-                    if (reader.Read())
-                    {
-                        snapshotDescriptor = new SnapshotDescriptor(reader.GetString(0), reader.GetString(1), stream,
-                            reader.GetInt32(2));
-                    }
+                    snapshotDescriptor = new SnapshotDescriptor(reader.GetString(0), reader.GetString(1), stream,
+                        reader.GetInt32(2));
                 }
             }
 
@@ -82,9 +80,9 @@ namespace NBB.EventStore.AdoNet
 
 
             using (var ts = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-            using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
+            await using (var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString))
             {
-                cnx.Open();
+                await cnx.OpenAsync(cancellationToken);
 
                 var cmd = new SqlCommand(_scripts.SetSnapshotForStream, cnx);
                 cmd.Parameters.Add(new SqlParameter("@SnapshotType", SqlDbType.VarChar, 300)

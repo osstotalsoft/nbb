@@ -9,7 +9,7 @@ namespace NBB.Correlation
 {
     public static class CorrelationManager
     {
-        private static readonly AsyncLocal<Guid?> CorrelationId = new AsyncLocal<Guid?>();
+        private static readonly AsyncLocal<Guid?> CorrelationId = new();
 
         public static IDisposable NewCorrelationId(Guid? correlationId = null)
         {

@@ -13,7 +13,7 @@ namespace NBB.Messaging.Abstractions
 {
     public class DefaultMessageTypeRegistry : IMessageTypeRegistry
     {
-        private readonly ConcurrentDictionary<string, Type> _typeCache = new ConcurrentDictionary<string, Type>();
+        private readonly ConcurrentDictionary<string, Type> _typeCache = new();
 
         public Type ResolveType(string messageTypeId, IEnumerable<Assembly> scannedAssemblies)
         {
@@ -109,7 +109,7 @@ namespace NBB.Messaging.Abstractions
             private string Name
             {
                 get => _name;
-                set => _name = _name ?? value?.Trim();
+                set => _name ??= value?.Trim();
             }
 
             public bool IsGeneric { get; private set; }
@@ -303,7 +303,7 @@ namespace NBB.Messaging.Abstractions
 
         private static class WellKnownTypes
         {
-            private static readonly Dictionary<string, Type> Map = new Dictionary<string, Type>
+            private static readonly Dictionary<string, Type> Map = new()
             {
                 ["bool"] = typeof(bool),
                 ["Boolean"] = typeof(bool),
@@ -329,8 +329,6 @@ namespace NBB.Messaging.Abstractions
                 ["UInt64"] = typeof(ulong),
                 ["object"] = typeof(object),
                 ["Object"] = typeof(object),
-                ["short"] = typeof(short),
-                ["Int16"] = typeof(short),
                 ["ushort"] = typeof(ushort),
                 ["UInt16"] = typeof(ushort),
                 ["short"] = typeof(short),

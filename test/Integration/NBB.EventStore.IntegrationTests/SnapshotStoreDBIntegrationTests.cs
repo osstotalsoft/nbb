@@ -33,32 +33,30 @@ namespace NBB.EventStore.IntegrationTests
             const int threadCount = 10;
             var concurrencyExceptionCount = 0;
 
-            using (var scope = container.CreateScope())
+            using var scope = container.CreateScope();
+            var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
+
+            // Act
+            Parallel.For(0, threadCount, _ =>
             {
-                var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
+                try
+                {
+                    snapshotStore.StoreSnapshotAsync(
+                        new SnapshotEnvelope(
+                            new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" }, streamVersion, stream),
+                        CancellationToken.None
+                    ).GetAwaiter().GetResult();
+                }
+                catch (ConcurrencyUnrecoverableException)
+                {
+                    Interlocked.Increment(ref concurrencyExceptionCount);
+                }
+            });
+            var snapshot = snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None).Result;
 
-                // Act
-                Parallel.For(0, threadCount, _ =>
-               {
-                   try
-                   {
-                       snapshotStore.StoreSnapshotAsync(
-                           new SnapshotEnvelope(
-                               new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" }, streamVersion, stream),
-                           CancellationToken.None
-                       ).GetAwaiter().GetResult();
-                   }
-                   catch (ConcurrencyUnrecoverableException)
-                   {
-                       Interlocked.Increment(ref concurrencyExceptionCount);
-                   }
-               });
-                var snapshot = snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None).Result;
-
-                // Assert
-                snapshot.Should().NotBeNull();
-                concurrencyExceptionCount.Should().Be(threadCount - 1);
-            }
+            // Assert
+            snapshot.Should().NotBeNull();
+            concurrencyExceptionCount.Should().Be(threadCount - 1);
         }
 
         [Fact]
@@ -70,26 +68,24 @@ namespace NBB.EventStore.IntegrationTests
             var stream = Guid.NewGuid().ToString();
             const int threadCount = 10;
 
-            using (var scope = container.CreateScope())
+            using var scope = container.CreateScope();
+            var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
+
+            // Act
+            Parallel.For(0, threadCount, index =>
             {
-                var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
+                snapshotStore.StoreSnapshotAsync(
+                    new SnapshotEnvelope(
+                        new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" }, index, stream),
+                    CancellationToken.None
+                ).GetAwaiter().GetResult();
 
-                // Act
-                Parallel.For(0, threadCount, index =>
-               {
-                   snapshotStore.StoreSnapshotAsync(
-                        new SnapshotEnvelope(
-                            new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" }, index, stream),
-                        CancellationToken.None
-                    ).GetAwaiter().GetResult();
+            });
+            var snapshot = snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None).Result;
 
-               });
-                var snapshot = snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None).Result;
-
-                // Assert
-                snapshot.Should().NotBeNull();
-                snapshot.AggregateVersion.Should().Be(threadCount - 1);
-            }
+            // Assert
+            snapshot.Should().NotBeNull();
+            snapshot.AggregateVersion.Should().Be(threadCount - 1);
         }
 
         [Fact]
@@ -102,19 +98,17 @@ namespace NBB.EventStore.IntegrationTests
             var snapshot = new TestSnapshot { Prop1 = "aaa", Prop2 = "bbb" };
             var snapshotEnvelope = new SnapshotEnvelope(snapshot, 1, stream);
 
-            using (var scope = container.CreateScope())
-            {
-                //Act
-                var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
+            using var scope = container.CreateScope();
+            //Act
+            var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
 
-                await snapshotStore.StoreSnapshotAsync(snapshotEnvelope, CancellationToken.None);
+            await snapshotStore.StoreSnapshotAsync(snapshotEnvelope, CancellationToken.None);
 
-                var loadedSnapshotEnvelope = await snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None);
+            var loadedSnapshotEnvelope = await snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None);
 
-                //Assert
-                loadedSnapshotEnvelope.Should().NotBeNull();
-                loadedSnapshotEnvelope.Should().BeEquivalentTo(snapshotEnvelope);
-            }
+            //Assert
+            loadedSnapshotEnvelope.Should().NotBeNull();
+            loadedSnapshotEnvelope.Should().BeEquivalentTo(snapshotEnvelope);
         }
 
         [Fact]
@@ -125,15 +119,13 @@ namespace NBB.EventStore.IntegrationTests
             var container = BuildAdoRepoServiceProvider();
             var stream = Guid.NewGuid().ToString();
 
-            using (var scope = container.CreateScope())
-            {
-                //Act
-                var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
-                var loadedSnapshotEnvelope = await snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None);
+            using var scope = container.CreateScope();
+            //Act
+            var snapshotStore = scope.ServiceProvider.GetService<ISnapshotStore>();
+            var loadedSnapshotEnvelope = await snapshotStore.LoadSnapshotAsync(stream, CancellationToken.None);
 
-                //Assert
-                loadedSnapshotEnvelope.Should().BeNull();
-            }
+            //Assert
+            loadedSnapshotEnvelope.Should().BeNull();
         }
 
         private static IServiceProvider BuildAdoRepoServiceProvider()

@@ -14,7 +14,7 @@ namespace NBB.Core.DependencyInjection
         public static T NotNull<T>([NoEnumeration] T value, [InvokerParameterName, NotNull] string parameterName)
             where T : class
         {
-            if (ReferenceEquals(value, null))
+            if (value is null)
             {
                 NotEmpty(parameterName, nameof(parameterName));
 
@@ -27,7 +27,7 @@ namespace NBB.Core.DependencyInjection
         [ContractAnnotation("value:null => halt")]
         public static string NotEmpty(string value, [InvokerParameterName, NotNull] string parameterName)
         {
-            if (ReferenceEquals(value, null))
+            if (value is null)
             {
                 NotEmpty(parameterName, nameof(parameterName));
 

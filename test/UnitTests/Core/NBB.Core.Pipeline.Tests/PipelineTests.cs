@@ -111,19 +111,17 @@ namespace NBB.Core.Pipeline.Tests
                 .Pipeline;
 
             var sentContext = Mock.Of<IContext>(x => x.Services == mockedServiceProvider);
-            using (var ts = new CancellationTokenSource())
-            {
-                var sentCancellationToken = ts.Token;
+            using var ts = new CancellationTokenSource();
+            var sentCancellationToken = ts.Token;
 
-                //Act
-                await pipeline(sentContext, sentCancellationToken);
+            //Act
+            await pipeline(sentContext, sentCancellationToken);
 
-                //Assert
-                receivedCancellationToken1.Should().Be(sentCancellationToken);
-                receivedCancellationToken2.Should().Be(sentCancellationToken);
-                receivedData1.Should().Be(sentContext);
-                receivedData2.Should().Be(sentContext);
-            }
+            //Assert
+            receivedCancellationToken1.Should().Be(sentCancellationToken);
+            receivedCancellationToken2.Should().Be(sentCancellationToken);
+            receivedData1.Should().Be(sentContext);
+            receivedData2.Should().Be(sentContext);
         }
 
         [Fact]

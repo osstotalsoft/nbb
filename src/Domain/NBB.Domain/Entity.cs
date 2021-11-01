@@ -16,16 +16,14 @@ namespace NBB.Domain
         object IIdentifiedEntity.GetIdentityValue() => GetIdentityValue();
 
         public bool IsTransient()
-        {
-            return EqualityComparer<TIdentity>.Default.Equals(this.GetIdentityValue(), default(TIdentity));
-        }
+            => EqualityComparer<TIdentity>.Default.Equals(GetIdentityValue(), default);
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Entity<TIdentity>))
+            if (obj == null || obj is not Entity<TIdentity>)
                 return false;
 
-            if (Object.ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
                 return true;
 
             if (this.GetType() != obj.GetType())
@@ -35,8 +33,8 @@ namespace NBB.Domain
 
             if (item.IsTransient() || this.IsTransient())
                 return false;
-            else
-                return EqualityComparer<TIdentity>.Default.Equals(item.GetIdentityValue(), this.GetIdentityValue());
+
+            return EqualityComparer<TIdentity>.Default.Equals(item.GetIdentityValue(), this.GetIdentityValue());
         }
 
         public override int GetHashCode()
@@ -48,28 +46,21 @@ namespace NBB.Domain
 
                 return _requestedHashCode.Value;
             }
-            else
-                return base.GetHashCode();
+
+            return base.GetHashCode();
 
         }
 
         public static bool operator ==(Entity<TIdentity> left, Entity<TIdentity> right)
-        {
-            if (Object.Equals(left, null))
-                return (Object.Equals(right, null)) ? true : false;
-            else
-                return left.Equals(right);
-        }
+            => left?.Equals(right) ?? Equals(right, null);
 
         public static bool operator !=(Entity<TIdentity> left, Entity<TIdentity> right)
-        {
-            return !(left == right);
-        }
+            => !(left == right);
     }
 
     public abstract class Entity<TIdentity, TMemento> : Entity<TIdentity>, IMementoProvider<TMemento>
     {
-        void IMementoProvider.SetMemento(object memento) => SetMemento((TMemento)memento) ;
+        void IMementoProvider.SetMemento(object memento) => SetMemento((TMemento)memento);
         object IMementoProvider.CreateMemento() => CreateMemento();
 
         TMemento IMementoProvider<TMemento>.CreateMemento() => CreateMemento();

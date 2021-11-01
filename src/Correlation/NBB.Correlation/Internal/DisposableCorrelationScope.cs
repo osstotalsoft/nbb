@@ -16,7 +16,16 @@ namespace NBB.Correlation.Internal
 
         public void Dispose()
         {
-            CorrelationManager.ClearCorrelationId();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                CorrelationManager.ClearCorrelationId();
+            }
         }
 
         public static implicit operator Guid(DisposableCorrelationScope disposableCorrelationScope)
