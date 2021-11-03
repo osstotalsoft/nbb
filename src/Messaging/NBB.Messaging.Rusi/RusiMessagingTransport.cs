@@ -48,7 +48,7 @@ namespace NBB.Messaging.Rusi
 
             var request = new PublishRequest()
             {
-                PubsubName = _options.Value.PubsubName,
+                PubsubName = _options.Value.PubsubName ?? string.Empty,
                 Topic = topic,
                 Data = ByteString.CopyFrom(payload),
                 DataContentType = "application/json;charset=utf-8",
