@@ -76,7 +76,7 @@ namespace NBB.Messaging.Rusi
 
             var subRequest = new SubscriptionRequest()
             {
-                PubsubName = _options.Value.PubsubName,
+                PubsubName = _options.Value.PubsubName ?? string.Empty,
                 Topic = topic,
                 Options = subscriptionOptions
             };
