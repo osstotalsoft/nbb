@@ -98,7 +98,7 @@ namespace NBB.Messaging.Rusi
             {
                 try
                 {
-                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync())
+                    await foreach (var msg in subscription.ResponseStream.ReadAllAsync(cancellationToken))
                     {
                         var receiveContext = new TransportReceiveContext(
                             new TransportReceivedData.PayloadBytesAndHeaders(msg.Data.ToByteArray(), msg.Metadata));
@@ -118,7 +118,7 @@ namespace NBB.Messaging.Rusi
                         });
                     }
                 }
-                catch (RpcException ex)
+                catch (RpcException ex) when (new[] { StatusCode.Unavailable, StatusCode.Aborted }.Contains(ex.StatusCode))
                 {
                     _logger.LogError(ex, "Rusi transport unrecoverable exception");
 
