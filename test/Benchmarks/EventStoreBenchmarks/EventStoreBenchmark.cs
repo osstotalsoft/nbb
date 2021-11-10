@@ -4,14 +4,10 @@
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.EventStore;
 using NBB.EventStore.Abstractions;
-using NBB.EventStore.AdoNet;
 using NBB.EventStore.AdoNet.Migrations;
-using NBB.EventStore.AdoNet.Multitenancy;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.SQLStreamStore;
 using NBB.SQLStreamStore.Migrations;
 using System;
 using System.Collections.Generic;

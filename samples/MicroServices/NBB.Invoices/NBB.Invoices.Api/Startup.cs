@@ -8,8 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.AspNet;
 using NBB.Invoices.Data;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.Nats;
 
 namespace NBB.Invoices.Api
 {

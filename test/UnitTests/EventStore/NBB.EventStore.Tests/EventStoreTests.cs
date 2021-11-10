@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NBB.Core.Abstractions;
 using NBB.EventStore.Internal;
 using Xunit;
 

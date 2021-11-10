@@ -25,9 +25,9 @@ namespace NBB.Messaging.Abstractions
         /// Publishes a message to a topic
         /// </summary>
         /// <param name="topic">The topic/channel to publish to</param>
-        /// <param name="message">The message</param>
+        /// <param name="sendContext">The context: message and headers</param>
         /// <param name="cancellationToken"></param>
-        Task PublishAsync(string topic, TransportSendContext message, CancellationToken cancellationToken = default);
+        Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default);
     }
 
 

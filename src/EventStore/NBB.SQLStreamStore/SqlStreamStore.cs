@@ -2,7 +2,6 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Logging;
-using NBB.Core.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.SQLStreamStore.Internal;
 using SqlStreamStore;

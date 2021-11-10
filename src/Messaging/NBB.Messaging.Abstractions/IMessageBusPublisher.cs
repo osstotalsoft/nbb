@@ -8,7 +8,7 @@ namespace NBB.Messaging.Abstractions
 {
     public interface IMessageBusPublisher
     {
-        Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
+        Task PublishAsync<T>(T message, MessagingPublisherOptions publisherOptions = null,
             CancellationToken cancellationToken = default);
 
         Task PublishAsync<T>(T message, CancellationToken cancellationToken) =>

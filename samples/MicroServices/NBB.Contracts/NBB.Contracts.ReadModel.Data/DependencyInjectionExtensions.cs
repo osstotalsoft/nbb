@@ -4,7 +4,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Data.EntityFramework;
 
 namespace NBB.Contracts.ReadModel.Data
 {

@@ -3,7 +3,6 @@
 
 using System;
 using Grpc.Core;
-using Grpc.Core.Interceptors;
 using Grpc.Net.Client.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
