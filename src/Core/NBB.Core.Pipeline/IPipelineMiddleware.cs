@@ -17,9 +17,9 @@ namespace NBB.Core.Pipeline
         /// <summary>
         /// Perform processing for the current <paramref name="data"/> next middleware data.
         /// </summary>
-        /// <param name="data">The data/context processed in the pipeline.</param>
+        /// <param name="context">The data / context processed in the pipeline.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <param name="next">The next middleware.</param>
-        Task Invoke(TContext data, CancellationToken cancellationToken, Func<Task> next);
+        Task Invoke(TContext context, CancellationToken cancellationToken, Func<Task> next);
     }
 }

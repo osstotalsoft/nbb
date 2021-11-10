@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Contracts.Domain.ContractAggregate;
-using NBB.Data.EventSourcing;
 
 namespace NBB.Contracts.WriteModel.Data
 {

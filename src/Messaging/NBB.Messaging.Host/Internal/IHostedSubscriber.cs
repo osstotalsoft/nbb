@@ -3,7 +3,6 @@
 
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 

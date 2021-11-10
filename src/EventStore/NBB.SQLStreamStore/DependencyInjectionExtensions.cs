@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Configuration;
 using NBB.EventStore.Abstractions;
-using NBB.SQLStreamStore;
 using NBB.SQLStreamStore.Internal;
 using SqlStreamStore;
 

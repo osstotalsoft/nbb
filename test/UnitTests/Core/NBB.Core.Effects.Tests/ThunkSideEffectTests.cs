@@ -2,8 +2,6 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;

@@ -7,8 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.Nats;
 using NBB.Payments.Data;
 
 namespace NBB.Payments.Api

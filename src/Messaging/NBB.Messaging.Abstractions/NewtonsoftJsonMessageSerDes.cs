@@ -50,12 +50,12 @@ namespace NBB.Messaging.Abstractions
                 (TMessage)partialEnvelope.Payload.ToObject(outputType));
         }
 
-        public byte[] SerializeMessageEnvelope(MessagingEnvelope message, MessageSerDesOptions options = null)
+        public byte[] SerializeMessageEnvelope(MessagingEnvelope envelope, MessageSerDesOptions options = null)
         {
-            var messageTypeId = _messageTypeRegistry.GetTypeId(message.Payload.GetType());
-            message.SetHeader(MessagingHeaders.MessageType, messageTypeId, true);
+            var messageTypeId = _messageTypeRegistry.GetTypeId(envelope.Payload.GetType());
+            envelope.SetHeader(MessagingHeaders.MessageType, messageTypeId, true);
 
-            return Serialize(message);
+            return Serialize(envelope);
         }
         private Type ResolveOutputType<TMessage>(string messageTypeId, Type expectedType, MessageSerDesOptions options = null)
         {
