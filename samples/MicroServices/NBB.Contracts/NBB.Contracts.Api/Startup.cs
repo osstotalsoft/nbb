@@ -11,7 +11,6 @@ using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.Nats;
 using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Repositories;
-using NBB.MultiTenancy.AspNet;
 using NBB.MultiTenancy.Identification.Http.Extensions;
 
 namespace NBB.Contracts.Api

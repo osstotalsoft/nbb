@@ -7,8 +7,8 @@ namespace NBB.Messaging.Abstractions
 {
     public interface IMessageBusSubscriber<TMessage>
     {
-        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token = default, string topicName = null, MessagingSubscriberOptions options = null);
-        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken token = default);
+        Task SubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default, string topicName = null, MessagingSubscriberOptions options = null);
+        Task UnSubscribeAsync(Func<MessagingEnvelope<TMessage>, Task> handler, CancellationToken cancellationToken = default);
     }
 
 

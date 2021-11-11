@@ -22,7 +22,6 @@ namespace NBB.Exporter.Csv
             if (exportData == null)
                 throw new ArgumentNullException("exportData");
 
-            var newLine = Environment.NewLine;
             var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var exportDataList = new List<List<object>>();
 

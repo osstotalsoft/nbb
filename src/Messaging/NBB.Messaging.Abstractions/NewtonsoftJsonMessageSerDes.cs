@@ -47,12 +47,12 @@ namespace NBB.Messaging.Abstractions
                 : new MessagingEnvelope(partialEnvelope.Headers, partialEnvelope.Payload.ToObject(concreteType));
         }
 
-        public string SerializeMessageEnvelope(MessagingEnvelope message, MessageSerDesOptions options = null)
+        public string SerializeMessageEnvelope(MessagingEnvelope envelope, MessageSerDesOptions options = null)
         {
-            var messageTypeId = _messageTypeRegistry.GetTypeId(message.Payload.GetType());
-            message.SetHeader(MessagingHeaders.MessageType, messageTypeId, true);
+            var messageTypeId = _messageTypeRegistry.GetTypeId(envelope.Payload.GetType());
+            envelope.SetHeader(MessagingHeaders.MessageType, messageTypeId, true);
 
-            var json = JsonConvert.SerializeObject(message, new JsonSerializerSettings()
+            var json = JsonConvert.SerializeObject(envelope, new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });

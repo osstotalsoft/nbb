@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions;
-using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Repositories;
 
 namespace NBB.Contracts.Worker.MultiTenancy

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NBB.MultiTenancy.Abstractions.Context
+﻿namespace NBB.MultiTenancy.Abstractions.Context
 {
     public class TenantContext
     {
