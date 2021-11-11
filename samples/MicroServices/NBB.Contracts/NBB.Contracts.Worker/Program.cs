@@ -25,6 +25,7 @@ using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Hosting;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Messaging.Extensions;
+using NBB.Messaging.Noop;
 
 namespace NBB.Contracts.Worker
 {
@@ -72,6 +73,7 @@ namespace NBB.Contracts.Worker
 
                     //services.AddKafkaMessaging();
                     services.AddNatsMessaging();
+                    //services.AddNoopMessaging();
 
                     services.AddContractsWriteModelDataAccess();
                     services.AddContractsReadModelDataAccess();

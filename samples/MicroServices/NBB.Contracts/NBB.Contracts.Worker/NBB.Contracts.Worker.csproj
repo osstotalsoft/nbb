@@ -42,6 +42,7 @@
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.GetEventStore\NBB.GetEventStore.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Kafka\NBB.Messaging.Kafka.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Noop\NBB.Messaging.Noop.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.MultiTenancy\NBB.Messaging.MultiTenancy.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Messaging\NBB.MultiTenancy.Identification.Messaging.csproj" />

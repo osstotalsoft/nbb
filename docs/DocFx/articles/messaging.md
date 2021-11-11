@@ -43,6 +43,16 @@ In order to register Kafka as the default messaging:
 services.AddKafkaMessaging();
 ```
 
+Noop
+----------------
+
+NoOp implementation (no operation eg do nothing)
+
+In order to register Noop as the default messaging:
+```csharp
+services.AddNoopMessaging();
+```
+
 The topic resolution for messages is done by a simple interface *ITopicRegistry*. There is a simple implementation of this interface, *TopicRegistry* that resolves topic names from messages full type name.
 To change this behavoiur you can use the *TopicNameResolverAttribute*, for ex:
 ```csharp

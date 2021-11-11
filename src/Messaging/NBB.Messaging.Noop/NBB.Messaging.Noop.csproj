@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Noop provides in no operation implementation for IMessageBusPublisher</Description>
+    <Description>Noop provides in no operation implementation for messaging publisher and subscriber</Description>
   </PropertyGroup>
 
   <ItemGroup>

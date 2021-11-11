@@ -33,6 +33,7 @@ namespace NBB.Contracts.Api
 
             //services.AddKafkaMessaging();
             services.AddNatsMessaging();
+            //services.AddNoopMessaging();
 
             services.AddContractsReadModelDataAccess();
 

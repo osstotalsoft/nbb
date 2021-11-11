@@ -8,7 +8,7 @@ namespace NBB.Application.DataContracts.Schema.Sample
     public class StringSpecimenBuilder : ISpecimenBuilder
     {
         private readonly Random random = new Random();
-        
+
         public string RandomString(int length)
         {
             const string chars = "abcdefghijklmnopqrstwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -22,7 +22,10 @@ namespace NBB.Application.DataContracts.Schema.Sample
             {
                 return RandomString(10);
             }
-
+            if (request is ParameterInfo pi2 && pi2.ParameterType == typeof(string))
+            {
+                return RandomString(10);
+            }
             return new NoSpecimen();
         }
     }

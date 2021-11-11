@@ -8,7 +8,7 @@ namespace NBB.Messaging.Noop
     {
         public static void AddNoopMessaging(this IServiceCollection services)
         {
-            services.AddSingleton<IMessageBusPublisher, MessageBusPublisher>();
+            services.AddSingleton<IMessageBusPublisher, NoopMessageBusPublisher>();
             services.AddSingleton(typeof(IMessageBusSubscriber<>), typeof(NoopMessageBusSubscriber<>));
             services.AddTransient<IMessagingTopicSubscriber, NoopMessagingTopicSubscriber>();
             services.AddTransient<IMessagingTopicPublisher, NoopMessagingTopicPublisher>();
