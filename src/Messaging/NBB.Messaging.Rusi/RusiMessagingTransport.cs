@@ -43,6 +43,7 @@ namespace NBB.Messaging.Rusi
             var (payload, extraHeaders) = sendContext.PayloadBytesAccessor.Invoke();
             var headers = sendContext.HeadersAccessor.Invoke()
                 .Concat(extraHeaders)
+                .Where(h => h.Value != null)
                 .GroupBy(x => x.Key)
                 .ToDictionary(x => x.Key, x => x.Last().Value);
 
