@@ -119,7 +119,11 @@ namespace NBB.Messaging.Rusi
                         });
                     }
                 }
-                catch (RpcException ex) when (new[] { StatusCode.Unavailable, StatusCode.Aborted }.Contains(ex.StatusCode))
+                catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
+                {
+                    _logger.LogDebug(ex, "Rusi transport cancelled");
+                }
+                catch (Exception ex) 
                 {
                     _logger.LogError(ex, "Rusi transport unrecoverable exception");
 
