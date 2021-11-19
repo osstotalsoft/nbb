@@ -49,7 +49,10 @@ namespace Microsoft.Extensions.DependencyInjection
                                     InitialBackoff = TimeSpan.FromSeconds(0.1),
                                     MaxBackoff = TimeSpan.FromSeconds(1),
                                     BackoffMultiplier = 1.5,
-                                    RetryableStatusCodes = { StatusCode.Unavailable, StatusCode.Aborted }
+                                    RetryableStatusCodes = { StatusCode.Unavailable,
+                                        StatusCode.Unknown,
+                                        StatusCode.DeadlineExceeded,
+                                        StatusCode.Aborted }
                                 }
                             }
                         }
