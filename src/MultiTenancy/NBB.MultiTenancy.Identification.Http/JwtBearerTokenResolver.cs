@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using NBB.MultiTenancy.Identification.Resolvers;
 using System.IdentityModel.Tokens.Jwt;
@@ -35,6 +36,10 @@ namespace NBB.MultiTenancy.Identification.Http
                 .Replace("Bearer ", "");
 
             var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(tokenString))
+            {
+                return Task.FromResult((string)null);
+            }
             var jsonToken = handler.ReadToken(tokenString);
             if (jsonToken is not JwtSecurityToken token)
             {
