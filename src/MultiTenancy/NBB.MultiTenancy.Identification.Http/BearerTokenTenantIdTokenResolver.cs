@@ -25,7 +25,7 @@ namespace NBB.MultiTenancy.Identification.Http
         {
             if (!_httpContextAccessor.HttpContext.Request.Headers.ContainsKey(HeaderNames.Authorization))
             {
-                return Task.FromResult(string.Empty);
+                return Task.FromResult((string)null);
             }
             var tokenString = _httpContextAccessor
                 .HttpContext
@@ -38,7 +38,7 @@ namespace NBB.MultiTenancy.Identification.Http
             var jsonToken = handler.ReadToken(tokenString);
             if (jsonToken is not JwtSecurityToken token)
             {
-                return default;
+                return Task.FromResult((string)null);
             }
             var claim = token.Claims.FirstOrDefault(x => x.Type == _parameterName);
             return Task.FromResult(claim?.Value);
