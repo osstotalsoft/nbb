@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Identification.Http
 {
-    public class BearerTokenTenantIdTokenResolver : ITenantTokenResolver
+    public class JwtBearerTokenResolver : ITenantTokenResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly string _parameterName;
 
-        public BearerTokenTenantIdTokenResolver(IHttpContextAccessor httpContextAccessor, string parameterName)
+        public JwtBearerTokenResolver(IHttpContextAccessor httpContextAccessor, string parameterName)
         {
             _httpContextAccessor = httpContextAccessor;
             _parameterName = parameterName;

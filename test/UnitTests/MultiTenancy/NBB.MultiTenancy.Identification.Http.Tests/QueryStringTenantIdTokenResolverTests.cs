@@ -34,7 +34,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new QueryStringTenantIdTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+            var _ = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
@@ -47,7 +47,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var paramName = "name";
             var paramValue = "value";
             _mockQuery.Setup(q => q[paramName]).Returns(paramValue);
-            var sut = new QueryStringTenantIdTokenResolver(_mockHttpContextAccessor.Object, paramName);
+            var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, paramName);
 
             // Act
             var _ = sut.GetTenantToken().Result;
@@ -65,7 +65,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var paramName = "name";
             var paramValue = "value";
             _mockQuery.Setup(q => q[paramName]).Returns(paramValue);
-            var sut = new QueryStringTenantIdTokenResolver(_mockHttpContextAccessor.Object, paramName);
+            var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, paramName);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -81,7 +81,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var paramName = "badName";
             var paramValue = "value";
             _mockQuery.Setup(q => q[paramName]).Returns(paramValue);
-            var sut = new QueryStringTenantIdTokenResolver(_mockHttpContextAccessor.Object, "name");
+            var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, "name");
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -95,7 +95,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             _mockHttpContextAccessor.Setup(a => a.HttpContext).Returns((HttpContext)null);
-            var sut = new QueryStringTenantIdTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+            var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Act
             var result = sut.GetTenantToken().Result;

@@ -9,18 +9,19 @@ using System.Threading.Tasks;
 namespace NBB.MultiTenancy.Identification.Http
 {
     /// <summary>
-    /// services.AddTenantTokenResolver<TenantIdRefererHttpTokenResolver>("nbb-tenantId=([({]?[a-fA-F0-9]{8}[-]?([a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?)")
+    /// services.AddTenantTokenResolver<ReferrerHttpTokenResolver>("nbb-tenantId=([({]?[a-fA-F0-9]{8}[-]?([a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?)")
     /// </summary>
-    public class ReferrerTenantIdTokenResolver : ITenantTokenResolver
+    public class HeaderRegexHttpTokenResolver : ITenantTokenResolver
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private const string HeaderNameDefault = "Referer";
+        private readonly string _headerName;
         private readonly string _regEx;
 
-        public ReferrerTenantIdTokenResolver(string regEx, IHttpContextAccessor httpContextAccessor)
+        public HeaderRegexHttpTokenResolver(string regEx, string headerName, IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
             _regEx = regEx;
+            _headerName = headerName;
         }
 
         public Task<string> GetTenantToken()
@@ -29,14 +30,14 @@ namespace NBB.MultiTenancy.Identification.Http
             {
                 return Task.FromResult((string)null);
             }
-            if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue(HeaderNameDefault, out var value))
+            if (_httpContextAccessor.HttpContext.Request.Headers.TryGetValue(_headerName, out var value))
             {
-                var url = value.ToString();
-                var match = Regex.Match(url, _regEx, RegexOptions.IgnoreCase);
+                var headerValue = value.ToString();
+                var match = Regex.Match(headerValue, _regEx, RegexOptions.IgnoreCase);
                 if (match.Success)
                 {
-                    var tenantId = match.Groups[1].Value;
-                    return Task.FromResult(tenantId);
+                    var token = match.Groups[1].Value;
+                    return Task.FromResult(token);
                 }
             }
 
