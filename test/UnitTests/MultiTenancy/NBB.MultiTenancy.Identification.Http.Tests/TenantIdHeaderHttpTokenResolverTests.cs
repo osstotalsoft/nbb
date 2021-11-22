@@ -34,7 +34,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+            var _ = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
@@ -47,7 +47,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var hKey = "key";
             var hValue = "value";
             _mockHeaders.Setup(h => h[hKey]).Returns(new StringValues(hValue));
-            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
+            var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
             var _ = sut.GetTenantToken().Result;
@@ -65,7 +65,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var hKey = "key";
             var hValue = "value";
             _mockHeaders.Setup(h => h[hKey]).Returns(new StringValues(hValue));
-            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
+            var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -79,7 +79,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             var hKey = "bad key";
-            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
+            var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
             var result = sut.GetTenantToken().Result;
@@ -93,7 +93,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         {
             // Arrange
             _mockHttpContextAccessor.Setup(a => a.HttpContext).Returns((HttpContext)null);
-            var sut = new TenantIdHeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+            var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Act
             var result = sut.GetTenantToken().Result;

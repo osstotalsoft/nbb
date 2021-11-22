@@ -1,9 +1,12 @@
 # NBB.MultiTenancy.Identification.Http
 This package provides tenant identification from HTTP requests:
-* `TenantIdHeaderHttpTokenResolver` - obtains the tenant token from the given http header
-* `QueryStringTenantIdTokenResolver` - obtains the tenant token from the given query string parameter
+* `FormTokenResolver` - obtains the tenant token from the form values (when Request.HasFormContentType == true)
+* `HeaderHttpTokenResolver` - obtains the tenant token from the given http header
+* `HeaderRegexHttpTokenResolver` - obtains the tenant token from the header with a regular expression.
 * `HostHttpTenantTokenResolver` - obtains the tenant token from http request host 
-* `HostRefererHttpTokenResolver` - obtains the tenant token from the host name in the 'Referer' HTTP header. 
+* `HostRefererHttpTokenResolver` - obtains the tenant token from the host name in the 'Referer' HTTP header.
+* `JwtBearerTokenResolver` - obtains the tenant token from the a claim in a Jwt token extracted from Bearer authentication.
+* `QueryStringTokenResolver` - obtains the tenant token from the given query string parameter
 
 For details about resolvers see [`NBB.Multitenancy.Identification`](../NBB.MultiTenancy.Identification#readme)
 

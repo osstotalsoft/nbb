@@ -13,14 +13,16 @@ dotnet add package NBB.MultiTenancy.Identification
 
 ## Registration
 The following example registers a tenant identification service that uses the following strategy:
-* try to get a tenant token using the resolver `TenantIdHeaderHttpTokenResolver`
-* if a tenant token could not be resolved in the previous step, try to get one using the resolver `TenantIdHeaderHttpTokenResolver`
+* try to get a tenant token using the resolver JwtBearerTokenResolver (from Jwt token), from the claim "tid"
+* try to get a tenant token using the resolver `HeaderHttpTokenResolver` from the header key "TenantId"
+* if a tenant token could not be resolved in the previous step, try to get one using the resolver `QueryStringHttpTokenResolver`, from the key "TenantId"
 * if a token was resolved, obtain the tenant ID using the identifier `IdTenantIdentifier`
 
 ```csharp
     services.AddTenantIdentificationService()
         .AddTenantIdentificationStrategy<IdTenantIdentifier>(builder => builder
-            .AddTenantTokenResolver<TenantIdHeaderHttpTokenResolver>(DefaultTenantHttpHeaderName)
-            .AddTenantTokenResolver<QueryStringTenantIdTokenResolver>(DefaultTenantQueryStringParamName)
+            .AddTenantTokenResolver<JwtBearerTokenResolver>(DefaultJwtClaimStringParamName)
+            .AddTenantTokenResolver<HeaderHttpTokenResolver>(DefaultTenantHttpHeaderName)
+            .AddTenantTokenResolver<QueryStringHttpTokenResolver>(DefaultTenantQueryStringParamName)
         );
 ```

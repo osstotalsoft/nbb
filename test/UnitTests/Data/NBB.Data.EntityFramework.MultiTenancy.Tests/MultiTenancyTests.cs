@@ -160,7 +160,6 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             var scope = sp.CreateScope();
             var tenantContextAccessor = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>();
-            //var dbConfigService = scope.ServiceProvider.GetRequiredService<ITenantDatabaseConfigService>();
             tenantContextAccessor.TenantContext = new TenantContext(new Tenant(tenantId, string.Empty));
 
             await action(scope.ServiceProvider);
