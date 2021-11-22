@@ -23,5 +23,6 @@
     <AutoFixturePackageVersion>4.15.0</AutoFixturePackageVersion>
     <OpenTracingContribPackageVersion>0.7.1</OpenTracingContribPackageVersion>
     <JaegerPackageVersion>0.4.2</JaegerPackageVersion>
+    <SystemIdentityModelTokensJwtPackageVersion>6.14.1</SystemIdentityModelTokensJwtPackageVersion>
   </PropertyGroup>
 </Project>
