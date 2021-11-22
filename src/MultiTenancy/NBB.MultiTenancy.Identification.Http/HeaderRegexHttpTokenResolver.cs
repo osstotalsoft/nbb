@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace NBB.MultiTenancy.Identification.Http
 {
     /// <summary>
-    /// services.AddTenantTokenResolver<ReferrerHttpTokenResolver>("nbb-tenantId=([({]?[a-fA-F0-9]{8}[-]?([a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?)")
+    /// services.AddTenantTokenResolver<HeaderRegexHttpTokenResolver>("nbb-tenantId=([({]?[a-fA-F0-9]{8}[-]?([a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?)", "Referrer")
     /// </summary>
     public class HeaderRegexHttpTokenResolver : ITenantTokenResolver
     {
