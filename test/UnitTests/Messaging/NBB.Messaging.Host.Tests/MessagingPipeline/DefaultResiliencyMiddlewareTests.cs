@@ -35,7 +35,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
 
      
         [Fact]
-        public void Should_throwGenericException()
+        public async Task Should_throwGenericException()
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<DefaultResiliencyMiddleware>>();
@@ -54,11 +54,11 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             }
 
             //Assert
-            ((Func<Task>) Action).Should().Throw<ApplicationException>();
+            await ((Func<Task>) Action).Should().ThrowAsync<ApplicationException>();
         }
 
         [Fact]
-        public void Should_throwPolicyException()
+        public async Task Should_throwPolicyException()
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<DefaultResiliencyMiddleware>>();
@@ -77,7 +77,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             }
 
             //Assert
-            ((Func<Task>) Action).Should().Throw<ApplicationException>();
+            await ((Func<Task>) Action).Should().ThrowAsync<ApplicationException>();
         }
     }
 }

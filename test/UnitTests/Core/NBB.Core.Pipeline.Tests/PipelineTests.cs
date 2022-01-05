@@ -125,7 +125,7 @@ namespace NBB.Core.Pipeline.Tests
         }
 
         [Fact]
-        public void Should_not_swallow_exception_async()
+        public async void Should_not_swallow_exception_async()
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
@@ -150,7 +150,7 @@ namespace NBB.Core.Pipeline.Tests
             async Task Action() => await pipeline(sentContext, default);
 
             //Assert
-            ((Func<Task>)Action).Should().Throw<ApplicationException>();
+            await ((Func<Task>)Action).Should().ThrowAsync<ApplicationException>();
             hasMiddleware1Finished.Should().BeFalse();
         }
 

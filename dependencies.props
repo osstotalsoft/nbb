@@ -1,28 +1,31 @@
 ﻿<Project>
   <PropertyGroup Label="Package Versions">
-    <NewtonsoftJsonPackageVersion>12.0.3</NewtonsoftJsonPackageVersion>
+    <NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
     <MediatRPackageVersion>9.0.0</MediatRPackageVersion>
     <ScrutorPackageVersion>3.3.0</ScrutorPackageVersion>
-    <BenchmarkDotNetPackageVersion>0.12.1</BenchmarkDotNetPackageVersion>
-    <MoqPackageVersion>4.15.2</MoqPackageVersion>
+    <BenchmarkDotNetPackageVersion>0.13.1</BenchmarkDotNetPackageVersion>
+    <MoqPackageVersion>4.16.1</MoqPackageVersion>
     <XunitPackageVersion>2.4.1</XunitPackageVersion>
     <XunitRunnerVisualStudioPackageVersion>2.4.3</XunitRunnerVisualStudioPackageVersion>
-    <FsUnitPackageVersion>4.0.2</FsUnitPackageVersion>
-    <FluentAssertionsPackageVersion>5.10.3</FluentAssertionsPackageVersion>
+    <CoverletCollectorPackageVersion>3.1.0</CoverletCollectorPackageVersion>
+    <MicrosoftNetTestSdkPackageVersion>17.0.0</MicrosoftNetTestSdkPackageVersion>
+    <FsUnitPackageVersion>4.1.0</FsUnitPackageVersion>
+    <FluentAssertionsPackageVersion>6.3.0</FluentAssertionsPackageVersion>
     <MicrosoftExtensionsPackagesVersion>6.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>6.0.1</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
-    <PollyVersion>7.2.1</PollyVersion>
+    <PollyVersion>7.2.2</PollyVersion>
     <SerilogPackageVersion>2.10.0</SerilogPackageVersion>
-    <SerilogExtensionsLoggingPackageVersion>3.0.1</SerilogExtensionsLoggingPackageVersion>
-    <SerilogSinksMSSqlServerPackageVersion>5.6.0</SerilogSinksMSSqlServerPackageVersion>
-    <SerilogAspNetCorePackageVersion>3.4.0</SerilogAspNetCorePackageVersion>
+    <SerilogExtensionsLoggingPackageVersion>3.1.0</SerilogExtensionsLoggingPackageVersion>
+    <SerilogSinksConsole>4.0.1</SerilogSinksConsole>
+    <SerilogSinksMSSqlServerPackageVersion>5.6.1</SerilogSinksMSSqlServerPackageVersion>
+    <SerilogAspNetCorePackageVersion>4.1.0</SerilogAspNetCorePackageVersion>
     <AutoMapperPackageVersion>10.1.1</AutoMapperPackageVersion>
     <OpenTracingPackageVersion>0.12.1</OpenTracingPackageVersion>
-    <NJsonSchemaPackageVersion>10.3.11</NJsonSchemaPackageVersion>
-    <AutoFixturePackageVersion>4.15.0</AutoFixturePackageVersion>
+    <NJsonSchemaPackageVersion>10.6.6</NJsonSchemaPackageVersion>
+    <AutoFixturePackageVersion>4.17.0</AutoFixturePackageVersion>
     <OpenTracingContribPackageVersion>0.8.0</OpenTracingContribPackageVersion>
-    <JaegerPackageVersion>0.4.2</JaegerPackageVersion>
-    <SystemIdentityModelTokensJwtPackageVersion>6.14.1</SystemIdentityModelTokensJwtPackageVersion>
+    <JaegerPackageVersion>1.0.3</JaegerPackageVersion>
+    <SystemIdentityModelTokensJwtPackageVersion>6.15.0</SystemIdentityModelTokensJwtPackageVersion>
   </PropertyGroup>
 </Project>

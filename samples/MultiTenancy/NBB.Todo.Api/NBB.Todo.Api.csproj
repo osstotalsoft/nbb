@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00777" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
   </ItemGroup>
   
   <ItemGroup>
