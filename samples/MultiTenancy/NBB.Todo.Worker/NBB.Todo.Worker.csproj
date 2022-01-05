@@ -18,9 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />      
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
