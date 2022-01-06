@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Description>Correlation middleware for Asp.Net Core</Description>
   </PropertyGroup>
 

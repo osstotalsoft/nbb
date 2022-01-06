@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>NBB_Payments_65e4fd90-1fb9-4806-9e38-5d70466ad364</UserSecretsId>
   </PropertyGroup>
 

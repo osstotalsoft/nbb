@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion></LangVersion>
     <UserSecretsId>NBB_TheBenchmarks_4e36178d-da86-4206-8332-54c8f5bb818b</UserSecretsId>
   </PropertyGroup>

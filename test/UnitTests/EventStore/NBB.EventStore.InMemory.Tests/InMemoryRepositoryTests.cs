@@ -59,7 +59,7 @@ namespace NBB.EventStore.InMemory.Tests
         }
 
         [Fact]
-        public void Should_throw_concurrency_exception_for_wrong_version()
+        public async Task Should_throw_concurrency_exception_for_wrong_version()
         {
             //Arrange
             var sut = new InMemoryRepository();
@@ -76,7 +76,7 @@ namespace NBB.EventStore.InMemory.Tests
                 await sut.AppendEventsToStreamAsync(stream, appendedDescriptors, 999, CancellationToken.None);
 
             //Assert
-            action.Should().Throw<ConcurrencyException>();
+            await action.Should().ThrowAsync<ConcurrencyException>();
 
         }
 
@@ -98,7 +98,7 @@ namespace NBB.EventStore.InMemory.Tests
                 await sut.AppendEventsToStreamAsync(stream, appendedDescriptors, 0, CancellationToken.None);
 
             //Assert
-            action2.Should().Throw<ConcurrencyUnrecoverableException>();
+            await action2.Should().ThrowAsync<ConcurrencyUnrecoverableException>();
         }
     }
 }

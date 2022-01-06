@@ -43,14 +43,14 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public override string LogFragment => string.Empty;
 
-        public override long GetServiceProviderHashCode()
-        {
-            return 0;
-        }
+        public override int GetServiceProviderHashCode() => 0;
 
         public override void PopulateDebugInfo([NotNull] IDictionary<string, string> debugInfo)
         {
 
         }
+
+        public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+            => other is MultiTenantDbContextExtensionInfo;
     }
 }

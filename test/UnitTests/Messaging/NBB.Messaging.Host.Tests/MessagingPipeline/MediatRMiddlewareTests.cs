@@ -54,7 +54,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public void Should_throwExceptionForUnhandledMessageType()
+        public async void Should_throwExceptionForUnhandledMessageType()
         {
             //Arrange
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());
@@ -71,7 +71,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
 
             //Assert
 
-            ((Func<Task>) Action).Should().Throw<ApplicationException>();
+            await ((Func<Task>) Action).Should().ThrowAsync<ApplicationException>();
         }
 
         [Fact]

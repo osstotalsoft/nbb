@@ -23,6 +23,8 @@ namespace NBB.EventStore.AdoNet
         private readonly Scripts _scripts;
         private readonly ILogger<AdoNetEventRepository> _logger;
         private readonly IOptions<EventStoreOptions> _eventstoreOptions;
+
+        // TODO: migrate to Microsoft.Data.SqlClient
         private readonly SqlMetaData[] _appendEventsMetadata = new List<SqlMetaData>
         {
             new SqlMetaData("OrderNo", SqlDbType.Int, true, false, SortOrder.Unspecified, -1),
