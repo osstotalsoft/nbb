@@ -20,7 +20,7 @@
     <SerilogSinksConsole>4.0.1</SerilogSinksConsole>
     <SerilogSinksMSSqlServerPackageVersion>5.6.1</SerilogSinksMSSqlServerPackageVersion>
     <SerilogAspNetCorePackageVersion>4.1.0</SerilogAspNetCorePackageVersion>
-    <AutoMapperPackageVersion>10.1.1</AutoMapperPackageVersion>
+    <AutoMapperPackageVersion>11.0.0</AutoMapperPackageVersion>
     <OpenTracingPackageVersion>0.12.1</OpenTracingPackageVersion>
     <NJsonSchemaPackageVersion>10.6.6</NJsonSchemaPackageVersion>
     <AutoFixturePackageVersion>4.17.0</AutoFixturePackageVersion>

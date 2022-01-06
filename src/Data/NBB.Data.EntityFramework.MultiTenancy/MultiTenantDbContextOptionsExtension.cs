@@ -50,8 +50,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         }
 
-        // TODO: Investigate what return value should be used
         public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
-            => false;
+            => other is MultiTenantDbContextExtensionInfo;
     }
 }
