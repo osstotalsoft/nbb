@@ -11,6 +11,8 @@ namespace NBB.Messaging.Abstractions
 {
     public class DefaultDeadLetterQueue : IDeadLetterQueue
     {
+        public const string ErrorTopicName = "_error";
+
         private readonly IMessageBusPublisher _messageBusPublisher;
         private readonly IMessageSerDes _messageSerDes;
         private readonly ILogger<DefaultDeadLetterQueue> _logger;
@@ -46,7 +48,7 @@ namespace NBB.Messaging.Abstractions
 
             // Fire and forget
             _ = _messageBusPublisher
-                    .PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, default)
+                    .PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = ErrorTopicName }, default)
                     .ContinueWith(t => _logger.LogError(t.Exception, "Error publishing to dead letter queue"), TaskContinuationOptions.OnlyOnFaulted);
 
         }
@@ -93,7 +95,7 @@ namespace NBB.Messaging.Abstractions
 
             // Fire and forget
             _ = _messageBusPublisher
-                    .PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = "_error" }, default)
+                    .PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = ErrorTopicName }, default)
                     .ContinueWith(t => _logger.LogError(t.Exception, "Error publishing to dead letter queue"), TaskContinuationOptions.OnlyOnFaulted);
         }
 
