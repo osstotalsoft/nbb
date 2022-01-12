@@ -23,6 +23,12 @@ namespace NBB.Messaging.MultiTenancy
         public async Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
             CancellationToken cancellationToken = default)
         {
+            if (options?.TopicName == DefaultDeadLetterQueue.ErrorTopicName)
+            {
+                await _inner.PublishAsync(message, options , cancellationToken);
+                return;
+            }
+
             var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
             options ??= MessagingPublisherOptions.Default;
 
