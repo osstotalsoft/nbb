@@ -12,7 +12,10 @@ namespace Microsoft.Extensions.DependencyInjection
         public static void AddInProcessTransport(this IServiceCollection services)
         {
             services.AddSingleton<IStorage, Storage>();
-            services.AddSingleton<IMessagingTransport, InProcessMessagingTransport>();
+
+            services.AddSingleton<InProcessMessagingTransport>();
+            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<InProcessMessagingTransport>());
+            services.AddSingleton<IMessagingTransport>(sp => sp.GetRequiredService<InProcessMessagingTransport>());
         }
     }
 }
