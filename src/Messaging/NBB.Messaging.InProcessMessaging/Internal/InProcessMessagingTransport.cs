@@ -10,7 +10,7 @@ using NBB.Messaging.Abstractions;
 
 namespace NBB.Messaging.InProcessMessaging.Internal
 {
-    public class InProcessMessagingTransport : IMessagingTransport
+    public class InProcessMessagingTransport : IMessagingTransport, ITransportMonitor
     {
         private readonly IStorage _storage;
         private readonly ILogger<InProcessMessagingTransport> _logger;
@@ -20,6 +20,8 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             _storage = storage;
             _logger = logger;
         }
+
+        public event TransportErrorHandler OnError;
 
         public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
             SubscriptionTransportOptions options = null,
@@ -38,6 +40,9 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                     _logger.LogError(
                         "InProcessMessagingTopicSubscriber encountered an error when handling a message from topic {TopicName}.\n {Error}",
                         topic, ex);
+
+                    OnError?.Invoke(ex);
+
                     //TODO: push to DLQ
                 }
             }, cancellationToken);
@@ -61,10 +66,11 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             return Task.CompletedTask;
         }
 
-        private class Subscription : IDisposable
+        private sealed class Subscription : IDisposable
         {
             public void Dispose()
             {
+                // Nothing to dispose
             }
         }
     }
