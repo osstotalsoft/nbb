@@ -6,6 +6,7 @@
         <BenchmarkDotNetPackageVersion>0.13.1</BenchmarkDotNetPackageVersion>
         <CoverletCollectorPackageVersion>3.1.0</CoverletCollectorPackageVersion>
         <FluentAssertionsPackageVersion>6.3.0</FluentAssertionsPackageVersion>
+        <FluentValidationPackageVersion>10.3.6</FluentValidationPackageVersion>
         <FoqVersion>1.8.0</FoqVersion>
         <FSharpPlusVersion>1.2.2</FSharpPlusVersion>
         <FsUnitPackageVersion>4.1.0</FsUnitPackageVersion>
@@ -14,7 +15,7 @@
         <GrpcToolsVersion>2.43.0</GrpcToolsVersion>
         <JaegerPackageVersion>1.0.3</JaegerPackageVersion>
         <JetBrainsAnnotationsPackageVersion>2021.3.0</JetBrainsAnnotationsPackageVersion>
-        <MediatRPackageVersion>9.0.0</MediatRPackageVersion>
+        <MediatRPackageVersion>10.0.1</MediatRPackageVersion>
         <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
         <MicrosoftEntityFrameworkPackagesVersion>6.0.1</MicrosoftEntityFrameworkPackagesVersion>
         <MicrosoftExtensionsPackagesVersion>6.0.0</MicrosoftExtensionsPackagesVersion>

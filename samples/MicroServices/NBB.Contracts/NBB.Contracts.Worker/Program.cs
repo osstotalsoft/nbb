@@ -1,11 +1,13 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using FluentValidation;
 using Jaeger;
 using Jaeger.Reporters;
 using Jaeger.Samplers;
 using Jaeger.Senders.Thrift;
 using MediatR;
+using MediatR.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -58,7 +60,13 @@ namespace NBB.Contracts.Worker
                 .ConfigureServices((hostingContext, services) =>
                 {
                     services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
+                    services.Scan(scan => scan
+                        .FromAssemblyOf<ContractCommandHandlers>()
+                        .AddClasses(classes => classes.AssignableTo<IValidator>())
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime());
 
+                    services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
 
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))

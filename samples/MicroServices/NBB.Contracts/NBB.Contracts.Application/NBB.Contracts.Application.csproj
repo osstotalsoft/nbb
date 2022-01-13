@@ -29,4 +29,8 @@
     <ProjectReference Include="..\NBB.Contracts.ReadModel\NBB.Contracts.ReadModel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="$(FluentValidationPackageVersion)" />
+  </ItemGroup>
+  
 </Project>

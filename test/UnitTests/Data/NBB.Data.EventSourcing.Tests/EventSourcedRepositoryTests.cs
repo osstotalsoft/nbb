@@ -320,6 +320,16 @@ namespace NBB.Data.EventSourcing.Tests
         {
             throw new NotImplementedException();
         }
+
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class TestEventStore : IEventStore
