@@ -20,7 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="$(SwashbuckleAspNetCoreVersion)" />
         <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" />
         <PackageReference Include="Jaeger.Senders.Thrift" Version="$(JaegerPackageVersion)" />
         <PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" />

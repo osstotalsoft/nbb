@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Foq" Version="1.8.0" />
-    <PackageReference Include="FSharpPlus" Version="1.2.2" />
+    <PackageReference Include="Foq" Version="$(FoqVersion)" />
+    <PackageReference Include="FSharpPlus" Version="$(FSharpPlusVersion)" />
     <PackageReference Include="FsUnit.xUnit" Version="$(FsUnitPackageVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNetTestSdkPackageVersion)" />
     <PackageReference Include="Moq" Version="$(MoqPackageVersion)" />
