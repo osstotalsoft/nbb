@@ -11,8 +11,10 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddNoopTransport(this IServiceCollection services)
         {
-            services.AddSingleton<IMessagingTransport, NoopMessagingTransport>();
-
+            services.AddSingleton<NoopMessagingTransport>();
+            services.AddSingleton<IMessagingTransport>(sp => sp.GetRequiredService<NoopMessagingTransport>());
+            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<NoopMessagingTransport>());
+            
             return services;
         }
     }
