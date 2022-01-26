@@ -9,6 +9,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
   
   <ItemGroup>

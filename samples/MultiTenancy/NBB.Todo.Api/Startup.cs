@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.AspNet;
 using NBB.Todos.Data;
@@ -32,8 +33,9 @@ namespace NBB.Todo.Api
             services.AddTodoDataAccess();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSwaggerGen();
 
-            services.AddMultitenancy(Configuration)
+          services.AddMultitenancy(Configuration)
                 .AddDefaultHttpTenantIdentification()
                 .AddMultiTenantMessaging()
                 .AddTenantRepository<ConfigurationTenantRepository>();
@@ -50,6 +52,8 @@ namespace NBB.Todo.Api
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
@@ -59,6 +63,7 @@ namespace NBB.Todo.Api
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }
