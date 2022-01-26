@@ -149,7 +149,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TDBContext>((sp, options) =>
                 {
-                    var conn = sp.GetRequiredService<ITenantConfiguration>().GetConnectionString();
+                    var conn = sp.GetRequiredService<ITenantConfiguration>().GetConnectionString("");
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
 

@@ -25,7 +25,7 @@ namespace NBB.Todos.Data
                 (serviceProvider, options) =>
                 {
                     var databaseService = serviceProvider.GetRequiredService<ITenantConfiguration>();
-                    var connectionString = databaseService.GetConnectionString();
+                    var connectionString = databaseService.GetConnectionString("DefaultConnection");
 
                     options
                         .UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Todo.Migrations"))
