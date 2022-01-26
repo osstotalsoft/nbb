@@ -13,7 +13,7 @@ namespace NBB.MultiTenancy.Abstractions.Configuration
     {
         public static string GetConnectionString(this ITenantConfiguration config, string name)
         {
-            return config.GetValue<string>($"ConnectionStrings__{name}");
+            return config.GetValue<string>($"ConnectionStrings:{name}");
         }
     }
 }
