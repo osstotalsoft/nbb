@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Abstractions;
 using NBB.MultiTenancy.Abstractions;
+using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 using Xunit;
@@ -134,7 +135,8 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             var tenantService = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == null);
             var tenantDatabaseConfigService =
-                Mock.Of<ITenantDatabaseConfigService>(x => x.GetConnectionString() == (isSharedDB ? "Test" : Guid.NewGuid().ToString()));
+                Mock.Of<ITenantConfiguration>(x => x.GetValue<string>(It.Is<string>(a=>a.Contains("ConnectionString")))
+                                                   == (isSharedDB ? "Test" : Guid.NewGuid().ToString()));
             var services = new ServiceCollection();
             services.AddOptions<TenancyHostingOptions>().Configure(o =>
             {
@@ -147,7 +149,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TDBContext>((sp, options) =>
                 {
-                    var conn = sp.GetRequiredService<ITenantDatabaseConfigService>().GetConnectionString();
+                    var conn = sp.GetRequiredService<ITenantConfiguration>().GetConnectionString();
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
 

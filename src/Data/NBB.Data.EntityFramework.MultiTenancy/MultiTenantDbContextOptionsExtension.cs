@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using NBB.MultiTenancy.Abstractions.Context;
 using System;
 using System.Collections.Generic;
+using NBB.MultiTenancy.Abstractions.Configuration;
 
 namespace NBB.Data.EntityFramework.MultiTenancy
 {
@@ -24,7 +25,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
         public void ApplyServices(IServiceCollection services)
         {
             services.TryAddSingleton(_serviceProvider.GetService<ITenantContextAccessor>());
-            services.TryAddSingleton(_serviceProvider.GetService<ITenantDatabaseConfigService>());
+            services.TryAddSingleton(_serviceProvider.GetService<ITenantConfiguration>());
         }
 
         public void Validate(IDbContextOptions options)
