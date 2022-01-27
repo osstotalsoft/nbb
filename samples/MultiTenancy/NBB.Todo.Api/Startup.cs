@@ -32,6 +32,7 @@ namespace NBB.Todo.Api
             services.AddTodoDataAccess();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSwaggerGen(options => options.OperationFilter<SwaggerTenantHeaderFilter>());
 
             services.AddMultitenancy(Configuration)
                 .AddDefaultHttpTenantIdentification()
@@ -50,15 +51,15 @@ namespace NBB.Todo.Api
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseWhen(
                 ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
                 appBuilder => appBuilder.UseTenantMiddleware());
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
         }
     }
 }

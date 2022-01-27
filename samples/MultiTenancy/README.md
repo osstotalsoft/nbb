@@ -13,7 +13,9 @@ You can configure the tenancy hosting options in *appsettings.json*:
 "MultiTenancy": {
     "TenancyType": "MultiTenant", // "MultiTenant" "MonoTenant"
     "Defaults": {
-      "ConnectionString": "Server=YOUR_SERVER;Database=NBB_Invoices;User Id=YOUR_USER;Password=YOUR_PASSWORD;MultipleActiveResultSets=true"
+      "ConnectionStrings": {
+          "DefaultConnection" : "Server=YOUR_SERVER;Database=NBB_Invoices;User Id=YOUR_USER;Password=YOUR_PASSWORD;MultipleActiveResultSets=true"
+      } 
     },
     "Tenants": [
       {

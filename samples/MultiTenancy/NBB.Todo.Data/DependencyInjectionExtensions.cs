@@ -6,13 +6,15 @@ using Microsoft.EntityFrameworkCore;
 using NBB.Todo.Data;
 using NBB.Todo.Data.Entities;
 using NBB.Data.EntityFramework.MultiTenancy;
+using NBB.MultiTenancy.Abstractions.Configuration;
+
 namespace NBB.Todos.Data
 {
     public static class DependencyInjectionExtensions
     {
         public static void AddTodoDataAccess(this IServiceCollection services)
         {
-            services.AddTenantDatabaseConfigService<ConfigurationDatabaseConfigService>();
+            services.AddDefaultTenantConfiguration();
 
             services.AddEfCrudRepository<TodoTask, TodoDbContext>();
             services.AddEfQuery<TodoTask, TodoDbContext>();
@@ -22,8 +24,8 @@ namespace NBB.Todos.Data
             services.AddDbContext<TodoDbContext>(
                 (serviceProvider, options) =>
                 {
-                    var databaseService = serviceProvider.GetRequiredService<ITenantDatabaseConfigService>();
-                    var connectionString = databaseService.GetConnectionString();
+                    var databaseService = serviceProvider.GetRequiredService<ITenantConfiguration>();
+                    var connectionString = databaseService.GetConnectionString("DefaultConnection");
 
                     options
                         .UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Todo.Migrations"))
