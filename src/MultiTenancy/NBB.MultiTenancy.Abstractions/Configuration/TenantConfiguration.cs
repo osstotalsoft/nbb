@@ -7,6 +7,8 @@ using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Linq;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
 
@@ -63,7 +65,7 @@ public class TenantConfiguration : ITenantConfiguration
     {
         if (_tenancyHostingOptions.Value.TenancyType == TenancyType.MonoTenant)
         {
-            return _globalConfiguration.GetValue<T>(key);
+            return getValueOrComplexObject<T>(_globalConfiguration, key);
         }
 
         var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
@@ -72,6 +74,22 @@ public class TenantConfiguration : ITenantConfiguration
             ? result
             : throw new Exception($"Configuration not found for tenant {tenantId}");
 
-        return section.GetValue<T>(key, defaultSection.GetValue<T>(key));
+
+        return getValueOrComplexObject<T>(section, key, defaultSection);
+    }
+
+    private static T getValueOrComplexObject<T>(IConfiguration config, string key, IConfigurationSection defaultSection = null)
+    {
+        //section.GetSection is never null
+        if (config.GetSection(key).GetChildren().Any())
+        {
+            //complex type is present
+            return config.GetSection(key).Get<T>();
+        }
+
+        if (config.GetSection(key).Value != null)
+            return config.GetValue<T>(key);
+
+        return defaultSection == null ? default : getValueOrComplexObject<T>(defaultSection, key);
     }
 }
