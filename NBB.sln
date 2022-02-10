@@ -381,6 +381,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Noop", "src\M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Configuration.Tests", "test\UnitTests\MultiTenancy\NBB.MultiTenancy.Configuration.Tests\NBB.MultiTenancy.Configuration.Tests.csproj", "{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.EventStore.AdoNet.Tests", "test\UnitTests\EventStore\NBB.EventStore.AdoNet.Tests\NBB.EventStore.AdoNet.Tests.csproj", "{C3F79479-1011-4ECB-8876-81B81CA2457B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -855,6 +857,10 @@ Global
 		{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3F79479-1011-4ECB-8876-81B81CA2457B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3F79479-1011-4ECB-8876-81B81CA2457B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3F79479-1011-4ECB-8876-81B81CA2457B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3F79479-1011-4ECB-8876-81B81CA2457B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1013,6 +1019,7 @@ Global
 		{2E1525F5-9FF4-47C0-94C1-2BA295A5AD20} = {A4361674-5AB7-442D-8DA7-7187C9BCA38F}
 		{A53CE5F4-841F-40E3-A079-22C583509D6E} = {584C62C0-2AE6-4DD6-9BCF-8FF28B7122CE}
 		{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08} = {0ECF24A0-BFED-4F7A-8B06-CC40E628E852}
+		{C3F79479-1011-4ECB-8876-81B81CA2457B} = {0407911F-89FC-4138-BD4D-D4CFCFBB5DC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}

@@ -277,7 +277,7 @@ namespace NBB.Core.DependencyInjection
             return t1.IsGenericType && t2.IsGenericType && t1.GetGenericTypeDefinition() == t2.GetGenericTypeDefinition();
         }
 
-        private static bool TryDecorateOpenGeneric(this IServiceCollection services, Type serviceType, Type decoratorType, [NotNullWhen(false)] out Exception? error, Predicate<Type> serviceTypePredicate = null)
+        private static bool TryDecorateOpenGeneric(this IServiceCollection services, Type serviceType, Type decoratorType, [NotNullWhen(false)] out Exception error, Predicate<Type> serviceTypePredicate = null)
          {
             var closedGenericServiceTypes = services
                 .Where(x => !x.ServiceType.IsGenericTypeDefinition)
@@ -323,7 +323,7 @@ namespace NBB.Core.DependencyInjection
             throw error;
         }
 
-        private static bool TryDecorateDescriptors(this IServiceCollection services, Type serviceType, [NotNullWhen(false)] out Exception? error, Func<ServiceDescriptor, ServiceDescriptor> decorator)
+        private static bool TryDecorateDescriptors(this IServiceCollection services, Type serviceType, [NotNullWhen(false)] out Exception error, Func<ServiceDescriptor, ServiceDescriptor> decorator)
         {
             if (!services.TryGetDescriptors(serviceType, out var descriptors))
             {
@@ -363,7 +363,7 @@ namespace NBB.Core.DependencyInjection
             return descriptor.WithFactory(provider => provider.CreateInstance(decoratorType, provider.GetInstance(descriptor)));
         }
 
-        private static ServiceDescriptor WithFactory(this ServiceDescriptor descriptor, Func<IServiceProvider, object?> factory)
+        private static ServiceDescriptor WithFactory(this ServiceDescriptor descriptor, Func<IServiceProvider, object> factory)
         {
             return ServiceDescriptor.Describe(descriptor.ServiceType, factory, descriptor.Lifetime);
         }

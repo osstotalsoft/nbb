@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.SqlServer.Server;
 using NBB.Core.Abstractions;
-using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ namespace NBB.EventStore.AdoNet
     {
         private readonly Scripts _scripts;
         private readonly ILogger<AdoNetEventRepository> _logger;
-        private readonly IOptions<EventStoreOptions> _eventstoreOptions;
+        private readonly IOptionsSnapshot<EventStoreAdoNetOptions> _eventstoreOptions;
 
         // TODO: migrate to Microsoft.Data.SqlClient
         private readonly SqlMetaData[] _appendEventsMetadata = new List<SqlMetaData>
@@ -34,7 +33,7 @@ namespace NBB.EventStore.AdoNet
             new SqlMetaData("CorrelationId", SqlDbType.UniqueIdentifier),
         }.ToArray();
 
-        public AdoNetEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptions<EventStoreOptions> eventstoreOptions)
+        public AdoNetEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptionsSnapshot<EventStoreAdoNetOptions> eventstoreOptions)
         {
             _scripts = scripts;
             _eventstoreOptions = eventstoreOptions;

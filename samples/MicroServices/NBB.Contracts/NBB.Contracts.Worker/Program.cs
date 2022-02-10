@@ -84,9 +84,11 @@ namespace NBB.Contracts.Worker
                     services.AddContractsReadModelDataAccess();
 
 
-                    services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
-                        .WithAdoNetEventRepository();
+                    services.AddEventStore(b =>
+                    {
+                        b.UseNewtownsoftJson(new SingleValueObjectConverter());
+                        b.UseAdoNetEventRepository(o => o.FromConfiguration());
+                    });
 
                     services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());

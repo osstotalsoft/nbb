@@ -53,9 +53,11 @@ namespace NBB.Mono
             services.AddInvoicesDataAccess();
             services.AddPaymentsDataAccess();
 
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer(new[] { new SingleValueObjectConverter() })
-                .WithAdoNetEventRepository();
+            services.AddEventStore(es =>
+            {
+                es.UseNewtownsoftJson(new SingleValueObjectConverter());
+                es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+            });
 
             var integrationMessageAssemblies = new[] {
                 typeof(NBB.Contracts.PublishedLanguage.ContractValidated).Assembly,

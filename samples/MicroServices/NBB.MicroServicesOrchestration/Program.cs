@@ -46,9 +46,11 @@ namespace NBB.MicroServicesOrchestration
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
-                    services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer()
-                        .WithAdoNetEventRepository();
+                    services.AddEventStore(es =>
+                    {
+                        es.UseNewtownsoftJson();
+                        es.UseAdoNetEventRepository(o => o.FromConfiguration());
+                    });
 
                     var integrationMessageAssemblies = new[] {
                         typeof(NBB.Contracts.PublishedLanguage.ContractValidated).Assembly,

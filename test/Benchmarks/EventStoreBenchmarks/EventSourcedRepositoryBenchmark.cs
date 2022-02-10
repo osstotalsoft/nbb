@@ -242,9 +242,11 @@ namespace TheBenchmarks
 
             services.AddMediatR(typeof(Program).Assembly);
 
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer()
-                .WithAdoNetEventRepository();
+            services.AddEventStore(es =>
+            {
+                es.UseNewtownsoftJson();
+                es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+            });
 
             addEventStoreAction(services);
 

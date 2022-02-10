@@ -63,8 +63,8 @@ namespace NBB.EventStore.Effects
     {
         public static IServiceCollection AddEventStoreEffects(this IServiceCollection services)
         {
-            services.AddSingleton<ISideEffectHandler<AppendEventsToStream.SideEffect, Unit>, AppendEventsToStream.Handler>();
-            services.AddSingleton<ISideEffectHandler<GetEventsFromStream.SideEffect, List<object>>, GetEventsFromStream.Handler>();
+            services.AddScoped<ISideEffectHandler<AppendEventsToStream.SideEffect, Unit>, AppendEventsToStream.Handler>();
+            services.AddScoped<ISideEffectHandler<GetEventsFromStream.SideEffect, List<object>>, GetEventsFromStream.Handler>();
             return services;
         }
     }
