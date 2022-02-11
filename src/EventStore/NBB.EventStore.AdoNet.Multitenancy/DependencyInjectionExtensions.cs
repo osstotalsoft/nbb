@@ -20,7 +20,7 @@ public static class EventStoreOptionsBuilderExtensions
 
 public static class MultiTenantAdoNetEventStoreOptionsBuilderExtensions
 {
-    public static EventStoreOptionsBuilder UseMultiTenantAdoNetEventRepository(this EventStoreOptionsBuilder b, Action<EventStoreAdoNetOptionsBuilder> optionsAction) => ((IEventStoreOptionsBuilder)b).Add(services =>
+    public static EventStoreOptionsBuilder UseMultiTenantAdoNetEventRepository(this EventStoreOptionsBuilder b, Action<EventStoreAdoNetOptionsBuilder> optionsAction) => ((IEventStoreOptionsBuilder)b).AdExtension(services =>
     {
         services.AddScoped<IEventRepository, AdoNetMultiTenantEventRepository>();
         services.AddScoped<ISnapshotRepository, AdoNetMultitenantSnapshotRepository>();

@@ -29,7 +29,7 @@ public static class DependencyInjectionExtensions
 
 public interface IEventStoreOptionsBuilder
 {
-    EventStoreOptionsBuilder Add(Action<IServiceCollection> extension);
+    EventStoreOptionsBuilder AdExtension(Action<IServiceCollection> extension);
     void AddServices(IServiceCollection services);
 }
 
@@ -37,7 +37,7 @@ public class EventStoreOptionsBuilder: IEventStoreOptionsBuilder
 {
     private readonly List<Action<IServiceCollection>> extensions = new();
 
-    EventStoreOptionsBuilder IEventStoreOptionsBuilder.Add(Action<IServiceCollection> extension)
+    EventStoreOptionsBuilder IEventStoreOptionsBuilder.AdExtension(Action<IServiceCollection> extension)
     {
         extensions.Add(extension);
         return this;
@@ -47,5 +47,5 @@ public class EventStoreOptionsBuilder: IEventStoreOptionsBuilder
         extensions.ForEach(e => e(services));
 
     public EventStoreOptionsBuilder UseNewtownsoftJson(params JsonConverter[] converters)
-        => ((IEventStoreOptionsBuilder)this).Add(services => services.AddSingleton<IEventStoreSerDes>(sp => new NewtonsoftJsonEventStoreSerDes(converters)));
+        => ((IEventStoreOptionsBuilder)this).AdExtension(services => services.AddSingleton<IEventStoreSerDes>(sp => new NewtonsoftJsonEventStoreSerDes(converters)));
 }

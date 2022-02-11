@@ -55,7 +55,7 @@ public class EventStoreAdoNetOptionsBuilder: IEventStoreAdoNetOptionsBuilder
 
 public static class EventStoreOptionsBuilderExtensions
 {
-    public static EventStoreOptionsBuilder UseAdoNetEventRepository(this EventStoreOptionsBuilder b, Action<EventStoreAdoNetOptionsBuilder> optionsAction) => ((IEventStoreOptionsBuilder)b).Add(services =>
+    public static EventStoreOptionsBuilder UseAdoNetEventRepository(this EventStoreOptionsBuilder b, Action<EventStoreAdoNetOptionsBuilder> optionsAction) => ((IEventStoreOptionsBuilder)b).AdExtension(services =>
     {
         services.AddScoped<IEventRepository, AdoNetEventRepository>();
         services.AddScoped<ISnapshotRepository, AdoNetSnapshotRepository>();

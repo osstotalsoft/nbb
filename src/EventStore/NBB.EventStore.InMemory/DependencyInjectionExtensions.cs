@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class EventStoreOptionsBuilderExtensions
 {
-    public static EventStoreOptionsBuilder UseInMemoryEventRepository(this EventStoreOptionsBuilder b) => ((IEventStoreOptionsBuilder)b).Add(services =>
+    public static EventStoreOptionsBuilder UseInMemoryEventRepository(this EventStoreOptionsBuilder b) => ((IEventStoreOptionsBuilder)b).AdExtension(services =>
     {
         services.AddSingleton<IEventRepository, InMemoryRepository>();
         services.AddSingleton<ISnapshotRepository, InMemorySnapshotRepository>();
