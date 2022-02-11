@@ -15,7 +15,7 @@ public interface IEventStoreAdoNetOptionsBuilder
 {
     void Configure(EventStoreAdoNetOptions options, IServiceProvider sp);
 }
-public class EventStoreAdoNetOptionsBuilder: IEventStoreAdoNetOptionsBuilder
+public class EventStoreAdoNetOptionsBuilder : IEventStoreAdoNetOptionsBuilder
 {
     private readonly List<Action<IServiceProvider, EventStoreAdoNetOptions>> mutations = new();
 

@@ -30,12 +30,14 @@ The package [`NBB.EventStore.InMemory`](./NBB.EventStore.InMemory#readme) offers
 Example: register the event store using ADO.NET event repository and JSON serialization:
 
 ```csharp
-services.AddEventStore()
-    .WithNewtownsoftJsonEventStoreSeserializer()
-    .WithAdoNetEventRepository();
+services.AddEventStore(b =>
+{
+    b.UseNewtownsoftJson(new SingleValueObjectConverter());
+    b.UseAdoNetEventRepository(o => o.FromConfiguration());
+});
 ```
 
-The connection string used by the ADO.net repository is configured in section *EventStore.NBB.ConnectionString*
+When using `FromConfiguration`, the connection string used by the ADO.net repository is configured in section *EventStore.NBB.ConnectionString*
 
 ```json
 {

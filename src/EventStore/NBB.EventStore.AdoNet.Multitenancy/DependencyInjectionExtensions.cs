@@ -12,7 +12,7 @@ using System;
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class EventStoreOptionsBuilderExtensions
+public static class MultiTenantEventStoreAdoNetBuilderExtensions
 {
     public static EventStoreAdoNetOptionsBuilder FromTenantConfiguration(this EventStoreAdoNetOptionsBuilder b, string name)
         => b.From<ITenantConfiguration>((c, o) => o.ConnectionString = c.GetConnectionString(name));
