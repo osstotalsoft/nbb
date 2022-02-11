@@ -39,7 +39,7 @@ namespace NBB.Invoices.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
+                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -52,14 +52,16 @@ namespace NBB.Invoices.Worker
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();
-                    services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
-                        .WithAdoNetEventRepository();
+                    services.AddEventStore(e =>
+                    {
+                        e.UseNewtownsoftJson(new SingleValueObjectConverter());
+                        e.UseAdoNetEventRepository(o => o.FromConfiguration());
+                    });
 
                     services.AddMessagingHost(
                         hostingContext.Configuration,
                         hostBuilder => hostBuilder
-                        .Configure(configBuilder =>  configBuilder
+                        .Configure(configBuilder => configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
                                 .FromMediatRHandledCommands().AddAllClasses()
                                 .FromMediatRHandledEvents().AddAllClasses()

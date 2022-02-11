@@ -54,9 +54,11 @@ namespace NBB.Payments.Worker
 
                     services.AddPaymentsWriteDataAccess();
 
-                    services.AddEventStore()
-                        .WithNewtownsoftJsonEventStoreSeserializer(new[] {new SingleValueObjectConverter()})
-                        .WithAdoNetEventRepository();
+                    services.AddEventStore(es =>
+                    {
+                        es.UseNewtownsoftJson(new SingleValueObjectConverter());
+                        es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+                    });
 
                     services.AddMessagingHost(
                         hostingContext.Configuration,

@@ -27,9 +27,11 @@ namespace ProcessManagerSample
 
             services.AddProcessManager(Assembly.GetEntryAssembly());
 
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer()
-                .WithAdoNetEventRepository();
+            services.AddEventStore(es =>
+            {
+                es.UseNewtownsoftJson();
+                es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+            });
 
             services.AddMessagingHost(
                 context.Configuration,

@@ -149,14 +149,15 @@ namespace NBB.EventStore.IntegrationTests
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer()
-                .WithAdoNetEventRepository();
+            services.AddEventStore(es =>
+            {
+                es.UseNewtownsoftJson();
+                es.UseMultiTenantAdoNetEventRepository(opts => opts.FromConfiguration());
+            });
 
             services.AddMultitenancy(configuration)
                 .AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                            x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null))))
-                .WithMultiTenantAdoNetEventRepository();
+                            x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null))));
 
             var container = services.BuildServiceProvider();
             return container;

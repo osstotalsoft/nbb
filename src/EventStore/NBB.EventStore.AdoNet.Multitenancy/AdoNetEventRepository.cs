@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
 using NBB.MultiTenancy.Abstractions.Context;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace NBB.EventStore.AdoNet.Multitenancy
     {
         private readonly ITenantContextAccessor _tenantContextAccessor;
 
-        public AdoNetMultiTenantEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptions<EventStoreOptions> eventstoreOptions, ITenantContextAccessor tenantContextAccessor)
+        public AdoNetMultiTenantEventRepository(Scripts scripts, ILogger<AdoNetEventRepository> logger, IOptionsSnapshot<EventStoreAdoNetOptions> eventstoreOptions, ITenantContextAccessor tenantContextAccessor)
                 : base(scripts, logger, eventstoreOptions)
         {
             _tenantContextAccessor = tenantContextAccessor;

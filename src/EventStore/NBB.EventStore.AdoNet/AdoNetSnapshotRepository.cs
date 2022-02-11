@@ -4,7 +4,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NBB.Core.Abstractions;
-using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
 using System;
 using System.Collections.Generic;
@@ -21,10 +20,10 @@ namespace NBB.EventStore.AdoNet
     {
         private readonly Scripts _scripts;
         private readonly ILogger<AdoNetSnapshotRepository> _logger;
-        private readonly IOptions<EventStoreOptions> _eventstoreOptions;
+        private readonly IOptionsSnapshot<EventStoreAdoNetOptions> _eventstoreOptions;
 
         public AdoNetSnapshotRepository(Scripts scripts,
-            ILogger<AdoNetSnapshotRepository> logger, IOptions<EventStoreOptions> eventstoreOptions)
+            ILogger<AdoNetSnapshotRepository> logger, IOptionsSnapshot<EventStoreAdoNetOptions> eventstoreOptions)
         {
             _scripts = scripts;
             _logger = logger;

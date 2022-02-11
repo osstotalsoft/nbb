@@ -42,9 +42,11 @@ namespace TheBenchmarks
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer()
-                .WithAdoNetEventRepository();
+            services.AddEventStore(es =>
+            {
+                es.UseNewtownsoftJson();
+                es.UseAdoNetEventRepository(o => o.FromConfiguration());
+            });
             _container = services.BuildServiceProvider();
         }
 
@@ -79,9 +81,12 @@ namespace TheBenchmarks
             var services = new ServiceCollection();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer()
-                .WithAdoNetEventRepository();
+            services.AddEventStore(es =>
+            {
+                es.UseNewtownsoftJson();
+                es.UseAdoNetEventRepository(o => o.FromConfiguration());
+            });
+
             _container = services.BuildServiceProvider();
 
             using (var scope = _container.CreateScope())

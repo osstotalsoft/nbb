@@ -19,9 +19,7 @@ namespace NBB.ProjectR.Tests
                 .AddMessagingEffects()
                 .AddMediatorEffects();
             services.AddMessageBus().AddInProcessTransport();
-            services.AddEventStore()
-                .WithNewtownsoftJsonEventStoreSeserializer()
-                .WithInMemoryEventRepository();
+            services.AddEventStore(b => b.UseNewtownsoftJson().UseInMemoryEventRepository());
             services.AddLogging();
             services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
 

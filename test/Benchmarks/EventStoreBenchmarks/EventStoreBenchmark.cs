@@ -19,7 +19,7 @@ using MediatR;
 
 namespace TheBenchmarks
 {
-    public record TestEvent (Guid EventId, Guid? CorrelationId) : INotification;
+    public record TestEvent(Guid EventId, Guid? CorrelationId) : INotification;
 
 
     [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 10)]
@@ -35,9 +35,11 @@ namespace TheBenchmarks
             MigrateNbbEventStore(false);
 
             _container = BuildServiceProvider((services, _) =>
-                services.AddEventStore()
-                    .WithNewtownsoftJsonEventStoreSeserializer()
-                    .WithAdoNetEventRepository());
+                services.AddEventStore(es =>
+                {
+                    es.UseNewtownsoftJson();
+                    es.UseAdoNetEventRepository(o => o.FromConfiguration());
+                }));
         }
 
         [GlobalSetup(Target = nameof(NBBMultiTenantEventStoreSave))]
@@ -46,11 +48,14 @@ namespace TheBenchmarks
             MigrateNbbEventStore(true);
 
             _container = BuildServiceProvider((services, configuration) =>
-                services.AddEventStore()
-                    .WithNewtownsoftJsonEventStoreSeserializer()
-                    .AddSingleton<ITenantContextAccessor, TenantContextAccessorMock>()
-                    .WithMultiTenantAdoNetEventRepository());
-         
+                services.AddEventStore(es =>
+                {
+                    es.UseNewtownsoftJson();
+                    es.UseMultiTenantAdoNetEventRepository(opts => opts.FromConfiguration());
+                })
+                .AddSingleton<ITenantContextAccessor, TenantContextAccessorMock>());
+
+
         }
 
         [GlobalSetup(Target = nameof(SqlStreamStoreSave))]

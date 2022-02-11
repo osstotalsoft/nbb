@@ -1,61 +1,51 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using NBB.EventStore;
 using NBB.EventStore.Abstractions;
-using NBB.EventStore.Infrastructure;
 using NBB.EventStore.Internal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using AbstractionsEventStoreOptions = NBB.EventStore.Abstractions.EventStoreOptions;
-using InfrastructureEventStoreOptions = NBB.EventStore.Infrastructure.EventStoreOptions;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class DependencyInjectionExtensions
 {
-    public static class DependencyInjectionExtensions
+    public static IServiceCollection AddEventStore(this IServiceCollection services, Action<EventStoreOptionsBuilder> optionsAction)
     {
-        public static IServiceCollection AddEventStore(this IServiceCollection services, Action<IServiceProvider, EventStoreOptionsBuilder> optionsAction = null)
-        {
-            services.AddSingleton<IEventStore, EventStore>();
-            services.AddSingleton<ISnapshotStore, SnapshotStore>();
+        services.AddScoped<IEventStore, EventStore>();
+        services.AddScoped<ISnapshotStore, SnapshotStore>();
 
-            services.AddSingleton<IConfigureOptions<AbstractionsEventStoreOptions>, ConfigureEventStoreOptions>();
+        var b = new EventStoreOptionsBuilder();
+        optionsAction?.Invoke(b);
+        ((IEventStoreOptionsBuilder)b).AddServices(services);
 
-            services.Add(new ServiceDescriptor(typeof(InfrastructureEventStoreOptions),
-                serviceProvider =>
-                {
-                    var builder = new EventStoreOptionsBuilder();
-                    optionsAction?.Invoke(serviceProvider, builder);
-                    return builder.Options;
-                }, ServiceLifetime.Singleton));
+        return services;
+    }
+}
 
-            return services;
 
-        }
+public interface IEventStoreOptionsBuilder
+{
+    EventStoreOptionsBuilder AdExtension(Action<IServiceCollection> extension);
+    void AddServices(IServiceCollection services);
+}
 
-        public static IServiceCollection WithNewtownsoftJsonEventStoreSeserializer(this IServiceCollection services, IEnumerable<JsonConverter> converters = null)
-        {
-            services.AddSingleton<IEventStoreSerDes>(sp => new NewtonsoftJsonEventStoreSerDes(converters));
+public class EventStoreOptionsBuilder: IEventStoreOptionsBuilder
+{
+    private readonly List<Action<IServiceCollection>> extensions = new();
 
-            return services;
-
-        }
+    EventStoreOptionsBuilder IEventStoreOptionsBuilder.AdExtension(Action<IServiceCollection> extension)
+    {
+        extensions.Add(extension);
+        return this;
     }
 
-    internal class ConfigureEventStoreOptions : IConfigureOptions<AbstractionsEventStoreOptions>
-    {
-        private readonly IConfiguration _configuration;
+    void IEventStoreOptionsBuilder.AddServices(IServiceCollection services) =>
+        extensions.ForEach(e => e(services));
 
-        public ConfigureEventStoreOptions(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public void Configure(AbstractionsEventStoreOptions options) =>
-            _configuration.GetSection("EventStore").GetSection("NBB").Bind(options);
-    }
+    public EventStoreOptionsBuilder UseNewtownsoftJson(params JsonConverter[] converters)
+        => ((IEventStoreOptionsBuilder)this).AdExtension(services => services.AddSingleton<IEventStoreSerDes>(sp => new NewtonsoftJsonEventStoreSerDes(converters)));
 }
