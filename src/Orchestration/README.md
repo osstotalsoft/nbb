@@ -13,10 +13,7 @@ we correlate events that will come through your process manager, then you can bu
 waiting for other events. 
 
 ```csharp
- public struct OrderState
- {
-    public int OrderNumber { set; get; }
- }
+ public record struct OrderState(int OrderNumber);
  
  public class OrderProcessManager : AbstractDefinition<OrderState>
  {
@@ -29,7 +26,6 @@ waiting for other events.
              .SendCommand((orderCreated, data) => new DoPaymentCommand())
              .Complete();
       }
-      
  }
 ```
 
@@ -43,3 +39,47 @@ a payment to be processed, if the instance does not closes in a day, then a spec
      .SendCommand((orderCreated, data) => ...)
      .Schedule((created, data) => new OrderPaymentExpired(), TimeSpan.FromDays(2));
 ```
+
+## Upgrading process definitions
+You must create a new version of a process definition if you need to perform changes such as:
+* Changing the `State` type of the process
+* Modifying the steps (add or delete steps)
+* Changes to a step (such as state update logic)
+
+ The old versions of the process definition must be preserved because otherwise the already running processes will fail to complete.
+ Old versions should be marked with `[ObsoleteProcess]` attribute. This ensures that the definition will not be used for starting new processes.
+
+ ```csharp
+public class OrderProcessManager
+{
+    public class V2 : AbstractDefinition<V2.OrderProcessManagerData>
+    {
+        public record struct OrderProcessManagerData(Guid OrderId, bool IsPaid);
+
+        public V2()
+        {
+            Event<OrderCreated>(builder => builder.CorrelateById(orderCreated => orderCreated.OrderId));
+
+            StartWith<OrderCreated>()
+                .PublishEvent((orderCreated, data) => new OrderReceivedEvent())
+                .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
+                .Complete();
+        }
+    }
+
+    [ObsoleteProcess]
+    public class V1 : AbstractDefinition<V1.OrderProcessManagerData>
+    {
+        public record struct OrderProcessManagerData(string OrderId);
+
+        public V1(IMapper mapper)
+        {
+            Event<OrderCreated>(builder => builder.CorrelateById(orderCreated => orderCreated.OrderId));
+
+            StartWith<OrderCreated>()
+                .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid().ToString() })
+                .Complete();
+        }
+    }
+}
+ ```

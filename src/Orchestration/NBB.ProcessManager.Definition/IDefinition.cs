@@ -17,6 +17,23 @@ namespace NBB.ProcessManager.Definition
 
     public interface IDefinition
     {
-        IEnumerable<Type> GetEventTypes();
+        IEnumerable<EventType> GetEventTypes();
     }
+
+    public static class IDefinitionExtensions
+    {
+        public static bool IsObsolete(this IDefinition definition)
+            => definition.GetType().HasAttribute(typeof(ObsoleteProcessAttribute));
+    }
+
+    /// <summary>
+    /// New process instances cannot be started for this definition.
+    /// Obsolete versions of the process definitions are retained because they are required for completing already started processes.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public sealed class ObsoleteProcessAttribute : Attribute
+    {
+    }
+
+    public record struct EventType(Type Type, bool StartsProcess);
 }

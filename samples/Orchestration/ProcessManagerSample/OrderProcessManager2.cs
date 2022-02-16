@@ -4,26 +4,14 @@
 using NBB.Core.Effects;
 using NBB.ProcessManager.Definition.Builder;
 using ProcessManagerSample.Events;
+using System;
 
 namespace ProcessManagerSample
 {
-    public class ProcessManager2 : AbstractDefinition<ProcessManager2Data>
-    {
-        public ProcessManager2()
-        {
-
-        }
-
-    }
-
-    public struct ProcessManager2Data
-    {
-    }
-
+    public record struct OrderProcessManagerData(Guid OrderId, bool IsPaid);
 
     public class OrderProcessManager2 : AbstractDefinition<OrderProcessManagerData>
     {
-
         public OrderProcessManager2()
         {
             Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));

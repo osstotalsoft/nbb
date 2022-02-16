@@ -46,8 +46,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 if (dataType == null)
                     throw new Exception("Cannot determine process manager definition data type");
 
-                foreach (var eventType in def.GetEventTypes())
+                foreach (var (eventType, startsProcess) in def.GetEventTypes())
                 {
+                    if (startsProcess && def.IsObsolete())
+                    {
+                        continue;
+                    }
+
                     services.AddScoped(typeof(INotificationHandler<>).MakeGenericType(eventType),
                         processManagerNotificationHandlerImplementationType.MakeGenericType(def.GetType(), dataType, eventType));
                 }
