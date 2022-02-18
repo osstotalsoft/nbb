@@ -15,8 +15,6 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         private readonly ITenantRepository _tenantRepository;
         private readonly IDistributedCache _cache;
         private static readonly Func<Guid, string> CacheTenantByIdKey = tenantId => $"tenantId:{tenantId}";
-        private static readonly Func<string, string> CacheTenantByHostKey = host => $"tenantHost:{host}";
-        private static readonly string AllKey = "__ALL__Tenants";
 
         public CachedTenantRepositoryDecorator(ITenantRepository tenantRepository, IDistributedCache cache)
         {
@@ -60,25 +58,10 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
                 },token);
         }
 
-        public Task<List<Tenant>> GetAll(CancellationToken token = default)
+        public async Task<List<Tenant>> GetAll(CancellationToken token = default)
         {
-            throw new NotImplementedException();
-        }
-
-        private async Task<List<Tenant>> GetAllTenantsFromCache(CancellationToken token = default)
-        {
-            var list = await _cache.GetStringAsync(AllKey, token);
-            return string.IsNullOrWhiteSpace(list) ? null : JsonConvert.DeserializeObject<List<Tenant>>(list);
-        }
-
-        private async Task SetAllTenantsToCache(List<Tenant> tenants, CancellationToken token = default)
-        {
-            var list = JsonConvert.SerializeObject(tenants);
-            await _cache.SetStringAsync(AllKey, list,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
-                }, token);
+            var tenants = await _tenantRepository.GetAll(token);
+            return tenants;
         }
     }
 }
