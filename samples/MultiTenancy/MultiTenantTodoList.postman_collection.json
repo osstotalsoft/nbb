@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fe2223de-d906-4829-b07f-e1172bd2d2c7",
+		"_postman_id": "a6cf0814-a93a-4ca1-8320-d0424ddd19c5",
 		"name": "MultiTenantTodoList",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -48,7 +48,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"Name\": \"My task name\",\n  \"Description\": \"My task description\"\n}"
+					"raw": "{\n  \"Name\": \"My task name\",\n  \"Description\": \"My task description\",\n  \"DueDate\": \"2022-07-01\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:58733/api/todo",

@@ -9,16 +9,16 @@ namespace NBB.MultiTenancy.Identification.Identifiers
 {
     public class HostTenantIdentifier : ITenantIdentifier
     {
-        private readonly ITenantRepository _hostTenantRepository;
+        private readonly ITenantRepository _tenantRepository;
 
-        public HostTenantIdentifier(ITenantRepository hostTenantRepository)
+        public HostTenantIdentifier(ITenantRepository tenantRepository)
         {
-            _hostTenantRepository = hostTenantRepository;
+            _tenantRepository = tenantRepository;
         }
 
         public async Task<Guid> GetTenantIdAsync(string tenantToken)
         {
-            var tenant = await _hostTenantRepository.GetByHost(tenantToken);
+            var tenant = await _tenantRepository.GetByHost(tenantToken);
             return tenant.TenantId;
         }
     }

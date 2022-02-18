@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,7 +45,6 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
 
         public Task<Tenant> Get(Guid id, CancellationToken token = default)
         {
-
             return Task.FromResult(tenantMap.TryGetValue(id, out var result) ? result : throw new Exception($"Tenant configuration not found for tenant {id}"));
         }
 
@@ -71,6 +72,11 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         {
             var newTenant = Tenant.Default;
             tenantMap = new ConcurrentDictionary<Guid, Tenant>() { [newTenant.TenantId] = newTenant };
+        }
+
+        public Task<List<Tenant>> GetAll(CancellationToken token = default)
+        {
+            return Task.FromResult(tenantMap.Values.ToList());
         }
     }
 }
