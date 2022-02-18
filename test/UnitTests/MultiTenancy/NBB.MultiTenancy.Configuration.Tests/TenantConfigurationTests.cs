@@ -8,6 +8,7 @@ using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
+using NBB.MultiTenancy.Abstractions.Repositories;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,8 +19,6 @@ namespace NBB.MultiTenancy.Configuration.Tests
 {
     public class TenantConfigurationTests
     {
-       
-
         [Fact]
         public void load_value_from_config()
         {
@@ -375,7 +374,7 @@ namespace NBB.MultiTenancy.Configuration.Tests
                       ""MultiTenancy"": {
                         ""Defaults"": {
                           ""ConnectionStrings"": {
-                            ""Leasing_Database"": ""Server=server0;Database=lsngdbqa;User Id=web;Password=pas;MultipleActiveResultSets=true""
+                            ""Leasing_Database"": ""Server=server0;Database=db2;User Id=web;Password=pas;MultipleActiveResultSets=true""
                           }
                         },
                         ""Tenants"": [
@@ -443,7 +442,7 @@ namespace NBB.MultiTenancy.Configuration.Tests
                           {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
-                              ""Leasing_Database"": ""Server=server0;Database=lsngdbqa;User Id=web;Password=B1llpwd!;MultipleActiveResultSets=true""
+                              ""Leasing_Database"": ""Server=server0;Database=db;User Id=a;Password=a;MultipleActiveResultSets=true""
                             }
                           },
                           {
@@ -475,8 +474,10 @@ namespace NBB.MultiTenancy.Configuration.Tests
 
             // Assert
             tenantConfig.GetConnectionString("ConnectionString_").Should().BeNull();
-            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server0;Database=lsngdbqa;User Id=web;Password=B1llpwd!;MultipleActiveResultSets=true");
+            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server0;Database=db;User Id=a;Password=a;MultipleActiveResultSets=true");
             tenantConfig.GetValue<string>("TenantId").Should().Be("68a448a2-e7d8-4875-8127-f18668217eb6");
         }
+
+        
     }
 }

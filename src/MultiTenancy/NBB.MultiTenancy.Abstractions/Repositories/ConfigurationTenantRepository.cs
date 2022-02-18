@@ -48,6 +48,11 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
             return Task.FromResult(tenantMap.TryGetValue(id, out var result) ? result : throw new Exception($"Tenant configuration not found for tenant {id}"));
         }
 
+        public Task<Tenant> GetByHost(string host, CancellationToken token = default)
+        {
+            throw new NotImplementedException();
+        }
+
         private void LoadTenants()
         {
             var newMap = new ConcurrentDictionary<Guid, Tenant>();

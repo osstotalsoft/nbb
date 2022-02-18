@@ -15,6 +15,7 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         private readonly ITenantRepository _tenantRepository;
         private readonly IDistributedCache _cache;
         private static readonly Func<Guid, string> CacheTenantByIdKey = tenantId => $"tenantId:{tenantId}";
+        private static readonly Func<string, string> CacheTenantByHostKey = host => $"tenantHost:{host}";
 
         public CachedTenantRepositoryDecorator(ITenantRepository tenantRepository, IDistributedCache cache)
         {
@@ -62,6 +63,26 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         {
             var tenants = await _tenantRepository.GetAll(token);
             return tenants;
+        }
+
+        public async Task<Tenant> GetByHost(string host, CancellationToken token)
+        {
+            var cacheKey = CacheTenantByHostKey(host);
+            var cachedTenant = await GetTenantFromCache(cacheKey, token);
+            if (cachedTenant != null)
+            {
+                return cachedTenant;
+            }
+
+            var dbTenant = await _tenantRepository.GetByHost(host, token);
+            if (dbTenant == null)
+            {
+                return null;
+            }
+
+            await SetTenantToCache(dbTenant, cacheKey, token);
+
+            return dbTenant;
         }
     }
 }
