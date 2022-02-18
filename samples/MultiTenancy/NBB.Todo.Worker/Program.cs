@@ -84,7 +84,7 @@ namespace NBB.Todo.Worker
             services.AddMultitenancy(hostingContext.Configuration)
                 .AddMultiTenantMessaging()
                 .AddDefaultMessagingTenantIdentification()
-                .AddTenantRepository<BasicTenantRepository>();
+                .AddTenantRepository<ConfigurationTenantRepository>();
         }
 
         private static void ConfigureLogging(HostBuilderContext ctx, ILoggingBuilder _builder)

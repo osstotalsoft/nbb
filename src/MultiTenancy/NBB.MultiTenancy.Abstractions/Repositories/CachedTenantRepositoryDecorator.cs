@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         private readonly IDistributedCache _cache;
         private static readonly Func<Guid, string> CacheTenantByIdKey = tenantId => $"tenantId:{tenantId}";
         private static readonly Func<string, string> CacheTenantByHostKey = host => $"tenantHost:{host}";
+        private static readonly string AllKey = "__ALL__Tenants";
 
         public CachedTenantRepositoryDecorator(ITenantRepository tenantRepository, IDistributedCache cache)
         {
@@ -42,27 +44,6 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
             return dbTenant;
         }
 
-        public async Task<Tenant> GetByHost(string host, CancellationToken token)
-        {
-            
-            var cacheKey = CacheTenantByHostKey(host);
-            var cachedTenant = await GetTenantFromCache(cacheKey, token);
-            if (cachedTenant != null)
-            {
-                return cachedTenant;
-            }
-                        
-            var dbTenant = await _tenantRepository.GetByHost(host, token);
-            if (dbTenant == null)
-            {
-                return null;
-            }
-
-            await SetTenantToCache(dbTenant, cacheKey, token);
-
-            return dbTenant;
-        }
-
         private async Task<Tenant> GetTenantFromCache(string key, CancellationToken token = default)
         {
             var sTenant = await _cache.GetStringAsync(key, token);
@@ -77,6 +58,27 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
                 },token);
+        }
+
+        public Task<List<Tenant>> GetAll(CancellationToken token = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        private async Task<List<Tenant>> GetAllTenantsFromCache(CancellationToken token = default)
+        {
+            var list = await _cache.GetStringAsync(AllKey, token);
+            return string.IsNullOrWhiteSpace(list) ? null : JsonConvert.DeserializeObject<List<Tenant>>(list);
+        }
+
+        private async Task SetAllTenantsToCache(List<Tenant> tenants, CancellationToken token = default)
+        {
+            var list = JsonConvert.SerializeObject(tenants);
+            await _cache.SetStringAsync(AllKey, list,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
+                }, token);
         }
     }
 }

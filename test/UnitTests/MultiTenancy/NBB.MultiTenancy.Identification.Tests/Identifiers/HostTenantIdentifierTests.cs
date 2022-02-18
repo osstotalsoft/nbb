@@ -15,11 +15,11 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
 {
     public class HostTenantIdentifierTests
     {
-        private readonly Mock<ITenantRepository> _hostTenantRepository;
+        private readonly Mock<ITenantHostRepository> _hostTenantRepository;
 
         public HostTenantIdentifierTests()
         {
-            _hostTenantRepository = new Mock<ITenantRepository>();
+            _hostTenantRepository = new Mock<ITenantHostRepository>();
         }
 
         [Fact]

@@ -9,9 +9,9 @@ namespace NBB.MultiTenancy.Identification.Identifiers
 {
     public class HostTenantIdentifier : ITenantIdentifier
     {
-        private readonly ITenantRepository _hostTenantRepository;
+        private readonly ITenantHostRepository _hostTenantRepository;
 
-        public HostTenantIdentifier(ITenantRepository hostTenantRepository)
+        public HostTenantIdentifier(ITenantHostRepository hostTenantRepository)
         {
             _hostTenantRepository = hostTenantRepository;
         }
