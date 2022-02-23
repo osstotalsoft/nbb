@@ -20,7 +20,7 @@ public class TenantConfiguration : ITenantConfiguration
     private readonly IConfiguration _globalConfiguration;
     private readonly IOptions<TenancyHostingOptions> _tenancyHostingOptions;
     private readonly ITenantContextAccessor _tenantContextAccessor;
-    private ConcurrentDictionary<Guid, IConfiguration> _tenantMap;
+    private ConcurrentDictionary<Guid, string> _tenantMap;
 
     public TenantConfiguration(IConfiguration configuration, IOptions<TenancyHostingOptions> tenancyHostingOptions,
         ITenantContextAccessor tenantContextAccessor)
@@ -49,13 +49,13 @@ public class TenantConfiguration : ITenantConfiguration
 
     private void LoadTenantsMap()
     {
-        var newMap = new ConcurrentDictionary<Guid, IConfiguration>();
-        var tenants = _tenancyConfigurationSection.GetSection("Tenants").GetChildren();
+        var newMap = new ConcurrentDictionary<Guid, string>();
+        var tenants = _tenancyConfigurationSection.GetSection("Tenants").GetChildren().ToList();
 
-        foreach (var tenantSection in tenants)
+        for (int i = 0; i < tenants.Count; i++)
         {
-            var tid = tenantSection.GetValue<Guid>("TenantId");
-            newMap.TryAdd(tid, tenantSection);
+            var tid = tenants[i].GetValue<Guid>("TenantId");
+            newMap.TryAdd(tid, $"Tenants:{i}");
         }
 
         _tenantMap = newMap;
@@ -70,12 +70,12 @@ public class TenantConfiguration : ITenantConfiguration
 
         var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
         var defaultSection = _tenancyConfigurationSection.GetSection("Defaults");
-        var section = _tenantMap.TryGetValue(tenantId, out var result)
+        var sectionPath = _tenantMap.TryGetValue(tenantId, out var result)
             ? result
             : throw new Exception($"Configuration not found for tenant {tenantId}");
 
 
-        return getValueOrComplexObject<T>(section, key, defaultSection);
+        return getValueOrComplexObject<T>(_tenancyConfigurationSection.GetSection(sectionPath), key, defaultSection);
     }
 
     private static T getValueOrComplexObject<T>(IConfiguration config, string key, IConfigurationSection defaultSection = null)
