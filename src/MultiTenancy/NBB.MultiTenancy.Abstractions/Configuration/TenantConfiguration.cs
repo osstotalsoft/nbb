@@ -3,11 +3,12 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
 using System.Collections.Concurrent;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
@@ -21,6 +22,8 @@ public class TenantConfiguration : ITenantConfiguration
     private readonly IOptions<TenancyHostingOptions> _tenancyHostingOptions;
     private readonly ITenantContextAccessor _tenantContextAccessor;
     private ConcurrentDictionary<Guid, string> _tenantMap;
+
+    public string this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     public TenantConfiguration(IConfiguration configuration, IOptions<TenancyHostingOptions> tenancyHostingOptions,
         ITenantContextAccessor tenantContextAccessor)
@@ -61,35 +64,30 @@ public class TenantConfiguration : ITenantConfiguration
         _tenantMap = newMap;
     }
 
-    public T GetValue<T>(string key)
+    private IConfiguration GetTenantConfiguration()
     {
         if (_tenancyHostingOptions.Value.TenancyType == TenancyType.MonoTenant)
         {
-            return getValueOrComplexObject<T>(_globalConfiguration, key);
+            return _globalConfiguration;
         }
 
         var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
-        var defaultSection = _tenancyConfigurationSection.GetSection("Defaults");
         var sectionPath = _tenantMap.TryGetValue(tenantId, out var result)
             ? result
             : throw new Exception($"Configuration not found for tenant {tenantId}");
+        var tenantSection =  _tenancyConfigurationSection.GetSection(sectionPath);
+        var defaultSection = _tenancyConfigurationSection.GetSection("Defaults");
+        var mergedSection = new MergedConfigurationSection(tenantSection, defaultSection);
+        return mergedSection;
 
-
-        return getValueOrComplexObject<T>(_tenancyConfigurationSection.GetSection(sectionPath), key, defaultSection);
     }
 
-    private static T getValueOrComplexObject<T>(IConfiguration config, string key, IConfigurationSection defaultSection = null)
-    {
-        //section.GetSection is never null
-        if (config.GetSection(key).GetChildren().Any())
-        {
-            //complex type is present
-            return config.GetSection(key).Get<T>();
-        }
+    public IEnumerable<IConfigurationSection> GetChildren()
+        => GetTenantConfiguration().GetChildren();
 
-        if (config.GetSection(key).Value != null)
-            return config.GetValue<T>(key);
+    public IChangeToken GetReloadToken()
+        => GetTenantConfiguration().GetReloadToken();
 
-        return defaultSection == null ? default : getValueOrComplexObject<T>(defaultSection, key);
-    }
+    public IConfigurationSection GetSection(string key)
+        => GetTenantConfiguration().GetSection(key);
 }
