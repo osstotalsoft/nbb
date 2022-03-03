@@ -71,15 +71,16 @@ public class TenantConfiguration : ITenantConfiguration
             return _globalConfiguration;
         }
 
-        var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
-        var sectionPath = _tenantMap.TryGetValue(tenantId, out var result)
-            ? result
-            : throw new Exception($"Configuration not found for tenant {tenantId}");
-        var tenantSection =  _tenancyConfigurationSection.GetSection(sectionPath);
         var defaultSection = _tenancyConfigurationSection.GetSection("Defaults");
-        var mergedSection = new MergedConfigurationSection(tenantSection, defaultSection);
-        return mergedSection;
+        var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
+        if(_tenantMap.TryGetValue(tenantId, out var tenentSectionPath))
+        {
+            var tenantSection = _tenancyConfigurationSection.GetSection(tenentSectionPath);
+            var mergedSection = new MergedConfigurationSection(tenantSection, defaultSection);
+            return mergedSection;
+        }
 
+        return defaultSection;
     }
 
     public IEnumerable<IConfigurationSection> GetChildren()

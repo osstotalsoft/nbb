@@ -2,10 +2,12 @@
 // This source code is licensed under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Abstractions;
@@ -134,22 +136,27 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         private IServiceProvider GetServiceProvider<TDBContext>(bool isSharedDB) where TDBContext : DbContext
         {
             var tenantService = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == null);
-            var tenantDatabaseConfigService =
-                Mock.Of<ITenantConfiguration>(x => x.GetValue<string>(It.Is<string>(a=>a.Contains("ConnectionString")))
-                                                   == (isSharedDB ? "Test" : Guid.NewGuid().ToString()));
+            IConfiguration configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string>
+            {
+                { "MultiTenancy:Defaults:ConnectionStrings:myDb", isSharedDB ? "Test" : Guid.NewGuid().ToString()}
+            })
+            .Build();
+
             var services = new ServiceCollection();
+            services.AddSingleton(configuration);
+            services.AddDefaultTenantConfiguration();
             services.AddOptions<TenancyHostingOptions>().Configure(o =>
             {
                 o.TenancyType = TenancyType.MultiTenant;
             });
             services.AddSingleton(tenantService);
-            services.AddSingleton(tenantDatabaseConfigService);
             services.AddLogging();
 
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TDBContext>((sp, options) =>
                 {
-                    var conn = sp.GetRequiredService<ITenantConfiguration>().GetConnectionString("");
+                    var conn = sp.GetRequiredService<ITenantConfiguration>().GetConnectionString("myDb");
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
 
