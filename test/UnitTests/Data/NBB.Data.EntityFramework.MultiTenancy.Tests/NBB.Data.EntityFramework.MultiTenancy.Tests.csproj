@@ -19,6 +19,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioPackageVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(MicrosoftEntityFrameworkPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsPackagesVersion)" />
   </ItemGroup>
 
   <ItemGroup>
