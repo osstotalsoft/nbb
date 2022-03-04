@@ -12,6 +12,7 @@ namespace NBB.Messaging.Abstractions
     public class DefaultDeadLetterQueue : IDeadLetterQueue
     {
         public const string ErrorTopicName = "_error";
+        private const string PushErrorMessage = "Error publishing to dead letter queue";
 
         private readonly IMessageBusPublisher _messageBusPublisher;
         private readonly IMessageSerDes _messageSerDes;
@@ -26,45 +27,54 @@ namespace NBB.Messaging.Abstractions
 
         public void Push(MessagingEnvelope messageEnvelope, string topicName, Exception ex)
         {
-            var payload = new
+            try
             {
-                ExceptionType = ex.GetType(),
-                ErrorMessage = ex.Message,
-                ex.StackTrace,
-                ex.Source,
-                Data = messageEnvelope,
-                OriginalTopic = topicName,
-                OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
-                CorrelationId = messageEnvelope.GetCorrelationId(),
-                MessageType = messageEnvelope.GetMessageTypeId(),
-                PublishTime = messageEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value)
-                            ? DateTime.TryParse(value, out var publishTime)
-                                    ? publishTime
-                                    : default
-                            : default,
+                var payload = new
+                {
+                    ExceptionType = ex.GetType(),
+                    ErrorMessage = ex.Message,
+                    ex.StackTrace,
+                    ex.Source,
+                    Data = messageEnvelope,
+                    OriginalTopic = topicName,
+                    OriginalSystem = messageEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var source) ? source : string.Empty,
+                    CorrelationId = messageEnvelope.GetCorrelationId(),
+                    MessageType = messageEnvelope.GetMessageTypeId(),
+                    PublishTime = messageEnvelope.Headers.TryGetValue(MessagingHeaders.PublishTime, out var value) && DateTime.TryParse(value, out var publishTime)
+                                  ? publishTime : default,
+                    MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
+                };
 
-                MessageId = messageEnvelope.Headers.TryGetValue(MessagingHeaders.MessageId, out var messageId) ? messageId : string.Empty
-            };
-
-            // Fire and forget
-            _ = _messageBusPublisher
-                    .PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = ErrorTopicName }, default)
-                    .ContinueWith(t => _logger.LogError(t.Exception, "Error publishing to dead letter queue"), TaskContinuationOptions.OnlyOnFaulted);
-
+                // Fire and forget
+                Task.Run(async () => await Publish(payload));
+            }
+            catch (Exception localException)
+            {
+                // Pushing to DLQ should not throw exceptions
+                _logger.LogError(localException, PushErrorMessage);
+            }
         }
 
         public void Push(TransportReceivedData messageData, string topicName, Exception ex)
         {
-            switch (messageData)
+            try
             {
-                case TransportReceivedData.EnvelopeBytes(var envelopeBytes):
-                    Push(envelopeBytes, topicName, ex);
-                    break;
-                case TransportReceivedData.PayloadBytesAndHeaders(var payloadBytes, var headers):
-                    Push(payloadBytes, headers, topicName, ex);
-                    break;
-                default:
-                    throw new ArgumentException("Invalid transport received data", nameof(messageData));
+                switch (messageData)
+                {
+                    case TransportReceivedData.EnvelopeBytes(var envelopeBytes):
+                        Push(envelopeBytes, topicName, ex);
+                        break;
+                    case TransportReceivedData.PayloadBytesAndHeaders(var payloadBytes, var headers):
+                        Push(payloadBytes, headers, topicName, ex);
+                        break;
+                    default:
+                        throw new ArgumentException("Invalid transport received data", nameof(messageData));
+                }
+            }
+            catch (Exception localException)
+            {
+                // Pushing to DLQ should not throw exceptions
+                _logger.LogError(localException, PushErrorMessage);
             }
         }
 
@@ -77,7 +87,10 @@ namespace NBB.Messaging.Abstractions
                 Push(partialEnvelope, topicName, ex);
                 return;
             }
-            catch { } // ignore partial deserialization exception
+            catch
+            {
+                // ignore partial deserialization exception
+            }
 
             var envelopeString = Encoding.UTF8.GetString(messageData);
             var payload = new
@@ -94,9 +107,7 @@ namespace NBB.Messaging.Abstractions
             };
 
             // Fire and forget
-            _ = _messageBusPublisher
-                    .PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = ErrorTopicName }, default)
-                    .ContinueWith(t => _logger.LogError(t.Exception, "Error publishing to dead letter queue"), TaskContinuationOptions.OnlyOnFaulted);
+            Task.Run(async () => await Publish(payload));
         }
 
         private void Push(byte[] payloadData, IDictionary<string, string> headers, string topicName, Exception ex)
@@ -108,11 +119,26 @@ namespace NBB.Messaging.Abstractions
                 Push(new MessagingEnvelope(headers, untypedPayload), topicName, ex);
                 return;
             }
-            catch { } // ignore untyped deserialization exception
+            catch
+            {
+                // ignore untyped deserialization exception
+            }
 
             var payloadString = Encoding.UTF8.GetString(payloadData);
 
             Push(new MessagingEnvelope(headers, payloadString), topicName, ex);
+        }
+
+        private async Task Publish<T>(T payload)
+        {
+            try
+            {
+                await _messageBusPublisher.PublishAsync(payload, MessagingPublisherOptions.Default with { TopicName = ErrorTopicName }, default);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, PushErrorMessage);
+            }
         }
     }
 }
