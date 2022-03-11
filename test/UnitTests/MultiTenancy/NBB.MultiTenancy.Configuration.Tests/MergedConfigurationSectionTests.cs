@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 
-namespace NBB.MultiTenancy.Configuration.Tests;
+namespace NBB.MultiTenancy.Abstractions.Tests;
 
 public class MergedConfigurationSectionTests
 {

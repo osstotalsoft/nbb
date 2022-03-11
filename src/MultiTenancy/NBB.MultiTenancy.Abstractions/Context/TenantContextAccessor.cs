@@ -17,7 +17,7 @@ namespace NBB.MultiTenancy.Abstractions.Context
        
         public TenantContextFlow ChangeTenantContext(TenantContext context)
         {
-            var flow = new TenantContextFlow(this, TenantContext.Clone());
+            var flow = new TenantContextFlow(this, TenantContext?.Clone());
             TenantContext = context;
             return flow;
         }
