@@ -24,6 +24,10 @@ The package [`NBB.Messaging.MultiTenancy`](../Messaging/NBB.Messaging.MultiTenan
 
 The package [`NBB.Data.EntityFramework.MultiTenancy`](../Data/NBB.Data.EntityFramework.MultiTenancy#readme) helps implementing a multi-tenant data access solution using Entity Framework.
 
+## Multi-tenant data access
+
+The package [`NBB.MultiTenancy.Serilog`](../Data/NBB.MultiTenancy.Serilog#readme) provides a Serilog enricher that puts the tenantId into the LogContext.
+
 ## Samples
 
 * [`Todo Tasks`](../../samples/MultiTenancy#readme) is a sample multi-tenant service containing split across two containers one Web API and one worker. It uses Entyty Framework for data access.

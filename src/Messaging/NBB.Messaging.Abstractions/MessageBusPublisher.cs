@@ -80,8 +80,8 @@ namespace NBB.Messaging.Abstractions
 
         private string GetSourceId()
         {
-            var topicPrefix = _configuration.GetSection("Messaging")?["Source"];
-            return topicPrefix ?? "";
+            var sourceId = _configuration.GetSection("Messaging")?["Source"];
+            return sourceId ?? "";
         }
     }
 }
