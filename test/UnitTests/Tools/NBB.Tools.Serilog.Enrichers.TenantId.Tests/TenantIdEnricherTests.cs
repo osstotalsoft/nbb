@@ -41,7 +41,7 @@ namespace NBB.MultiTenancy.Serilog.Tests
         }
 
         [Fact]
-        public void TenantId_enricher_correct_value_from_multitenant_context()
+        public void TenantId_enricher_correct_value_from_context()
         {
             var tid = Guid.Parse("68a448a2-e7d8-4875-8127-f18668217eb6");
 
@@ -55,45 +55,6 @@ namespace NBB.MultiTenancy.Serilog.Tests
             };
 
             var enricher = new TenantEnricher(tenantContextAccessor);
-
-            enricher.Enrich(logEvent, propertyFactory);
-
-            Assert.Equal(3, logEvent.Properties.Count);
-            Assert.Equal(tid.ToString(), logEvent.Properties[TenantEnricher.PropertyName].ToString());
-        }
-
-        [Fact]
-        public void TenantId_enricher_correct_value_from_monotenant_context()
-        {
-            var tid = Tenant.Default.TenantId;
-
-            var propertyFactory = GetPropertyFactory();
-
-            var logEvent = GetLogEvent();
-
-            var tenantContextAccessor = new TenantContextAccessor
-            {
-                TenantContext = new TenantContext(new Tenant(tid, tid.ToString()))
-            };
-
-            var enricher = new TenantEnricher(tenantContextAccessor);
-
-            enricher.Enrich(logEvent, propertyFactory);
-
-            Assert.Equal(3, logEvent.Properties.Count);
-            Assert.Equal(tid.ToString(), logEvent.Properties[TenantEnricher.PropertyName].ToString());
-        }
-
-        [Fact]
-        public void TenantId_enricher_monotenant_correct_value_null_context()
-        {
-            var tid = Tenant.Default.TenantId;
-
-            var propertyFactory = GetPropertyFactory();
-
-            var logEvent = GetLogEvent();
-
-            var enricher = new TenantEnricher(new TenantContextAccessor());
 
             enricher.Enrich(logEvent, propertyFactory);
 

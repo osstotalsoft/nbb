@@ -23,7 +23,12 @@ namespace NBB.Tools.Serilog.Enrichers.ServiceIdentifier
             var source = _configuration.GetSection("Messaging")?["Source"];
             if (string.IsNullOrEmpty(source))
             {
-                source = Assembly.GetCallingAssembly().GetName().Name;
+                source = Assembly.GetEntryAssembly().GetName().Name;
+            }
+            if (string.IsNullOrEmpty(source))
+            {
+                using var process = System.Diagnostics.Process.GetCurrentProcess();
+                source = process.ProcessName;
             }
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(PropertyName, source));
         }
