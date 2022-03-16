@@ -8,6 +8,7 @@ using Serilog.Events;
 using Serilog.Parsing;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Xunit;
 
 namespace NBB.Tools.Serilog.Enrichers.ServiceIdentifier.Tests
@@ -38,7 +39,7 @@ namespace NBB.Tools.Serilog.Enrichers.ServiceIdentifier.Tests
             return logEvent;
         }
 
-        
+
 
         [Fact]
         public void Service_identifier_enricher_from_messaging_source()
@@ -70,12 +71,10 @@ namespace NBB.Tools.Serilog.Enrichers.ServiceIdentifier.Tests
         public void Service_identifier_enricher_from_default()
         {
             var propertyFactory = GetPropertyFactory();
-            var expectedName = GetType().Assembly.GetName().Name;
+            var expectedName = Assembly.GetEntryAssembly().GetName().Name;
 
             var logEvent = GetLogEvent();
-            var myConfiguration = new Dictionary<string, string>
-            {
-            };
+            var myConfiguration = new Dictionary<string, string> { };
 
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration)
