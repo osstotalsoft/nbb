@@ -15,7 +15,7 @@ using System.IO;
 using System.Text;
 using Xunit;
 
-namespace NBB.MultiTenancy.Configuration.Tests
+namespace NBB.MultiTenancy.Abstractions.Tests
 {
     public class TenantConfigurationTests
     {
@@ -190,7 +190,7 @@ namespace NBB.MultiTenancy.Configuration.Tests
 
             // Assert
             tenantConfig.GetConnectionString("ConnectionString_").Should().BeNull();
-            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server1;Database=db1;User Id=web;Password=;MultipleActiveResultSets=true");
+            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server1;Database=db1;User Id=web;Password=mama123;MultipleActiveResultSets=true");
             tenantConfig.GetValue<string>("TenantId").Should().Be("68a448a2-e7d8-4875-8127-f18668217eb6");
         }
 

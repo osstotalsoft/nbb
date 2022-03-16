@@ -379,7 +379,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Rusi.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Noop", "src\Messaging\NBB.Messaging.Noop\NBB.Messaging.Noop.csproj", "{A53CE5F4-841F-40E3-A079-22C583509D6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Configuration.Tests", "test\UnitTests\MultiTenancy\NBB.MultiTenancy.Configuration.Tests\NBB.MultiTenancy.Configuration.Tests.csproj", "{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.MultiTenancy.Abstractions.Tests", "test\UnitTests\MultiTenancy\NBB.MultiTenancy.Configuration.Tests\NBB.MultiTenancy.Abstractions.Tests.csproj", "{CEE3FAE5-2E96-4318-9A4D-7FAAC529CB08}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.EventStore.AdoNet.Tests", "test\UnitTests\EventStore\NBB.EventStore.AdoNet.Tests\NBB.EventStore.AdoNet.Tests.csproj", "{C3F79479-1011-4ECB-8876-81B81CA2457B}"
 EndProject
