@@ -1,6 +1,6 @@
 # Serilog tools
 
-NBB serilog tools provide enrichers and sinks for NVBB.
+NBB serilog tools provide enrichers and sinks for NBB.
 
 The package [`NBB.Tools.Serilog.Enrichers.ServiceIdentifier`](NBB.Tools.Serilog.Enrichers.ServiceIdentifier) provides an enricher for service identifier. It is taken from nbb source / entry assembly name / process name.
 

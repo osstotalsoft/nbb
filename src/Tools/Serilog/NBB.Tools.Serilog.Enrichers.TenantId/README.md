@@ -1,6 +1,8 @@
 # NBB.MultiTenancy.Serilog
 
-This project provides a Serilog Enricher that adds the tenant id to the log context
+This project provides a Serilog Enricher that adds the tenant id to the log context.
+It can be the case that logging is requested before tenant identification is requested or that tenant cannot be found. In this case, the empty guid will be set in the context.
+
 
 ## NuGet install
 ```
@@ -13,9 +15,23 @@ The enricher should be registered in `Startup.cs`:
 public void ConfigureServices(IServiceCollection services)
 {
     ...
-    services.AddSingleton<TenantEventLogEnricher>();
+    services.AddSingleton<TenantEnricher>();
     ...
 }
+```
+# Usage: example for Program.cs
+```csharp
+var hostBuilder = CreateHostBuilder(args);
+var tempLogger = new LoggerConfiguration()
+    .ReadFrom.Configuration(Configuration)
+    .CreateLogger();
+
+hostBuilder.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(Configuration);
+    configuration.Enrich.With(services.GetRequiredService<TenantEnricher>());
+    ...
+});
 ```
 
 # Usage: example for an sql logger configured in appsettings.json
@@ -55,6 +71,6 @@ public void ConfigureServices(IServiceCollection services)
         }
       }
     ],
-    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId", "Tenant" ]
   },
 

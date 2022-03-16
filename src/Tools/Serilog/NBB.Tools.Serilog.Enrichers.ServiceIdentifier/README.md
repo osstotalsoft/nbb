@@ -1,10 +1,12 @@
 # NBB.MultiTenancy.Serilog
 
-This project provides a Serilog Enricher that adds the tenant id to the log context
+This project provides a Serilog Enricher that adds a service identifier to the log context.
+The identifier is taken either from messaging source or from the Assembly.GetEntryAssembly().Name.
+
 
 ## NuGet install
 ```
-dotnet add package NBB.MultiTenancy.Serilog
+dotnet add package NBB.Tools.Serilog.Enrichers.ServiceIdentifier
 ```
 # Registration
 The enricher should be registered in `Startup.cs`:
@@ -13,9 +15,23 @@ The enricher should be registered in `Startup.cs`:
 public void ConfigureServices(IServiceCollection services)
 {
     ...
-    services.AddSingleton<TenantEventLogEnricher>();
+    services.AddSingleton<ServiceIdentifierEnricher>();
     ...
 }
+```
+# Usage: example for Program.cs
+```csharp
+var hostBuilder = CreateHostBuilder(args);
+var tempLogger = new LoggerConfiguration()
+    .ReadFrom.Configuration(Configuration)
+    .CreateLogger();
+
+hostBuilder.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(Configuration);
+    configuration.Enrich.With(services.GetRequiredService<ServiceIdentifierEnricher>());
+    ...
+});
 ```
 
 # Usage: example for an sql logger configured in appsettings.json
@@ -33,15 +49,10 @@ public void ConfigureServices(IServiceCollection services)
             "addStandardColumns": [ "LogEvent" ],
             "customColumns": [
               {
-                "ColumnName": "TenantId",
-                "PropertyName": "TenantId",
-                "DataType": "uniqueidentifier",
-                "AllowNull": false
-              },
-              {
-                "ColumnName": "OtherId",
-                "PropertyName": "OtherId",
-                "DataType": "uniqueidentifier",
+                "ColumnName": "ServiceIdentifier",
+                "PropertyName": "ServiceIdentifier",
+                "DataType": "nvarchar",
+                "DataLength": "255",
                 "AllowNull": true
               }
             ]
@@ -55,6 +66,6 @@ public void ConfigureServices(IServiceCollection services)
         }
       }
     ],
-    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId" ]
+    "Enrich": [ "FromLogContext", "WithMachineName", "WithThreadId", "ServiceIdentifier" ]
   },
 

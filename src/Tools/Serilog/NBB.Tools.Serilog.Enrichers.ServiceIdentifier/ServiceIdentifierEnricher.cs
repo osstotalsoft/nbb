@@ -25,11 +25,6 @@ namespace NBB.Tools.Serilog.Enrichers.ServiceIdentifier
             {
                 source = Assembly.GetEntryAssembly().GetName().Name;
             }
-            if (string.IsNullOrEmpty(source))
-            {
-                using var process = System.Diagnostics.Process.GetCurrentProcess();
-                source = process.ProcessName;
-            }
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(PropertyName, source));
         }
     }
