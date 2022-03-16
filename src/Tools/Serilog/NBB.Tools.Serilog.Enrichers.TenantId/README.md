@@ -1,4 +1,4 @@
-# NBB.MultiTenancy.Serilog
+# NBB.Tools.Serilog.Enrichers.TenantId
 
 This project provides a Serilog Enricher that adds the tenant id to the log context.
 It can be the case that logging is requested before tenant identification is requested or that tenant cannot be found. In this case, the empty guid will be set in the context.

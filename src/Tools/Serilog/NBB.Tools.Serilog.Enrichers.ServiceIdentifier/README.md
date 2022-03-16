@@ -1,4 +1,4 @@
-# NBB.MultiTenancy.Serilog
+# NBB.Tools.Serilog.Enrichers.ServiceIdentifier
 
 This project provides a Serilog Enricher that adds a service identifier to the log context.
 The identifier is taken either from messaging source or from the Assembly.GetEntryAssembly().Name.
