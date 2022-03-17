@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Repositories;
 
 // ReSharper disable once CheckNamespace
@@ -12,6 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
             where TTenantRepository : class, ITenantRepository
         {
             services.AddScoped<ITenantRepository, TTenantRepository>();
+            services.AddScoped<TenantInfrastructure>();
 
             if (!useCaching) return;
 

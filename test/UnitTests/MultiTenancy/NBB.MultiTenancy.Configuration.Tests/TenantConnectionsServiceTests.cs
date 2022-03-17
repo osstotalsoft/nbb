@@ -3,7 +3,9 @@
 
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using NBB.MultiTenancy.Abstractions.Configuration;
+using NBB.MultiTenancy.Abstractions.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -12,7 +14,6 @@ namespace NBB.MultiTenancy.Abstractions.Tests
 {
     public class TenantConnectionsServiceTests
     {
-
         private IConfigurationBuilder GetConfigurationBuilder()
         {
             var myConfiguration = new Dictionary<string, string>
@@ -37,9 +38,19 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             // Arrange
             var configuration = GetConfigurationBuilder().Build();
 
-            var sut = new TenantConnectionsService();
+            var services = new ServiceCollection();
+            services.AddSingleton<IConfiguration>(configuration);
 
-            var connections = await sut.GetConnectionStrings(configuration, "Service1");
+            services
+                .AddMultitenancy(configuration)
+                .AddDefaultTenantConfiguration()
+                .AddTenantRepository<ConfigurationTenantRepository>();
+
+            var sp = services.BuildServiceProvider();
+
+            var sut = sp.GetRequiredService<TenantInfrastructure>();
+
+            var connections = await sut.GetConnectionStrings("Service1");
 
             // Assert
             connections.Count.Should().Be(2);
@@ -66,10 +77,20 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                 .AddInMemoryCollection(mySecondConfiguration)
                 .Build();
 
-            var sut = new TenantConnectionsService();
+            var services = new ServiceCollection();
+            services.AddSingleton<IConfiguration>(configuration);
 
-            var connectionsService1 = await sut.GetConnectionStrings(configuration, "Service1");
-            var connectionsService2 = await sut.GetConnectionStrings(configuration, "Service2");
+            services
+                .AddMultitenancy(configuration)
+                .AddDefaultTenantConfiguration()
+                .AddTenantRepository<ConfigurationTenantRepository>();
+
+            var sp = services.BuildServiceProvider();
+
+            var sut = sp.GetRequiredService<TenantInfrastructure>();
+
+            var connectionsService1 = await sut.GetConnectionStrings("Service1");
+            var connectionsService2 = await sut.GetConnectionStrings("Service2");
 
             // Assert
             connectionsService1.Count.Should().Be(2);
