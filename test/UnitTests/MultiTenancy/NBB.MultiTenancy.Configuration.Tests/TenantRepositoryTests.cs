@@ -4,13 +4,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using NBB.MultiTenancy.Abstractions;
-using NBB.MultiTenancy.Abstractions.Configuration;
-using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Repositories;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
