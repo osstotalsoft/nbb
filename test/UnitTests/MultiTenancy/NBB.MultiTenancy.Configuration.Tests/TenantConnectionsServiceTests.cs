@@ -3,13 +3,7 @@
 
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Configuration;
-using NBB.MultiTenancy.Abstractions.Context;
-using NBB.MultiTenancy.Abstractions.Options;
-using NBB.MultiTenancy.Abstractions.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -43,7 +37,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             // Arrange
             var configuration = GetConfigurationBuilder().Build();
 
-            var sut = new TenantConnectionsService<ConfigurationTenantRepository>();
+            var sut = new TenantConnectionsService();
 
             var connections = await sut.GetConnectionStrings(configuration, "Service1");
 
@@ -72,7 +66,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                 .AddInMemoryCollection(mySecondConfiguration)
                 .Build();
 
-            var sut = new TenantConnectionsService<ConfigurationTenantRepository>();
+            var sut = new TenantConnectionsService();
 
             var connectionsService1 = await sut.GetConnectionStrings(configuration, "Service1");
             var connectionsService2 = await sut.GetConnectionStrings(configuration, "Service2");

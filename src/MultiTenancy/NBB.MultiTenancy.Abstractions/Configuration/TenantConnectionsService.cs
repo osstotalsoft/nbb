@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration
 {
-    public class TenantConnectionsService<TTenantRepository> where TTenantRepository : class, ITenantRepository
+    public class TenantConnectionsService
     {
         public Func<IConfiguration, IServiceProvider> BuildServiceProvider = (configuration) => BuildDefaultServiceProvider(configuration);
         private static IServiceProvider BuildDefaultServiceProvider(IConfiguration configuration)
@@ -22,7 +22,7 @@ namespace NBB.MultiTenancy.Abstractions.Configuration
 
             services.AddMultitenancy(configuration)
                 .AddDefaultTenantConfiguration()
-                .AddTenantRepository<TTenantRepository>();
+                .AddTenantRepository<ConfigurationTenantRepository>();
 
             var serviceProvider = services.BuildServiceProvider();
             return serviceProvider;
