@@ -7,6 +7,7 @@ namespace NBB.Messaging.Host
     {
         public TransportErrorStrategy TransportErrorStrategy { get; set; } = TransportErrorStrategy.Retry;
         public int StartRetryCount { get; set; } = 10;
+        public int RestartDelaySeconds { get; set;} = 10;
     }
 
     public enum TransportErrorStrategy
