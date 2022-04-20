@@ -27,10 +27,10 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                 {"OtherProp1", "OtherProp1"},
                 {"MultiTenancy:Defaults:ConnectionStrings:ConnectionString1", "ConnectionStringDefault"},
                 {"MultiTenancy:Defaults:OtherProp2", "OtherProp2"},
-                {"MultiTenancy:Tenants:0:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
-                {"MultiTenancy:Tenants:0:ConnectionStrings:ConnectionString1", "ConnectionStringT1"},
-                {"MultiTenancy:Tenants:1:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
-                {"MultiTenancy:Tenants:1:ConnectionStrings:ConnectionString1", "ConnectionStringT2"},
+                {"MultiTenancy:Tenants:MBFS:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:ConnectionString1", "ConnectionStringT1"},
+                {"MultiTenancy:Tenants:BCR:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:ConnectionString1", "ConnectionStringT2"},
             };
 
             var configuration = new ConfigurationBuilder()
@@ -41,7 +41,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid,""));
+            tca.TenantContext = new TenantContext(new Tenant(tid,"MBFS"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                     { TenancyType = TenancyType.MultiTenant }), tca);
@@ -65,11 +65,11 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                 {"OtherProp1", "OtherProp1"},
                 {"MultiTenancy:Defaults:ConnectionStrings:ConnectionString1", "ConnectionStringDefault"},
                 {"MultiTenancy:Defaults:OtherProp2", "OtherProp2"},
-                {"MultiTenancy:Tenants:0:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
-                {"MultiTenancy:Tenants:0:ConnectionStrings:ConnectionString1", "ConnectionStringT1"},
-                {"MultiTenancy:Tenants:1:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
-                {"MultiTenancy:Tenants:1:ConnectionStrings:ConnectionString1", "ConnectionStringT2"},
-                {"MultiTenancy:Tenants:2:TenantId", "4ec0398f-4335-41ca-a3be-d2f487d5d568"},
+                {"MultiTenancy:Tenants:MBFS:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:ConnectionString1", "ConnectionStringT1"},
+                {"MultiTenancy:Tenants:BCR:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:ConnectionString1", "ConnectionStringT2"},
+                {"MultiTenancy:Tenants:BRD:TenantId", "4ec0398f-4335-41ca-a3be-d2f487d5d568"},
             };
 
             var configuration = new ConfigurationBuilder()
@@ -80,7 +80,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "BRD"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                     { TenancyType = TenancyType.MultiTenant }), tca);
@@ -103,11 +103,11 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                 {"OtherProp1", "OtherProp1"},
                 {"MultiTenancy:Defaults:ConnectionStrings:ConnectionString1", "ConnectionStringDefault"},
                 {"MultiTenancy:Defaults:OtherProp2", "OtherProp2"},
-                {"MultiTenancy:Tenants:0:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
-                {"MultiTenancy:Tenants:0:ConnectionStrings:ConnectionString1", "ConnectionStringT1"},
-                {"MultiTenancy:Tenants:1:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
-                {"MultiTenancy:Tenants:1:ConnectionStrings:ConnectionString1", "ConnectionStringT2"},
-                {"MultiTenancy:Tenants:2:TenantId", "4ec0398f-4335-41ca-a3be-d2f487d5d568"},
+                {"MultiTenancy:Tenants:MBFS:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:ConnectionString1", "ConnectionStringT1"},
+                {"MultiTenancy:Tenants:BCR:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:ConnectionString1", "ConnectionStringT2"},
+                {"MultiTenancy:Tenants:BRD:TenantId", "4ec0398f-4335-41ca-a3be-d2f487d5d568"},
             };
 
             var configuration = new ConfigurationBuilder()
@@ -147,8 +147,8 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                             }
                           }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": {
@@ -159,15 +159,15 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""DEV"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 
@@ -180,7 +180,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "MBFS"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                     { TenancyType = TenancyType.MultiTenant }), tca);
@@ -201,8 +201,8 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                         ""Defaults"": {
                           ""ConnectionStrings"": { }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": {
@@ -213,15 +213,15 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""DEV"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 
@@ -234,7 +234,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "MBFS"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                 { TenancyType = TenancyType.MultiTenant }), tca);
@@ -262,8 +262,8 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                             }
                           }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": {
@@ -274,15 +274,15 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""DEV"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 
@@ -295,7 +295,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "BCR"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                 { TenancyType = TenancyType.MultiTenant }), tca);
@@ -318,8 +318,8 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                             ""Leasing_Database"": ""Server=server0;Database=lsngdbqa;User Id=web;Password=pas;MultipleActiveResultSets=true""
                           }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": {
@@ -330,15 +330,15 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""DEV"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 
@@ -351,7 +351,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "BCR"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                 { TenancyType = TenancyType.MultiTenant }), tca);
@@ -375,8 +375,8 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                             ""Leasing_Database"": ""Server=server0;Database=db2;User Id=web;Password=pas;MultipleActiveResultSets=true""
                           }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": {
@@ -387,15 +387,15 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""BRD"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 
@@ -408,7 +408,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "MBFS"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                 { TenancyType = TenancyType.MultiTenant }), tca);
@@ -436,22 +436,22 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                           }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": ""Server=server0;Database=db;User Id=a;Password=a;MultipleActiveResultSets=true""
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""DEV"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 
@@ -464,7 +464,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var tca = new TenantContextAccessor();
 
             //arrange
-            tca.TenantContext = new TenantContext(new Tenant(tid, ""));
+            tca.TenantContext = new TenantContext(new Tenant(tid, "MBFS"));
             var tenantConfig = new TenantConfiguration(configuration,
                 new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
                 { TenancyType = TenancyType.MultiTenant }), tca);
