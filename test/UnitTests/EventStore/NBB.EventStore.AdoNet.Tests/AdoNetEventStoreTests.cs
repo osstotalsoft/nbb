@@ -101,10 +101,12 @@ public class AdoNetEventStoreTests
         var myConfiguration = new Dictionary<string, string>
             {
                 {"MultiTenancy:TenancyType","MultiTenant" },
-                {"MultiTenancy:Tenants:0:TenantId", myTenantId1},
-                {"MultiTenancy:Tenants:0:ConnectionStrings:EventStore", myConnectionString1},
-                {"MultiTenancy:Tenants:1:TenantId", myTenantId2},
-                {"MultiTenancy:Tenants:1:ConnectionStrings:EventStore", myConnectionString2},
+                {"MultiTenancy:Tenants:BCR:TenantId", myTenantId1},
+                {"MultiTenancy:Tenants:BCR:Code", "BCR"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:EventStore", myConnectionString1},
+                {"MultiTenancy:Tenants:MBFS:TenantId", myTenantId2},
+                {"MultiTenancy:Tenants:MBFS:Code", "MBFS"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:EventStore", myConnectionString2},
             };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(myConfiguration)
@@ -117,22 +119,22 @@ public class AdoNetEventStoreTests
 
         //Act
         using var sp = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
-        IServiceScope CreateTenantScope(string tenantId)
+        IServiceScope CreateTenantScope(string tenantId, string tenantCode)
         {
             var scope = sp.CreateScope();
 
             var tca = scope.ServiceProvider.GetRequiredService<ITenantContextAccessor>().TenantContext =
-                new TenantContext(new Tenant { TenantId = Guid.Parse(tenantId) });
+                new TenantContext(new Tenant { TenantId = Guid.Parse(tenantId), Code = tenantCode });
             return scope;
         }
 
 
         //Assert
-        using var scope1 = CreateTenantScope(myTenantId1);
+        using var scope1 = CreateTenantScope(myTenantId1, "BCR");
         var opts1 = scope1.ServiceProvider.GetRequiredService<IOptionsSnapshot<EventStoreAdoNetOptions>>();
         opts1.Value.ConnectionString.Should().Be(myConnectionString1);
 
-        using var scope2 = CreateTenantScope(myTenantId2);
+        using var scope2 = CreateTenantScope(myTenantId2, "MBFS");
         var opts2 = scope2.ServiceProvider.GetRequiredService<IOptionsSnapshot<EventStoreAdoNetOptions>>();
         opts2.Value.ConnectionString.Should().Be(myConnectionString2);
 
