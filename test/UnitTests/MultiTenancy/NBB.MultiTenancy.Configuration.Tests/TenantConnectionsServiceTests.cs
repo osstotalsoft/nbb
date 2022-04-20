@@ -20,12 +20,14 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             {
                 {"MultiTenancy:Defaults:ConnectionStrings:Service1", "ConnectionString1Default"},
                 {"MultiTenancy:Defaults:ConnectionStrings:Service2", "ConnectionString2Default"},
-                {"MultiTenancy:Tenants:0:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
-                {"MultiTenancy:Tenants:0:ConnectionStrings:Service1", "ConnectionStringA"},
-                {"MultiTenancy:Tenants:0:ConnectionStrings:Service2", "ConnectionStringB"},
-                {"MultiTenancy:Tenants:1:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
-                {"MultiTenancy:Tenants:1:ConnectionStrings:Service1", "ConnectionStringC"},
-                {"MultiTenancy:Tenants:1:ConnectionStrings:Service2", "ConnectionStringD"},
+                {"MultiTenancy:Tenants:MBFS:TenantId", "68a448a2-e7d8-4875-8127-f18668217eb6"},
+                {"MultiTenancy:Tenants:MBFS:Code", "MBFS"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:Service1", "ConnectionStringA"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:Service2", "ConnectionStringB"},
+                {"MultiTenancy:Tenants:BCR:TenantId", "da84628a-2925-4b69-9116-a90dd5a72b1f"},
+                {"MultiTenancy:Tenants:BCR:Code", "BCR"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:Service1", "ConnectionStringC"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:Service2", "ConnectionStringD"},
             };
             var builder = new ConfigurationBuilder()
                 .AddInMemoryCollection(myConfiguration);
@@ -66,12 +68,14 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var builder = GetConfigurationBuilder();
             var mySecondConfiguration = new Dictionary<string, string>
             {
-                {"MultiTenancy:Tenants:2:TenantId", "288259b4-2086-493a-a206-e3517655120f"},
-                {"MultiTenancy:Tenants:2:ConnectionStrings:Service1", "ConnectionStringA"},
-                {"MultiTenancy:Tenants:2:ConnectionStrings:Service2", "ConnectionStringB"},
-                {"MultiTenancy:Tenants:3:TenantId", "bc626b53-e3f5-4e1b-9e41-2b7130d74747"},
-                {"MultiTenancy:Tenants:3:ConnectionStrings:Service1", "ConnectionStringC"},
-                {"MultiTenancy:Tenants:3:ConnectionStrings:Service2", "ConnectionStringD"},
+                {"MultiTenancy:Tenants:MBFS:TenantId", "288259b4-2086-493a-a206-e3517655120f"},
+                {"MultiTenancy:Tenants:MBFS:Code", "MBFS"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:Service1", "ConnectionStringA"},
+                {"MultiTenancy:Tenants:MBFS:ConnectionStrings:Service2", "ConnectionStringB"},
+                {"MultiTenancy:Tenants:BCR:TenantId", "bc626b53-e3f5-4e1b-9e41-2b7130d74747"},
+                {"MultiTenancy:Tenants:BCR:Code", "BCR"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:Service1", "ConnectionStringC"},
+                {"MultiTenancy:Tenants:BCR:ConnectionStrings:Service2", "ConnectionStringD"},
             };
             var configuration = builder
                 .AddInMemoryCollection(mySecondConfiguration)

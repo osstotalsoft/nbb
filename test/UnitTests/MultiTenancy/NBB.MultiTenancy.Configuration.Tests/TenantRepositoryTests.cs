@@ -31,22 +31,22 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                               }
                           }
                         },
-                        ""Tenants"": [
-                          {
+                        ""Tenants"": {
+                          ""MBFS"": {
                             ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
                             ""ConnectionStrings"": {
                               ""Leasing_Database"": ""Server=server0;Database=lsngdbqa;User Id=web;Password=;MultipleActiveResultSets=true""
                             }
                           },
-                          {
+                          ""BCR"": {
                             ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
                             ""Code"": ""BCR""
                           },
-                          {
+                          ""DEV"": {
                             ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
                             ""Code"": ""DEV""
                           }
-                        ]
+                        }
                       }
                     }";
 

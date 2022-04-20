@@ -7,9 +7,7 @@ using Microsoft.Extensions.Primitives;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
 
@@ -21,7 +19,6 @@ public class TenantConfiguration : ITenantConfiguration
     private readonly IConfiguration _globalConfiguration;
     private readonly IOptions<TenancyHostingOptions> _tenancyHostingOptions;
     private readonly ITenantContextAccessor _tenantContextAccessor;
-    private ConcurrentDictionary<Guid, string> _tenantMap;
 
     public string this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
@@ -43,25 +40,6 @@ public class TenantConfiguration : ITenantConfiguration
         _globalConfiguration = configuration;
         _tenancyHostingOptions = tenancyHostingOptions;
         _tenantContextAccessor = tenantContextAccessor;
-
-        if (tenancyHostingOptions.Value.TenancyType == TenancyType.MultiTenant)
-        {
-            LoadTenantsMap();
-        }
-    }
-
-    private void LoadTenantsMap()
-    {
-        var newMap = new ConcurrentDictionary<Guid, string>();
-        var tenants = _tenancyConfigurationSection.GetSection("Tenants").GetChildren().ToList();
-
-        for (int i = 0; i < tenants.Count; i++)
-        {
-            var tid = tenants[i].GetValue<Guid>("TenantId");
-            newMap.TryAdd(tid, $"Tenants:{i}");
-        }
-
-        _tenantMap = newMap;
     }
 
     private IConfiguration GetTenantConfiguration()
@@ -72,10 +50,11 @@ public class TenantConfiguration : ITenantConfiguration
         }
 
         var defaultSection = _tenancyConfigurationSection.GetSection("Defaults");
-        var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
-        if(_tenantMap.TryGetValue(tenantId, out var tenentSectionPath))
+        var tenantCode = _tenantContextAccessor.TenantContext.GetTenantCode();
+
+        var tenantSection = _tenancyConfigurationSection.GetSection($"Tenants:{tenantCode}");
+        if (tenantSection.Exists())
         {
-            var tenantSection = _tenancyConfigurationSection.GetSection(tenentSectionPath);
             var mergedSection = new MergedConfigurationSection(tenantSection, defaultSection);
             return mergedSection;
         }
