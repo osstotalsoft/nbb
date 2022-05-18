@@ -105,8 +105,8 @@ namespace NBB.Messaging.Host.Internal
 
             if (strategy == TransportErrorStrategy.Retry)
             {
-                _logger.LogInformation($"Restarting host");
-                ScheduleRestart();
+                _logger.LogInformation($"Restarting host in {_hostOptions.Value.RestartDelaySeconds} seconds");
+                ScheduleRestart(TimeSpan.FromSeconds(_hostOptions.Value.RestartDelaySeconds));
             }
             else if (strategy == TransportErrorStrategy.Throw)
             {

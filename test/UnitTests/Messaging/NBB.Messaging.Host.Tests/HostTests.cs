@@ -77,7 +77,8 @@ namespace NBB.Messaging.Host.Tests
         public async Task Shoud_restart_on_transport_error()
         {
             //Arrange
-            var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions { TransportErrorStrategy = TransportErrorStrategy.Retry });
+            var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value ==
+                new MessagingHostOptions { TransportErrorStrategy = TransportErrorStrategy.Retry, RestartDelaySeconds = 0 });
             var configurator = new DelegateMessagingHostStartup(config =>
                 config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
 
@@ -96,7 +97,7 @@ namespace NBB.Messaging.Host.Tests
             await messageHost.StartAsync();
             Mock.Get(mockedTransportMonitor).Raise(x => x.OnError += _ => { }, new Exception("TransportError"));
 
-            await Task.Delay(200);
+            await Task.Delay(100);
 
             //Assert
             Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
