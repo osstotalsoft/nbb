@@ -40,6 +40,12 @@ namespace NBB.Messaging.OpenTracing.Publisher
                 }
 
                 options.EnvelopeCustomizer?.Invoke(outgoingEnvelope);
+
+                if (_tracer.ActiveSpan != null)
+                {
+                    foreach (var header in outgoingEnvelope.Headers)
+                        _tracer.ActiveSpan.SetTag(MessagingTags.MessagingEnvelopeHeaderSpanTagPrefix + header.Key.ToLower(), header.Value);
+                }
             }
 
             var formattedTopicName = _topicRegistry.GetTopicForName(options.TopicName) ??
@@ -51,6 +57,7 @@ namespace NBB.Messaging.OpenTracing.Publisher
                 .WithTag(Tags.SpanKind, Tags.SpanKindProducer)
                 .WithTag(Tags.MessageBusDestination, formattedTopicName)
                 .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
+                .WithTag(Tags.SamplingPriority, 1)
                 .StartActive(true);
             try
             {
