@@ -23,7 +23,9 @@ namespace NBB.MultiTenancy.Identification.Http
 
         public Task<string> GetTenantToken()
         {
-            if (!_httpContextAccessor.HttpContext.Request.Headers.ContainsKey(HeaderNames.Authorization))
+
+            var hasAuthorizationHeader = _httpContextAccessor?.HttpContext?.Request?.Headers?.ContainsKey(HeaderNames.Authorization) ?? false;
+            if (!hasAuthorizationHeader)
             {
                 return Task.FromResult((string)null);
             }
