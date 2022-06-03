@@ -60,9 +60,14 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
 
             foreach (var tenantSection in tenants)
             {
-                var newTenant = _configurationSection.GetSection("Defaults").Get<Tenant>(options => options.BindNonPublicProperties = true) ?? new Tenant();
-                tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-                newMap.TryAdd(newTenant.TenantId, newTenant);
+                var tenant = _configurationSection.GetSection("Defaults").Get<Tenant>(options => options.BindNonPublicProperties = true) ?? new Tenant();
+                tenantSection.Bind(tenant, options => options.BindNonPublicProperties = true);
+                tenant = tenant with { Code = tenantSection.Key };
+
+                if (tenant.IsValid())
+                {
+                    newMap.TryAdd(tenant.TenantId, tenant);
+                }
             }
 
             tenantMap = newMap;

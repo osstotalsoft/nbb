@@ -5,7 +5,7 @@ using System;
 
 namespace NBB.MultiTenancy.Abstractions
 {
-    public class Tenant
+    public record Tenant
     {
         public Guid TenantId { get; init; }
 
@@ -18,6 +18,8 @@ namespace NBB.MultiTenancy.Abstractions
             TenantId = tenantId;
             Code = code;
         }
+
+        public bool IsValid() => TenantId != default && !string.IsNullOrWhiteSpace(Code);
 
         public static Tenant Default { get; } = new Tenant(default, "default");
     }
