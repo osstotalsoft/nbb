@@ -22,14 +22,13 @@ namespace ProcessManagerSample
 
             services.AddMediatR(typeof(GetPartnerQuery).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
-            //services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
 
             services.AddProcessManager(Assembly.GetEntryAssembly());
 
             services.AddEventStore(es =>
             {
                 es.UseNewtownsoftJson();
-                es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+                es.UseInMemoryEventRepository();
             });
 
             services.AddMessagingHost(
