@@ -37,43 +37,6 @@ namespace NBB.ProcessManager.Runtime.Timeouts
             return Task.CompletedTask;
         }
 
-        public Task<TimeoutRecord> Peek(Guid timeoutId)
-        {
-            try
-            {
-                _readerWriterLock.EnterReadLock();
-                return Task.FromResult(_storage.SingleOrDefault(t => t.Id == timeoutId));
-            }
-            finally
-            {
-                _readerWriterLock.ExitReadLock();
-            }
-        }
-
-        public Task<bool> TryRemove(Guid timeoutId)
-        {
-            try
-            {
-                _readerWriterLock.EnterWriteLock();
-
-                for (var index = 0; index < _storage.Count; index++)
-                {
-                    var data = _storage[index];
-                    if (data.Id == timeoutId)
-                    {
-                        _storage.RemoveAt(index);
-                        return Task.FromResult(true);
-                    }
-                }
-
-                return Task.FromResult(false);
-            }
-            finally
-            {
-                _readerWriterLock.ExitWriteLock();
-            }
-        }
-
         public Task RemoveTimeoutBy(string instanceId)
         {
             try
