@@ -4,101 +4,99 @@
 using System;
 using NBB.Core.Effects;
 
-namespace NBB.ProcessManager.Definition.Builder
+namespace NBB.ProcessManager.Definition.Builder;
+
+public class EventActivitySet<TEvent, TData> : IEventActivitySet<TData>
 {
+    public EffectFunc<object, TData> EffectFunc { get; set; }
+    public SetStateFunc<object, TData> SetStateFunc { get; set; }
+    public bool StartsProcess { get; set; }
+    public bool CompletesProcess { get; set; }
 
-    public class EventActivitySet<TEvent, TData> : IEventActivitySet<TData>
+    private readonly EventPredicate<TEvent, TData> _starterPredicate;
+    private EventPredicate<TEvent, TData> _completionPredicate;
+
+    private static readonly SetStateFunc<object, TData> NoSetStateFunc = (@event, data) => data.Data;
+    private static readonly EffectFunc<object, TData> NoEffectFunc = (@event, data) => Effect.Pure();
+
+
+    public EventActivitySet(bool startsProcess, EventPredicate<TEvent, TData> starterPredicate = null)
     {
-        public EffectFunc<object, TData> EffectFunc { get; set; }
-        public SetStateFunc<object, TData> SetStateFunc { get; set; }
-        public bool StartsProcess { get; set; }
-        public bool CompletesProcess { get; set; }
+        StartsProcess = startsProcess;
+        _starterPredicate = starterPredicate;
+        EffectFunc = NoEffectFunc;
+        SetStateFunc = NoSetStateFunc;
+    }
 
-        private readonly EventPredicate<TEvent, TData> _starterPredicate;
-        private EventPredicate<TEvent, TData> _completionPredicate;
+    public Type EventType => typeof(TEvent);
 
-        private static readonly SetStateFunc<object, TData> NoSetStateFunc = (@event, data) => data.Data;
-        private static readonly EffectFunc<object, TData> NoEffectFunc = (@event, data) => Effect.Pure();
-
-
-        public EventActivitySet(bool startsProcess, EventPredicate<TEvent, TData> starterPredicate = null)
+    public void AddEffectHandler(EffectFunc<TEvent, TData> func)
+    {
+        Effect<Unit> NewFunc(object @event, InstanceData<TData> data)
         {
-            StartsProcess = startsProcess;
-            _starterPredicate = starterPredicate;
-            EffectFunc = NoEffectFunc;
-            SetStateFunc = NoSetStateFunc;
+            if (_starterPredicate != null && !_starterPredicate((TEvent)@event, data))
+                return Effect.Pure();
+            return func((TEvent)@event, data);
         }
 
-        public Type EventType => typeof(TEvent);
+        EffectFunc = EffectFuncs.Sequential(EffectFunc, NewFunc);
+    }
 
-        public void AddEffectHandler(EffectFunc<TEvent, TData> func)
+    public void AddSetStateHandler(SetStateFunc<TEvent, TData> func)
+    {
+        SetStateFunc = (@event, data) =>
         {
-            Effect<Unit> NewFunc(object @event, InstanceData<TData> data)
-            {
-                if (_starterPredicate != null && !_starterPredicate((TEvent) @event, data))
-                    return Effect.Pure();
-                return func((TEvent) @event, data);
-            }
+            var newData = data.Data;
+            if (_starterPredicate == null || _starterPredicate((TEvent)@event, data))
+                newData = func((TEvent)@event, data);
 
-            EffectFunc = EffectFuncs.Sequential(EffectFunc, NewFunc);
+            return newData;
+        };
+    }
+
+    public EventPredicate<object, TData> StarterPredicate
+    {
+        get
+        {
+            if (_starterPredicate == null)
+                return null;
+            return (@event, data) => _starterPredicate((TEvent)@event, data);
         }
+    }
 
-        public void AddSetStateHandler(SetStateFunc<TEvent, TData> func)
+    public EventPredicate<object, TData> CompletionPredicate
+    {
+        get
         {
-            SetStateFunc = (@event, data) =>
+            return (@event, data) =>
             {
-                var newData = data.Data;
-                if (_starterPredicate == null || _starterPredicate((TEvent) @event, data))
-                    newData = func((TEvent) @event, data);
+                if (_completionPredicate != null && _starterPredicate != null)
+                    return _completionPredicate((TEvent)@event, data) && _starterPredicate((TEvent)@event, data);
+                if (_completionPredicate == null && _starterPredicate != null)
+                    return _starterPredicate((TEvent)@event, data);
+                if (_completionPredicate != null)
+                    return _completionPredicate((TEvent)@event, data);
 
-                return newData;
+                return true;
             };
         }
-
-        public EventPredicate<object, TData> StarterPredicate
-        {
-            get
-            {
-                if (_starterPredicate == null)
-                    return null;
-                return (@event, data) => _starterPredicate((TEvent) @event, data);
-            }
-        }
-
-        public EventPredicate<object, TData> CompletionPredicate
-        {
-            get
-            {
-                return (@event, data) =>
-                {
-                    if (_completionPredicate != null && _starterPredicate != null)
-                        return _completionPredicate((TEvent) @event, data) && _starterPredicate((TEvent) @event, data);
-                    if (_completionPredicate == null && _starterPredicate != null)
-                        return _starterPredicate((TEvent) @event, data);
-                    if (_completionPredicate != null)
-                        return _completionPredicate((TEvent) @event, data);
-
-                    return true;
-                };
-            }
-        }
-
-
-        public void UseForCompletion(EventPredicate<TEvent, TData> predicate = null)
-        {
-            _completionPredicate = predicate;
-            CompletesProcess = true;
-        }
     }
 
-    public interface IEventActivitySet<TData>
+
+    public void UseForCompletion(EventPredicate<TEvent, TData> predicate = null)
     {
-        Type EventType { get; }
-        bool CompletesProcess { get; }
-        bool StartsProcess { get; }
-        EventPredicate<object, TData> StarterPredicate { get; }
-        EventPredicate<object, TData> CompletionPredicate { get; }
-        EffectFunc<object, TData> EffectFunc { get; }
-        SetStateFunc<object, TData> SetStateFunc { get; }
+        _completionPredicate = predicate;
+        CompletesProcess = true;
     }
+}
+
+public interface IEventActivitySet<TData>
+{
+    Type EventType { get; }
+    bool CompletesProcess { get; }
+    bool StartsProcess { get; }
+    EventPredicate<object, TData> StarterPredicate { get; }
+    EventPredicate<object, TData> CompletionPredicate { get; }
+    EffectFunc<object, TData> EffectFunc { get; }
+    SetStateFunc<object, TData> SetStateFunc { get; }
 }
