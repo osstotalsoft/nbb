@@ -89,14 +89,8 @@ namespace NBB.ProcessManager.Tests
                 Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => Guid.NewGuid()));
 
                 StartWith<OrderCreated>()
-                    .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0))
-                    .SetState((orderCreated, state
-                    ) =>
-                        state.Data with
-                        {
-                            Amount = state
-                    .Data.Amount + 100
-                        });
+                    .SetState((orderCreated, state) => state.Data with { Amount = state.Data.Amount + 100 })
+                    .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0));
             }
         }
 
