@@ -14,14 +14,14 @@ namespace NBB.ProcessManager.Definition.Builder
         private readonly Dictionary<Type, EventCorrelation<object, TData>> _eventCorrelations = new();
 
 
-        public EventActivitySetBuilder<TEvent, TData> StartWith<TEvent>(EventPredicate<TEvent, TData> predicate = null)
+        public IEventActivitySetBuilder<TEvent, TData> StartWith<TEvent>(EventPredicate<TEvent, TData> predicate = null)
         {
             var ea = new EventActivitySet<TEvent, TData>(true, predicate);
             _eventActivities.Add(ea);
             return new EventActivitySetBuilder<TEvent, TData>(ea);
         }
 
-        public EventActivitySetBuilder<TEvent, TData> When<TEvent>(EventPredicate<TEvent, TData> predicate = null)
+        public IEventActivitySetBuilder<TEvent, TData> When<TEvent>(EventPredicate<TEvent, TData> predicate = null)
         {
             var ea = new EventActivitySet<TEvent, TData>(false, predicate);
             _eventActivities.Add(ea);

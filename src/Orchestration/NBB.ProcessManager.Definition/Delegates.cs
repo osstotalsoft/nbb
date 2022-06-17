@@ -30,5 +30,6 @@ namespace NBB.ProcessManager.Definition
         {
             return Aggregate(func1, func2, (effect1, effect2) => effect1.Then(effect2));
         }
+ 
     }
 }

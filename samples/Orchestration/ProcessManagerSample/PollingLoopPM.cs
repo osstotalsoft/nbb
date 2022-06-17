@@ -30,7 +30,7 @@ public class PollingLoopPM : AbstractDefinition<PollingLoopPM.State>
 
         When<TimerTicked<Guid>>((_, state) => !state.Data.IsWorking)
             .SetState((_, state) => state.Data with { IsWorking = true, LoopsNr = state.Data.LoopsNr + 1 })
-            .ThenTry((_, state) =>
+            .Then((_, state) =>
                 {
                     var q1 = Mediator.Send(new GetClientQuery());
                     return q1
@@ -41,8 +41,7 @@ public class PollingLoopPM : AbstractDefinition<PollingLoopPM.State>
                                 return MessageBus.Publish(new LoopCompleted(state.Data.OrderId));
                             return MessageBus.Publish(new LoopcycleCompleted(state.Data.OrderId));
                         });
-                },
-                (ex, state) => MessageBus.Publish(new LoopCompleted(state.Data.OrderId)));
+                });
 
         When<LoopcycleCompleted>()
             .SetState((_, state) => state.Data with { IsWorking = false })
