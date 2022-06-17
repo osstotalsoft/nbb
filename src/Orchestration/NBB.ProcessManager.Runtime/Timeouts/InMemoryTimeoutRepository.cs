@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace NBB.ProcessManager.Runtime.Timeouts
 {
-    public class InMemoryTimeoutRepository : ITimeoutsRepository, IDisposable
+    public class InMemoryTimeoutRepository : ITimeoutsRepository
     {
         private readonly Func<DateTime> _currentTimeProvider;
         private readonly ReaderWriterLockSlim _readerWriterLock = new();
@@ -95,23 +95,6 @@ namespace NBB.ProcessManager.Runtime.Timeouts
 
             return Task.FromResult(new TimeoutBatch(dueTimeouts.ToArray(), nextTimeToRunQuery));
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
+         
     }
 }
