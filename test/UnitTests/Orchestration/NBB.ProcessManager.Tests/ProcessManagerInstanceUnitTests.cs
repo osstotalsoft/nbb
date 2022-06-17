@@ -121,12 +121,7 @@ namespace NBB.ProcessManager.Tests
                     configurator.CorrelateById(paymentReceived => paymentReceived.OrderId));
 
                 StartWith<OrderCreated>()
-                    .SetState((orderCreated, state) =>
-                        state.Data with
-                        {
-                            Amount = 100,
-                            OrderId = orderCreated.OrderId
-                        })
+                    .SetState((orderCreated, state) => state.Data with { Amount = 100, OrderId = orderCreated.OrderId })
                     .PublishEvent((orderCreated, state) => new OrderCompleted(orderCreated.OrderId, 100, 0, 0));
 
                 When<OrderPaymentCreated>()
