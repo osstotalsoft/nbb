@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Repositories;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                             }
                         },
                         "TNNT2": {
-                            "TenantId": "ef8d5362-9969-4e02-8794-0d1af56816f6",
+                            "TenantId": "ef8d5362-9969-4e02-8794-0d1af56816f6"
                         },
                         "TNNT3": {
                             "TenantId": "da84628a-2925-4b69-9116-a90dd5a72b1f",
@@ -112,6 +113,91 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             // Assert
             all.Should().NotBeNull();
             all.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task get_all_tenants_should_ignore_disabled_tenants()
+        {
+            // Arrange
+            var myConfiguration = """
+            {
+                "MultiTenancy": {
+                    "Tenants": {
+                        "TNNT1": {
+                            "ConnectionStrings": {
+                                "Leasing_Database": "Server=server0;Database=lsngdbqa;User Id=web;Password=;MultipleActiveResultSets=true"
+                            },
+                            "TenantId": "ef8d5362-9969-4e02-8794-0d1af56816f6",
+                            "Enabled": "false"
+                        },
+                    }
+                }
+            }
+            """;
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection()
+                .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(myConfiguration)))
+                .Build();
+
+            var tenancyHostingOptions = new TenancyHostingOptions()
+            {
+                TenancyType = TenancyType.MultiTenant
+            };
+
+            var options = new OptionsWrapper<TenancyHostingOptions>(tenancyHostingOptions);
+
+            var repo = new ConfigurationTenantRepository(configuration, options);
+
+            //arrange
+            var all = await repo.GetAll();
+
+            // Assert
+            all.Should().NotBeNull();
+            all.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task get_tenant_should_throw_for_disabled_tenant()
+        {
+            // Arrange
+            var tenantId = "ef8d5362-9969-4e02-8794-0d1af56816f6";
+            var myConfiguration = $$"""
+            {
+                "MultiTenancy": {
+                    "Tenants": {
+                        "TNNT1": {
+                            "ConnectionStrings": {
+                                "Leasing_Database": "Server=server0;Database=lsngdbqa;User Id=web;Password=;MultipleActiveResultSets=true"
+                            },
+                            "TenantId": "{{tenantId}}",
+                            "Enabled": "false"
+                        },
+                    }
+                }
+            }
+            """;
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection()
+                .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(myConfiguration)))
+                .Build();
+
+            var tenancyHostingOptions = new TenancyHostingOptions()
+            {
+                TenancyType = TenancyType.MultiTenant
+            };
+
+            var options = new OptionsWrapper<TenancyHostingOptions>(tenancyHostingOptions);
+
+            var repo = new ConfigurationTenantRepository(configuration, options);
+
+            //Act
+            Func<Task> action = async() => 
+                await repo.Get(Guid.Parse(tenantId));
+
+            //Assert
+            await action.Should().ThrowAsync<Exception>().WithMessage("*disabled*");
         }
 
         [Fact]
