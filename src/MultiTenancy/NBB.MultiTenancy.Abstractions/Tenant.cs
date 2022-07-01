@@ -11,12 +11,17 @@ namespace NBB.MultiTenancy.Abstractions
 
         public string Code { get; init; }
 
-        public Tenant() { }
+        public bool Enabled {get; init; }
 
-        public Tenant(Guid tenantId, string code)
+        public Tenant() {
+            Enabled = true;
+         }
+
+        public Tenant(Guid tenantId, string code, bool enabled = true)
         {
             TenantId = tenantId;
             Code = code;
+            Enabled = enabled;
         }
 
         public bool IsValid() => TenantId != default && !string.IsNullOrWhiteSpace(Code);

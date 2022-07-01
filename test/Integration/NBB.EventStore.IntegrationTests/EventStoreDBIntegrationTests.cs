@@ -132,7 +132,7 @@ namespace NBB.EventStore.IntegrationTests
 
             services.AddMultitenancy(configuration)
                 .AddSingleton(Mock.Of<ITenantContextAccessor>(x =>
-                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null))));
+                    x.TenantContext == new TenantContext(new Tenant(Guid.NewGuid(), null, true))));
 
 
             var container = services.BuildServiceProvider();
