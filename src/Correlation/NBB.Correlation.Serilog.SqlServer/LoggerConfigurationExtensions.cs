@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Serilog.Sinks.MSSqlServer;
 using System.Linq;
 using System.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace NBB.Correlation.Serilog.SqlServer
 {
@@ -123,7 +124,7 @@ namespace NBB.Correlation.Serilog.SqlServer
           ColumnOptions columnOptions = null,
           string schemaName = "dbo",
           string correlationId = "CorrelationId",
-          SqlDbType? correlationIdType = null
+          IConfigurationSection columnOptionsSection = null
           )
         {
             if (columnOptions == null)
@@ -142,7 +143,7 @@ namespace NBB.Correlation.Serilog.SqlServer
                     new SqlColumn
                     {
                         ColumnName = correlationId,
-                        DataType = correlationIdType ?? SqlDbType.UniqueIdentifier
+                        DataType = SqlDbType.UniqueIdentifier
                     });
             }
 
@@ -158,7 +159,7 @@ namespace NBB.Correlation.Serilog.SqlServer
                 }, null, null,
                 restrictedToMinimumLevel,
                 formatProvider,
-                columnOptions);
+                columnOptions, columnOptionsSection);
         }
     }
 }
