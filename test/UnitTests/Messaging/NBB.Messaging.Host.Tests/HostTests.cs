@@ -9,121 +9,269 @@ using Moq;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host.Internal;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace NBB.Messaging.Host.Tests
+namespace NBB.Messaging.Host.Tests;
+
+public class MessagingHostTests
 {
-    public class MessagingHostTests
+    [Fact]
+    public async Task Should_subscribe_on_start_and_unsubscribe_on_stop()
     {
-        [Fact]
-        public async Task Should_subscribe_on_start_and_unsubscribe_on_stop()
-        {
-            //Arrange
-            var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions());
-            var configurator = new DelegateMessagingHostStartup(config =>
-                config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions());
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
 
-            var mockedMessageBus = Mock.Of<IMessageBus>();
-            var mockedSubscription = Mock.Of<IDisposable>();
-            Mock.Get(mockedMessageBus)
-                .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(mockedSubscription));
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        var mockedSubscription = Mock.Of<IDisposable>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(mockedSubscription));
 
-            var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
-            var messageHost = new MessagingHost(new MockLogger(), new[] { configurator }, mockedServiceProvider,
-                Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var messageHost = new MessagingHost(Mock.Of<ILogger<MessagingHost>>(), new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
 
-            //Act     
-            await messageHost.StartAsync();
-            await messageHost.StopAsync();
+        //Act     
+        await messageHost.StartAsync();
+        await messageHost.StopAsync();
 
-            //Assert
-            Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()), Times.Once);
-            Mock.Get(mockedSubscription).Verify(x => x.Dispose(), Times.Once);
-        }
+        //Assert
+        Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()), Times.Once);
+        Mock.Get(mockedSubscription).Verify(x => x.Dispose(), Times.Once);
+    }
 
-        [Fact]
-        public async Task Shoud_retry_start_failure()
-        {
-            //Arrange
-            var retryCount = 3;
-            var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions { StartRetryCount = retryCount });
-            var configurator = new DelegateMessagingHostStartup(config =>
-                config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+    [Fact]
+    public async Task Shoud_retry_start_failure()
+    {
+        //Arrange
+        var retryCount = 1;
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions { StartRetryCount = retryCount });
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
 
-            var mockedMessageBus = Mock.Of<IMessageBus>();
-            Mock.Get(mockedMessageBus)
-                .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
-                .Throws(new Exception("Retry"));
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .Throws(new Exception("Retry"));
 
-            var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
-            var messageHost = new MessagingHost(new MockLogger(), new[] { configurator }, mockedServiceProvider,
-                Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var messageHost = new MessagingHost(Mock.Of<ILogger<MessagingHost>>(), new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
 
-            //Act     
-            await messageHost.StartAsync();
+        //Act     
+        await messageHost.StartAsync();
 
-            //Assert
-            Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(1 + retryCount));
-        }
+        //Assert
+        Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(1 + retryCount));
+    }
 
-        [Fact]
-        public async Task Shoud_restart_on_transport_error()
-        {
-            //Arrange
-            var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value ==
-                new MessagingHostOptions { TransportErrorStrategy = TransportErrorStrategy.Retry, RestartDelaySeconds = 0 });
-            var configurator = new DelegateMessagingHostStartup(config =>
-                config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+    [Fact]
+    public async Task Shoud_restart_on_transport_error()
+    {
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value ==
+            new MessagingHostOptions { TransportErrorStrategy = TransportErrorStrategy.Retry, RestartDelaySeconds = 0 });
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
 
-            var mockedMessageBus = Mock.Of<IMessageBus>();
-            Mock.Get(mockedMessageBus)
-                .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(Mock.Of<IDisposable>()));
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<IDisposable>());
 
-            var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
-            var mockedTransportMonitor = Mock.Of<ITransportMonitor>();
-            var messageHost = new MessagingHost(new MockLogger(), new[] { configurator }, mockedServiceProvider,
-                Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), mockedTransportMonitor, hostOptions);
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var mockedTransportMonitor = Mock.Of<ITransportMonitor>();
+        var messageHost = new MessagingHost(Mock.Of<ILogger<MessagingHost>>(), new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), mockedTransportMonitor, hostOptions);
 
-            //Act     
-            await messageHost.StartAsync();
-            Mock.Get(mockedTransportMonitor).Raise(x => x.OnError += _ => { }, new Exception("TransportError"));
+        //Act     
+        await messageHost.StartAsync();
+        Mock.Get(mockedTransportMonitor).Raise(x => x.OnError += _ => { }, new Exception("TransportError"));
 
-            await Task.Delay(100);
+        await Task.Delay(100);
 
-            //Assert
-            Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                    It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
-        }
+        //Assert
+        Mock.Get(mockedMessageBus).Verify(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
+    }
 
-        private IServiceProvider GetMockedServiceProvider(IMessageBus mockedMessageBus)
-        {
-            return Mock.Of<IServiceProvider>(sp =>
-                sp.GetService(typeof(IMessageBus)) == mockedMessageBus &&
-                sp.GetService(typeof(IServiceProvider)) == Mock.Of<IServiceProvider>() &&
-                sp.GetService(typeof(MessagingContextAccessor)) == Mock.Of<MessagingContextAccessor>() &&
-                sp.GetService(typeof(ILogger<MessagingHost>)) == new MockLogger() &&
-                sp.GetService(typeof(ITopicRegistry)) == Mock.Of<ITopicRegistry>() &&
-                sp.GetService(typeof(ExecutionMonitor)) == new ExecutionMonitor());
-        }
+    [Fact]
+    public async Task Shoud_reject_subsequent_starts_When_starting()
+    {
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions());
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
 
-        public class MockLogger : ILogger<MessagingHost>
-        {
-            public IDisposable BeginScope<TState>(TState state) => throw new NotImplementedException();
-
-            public bool IsEnabled(LogLevel logLevel) => false;
-
-            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .Returns(async () =>
             {
-            }
-        }
+                await Task.Delay(30);
+                return Mock.Of<IDisposable>();
+            });
+
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var mockLogger = Mock.Of<ILogger<MessagingHost>>();
+        var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+
+        var startAttempts = Enumerable.Range(0, 100)
+            .Select(_ => Task.Run(() => messageHost.StartAsync()));
+
+        //Act     
+        await Task.WhenAll(startAttempts.ToArray());
+
+        //Assert
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Once());
+    }
+
+    [Fact]
+    public async Task Shoud_reject_subsequent_stops_When_stopping()
+    {
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions());
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() =>
+            {
+                var mockedSubscription = Mock.Of<IDisposable>();
+                Mock.Get(mockedSubscription)
+                    .Setup(x => x.Dispose()).Callback(() => { Thread.Sleep(30); }); //UnSubScribe takes some time
+                return mockedSubscription;
+            });
+
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var mockLogger = Mock.Of<ILogger<MessagingHost>>();
+        var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+
+        var rand = new Random();
+        var stops = Enumerable.Range(0, 100).Select(async _ =>
+        {
+            await Task.Delay(rand.Next(0, 5));
+            await messageHost.StopAsync();
+        });
+
+        //Act     
+        await messageHost.StartAsync();
+        await Task.WhenAll(stops.ToArray());
+
+        //Assert
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is stopping", Times.Once());
+    }
+
+    [Fact]
+    public async Task Shoud_reject_subsequent_restarts_When_restart_scheduled()
+    {
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions { RestartDelaySeconds = 0});
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .Returns(async () =>
+            {
+                await Task.Delay(10);
+                return Mock.Of<IDisposable>();
+            });
+
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var mockLogger = Mock.Of<ILogger<MessagingHost>>();
+        var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+
+        await messageHost.StartAsync();
+        var restartAttempts = Enumerable.Range(0, 1000)
+            .Select(_ => Task.Run(() => messageHost.ScheduleRestart()));
+
+        //Act     
+        await Task.WhenAll(restartAttempts.ToArray());
+
+        //Assert
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Exactly(2), "Messaging host expected to re-start once");
+    }
+
+    [Fact]
+    public async Task Shoud_restart_even_if_stop_fails()
+    {
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions());
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .Returns(() =>
+            {
+                var subscription = Mock.Of<IDisposable>();
+                Mock.Get(subscription).Setup(x => x.Dispose()).Throws(new Exception("Unsubscribe error"));
+                return Task.FromResult(subscription);
+            });
+        var mockLogger = Mock.Of<ILogger<MessagingHost>>();
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+
+        //Act     
+        await messageHost.StartAsync();
+        messageHost.ScheduleRestart();
+
+        await Task.Delay(100);
+
+        //Assert
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Exactly(2), "Messaging host expected to re-start");
+    }
+
+
+    private IServiceProvider GetMockedServiceProvider(IMessageBus mockedMessageBus)
+    {
+        return Mock.Of<IServiceProvider>(sp =>
+            sp.GetService(typeof(IMessageBus)) == mockedMessageBus &&
+            sp.GetService(typeof(IServiceProvider)) == Mock.Of<IServiceProvider>() &&
+            sp.GetService(typeof(MessagingContextAccessor)) == Mock.Of<MessagingContextAccessor>() &&
+            sp.GetService(typeof(ILogger<MessagingHost>)) == Mock.Of<ILogger<MessagingHost>>() &&
+            sp.GetService(typeof(ITopicRegistry)) == Mock.Of<ITopicRegistry>() &&
+            sp.GetService(typeof(ExecutionMonitor)) == new ExecutionMonitor());
+    }
+}
+
+public static class LoggerExtensions
+{
+    public static Mock<ILogger<T>> VerifyLogInformationWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage, Times times, string failMessage = null)
+    {
+        Func<object, Type, bool> state = (v, t) => v.ToString().CompareTo(expectedMessage) == 0;
+
+        logger.Verify(
+            x => x.Log(
+                It.Is<LogLevel>(l => l == LogLevel.Information),
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => state(v, t)),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), times, failMessage);
+
+        return logger;
     }
 }

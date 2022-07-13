@@ -12,6 +12,9 @@ using Polly;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Abstractions;
 using Microsoft.Extensions.Options;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace NBB.Messaging.Host.Internal
 {
@@ -30,8 +33,10 @@ namespace NBB.Messaging.Host.Internal
         private CancellationTokenSource _stoppingSource = new();
         private CancellationTokenSource _subscriberStopSource;
 
-        private bool _isStarted;
-        private bool _isStarting;
+        private bool _isStarted = false;
+        private uint _isStarting = 0;
+        private uint _isStopping = 0;
+        private uint _isScheduledRestart = 0;
 
         public MessagingHost(ILogger<MessagingHost> logger, IEnumerable<IMessagingHostStartup> configurators,
             IServiceProvider serviceProvider, IServiceCollection serviceCollection,
@@ -50,18 +55,30 @@ namespace NBB.Messaging.Host.Internal
 
         public void ScheduleRestart(TimeSpan delay = default)
         {
+            //if already stopping do nothing
+            if (1 == Interlocked.Exchange(ref _isScheduledRestart, 1))
+                return;
+
+            _logger.LogInformation($"Messaging host is scheduled for restart in {delay.TotalSeconds} seconds");
             Task.Run(async () =>
             {
-                await Task.Delay(delay);
+                try
+                {
+                    await Task.Delay(delay);
 
-                if (!ExecutionContext.IsFlowSuppressed())
-                    ExecutionContext.SuppressFlow();
+                    if (!ExecutionContext.IsFlowSuppressed())
+                        ExecutionContext.SuppressFlow();
 
-                await TryStopAsync();
+                    await TryStopAsync();
 
-                _stoppingSource = new CancellationTokenSource();
+                    _stoppingSource = new CancellationTokenSource();
 
-                await StartAsync();
+                    await StartAsync();
+                }
+                finally
+                {
+                    _isScheduledRestart = 0;
+                }
             });
         }
 
@@ -96,6 +113,9 @@ namespace NBB.Messaging.Host.Internal
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Message host could not be gracefully stopped");
+
+                _subscriptions.Clear();
+                _isStarted = false;
             }
         }
 
@@ -117,13 +137,16 @@ namespace NBB.Messaging.Host.Internal
 
         private async Task StartAsyncInternal(CancellationToken cancellationToken = default)
         {
-            // TODO: Add synchronization
-            if (_isStarted || _isStarting)
+            // if started do nothing
+            if (_isStarted)
+                return;
+
+            //if already starting do nothing
+            if (1 == Interlocked.Exchange(ref _isStarting, 1))
                 return;
 
             try
             {
-                _isStarting = true;
                 _logger.LogInformation("Messaging host is starting");
 
                 _subscriberStopSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _stoppingSource.Token);
@@ -156,31 +179,41 @@ namespace NBB.Messaging.Host.Internal
             }
             finally
             {
-                _isStarting = false;
+                _isStarting = 0;
             }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default)
         {
-            // TODO: Add synchronization
+            // if not started do nothing
             if (!_isStarted) return;
 
-            _logger.LogInformation("Messaging host is stopping");
+            //if already stopping do nothing
+            if (1 == Interlocked.Exchange(ref _isStopping, 1)) return;
 
-            ExecuteCancellation(_stoppingSource);
-
-            await _executionMonitor.WaitForHandlers(cancellationToken);
-
-            foreach (var subscription in ((IEnumerable<IDisposable>)_subscriptions).Reverse())
+            try
             {
-                subscription.Dispose();
+                _logger.LogInformation("Messaging host is stopping");
+
+                ExecuteCancellation(_stoppingSource);
+
+                await _executionMonitor.WaitForHandlers(cancellationToken);
+
+                foreach (var subscription in ((IEnumerable<IDisposable>)_subscriptions).Reverse())
+                {
+                    subscription.Dispose();
+                }
+
+                _subscriptions.Clear();
+
+                _logger.LogInformation("Messaging host has stopped");
+                _isStarted = false;
+            }
+            finally
+            {
+                _isStopping = 0;
             }
 
-            _subscriptions.Clear();
-
-            _logger.LogInformation("Messaging host has stopped");
-
-            _isStarted = false;
         }
 
         private void ExecuteCancellation(CancellationTokenSource cancel)
