@@ -33,7 +33,7 @@ namespace NBB.Messaging.Host.Internal
         private CancellationTokenSource _stoppingSource = new();
         private CancellationTokenSource _subscriberStopSource;
 
-        private bool _isStarted = false;
+        private uint _isStarted = 0;
         private uint _isStarting = 0;
         private uint _isStopping = 0;
         private uint _isScheduledRestart = 0;
@@ -77,7 +77,7 @@ namespace NBB.Messaging.Host.Internal
                 }
                 finally
                 {
-                    _isScheduledRestart = 0;
+                    Interlocked.Exchange(ref _isScheduledRestart, 0);
                 }
             });
         }
@@ -115,7 +115,7 @@ namespace NBB.Messaging.Host.Internal
                 _logger.LogError(ex, "Message host could not be gracefully stopped");
 
                 _subscriptions.Clear();
-                _isStarted = false;
+                Interlocked.Exchange(ref _isStarted, 0);
             }
         }
 
@@ -138,7 +138,7 @@ namespace NBB.Messaging.Host.Internal
         private async Task StartAsyncInternal(CancellationToken cancellationToken = default)
         {
             // if started do nothing
-            if (_isStarted)
+            if (_isStarted == 1)
                 return;
 
             //if already starting do nothing
@@ -175,21 +175,23 @@ namespace NBB.Messaging.Host.Internal
                 }
 
                 _logger.LogInformation("Messaging host has started");
-                _isStarted = true;
+                Interlocked.Exchange(ref _isStarted, 1);
             }
             finally
             {
-                _isStarting = 0;
+                Interlocked.Exchange(ref _isStarting, 0);
             }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default)
         {
             // if not started do nothing
-            if (!_isStarted) return;
+            if (_isStarted == 0)
+                return;
 
             //if already stopping do nothing
-            if (1 == Interlocked.Exchange(ref _isStopping, 1)) return;
+            if (1 == Interlocked.Exchange(ref _isStopping, 1))
+                return;
 
             try
             {
@@ -207,11 +209,12 @@ namespace NBB.Messaging.Host.Internal
                 _subscriptions.Clear();
 
                 _logger.LogInformation("Messaging host has stopped");
-                _isStarted = false;
+
+                Interlocked.Exchange(ref _isStarted, 0);
             }
             finally
             {
-                _isStopping = 0;
+                Interlocked.Exchange(ref _isStopping, 0);
             }
 
         }

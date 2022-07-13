@@ -119,7 +119,7 @@ public class MessagingHostTests
                 It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
             .Returns(async () =>
             {
-                await Task.Delay(30);
+                await Task.Delay(10); // Subscribe takes some time
                 return Mock.Of<IDisposable>();
             });
 
@@ -135,7 +135,7 @@ public class MessagingHostTests
         await Task.WhenAll(startAttempts.ToArray());
 
         //Assert
-        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Once());
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Once(), "Expected messaging host to start once");
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class MessagingHostTests
             {
                 var mockedSubscription = Mock.Of<IDisposable>();
                 Mock.Get(mockedSubscription)
-                    .Setup(x => x.Dispose()).Callback(() => { Thread.Sleep(30); }); //UnSubScribe takes some time
+                    .Setup(x => x.Dispose()).Callback(() => { Thread.Sleep(10); }); //UnSubScribe takes some time
                 return mockedSubscription;
             });
 
@@ -163,19 +163,19 @@ public class MessagingHostTests
         var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
             Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
 
+        //Act     
+        await messageHost.StartAsync();
+
         var rand = new Random();
         var stops = Enumerable.Range(0, 100).Select(async _ =>
         {
             await Task.Delay(rand.Next(0, 5));
             await messageHost.StopAsync();
         });
-
-        //Act     
-        await messageHost.StartAsync();
         await Task.WhenAll(stops.ToArray());
 
         //Assert
-        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is stopping", Times.Once());
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is stopping", Times.Once(), "Expected messaging host to stop once");
     }
 
     [Fact]
@@ -187,29 +187,34 @@ public class MessagingHostTests
             config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
 
         var mockedMessageBus = Mock.Of<IMessageBus>();
-        Mock.Get(mockedMessageBus)
-            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
-                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
-            .Returns(async () =>
-            {
-                await Task.Delay(10);
-                return Mock.Of<IDisposable>();
-            });
+       
 
         var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
         var mockLogger = Mock.Of<ILogger<MessagingHost>>();
         var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
             Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
 
-        await messageHost.StartAsync();
-        var restartAttempts = Enumerable.Range(0, 1000)
-            .Select(_ => Task.Run(() => messageHost.ScheduleRestart()));
+        Mock.Get(mockedMessageBus)
+           .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+               It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+           .Returns(async () =>
+           {
+               //subscribe takes some time
+               await Task.Delay(10);
 
-        //Act     
-        await Task.WhenAll(restartAttempts.ToArray());
+               return Mock.Of<IDisposable>();
+           });
+
+        //Act
+        var restartAttempts = Enumerable.Range(0, 100)
+               .Select(_ => Task.Run(() => messageHost.ScheduleRestart()));
+        await Task.WhenAll(restartAttempts);
+
+
+        await Task.Delay(10);
 
         //Assert
-        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Exactly(2), "Messaging host expected to re-start once");
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is scheduled for restart in 0 seconds", Times.Exactly(1), "Messaging host expected to re-start once");
     }
 
     [Fact]
