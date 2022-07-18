@@ -70,9 +70,6 @@ namespace NBB.Messaging.Host.Internal
                         ExecutionContext.SuppressFlow();
 
                     await TryStopAsync();
-
-                    _stoppingSource = new CancellationTokenSource();
-
                     await StartAsync();
                 }
                 finally
@@ -215,6 +212,7 @@ namespace NBB.Messaging.Host.Internal
             finally
             {
                 Interlocked.Exchange(ref _isStopping, 0);
+                _stoppingSource = new CancellationTokenSource();
             }
 
         }
