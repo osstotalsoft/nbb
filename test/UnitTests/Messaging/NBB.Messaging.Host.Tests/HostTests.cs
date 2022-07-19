@@ -250,6 +250,38 @@ public class MessagingHostTests
         Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host is starting", Times.Exactly(2), "Messaging host expected to re-start");
     }
 
+    [Fact]
+    public async Task Start_Stop_Start_should_work()
+    {
+        //Arrange
+        var hostOptions = Mock.Of<IOptions<MessagingHostOptions>>(x => x.Value == new MessagingHostOptions
+        {
+            RestartDelaySeconds = 0,
+            StartRetryCount = 0,
+        });
+        var configurator = new DelegateMessagingHostStartup(config =>
+            config.AddSubscriberServices(s => s.FromTopic("TestTopic")).WithDefaultOptions().UsePipeline(p => { }));
+
+        var mockedMessageBus = Mock.Of<IMessageBus>();
+        Mock.Get(mockedMessageBus)
+            .Setup(x => x.SubscribeAsync(It.IsAny<Func<MessagingEnvelope<object>, Task>>(),
+                It.IsAny<MessagingSubscriberOptions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<IDisposable>());
+
+        var mockLogger = Mock.Of<ILogger<MessagingHost>>();
+        var mockedServiceProvider = GetMockedServiceProvider(mockedMessageBus);
+        var messageHost = new MessagingHost(mockLogger, new[] { configurator }, mockedServiceProvider,
+            Mock.Of<IServiceCollection>(), Mock.Of<IHostApplicationLifetime>(), Mock.Of<ITransportMonitor>(), hostOptions);
+
+        //Act     
+        await messageHost.StartAsync();
+        await messageHost.StopAsync();
+        await messageHost.StartAsync();
+
+        //Assert
+        Mock.Get(mockLogger).VerifyLogInformationWasCalled("Messaging host has started", Times.Exactly(2), "Messaging host expected to start twice");
+    }
+
 
     private IServiceProvider GetMockedServiceProvider(IMessageBus mockedMessageBus)
     {
