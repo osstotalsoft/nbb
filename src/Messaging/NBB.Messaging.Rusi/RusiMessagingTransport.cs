@@ -121,7 +121,7 @@ namespace NBB.Messaging.Rusi
                 }
                 catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled)
                 {
-                    _logger.LogDebug(ex, "Rusi transport cancelled");
+                    _logger.LogDebug("Rusi message stream cancelled");
                 }
                 catch (Exception ex) 
                 {
