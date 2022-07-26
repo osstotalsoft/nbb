@@ -131,7 +131,20 @@ namespace NBB.Messaging.Rusi
                 }
             }, cancellationToken);
 
-            return Task.FromResult<IDisposable>(subscription);
+            return Task.FromResult<IDisposable>(new RusiSubscription(subscription));
+        }
+    }
+
+    internal class RusiSubscription : IDisposable
+    {
+        private readonly AsyncDuplexStreamingCall<SubscribeRequest, ReceivedMessage> _call;
+
+        public RusiSubscription(AsyncDuplexStreamingCall<SubscribeRequest, ReceivedMessage> call) => _call = call;
+
+        public void Dispose()
+        {
+            _call.RequestStream.CompleteAsync().GetAwaiter().GetResult(); //block since the api does not support IAsyncDisposable
+            _call.Dispose();
         }
     }
 }
