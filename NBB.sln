@@ -398,9 +398,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serilog", "Serilog", "{33AE
 		src\Tools\Serilog\README.md = src\Tools\Serilog\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Core.Configuration", "src\Core\NBB.Core.Configuration\NBB.Core.Configuration.csproj", "{2C7CA0BD-98AD-4CC1-B496-94ED49636466}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Configuration", "src\Core\NBB.Core.Configuration\NBB.Core.Configuration.csproj", "{2C7CA0BD-98AD-4CC1-B496-94ED49636466}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Core.Configuration.Tests", "test\UnitTests\Core\NBB.Core.Configuration.Tests\NBB.Core.Configuration.Tests.csproj", "{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Configuration.Tests", "test\UnitTests\Core\NBB.Core.Configuration.Tests\NBB.Core.Configuration.Tests.csproj", "{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Messaging.Rusi.IntegrationTests", "test\Integration\NBB.Messaging.Rusi.IntegrationTests\NBB.Messaging.Rusi.IntegrationTests.csproj", "{2D002428-8D55-46BD-A588-84946E33B4EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -904,6 +906,10 @@ Global
 		{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D002428-8D55-46BD-A588-84946E33B4EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D002428-8D55-46BD-A588-84946E33B4EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D002428-8D55-46BD-A588-84946E33B4EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D002428-8D55-46BD-A588-84946E33B4EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1071,6 +1077,7 @@ Global
 		{33AEB049-EC66-4728-9B22-CC0F282D3E73} = {EF374BA2-61FC-41FB-8229-5187DCBAA63A}
 		{2C7CA0BD-98AD-4CC1-B496-94ED49636466} = {14726095-DA28-43A6-A9A9-F16C605932E1}
 		{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7} = {29B7593C-60F4-41DC-A883-4976FF467927}
+		{2D002428-8D55-46BD-A588-84946E33B4EF} = {2D9089E7-54EA-4526-B8FE-12729BF14F16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23A42379-616A-43EF-99BC-803DF151F54E}
