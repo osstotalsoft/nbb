@@ -38,8 +38,11 @@ namespace NBB.Messaging.Host
             _messageTypeProvider = subscriberServiceSelector;
             _topicProvider = subscriberServiceSelector;
 
-            _currentSubscriberGroup = new List<MessagingHostConfiguration.Subscriber>();
-             _subscriberGroups.Add(_currentSubscriberGroup);
+            if (_currentSubscriberGroup == null)
+            {
+                _currentSubscriberGroup = new List<MessagingHostConfiguration.Subscriber>();
+                _subscriberGroups.Add(_currentSubscriberGroup);
+            }
 
             return this;
         }
@@ -143,7 +146,7 @@ namespace NBB.Messaging.Host
     /// <summary>
     /// Used to subscriberBuilder the messaging host pipeline
     /// </summary>
-    public interface IMessagingHostPipelineBuilder
+    public interface IMessagingHostPipelineBuilder : IMessagingHostConfigurationBuilder
     {
         /// <summary>
         /// Adds the message processing pipeline to the messaging host.

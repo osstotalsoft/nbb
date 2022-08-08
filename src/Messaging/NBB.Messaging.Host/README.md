@@ -73,7 +73,28 @@ services.AddMessagingHost(
         );
     }
 );
-```      
+```
+
+#### Multiple subscriber groups using the same pipeline
+
+In case you need to use the same pipeline for more subscriber groups, the builder lets you chain multiple `AddSubscriberServices(...).WithOptions(...)` function calls:
+
+```csharp
+
+services.AddMessagingHost(
+    Configuration,
+    hostBuilder =>
+    {
+        hostBuilder.Configure(configBuilder => configBuilder
+            .AddSubscriberServices(...)
+            .WithOptions(...)
+            .AddSubscriberServices(...)
+            .WithOptions(...)
+            .UsePipeline(...)
+        );
+    }
+);
+``` 
 
 #### Advanced scenarios
 There is an overload of the *Configure* method that allows async/await operations.
