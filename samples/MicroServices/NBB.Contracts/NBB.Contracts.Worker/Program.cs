@@ -18,7 +18,6 @@ using NBB.Domain;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
 using NBB.Messaging.OpenTracing.Publisher;
-using NBB.Messaging.OpenTracing.Subscriber;
 using OpenTracing;
 using OpenTracing.Noop;
 using OpenTracing.Util;
@@ -142,7 +141,7 @@ namespace NBB.Contracts.Worker
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
-                    .UseMiddleware<OpenTracingMiddleware>()
+                    .UseOpenTracingMiddleware()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );
