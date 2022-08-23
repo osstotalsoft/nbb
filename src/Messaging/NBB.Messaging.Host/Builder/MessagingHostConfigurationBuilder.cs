@@ -67,17 +67,15 @@ namespace NBB.Messaging.Host
             return this;
         }
 
-        public void UsePipeline(Action<IPipelineBuilder<MessagingContext>> configurePipeline)
+        public void UsePipeline(Action<Type, IPipelineBuilder<MessagingContext>> configurePipeline)
         {
-            var builder = new PipelineBuilder<MessagingContext>();
-            configurePipeline?.Invoke(builder);
-
             foreach (var subscriber in _currentSubscriberGroup)
             {
+                var messageType = subscriber.MessageType;
+                var builder = new PipelineBuilder<MessagingContext>();
+                configurePipeline?.Invoke(messageType, builder);
                 subscriber.Pipeline = builder.Pipeline;
             }
-
-           
             _currentSubscriberGroup = null;
         }
 
@@ -153,6 +151,9 @@ namespace NBB.Messaging.Host
         /// </summary>
         /// <param name="configurePipeline">The pipeline configurator is used to add the middleware to the pipeline.</param>
         /// <returns>The messaging host subscriberBuilder to further subscriberBuilder the messaging host. It is used in the fluent API</returns>
-        void UsePipeline(Action<IPipelineBuilder<MessagingContext>> configurePipeline);
+        void UsePipeline(Action<Type, IPipelineBuilder<MessagingContext>> configurePipeline);
+
+        public void UsePipeline(Action<IPipelineBuilder<MessagingContext>> configurePipeline)
+            => UsePipeline((_, b) => configurePipeline(b));
     }
 }

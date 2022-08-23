@@ -171,6 +171,36 @@ namespace NBB.Messaging.Host.Tests
 
         }
 
+        [Fact]
+        public void Should_register_a_type_dependent_pipeline()
+        {
+            //Arrange
+            var services = Mock.Of<IServiceCollection>();
+            var provider = Mock.Of<IServiceProvider>();
+            PipelineDelegate<MessagingContext> mockMiddlewareFunc = (ctx, ct) => Task.CompletedTask;
+            Func<PipelineDelegate<MessagingContext>, PipelineDelegate<MessagingContext>> mockMiddleware = next => mockMiddlewareFunc;
+
+            //Act
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
+            builder
+                .AddSubscriberServices(cfg => cfg
+                    .AddType<CommandMessage>()
+                    .AddType<EventMessage>()
+                    .FromTopic("OtherTopicName"))
+                .WithDefaultOptions()
+                .UsePipeline((t, p) => p
+                    .When(t == typeof(CommandMessage), p => p.Use(mockMiddleware)));
+            var config = builder.Build();
+
+            //Assert
+            config.Subscribers.Should().HaveCount(3);
+            config.Subscribers[0].MessageType.Should().Be(typeof(CommandMessage));
+            config.Subscribers[0].Pipeline.Should().Be(mockMiddlewareFunc);
+
+            config.Subscribers[1].Pipeline.Should().NotBe(mockMiddlewareFunc);
+            config.Subscribers[2].Pipeline.Should().NotBe(mockMiddlewareFunc);
+        }
+
         public record CommandMessage : IRequest;
 
         public record EventMessage : INotification;
