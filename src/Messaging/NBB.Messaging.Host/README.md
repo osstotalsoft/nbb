@@ -94,6 +94,28 @@ services.AddMessagingHost(
         );
     }
 );
+```
+
+#### Register a type dependent pipeline
+
+In case you need to register a type dependent pipeline (like conditional middleware) for more subscribers, you can build something like:
+
+```csharp
+
+services.AddMessagingHost(
+    Configuration,
+    hostBuilder =>
+    {
+        hostBuilder.Configure(configBuilder => configBuilder
+            .AddSubscriberServices(...)
+            .WithOptions(...)
+            .UsePipeline((t, p) => p
+                .Use(...)
+                .When(t == typeof(MyCommand), p => p.Use(...))  //<-- conditional middleware
+                .Use(...)
+        );
+    }
+);
 ``` 
 
 #### Advanced scenarios
