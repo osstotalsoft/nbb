@@ -56,8 +56,8 @@ namespace NBB.Messaging.Abstractions
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Messaging consumer encountered an error when handling a message from subject {Subject}.\n {Error}",
-                       topicName, ex);
+                    _logger.LogError(ex, "Messaging subscriber encountered an error when handling a message from subject {Subject}.",
+                       topicName);
 
                     if (messageEnvelope != null)
                         _deadLetterQueue.Push(messageEnvelope, topicNameWithoutPrefix, ex);

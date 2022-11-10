@@ -1,9 +1,12 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Options;
 using NBB.Tools.Serilog.Enrichers.TenantId;
 using Serilog.Core;
 using Serilog.Events;
@@ -44,6 +47,7 @@ namespace NBB.MultiTenancy.Serilog.Tests
         public void TenantId_enricher_correct_value_from_context()
         {
             var tid = Guid.Parse("68a448a2-e7d8-4875-8127-f18668217eb6");
+            var code = "tenant1";
 
             var propertyFactory = GetPropertyFactory();
 
@@ -51,15 +55,17 @@ namespace NBB.MultiTenancy.Serilog.Tests
 
             var tenantContextAccessor = new TenantContextAccessor
             {
-                TenantContext = new TenantContext(new Tenant(tid, tid.ToString()))
+                TenantContext = new TenantContext(new Tenant(tid, code))
             };
 
-            var enricher = new TenantEnricher(tenantContextAccessor);
+            var tenancyHostingOptionsAccessor = Mock.Of<IOptions<TenancyHostingOptions>>(x => x.Value == new TenancyHostingOptions { TenancyType = TenancyType.MultiTenant });
+
+            var enricher = new TenantEnricher(tenantContextAccessor, tenancyHostingOptionsAccessor);
 
             enricher.Enrich(logEvent, propertyFactory);
 
-            Assert.Equal(3, logEvent.Properties.Count);
-            Assert.Equal(tid.ToString(), logEvent.Properties[TenantEnricher.PropertyName].ToString());
+            Assert.Equal(4, logEvent.Properties.Count);
+            Assert.Equal(tid.ToString(), logEvent.Properties[TenantEnricher.TenantIdPropertyName].ToString());
         }
 
         [Fact]
@@ -68,13 +74,14 @@ namespace NBB.MultiTenancy.Serilog.Tests
             var propertyFactory = GetPropertyFactory();
 
             var logEvent = GetLogEvent();
+            var tenancyHostingOptionsAccessor = Mock.Of<IOptions<TenancyHostingOptions>>(x => x.Value == new TenancyHostingOptions { TenancyType = TenancyType.MultiTenant });
 
-            var enricher = new TenantEnricher(new TenantContextAccessor());
+            var enricher = new TenantEnricher(new TenantContextAccessor(), tenancyHostingOptionsAccessor);
 
             enricher.Enrich(logEvent, propertyFactory);
 
-            Assert.Equal(3, logEvent.Properties.Count);
-            Assert.Equal(Tenant.Default.TenantId.ToString(), logEvent.Properties[TenantEnricher.PropertyName].ToString());
+            Assert.Equal(4, logEvent.Properties.Count);
+            logEvent.Properties[TenantEnricher.TenantIdPropertyName].ToString().Should().Be("null");
         }
 
         [Fact]
@@ -83,13 +90,13 @@ namespace NBB.MultiTenancy.Serilog.Tests
             var propertyFactory = GetPropertyFactory();
 
             var logEvent = GetLogEvent();
-
-            var enricher = new TenantEnricher(new TenantContextAccessor {  TenantContext = new TenantContext(null)});
+            var tenancyHostingOptionsAccessor = Mock.Of<IOptions<TenancyHostingOptions>>(x => x.Value == new TenancyHostingOptions { TenancyType = TenancyType.MultiTenant });
+            var enricher = new TenantEnricher(new TenantContextAccessor { TenantContext = new TenantContext(null) }, tenancyHostingOptionsAccessor);
 
             enricher.Enrich(logEvent, propertyFactory);
 
-            Assert.Equal(3, logEvent.Properties.Count);
-            Assert.Equal(Tenant.Default.TenantId.ToString(), logEvent.Properties[TenantEnricher.PropertyName].ToString());
+            Assert.Equal(4, logEvent.Properties.Count);
+            logEvent.Properties[TenantEnricher.TenantIdPropertyName].ToString().Should().Be("null");
         }
     }
 }
