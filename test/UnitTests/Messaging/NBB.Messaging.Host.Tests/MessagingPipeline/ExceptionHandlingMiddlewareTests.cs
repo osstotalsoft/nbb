@@ -39,16 +39,17 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
             var deadLetterQueue = Mock.Of<IDeadLetterQueue>();
-            var correlationMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, deadLetterQueue);
+            var exceptionHandlingnMiddleWare = new ExceptionHandlingMiddleware(mockedLogger, deadLetterQueue);
             var sentMessage = new { Field = "value" };
             var envelope = new MessagingEnvelope(new System.Collections.Generic.Dictionary<string, string>(), sentMessage);
+            var exception = new ApplicationException();
 
-            Task next() => throw new ApplicationException();
+            Task next() => throw exception;
 
             //Act
             try
             {
-                await correlationMiddleWare.Invoke(new MessagingContext(envelope, string.Empty, null), default, next);
+                await exceptionHandlingnMiddleWare.Invoke(new MessagingContext(envelope, string.Empty, null), default, next);
             }
             catch
             {
@@ -56,7 +57,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             }
 
             //Assert
-            VerifyLog(mockedLogger, LogLevel.Error, nameof(ApplicationException));
+            VerifyLog(mockedLogger, LogLevel.Error, "An unhandled exception has occurred while processing message", exception);
         }
 
         [Fact]
@@ -79,11 +80,11 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             isNextMiddlewareCalled.Should().BeTrue();
         }
 
-        private void VerifyLog(ILogger<ExceptionHandlingMiddleware> mockedLogger, LogLevel logLevel, string containedString)
+        private void VerifyLog(ILogger<ExceptionHandlingMiddleware> mockedLogger, LogLevel logLevel, string containedString, Exception ex = null)
         {
             Mock.Get(mockedLogger).Verify(x => x.Log(logLevel, It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((v, _) => v.ToString().Contains(containedString)),
-                null, It.IsAny<Func<It.IsAnyType, Exception, string>>()));
+                ex, It.IsAny<Func<It.IsAnyType, Exception, string>>()));
         }
     }
 }

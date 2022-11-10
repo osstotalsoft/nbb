@@ -37,9 +37,8 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(
-                        "InProcessMessagingTopicSubscriber encountered an error when handling a message from topic {TopicName}.\n {Error}",
-                        topic, ex);
+                    _logger.LogError(ex,
+                        "InProcessMessagingTopicSubscriber encountered an error when handling a message from topic {TopicName}.", topic);
 
                     OnError?.Invoke(ex);
 

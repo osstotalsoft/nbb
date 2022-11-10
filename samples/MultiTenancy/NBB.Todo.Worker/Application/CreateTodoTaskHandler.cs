@@ -21,6 +21,7 @@ namespace NBB.Todo.Worker.Application
 
         public async Task<Unit> Handle(CreateTodoTask request, CancellationToken cancellationToken)
         {
+            //throw new System.Exception("handler exception");
             var todoTask = new TodoTask
             {
                 Name = request.Name,

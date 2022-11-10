@@ -15,6 +15,8 @@ using NBB.Messaging.MultiTenancy;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
+using NBB.Correlation.Serilog;
+using NBB.Tools.Serilog.Enrichers.TenantId;
 
 namespace NBB.Todo.Worker
 {
@@ -45,9 +47,16 @@ namespace NBB.Todo.Worker
 
         public static IHost BuildConsoleHost(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(ConfigureLogging)
                 .ConfigureServices(ConfigureServices)
-                .UseSerilog()
+                .UseSerilog((context, services, logConfig) =>
+                {
+                    logConfig
+                        .ReadFrom.Configuration(context.Configuration)
+                        .Enrich.FromLogContext()
+                        .Enrich.With<CorrelationLogEventEnricher>()
+                        .Enrich.With(services.GetRequiredService<TenantEnricher>())
+                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
+                })
                 .UseConsoleLifetime()
                 .Build();
 
@@ -71,8 +80,8 @@ namespace NBB.Todo.Worker
                         .WithDefaultOptions()
                         .UsePipeline(builder => builder
                             .UseCorrelationMiddleware()
-                            .UseExceptionHandlingMiddleware()
                             .UseTenantMiddleware()
+                            .UseExceptionHandlingMiddleware()
                             .UseDefaultResiliencyMiddleware()
                             .UseMediatRMiddleware())
                     )
@@ -85,16 +94,8 @@ namespace NBB.Todo.Worker
                 .AddMultiTenantMessaging()
                 .AddDefaultMessagingTenantIdentification()
                 .AddTenantRepository<ConfigurationTenantRepository>();
-        }
 
-        private static void ConfigureLogging(HostBuilderContext ctx, ILoggingBuilder _builder)
-        {
-            Log.Logger = new LoggerConfiguration()
-              .ReadFrom.Configuration(ctx.Configuration)
-              .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-              .Enrich.FromLogContext()
-              .WriteTo.Console()
-              .CreateLogger();
+            services.AddSingleton<TenantEnricher>();
         }
     }
 }

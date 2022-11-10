@@ -47,7 +47,7 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         {
             if (!tenantMap.TryGetValue(id, out var result))
             {
-                throw new Exception($"Tenant configuration not found for tenant {id}");
+                throw new TenantNotFoundException(id);
             }
 
 
