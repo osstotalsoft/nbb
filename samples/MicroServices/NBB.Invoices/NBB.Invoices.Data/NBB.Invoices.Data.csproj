@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Data\NBB.Data.EntityFramework\NBB.Data.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Data\NBB.Data.EventSourcing\NBB.Data.EventSourcing.csproj" />
     <ProjectReference Include="..\NBB.Invoices.Domain\NBB.Invoices.Domain.csproj" />
   </ItemGroup>
 
