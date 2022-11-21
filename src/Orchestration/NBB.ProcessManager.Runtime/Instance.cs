@@ -23,11 +23,11 @@ namespace NBB.ProcessManager.Runtime
         public object InstanceId { get; private set; }
 
         private readonly List<object> _changes = new();
-        private readonly List<Effect<Unit>> _effects = new();
+        private Effect<Unit> _effect = Effect.Pure();
         public int Version { get; internal set; }
 
         public IEnumerable<object> GetUncommittedChanges() => _changes;
-        public IEnumerable<Effect<Unit>> GetUncommittedEffects() => _effects;
+        public Effect<Unit> GetUncommittedEffect() => _effect;
 
         public Instance(IDefinition<TData> definition, ILogger<Instance<TData>> logger)
         {
@@ -81,8 +81,7 @@ namespace NBB.ProcessManager.Runtime
                     throw new Exception($"Cannot accept a new event. Instance is {State}");
             }
 
-            var effect = _definition.GetEffectFunc<TEvent>()(@event, GetInstanceData());
-            _effects.Add(effect);
+            _effect = _effect.Then(_definition.GetEffectFunc<TEvent>()(@event, GetInstanceData()));
 
             Emit(new EventReceived(@event, @event.GetType().GetLongPrettyName()));
 
@@ -177,7 +176,7 @@ namespace NBB.ProcessManager.Runtime
         {
             Version += _changes.Count;
             _changes.Clear();
-            _effects.Clear();
+            _effect = Effect.Pure();
         }
     }
 }

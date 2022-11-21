@@ -8,7 +8,7 @@ using NBB.ProcessManager.Definition.SideEffects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
-    public class EventActivitySetBuilder<TEvent, TData>
+    public class EventActivitySetBuilder<TEvent, TData> : IEventActivitySetBuilder<TEvent, TData>
     {
         private readonly EventActivitySet<TEvent, TData> _eventActivitySet;
 
@@ -17,7 +17,7 @@ namespace NBB.ProcessManager.Definition.Builder
             _eventActivitySet = eventActivitySet;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> Then(EffectFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
+        public IEventActivitySetEffectBuilder<TEvent, TData> Then(EffectFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.AddEffectHandler((whenEvent, data) =>
             {
@@ -28,7 +28,7 @@ namespace NBB.ProcessManager.Definition.Builder
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> SetState(SetStateFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
+        public IEventActivitySetBuilder<TEvent, TData> SetState(SetStateFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null)
         {
             _eventActivitySet.AddSetStateHandler((whenEvent, data) =>
             {
@@ -39,7 +39,7 @@ namespace NBB.ProcessManager.Definition.Builder
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> SendCommand<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null)
+        public IEventActivitySetEffectBuilder<TEvent, TData> SendCommand<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null)
         {
             Then((whenEvent, state) =>
             {
@@ -49,14 +49,14 @@ namespace NBB.ProcessManager.Definition.Builder
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> Schedule<T>(Func<TEvent, InstanceData<TData>, T> messageFactory, TimeSpan timeSpan,
+        public IEventActivitySetEffectBuilder<TEvent, TData> Schedule<T>(Func<TEvent, InstanceData<TData>, T> messageFactory, TimeSpan timeSpan,
             EventPredicate<TEvent, TData> predicate = null)
         {
             Then((whenEvent, state) => Timeout.Request(state.InstanceId.ToString(), timeSpan, messageFactory(whenEvent, state)), predicate);
             return this;
         }
 
-        public EventActivitySetBuilder<TEvent, TData> PublishEvent<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null)
+        public IEventActivitySetEffectBuilder<TEvent, TData> PublishEvent<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null)
         {
             Then((whenEvent, state) =>
             {
@@ -71,5 +71,20 @@ namespace NBB.ProcessManager.Definition.Builder
             _eventActivitySet.UseForCompletion(predicate);
             Then((whenEvent, state) => Timeout.Cancel(state.InstanceId.ToString()), predicate);
         }
+    }
+
+
+    public interface IEventActivitySetEffectBuilder<out TEvent, TData>
+    {
+        IEventActivitySetEffectBuilder<TEvent, TData> Then(EffectFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null);
+        IEventActivitySetEffectBuilder<TEvent, TData> SendCommand<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null);
+        IEventActivitySetEffectBuilder<TEvent, TData> PublishEvent<T>(Func<TEvent, InstanceData<TData>, T> handler, EventPredicate<TEvent, TData> predicate = null);
+        IEventActivitySetEffectBuilder<TEvent, TData> Schedule<T>(Func<TEvent, InstanceData<TData>, T> messageFactory, TimeSpan timeSpan, EventPredicate<TEvent, TData> predicate = null);
+        void Complete(EventPredicate<TEvent, TData> predicate = null);
+    }
+
+    public interface IEventActivitySetBuilder<out TEvent, TData> : IEventActivitySetEffectBuilder<TEvent, TData>
+    {
+        public IEventActivitySetBuilder<TEvent, TData> SetState(SetStateFunc<TEvent, TData> func, EventPredicate<TEvent, TData> predicate = null);
     }
 }

@@ -29,14 +29,13 @@ namespace NBB.ProcessManager.Runtime.Persistence
             where TData:  IEquatable<TData>, new()
         {
             var events = instance.GetUncommittedChanges().ToList();
-            var effects = instance.GetUncommittedEffects().ToList();
+            var effect = instance.GetUncommittedEffect();
             var streamId = instance.GetStream();
             var aggregateLoadedAtVersion = instance.Version;
             instance.MarkChangesAsCommitted();
 
             await _eventStore.AppendEventsToStreamAsync(streamId, events, aggregateLoadedAtVersion, cancellationToken);
-            foreach (var effect in effects)
-                await _interpreter.Interpret(effect, cancellationToken);
+            await _interpreter.Interpret(effect, cancellationToken);
         }
 
         public async Task<Instance<TData>> Get<TData>(IDefinition<TData> definition, object identity, CancellationToken cancellationToken = default)
