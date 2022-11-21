@@ -16,4 +16,6 @@ namespace NBB.Invoices.PublishedLanguage
         Guid InvoiceId, 
         Guid PaymentId
     ) : IRequest;
+
+    public record ProcessInvoice(Guid InvoiceId) : IRequest;
 }

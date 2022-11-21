@@ -5,6 +5,7 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -145,6 +146,59 @@ namespace NBB.Messaging.Host.Tests
             config.Subscribers[0].MessageType.Should().Be(typeof(object));
             config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default with {TopicName = "TopicName" });
             config.Subscribers[0].Pipeline.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Should_register_same_pipeline_for_more_subscriber_groups()
+        {
+            //Arrange
+            var services = Mock.Of<IServiceCollection>();
+            var provider = Mock.Of<IServiceProvider>();
+
+            //Act
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
+            builder
+                .AddSubscriberServices(cfg => cfg.FromTopics("SomeTopicName")).WithDefaultOptions()
+                .AddSubscriberServices(cfg => cfg.FromTopics("OtherTopicName")).WithDefaultOptions()
+                .UsePipeline(_ => { });
+            var config = builder.Build();
+
+            //Assert
+            config.Subscribers.Should().HaveCount(2);
+            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default with { TopicName = "SomeTopicName" });
+            config.Subscribers[1].Options.Should().Be(MessagingSubscriberOptions.Default with { TopicName = "OtherTopicName" });
+            config.Subscribers[0].Pipeline.Should().Be(config.Subscribers[1].Pipeline);
+
+        }
+
+        [Fact]
+        public void Should_register_a_type_dependent_pipeline()
+        {
+            //Arrange
+            var services = Mock.Of<IServiceCollection>();
+            var provider = Mock.Of<IServiceProvider>();
+            PipelineDelegate<MessagingContext> mockMiddlewareFunc = (ctx, ct) => Task.CompletedTask;
+            Func<PipelineDelegate<MessagingContext>, PipelineDelegate<MessagingContext>> mockMiddleware = next => mockMiddlewareFunc;
+
+            //Act
+            var builder = new MessagingHostConfigurationBuilder(provider, services);
+            builder
+                .AddSubscriberServices(cfg => cfg
+                    .AddType<CommandMessage>()
+                    .AddType<EventMessage>()
+                    .FromTopic("OtherTopicName"))
+                .WithDefaultOptions()
+                .UsePipeline((t, p) => p
+                    .When(t == typeof(CommandMessage), p => p.Use(mockMiddleware)));
+            var config = builder.Build();
+
+            //Assert
+            config.Subscribers.Should().HaveCount(3);
+            config.Subscribers[0].MessageType.Should().Be(typeof(CommandMessage));
+            config.Subscribers[0].Pipeline.Should().Be(mockMiddlewareFunc);
+
+            config.Subscribers[1].Pipeline.Should().NotBe(mockMiddlewareFunc);
+            config.Subscribers[2].Pipeline.Should().NotBe(mockMiddlewareFunc);
         }
 
         public record CommandMessage : IRequest;

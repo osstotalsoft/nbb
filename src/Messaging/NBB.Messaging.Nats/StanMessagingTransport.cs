@@ -44,18 +44,15 @@ namespace NBB.Messaging.Nats
             opts.AckWait = subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000;
             opts.ManualAcks = true;
 
-            //CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            
-            async void StanMsgHandler(object obj, StanMsgHandlerArgs args)
+            void StanMsgHandler(object obj, StanMsgHandlerArgs args)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
                 var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(args.Message.Data));
 
-                await handler(receiveContext);
-                
-                args.Message.Ack();
+                // Fire and forget
+                _ = handler(receiveContext).ContinueWith(_ => args.Message.Ack(), cancellationToken);
             }
 
             IDisposable subscription = null;

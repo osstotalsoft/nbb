@@ -24,6 +24,9 @@ namespace NBB.Invoices.Data
                     var connectionString = configuration.GetConnectionString("DefaultConnection");
                     options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
                 });
+
+            services.AddEventSourcingDataAccess()
+                .AddEventSourcedRepository<InvoiceLock>();
         }
 
         public static void AddInvoicesReadDataAccess(this IServiceCollection services)

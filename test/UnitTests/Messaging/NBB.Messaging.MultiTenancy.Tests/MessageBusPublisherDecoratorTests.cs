@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Messaging.Abstractions;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
+using NBB.MultiTenancy.Abstractions.Options;
 using Xunit;
 
 namespace NBB.Messaging.MultiTenancy.Tests
@@ -23,7 +25,8 @@ namespace NBB.Messaging.MultiTenancy.Tests
             var publisherMock = new Mock<IMessageBusPublisher>();
             var tenantContext = new TenantContext(new Tenant(new Guid(), string.Empty));
             var tenantContextAccessor = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == tenantContext);
-            var sut = new MultiTenancyMessageBusPublisherDecorator(publisherMock.Object, tenantContextAccessor);
+            var tenancyHostingOptionsAccessor = Mock.Of<IOptions<TenancyHostingOptions>>(x => x.Value == new TenancyHostingOptions { TenancyType = TenancyType.MultiTenant });
+            var sut = new MultiTenancyMessageBusPublisherDecorator(publisherMock.Object, tenantContextAccessor, tenancyHostingOptionsAccessor);
             const string message = "test";
 
             // Act
@@ -41,10 +44,10 @@ namespace NBB.Messaging.MultiTenancy.Tests
             // Arrange
             var tenantId = Guid.NewGuid();
             var publishedEnvelope = default(MessagingEnvelope);
-            var tenantContextAccessor = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == new TenantContext(new Tenant(tenantId, string.Empty)));
-            
+            var tenantContextAccessor = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == new TenantContext(new Tenant(tenantId, string.Empty, true)));
+            var tenancyHostingOptionsAccessor = Mock.Of<IOptions<TenancyHostingOptions>>(x => x.Value == new TenancyHostingOptions { TenancyType = TenancyType.MultiTenant });
             void EnvelopeCustomizer(MessagingEnvelope envelope) => publishedEnvelope = envelope;
-            var sut = new MultiTenancyMessageBusPublisherDecorator(new MockMessageBusPublisher(), tenantContextAccessor);
+            var sut = new MultiTenancyMessageBusPublisherDecorator(new MockMessageBusPublisher(), tenantContextAccessor, tenancyHostingOptionsAccessor);
 
             // Act
             await sut.PublishAsync("test", new MessagingPublisherOptions {EnvelopeCustomizer = EnvelopeCustomizer});

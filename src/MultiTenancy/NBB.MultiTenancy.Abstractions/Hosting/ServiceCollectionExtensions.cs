@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Extensions.Configuration;
+using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 

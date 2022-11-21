@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using AutoMapper;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +29,7 @@ namespace ProcessManagerSample
             services.AddEventStore(es =>
             {
                 es.UseNewtownsoftJson();
-                es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+                es.UseInMemoryEventRepository();
             });
 
             services.AddMessagingHost(
@@ -44,7 +43,7 @@ namespace ProcessManagerSample
                     .UsePipeline(builder => builder
                         .UseCorrelationMiddleware()
                         .UseExceptionHandlingMiddleware()
-                        //.UseMiddleware<OpenTracingMiddleware>()
+                        //.UseOpenTracingMiddleware()
                         .UseDefaultResiliencyMiddleware()
                         .UseMiddleware<SubscriberLoggingMiddleware>()
                         .UseMediatRMiddleware())

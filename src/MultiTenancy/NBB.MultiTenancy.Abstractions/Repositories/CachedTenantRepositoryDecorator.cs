@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,27 +43,6 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
             return dbTenant;
         }
 
-        public async Task<Tenant> GetByHost(string host, CancellationToken token)
-        {
-            
-            var cacheKey = CacheTenantByHostKey(host);
-            var cachedTenant = await GetTenantFromCache(cacheKey, token);
-            if (cachedTenant != null)
-            {
-                return cachedTenant;
-            }
-                        
-            var dbTenant = await _tenantRepository.GetByHost(host, token);
-            if (dbTenant == null)
-            {
-                return null;
-            }
-
-            await SetTenantToCache(dbTenant, cacheKey, token);
-
-            return dbTenant;
-        }
-
         private async Task<Tenant> GetTenantFromCache(string key, CancellationToken token = default)
         {
             var sTenant = await _cache.GetStringAsync(key, token);
@@ -77,6 +57,32 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3)
                 },token);
+        }
+
+        public async Task<List<Tenant>> GetAll(CancellationToken token = default)
+        {
+            var tenants = await _tenantRepository.GetAll(token);
+            return tenants;
+        }
+
+        public async Task<Tenant> GetByHost(string host, CancellationToken token)
+        {
+            var cacheKey = CacheTenantByHostKey(host);
+            var cachedTenant = await GetTenantFromCache(cacheKey, token);
+            if (cachedTenant != null)
+            {
+                return cachedTenant;
+            }
+
+            var dbTenant = await _tenantRepository.GetByHost(host, token);
+            if (dbTenant == null)
+            {
+                return null;
+            }
+
+            await SetTenantToCache(dbTenant, cacheKey, token);
+
+            return dbTenant;
         }
     }
 }

@@ -2,10 +2,12 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NBB.Messaging.Abstractions;
 using NBB.Todo.Data;
 using NBB.Todo.Data.Entities;
 using NBB.Todo.PublishedLanguage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -27,8 +29,9 @@ namespace NBB.Todo.Api.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<TodoTask> Get() 
-            => _todoDbContext.TodoTasks.ToList();
+        public Task<List<TodoTask>> Get()
+            => _todoDbContext.TodoTasks.ToListAsync();
+        //=> throw new Exception("Test exeception");
 
         [HttpPost]
         public async Task Post([FromBody]CreateTodoTask command, CancellationToken cancellationToken) 

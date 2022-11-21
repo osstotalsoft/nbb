@@ -40,8 +40,7 @@ namespace NBB.MultiTenancy.AspNet
 
 
             var tenantId = await tenantIdentificationService.GetTenantIdAsync();
-            var tenant = await tenantRepository.Get(tenantId, context.RequestAborted)
-                         ?? throw new ApplicationException($"Tenant {tenantId} not found");
+            var tenant = await tenantRepository.Get(tenantId, context.RequestAborted);
 
             tenantContextAccessor.TenantContext = new TenantContext(tenant);
 

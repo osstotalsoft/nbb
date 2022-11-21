@@ -3,12 +3,11 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
-using System.Collections.Concurrent;
-using System.ComponentModel;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
 
@@ -20,7 +19,8 @@ public class TenantConfiguration : ITenantConfiguration
     private readonly IConfiguration _globalConfiguration;
     private readonly IOptions<TenancyHostingOptions> _tenancyHostingOptions;
     private readonly ITenantContextAccessor _tenantContextAccessor;
-    private ConcurrentDictionary<Guid, IConfiguration> _tenantMap;
+
+    public string this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     public TenantConfiguration(IConfiguration configuration, IOptions<TenancyHostingOptions> tenancyHostingOptions,
         ITenantContextAccessor tenantContextAccessor)
@@ -40,56 +40,34 @@ public class TenantConfiguration : ITenantConfiguration
         _globalConfiguration = configuration;
         _tenancyHostingOptions = tenancyHostingOptions;
         _tenantContextAccessor = tenantContextAccessor;
-
-        if (tenancyHostingOptions.Value.TenancyType == TenancyType.MultiTenant)
-        {
-            LoadTenantsMap();
-        }
     }
 
-    private void LoadTenantsMap()
-    {
-        var newMap = new ConcurrentDictionary<Guid, IConfiguration>();
-        var tenants = _tenancyConfigurationSection.GetSection("Tenants").GetChildren();
-
-        foreach (var tenantSection in tenants)
-        {
-            var tid = tenantSection.GetValue<Guid>("TenantId");
-            newMap.TryAdd(tid, tenantSection);
-        }
-
-        _tenantMap = newMap;
-    }
-
-    public T GetValue<T>(string key)
+    private IConfiguration GetTenantConfiguration()
     {
         if (_tenancyHostingOptions.Value.TenancyType == TenancyType.MonoTenant)
         {
-            return getValueOrComplexObject<T>(_globalConfiguration, key);
+            return _globalConfiguration;
         }
 
-        var tenantId = _tenantContextAccessor.TenantContext.GetTenantId();
         var defaultSection = _tenancyConfigurationSection.GetSection("Defaults");
-        var section = _tenantMap.TryGetValue(tenantId, out var result)
-            ? result
-            : throw new Exception($"Configuration not found for tenant {tenantId}");
+        var tenantCode = _tenantContextAccessor.TenantContext.GetTenantCode();
 
-
-        return getValueOrComplexObject<T>(section, key, defaultSection);
-    }
-
-    private static T getValueOrComplexObject<T>(IConfiguration config, string key, IConfigurationSection defaultSection = null)
-    {
-        //section.GetSection is never null
-        if (config.GetSection(key).GetChildren().Any())
+        var tenantSection = _tenancyConfigurationSection.GetSection($"Tenants:{tenantCode}");
+        if (tenantSection.Exists())
         {
-            //complex type is present
-            return config.GetSection(key).Get<T>();
+            var mergedSection = new MergedConfigurationSection(tenantSection, defaultSection);
+            return mergedSection;
         }
 
-        if (config.GetSection(key).Value != null)
-            return config.GetValue<T>(key);
-
-        return defaultSection == null ? default : getValueOrComplexObject<T>(defaultSection, key);
+        return defaultSection;
     }
+
+    public IEnumerable<IConfigurationSection> GetChildren()
+        => GetTenantConfiguration().GetChildren();
+
+    public IChangeToken GetReloadToken()
+        => GetTenantConfiguration().GetReloadToken();
+
+    public IConfigurationSection GetSection(string key)
+        => GetTenantConfiguration().GetSection(key);
 }

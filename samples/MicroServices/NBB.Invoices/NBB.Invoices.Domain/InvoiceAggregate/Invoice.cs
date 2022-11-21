@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System;
+using System.Threading;
 using NBB.Domain;
 
 namespace NBB.Invoices.Domain.InvoiceAggregate
@@ -42,6 +43,12 @@ namespace NBB.Invoices.Domain.InvoiceAggregate
         {
             PaymentId = paymentId;
             AddEvent(new InvoicePayed(InvoiceId, paymentId, contractId));
+        }
+
+        public void Process()
+        {
+            Thread.Sleep(1000); //some computational havy stuff
+            //Processed = true;
         }
     }
 }

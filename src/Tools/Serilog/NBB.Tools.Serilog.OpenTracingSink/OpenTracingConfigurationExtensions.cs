@@ -14,7 +14,7 @@ namespace NBB.Tools.Serilog.OpenTracingSink
     {
         public static LoggerConfiguration OpenTracing(
             this LoggerSinkConfiguration sinkConfiguration,
-            LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum,
+            LogEventLevel restrictedToMinimumLevel = LogEventLevel.Warning,
             LoggingLevelSwitch levelSwitch = null,
             bool exludeOpenTracingContribEvents = true
         )

@@ -9,6 +9,7 @@ using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Tag;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,9 +34,16 @@ namespace NBB.Messaging.OpenTracing.Subscriber
                 .WithTag(Tags.Component, "NBB.Messaging")
                 .WithTag(Tags.SpanKind, Tags.SpanKindConsumer)
                 .WithTag(Tags.PeerService,
-                    context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var value) ? value : default)
+                    context.MessagingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var value)
+                        ? value
+                        : default)
                 .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
+                .WithTag(Tags.SamplingPriority, 1)
                 .StartActive(true);
+
+            foreach (var header in context.MessagingEnvelope.Headers)
+                scope.Span.SetTag(MessagingTags.MessagingEnvelopeHeaderSpanTagPrefix + header.Key.ToLower(), header.Value);
+
             try
             {
                 await next();

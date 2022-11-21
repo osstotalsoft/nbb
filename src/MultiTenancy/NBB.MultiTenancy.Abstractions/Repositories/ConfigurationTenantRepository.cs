@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,8 +45,13 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
 
         public Task<Tenant> Get(Guid id, CancellationToken token = default)
         {
+            if (!tenantMap.TryGetValue(id, out var result))
+            {
+                throw new TenantNotFoundException(id);
+            }
 
-            return Task.FromResult(tenantMap.TryGetValue(id, out var result) ? result : throw new Exception($"Tenant configuration not found for tenant {id}"));
+
+            return Task.FromResult(result.Enabled ? result : throw new Exception($"Tenant {result.Code} is disabled "));
         }
 
         public Task<Tenant> GetByHost(string host, CancellationToken token = default)
@@ -59,9 +66,14 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
 
             foreach (var tenantSection in tenants)
             {
-                var newTenant = _configurationSection.GetSection("Defaults").Get<Tenant>(options => options.BindNonPublicProperties = true) ?? new Tenant();
-                tenantSection.Bind(newTenant, options => options.BindNonPublicProperties = true);
-                newMap.TryAdd(newTenant.TenantId, newTenant);
+                var tenant = _configurationSection.GetSection("Defaults").Get<Tenant>(options => options.BindNonPublicProperties = true) ?? new Tenant();
+                tenantSection.Bind(tenant, options => options.BindNonPublicProperties = true);
+                tenant = tenant with { Code = tenantSection.Key };
+
+                if (tenant.IsValid())
+                {
+                    newMap.TryAdd(tenant.TenantId, tenant);
+                }
             }
 
             tenantMap = newMap;
@@ -71,6 +83,11 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         {
             var newTenant = Tenant.Default;
             tenantMap = new ConcurrentDictionary<Guid, Tenant>() { [newTenant.TenantId] = newTenant };
+        }
+
+        public Task<List<Tenant>> GetAll(CancellationToken token = default)
+        {
+            return Task.FromResult(tenantMap.Values.Where(t => t.Enabled).ToList());
         }
     }
 }

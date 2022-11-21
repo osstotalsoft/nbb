@@ -26,10 +26,8 @@ namespace NBB.ProcessManager.Definition
                 {
                     return typeInfo.IsPublic || typeInfo.IsNestedPublic;
                 }
-
                 return true;
             }
-
             return false;
         }
 

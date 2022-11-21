@@ -45,7 +45,14 @@ namespace NBB.Invoices.Api.Controllers
 
         // POST api/invoices
         [HttpPost]
-        public Task Post([FromBody]CreateInvoice command, CancellationToken cancellationToken)
+        public Task Create([FromBody]CreateInvoice command, CancellationToken cancellationToken)
+        {
+            return _messageBusPublisher.PublishAsync(command, cancellationToken);
+        }
+
+        // POST api/invoices/7327223E-22EA-48DC-BC44-FFF6AB3B9489/process
+        [HttpPost("{InvoiceId}/process")]
+        public Task Process([FromBody] ProcessInvoice command, CancellationToken cancellationToken)
         {
             return _messageBusPublisher.PublishAsync(command, cancellationToken);
         }

@@ -17,4 +17,10 @@ namespace ProcessManagerSample.Events
     public record OrderPaymentReceived(Guid OrderId, int DocumentId, int SiteId) : INotification;
 
     public record OrderShipped(Guid OrderId, int DocumentId, int SiteId) : INotification;
+
+    public record TimerTicked<T>(T Id) : INotification;
+
+    public record LoopcycleCompleted(Guid Id) : INotification;
+
+    public record LoopCompleted(Guid Id) : INotification;
 }

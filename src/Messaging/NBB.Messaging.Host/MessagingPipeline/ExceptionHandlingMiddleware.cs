@@ -44,9 +44,9 @@ namespace NBB.Messaging.Host
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    "Message of type {MessageType} could not be processed due to the following exception {Exception}.",
-                    context.MessagingEnvelope.Payload.GetType().GetPrettyName(), ex);
+                _logger.LogError(ex,
+                    "An unhandled exception has occurred while processing message of type {MessageType}.",
+                    context.MessagingEnvelope.Payload.GetType().GetPrettyName());
 
                 _deadLetterQueue.Push(context.MessagingEnvelope, context.TopicName, ex);
             }
