@@ -55,18 +55,16 @@ namespace NBB.ProcessManager.Runtime
             Emit(new ProcessStarted(identity));
         }
 
-        private bool IsObsoleteProcess() => Attribute.GetCustomAttribute(_definition.GetType(), typeof(ObsoleteAttribute)) != null;
-
+       
         public void ProcessEvent<TEvent>(TEvent @event)
         {
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
 
             if (State == InstanceStates.NotStarted && starter)
             {
-                if (IsObsoleteProcess())
+                if (_definition.IsObsolete())
                 {
-                    _logger.LogWarning($"Definition {_definition.GetType().GetLongPrettyName()} is obsolete and new process instances cannot be started.");
-                    return;
+                    throw new Exception($"Definition {_definition.GetType().GetLongPrettyName()} is obsolete and new process instances cannot be started.");
                 }
 
                 StartProcess(@event);

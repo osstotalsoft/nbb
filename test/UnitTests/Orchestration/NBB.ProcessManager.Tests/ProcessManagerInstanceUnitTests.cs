@@ -14,6 +14,7 @@ using NBB.ProcessManager.Definition;
 using Xunit;
 using Moq;
 using Microsoft.Extensions.Logging;
+using NBB.ProcessManager.Runtime.Events;
 
 namespace NBB.ProcessManager.Tests
 {
@@ -291,9 +292,55 @@ namespace NBB.ProcessManager.Tests
                     .Complete((@event, data) => @event.ShippingDate < DateTime.Parse("2019-09-08"));
             }
         }
+
+        [Fact]
+        public void Should_throw_when_starting_obsolete_processes()
+        {
+            var @event = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
+            var definition = new ObsoleteProcessManager();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
+
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
+            Action act = () => instance.ProcessEvent(@event);
+            act.Should().Throw<Exception>();
+        }
+
+        [Fact]
+        public void Should_handle_non_start_events_for_obsolete_processes()
+        {
+            var startEvent = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
+            var @event = new OrderShipped(startEvent.OrderId, DateTime.Now);
+            var definition = new ObsoleteProcessManager();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
+
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
+            instance.LoadFromHistory(new[] { new ProcessStarted(@event.OrderId) });
+            instance.ProcessEvent(@event);
+            instance.MarkChangesAsCommitted();
+            instance.Version.Should().Be(2);
+        }
+
+        [ObsoleteProcess]
+        class ObsoleteProcessManager : AbstractDefinition<OrderProcessManagerData>
+        {
+            public ObsoleteProcessManager()
+            {
+                Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
+                Event<OrderShipped>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
+
+                StartWith<OrderCreated>()
+                    .SendCommand((created, data) => new ShipOrder(created.OrderId, created.Amount, "bucuresti"));
+
+                When<OrderShipped>((@event, data) => @event.ShippingDate < DateTime.Parse("2019-09-08"))
+                    .Complete();
+
+                When<OrderShipped>()
+                    .Complete((@event, data) => @event.ShippingDate < DateTime.Parse("2019-09-08"));
+            }
+        }
     }
 
-    public record OrderProcessManagerData
+    public record struct OrderProcessManagerData
     {
         public Guid OrderId { get; init; }
         public int SiteId { get; init; }
