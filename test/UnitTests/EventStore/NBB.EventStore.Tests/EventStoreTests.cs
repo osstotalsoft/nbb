@@ -19,8 +19,9 @@ namespace NBB.EventStore.Tests
             //Arrange
             var eventRepository = new Mock<IEventRepository>();
             var eventSerDes = new Mock<IEventStoreSerDes>();
-            var sut = new NBB.EventStore.EventStore(eventRepository.Object, eventSerDes.Object, Mock.Of<ILogger<NBB.EventStore.EventStore>>());
-            var domainEvent = Mock.Of<object>();
+            var sut = new EventStore(eventRepository.Object, eventSerDes.Object, Mock.Of<ILogger<EventStore>>());
+            var domainEvent = new GenericEvent<GenericEvent<(int[], string)>>(new GenericEvent<(int[], string)>((new[] { 1, 2 }, "Test")));
+            var eventType = "NBB.EventStore.Tests.EventStoreTests+GenericEvent`1[[NBB.EventStore.Tests.EventStoreTests+GenericEvent`1[[System.ValueTuple`2[[System.Int32[], System.Private.CoreLib], [System.String, System.Private.CoreLib]], System.Private.CoreLib]], NBB.EventStore.Tests]], NBB.EventStore.Tests";
             var domainEvents = new List<object> { domainEvent };
             var stream = "stream";
 
@@ -28,8 +29,12 @@ namespace NBB.EventStore.Tests
             await sut.AppendEventsToStreamAsync(stream, domainEvents, null);
 
             //Assert
-            eventRepository.Verify(er => er.AppendEventsToStreamAsync(stream, It.IsAny<IList<EventDescriptor>>(), null, It.IsAny<CancellationToken>()), Times.Once);
+            eventRepository.Verify(er => er.AppendEventsToStreamAsync(stream,
+                It.Is<IList<EventDescriptor>>(list => list[0].EventType == eventType),
+                null, It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        public record GenericEvent<T>(T field);
 
     }
 }

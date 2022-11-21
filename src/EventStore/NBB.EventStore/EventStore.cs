@@ -64,8 +64,13 @@ namespace NBB.EventStore
 
         private static string GetFullTypeName(Type type)
         {
-            var result = type.FullName + ", " + type.Assembly.GetName().Name;
-            return result;
+            var typeName = type.FullName;
+            if (type.IsGenericType && type.GenericTypeArguments.Any())
+            {
+                var typeNameWithoutArgs=typeName.Remove(typeName.IndexOf("[["));
+                typeName = $"{typeNameWithoutArgs}[{string.Join(", ", type.GenericTypeArguments.Select(tn => $"[{GetFullTypeName(tn)}]"))}]";
+            }
+            return $"{typeName}, {type.Assembly.GetName().Name}";
         }
 
         private List<object> DeserializeEvents(string stream, List<EventDescriptor> eventDescriptors)
