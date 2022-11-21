@@ -40,24 +40,24 @@ namespace MicroServicesOrchestration
             Event<InvoiceMarkedAsPayed>(builder => builder.CorrelateById(ev => ev.ContractId.Value));
 
             StartWith<ContractValidated>()
-                .SendCommand((ev, state) => new CreateInvoice(ev.Amount, ev.ClientId, ev.ContractId))
-                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingInvoice, ContractId = ev.ContractId });
+                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingInvoice, ContractId = ev.ContractId })
+                .SendCommand((ev, state) => new CreateInvoice(ev.Amount, ev.ClientId, ev.ContractId));
 
             When<InvoiceCreated>((ev, state) => ev.ContractId.HasValue)
-                .SendCommand((ev, state) => new CreatePayable(ev.ClientId, ev.Amount, ev.InvoiceId, ev.ContractId))
-                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayable });
+                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayable })
+                .SendCommand((ev, state) => new CreatePayable(ev.ClientId, ev.Amount, ev.InvoiceId, ev.ContractId));
 
             When<PayableCreated>((ev, state) => ev.ContractId.HasValue)
-                .Schedule((ev, data) => new PayableExpired(ev.PayableId, ev.ContractId.Value), TimeSpan.FromDays(1))
-                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayment });
+                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.AwaitingPayment })
+                .Schedule((ev, data) => new PayableExpired(ev.PayableId, ev.ContractId.Value), TimeSpan.FromDays(1));
 
             When<PayableExpired>((ev, state) => state.Data.Status == InvoicingStatus.AwaitingPayment)
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.PaymentFailure })
                 .Complete();
 
             When<PaymentReceived>((ev, state) => ev.ContractId.HasValue && ev.InvoiceId.HasValue)
-                .SendCommand((ev, state) => new MarkInvoiceAsPayed(ev.InvoiceId.Value, ev.PaymentId))
-                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.PaymentReceived });
+                .SetState((ev, state) => state.Data with { Status = InvoicingStatus.PaymentReceived })
+                .SendCommand((ev, state) => new MarkInvoiceAsPayed(ev.InvoiceId.Value, ev.PaymentId));
 
             When<InvoiceMarkedAsPayed>()
                 .SetState((ev, state) => state.Data with { Status = InvoicingStatus.SuccessfullyCompleted })

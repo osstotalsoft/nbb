@@ -29,7 +29,7 @@ namespace ProcessManagerSample
             services.AddEventStore(es =>
             {
                 es.UseNewtownsoftJson();
-                es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+                es.UseInMemoryEventRepository();
             });
 
             services.AddMessagingHost(

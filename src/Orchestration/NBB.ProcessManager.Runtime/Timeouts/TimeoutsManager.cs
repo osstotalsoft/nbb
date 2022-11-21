@@ -61,7 +61,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
                 return;
             }
 
-            _logger.LogDebug("Polling for timeouts at {0}.", _currentTimeProvider());
+            _logger.LogDebug("Polling for timeouts at {0}.", _currentTimeProvider().ToLocalTime());
             var timeoutChunk = await _timeoutsRepository.GetNextBatch(_startSlice).ConfigureAwait(false);
 
             foreach (var timeoutData in timeoutChunk.DueTimeouts)
