@@ -9,7 +9,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <UserSecretsId>NBB_Contracts_6a73f87d-2175-4be0-9a42-31cb73bc8e10</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <DockerfileContext>..\..\..\..</DockerfileContext>
@@ -33,7 +33,7 @@
         <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
         <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" />
         <PackageReference Include="Jaeger.Senders.Thrift" Version="$(JaegerPackageVersion)" />
-        <PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" />
+        <!--<PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" />-->
     </ItemGroup>
 
     <ItemGroup>

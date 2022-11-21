@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>NBB_Mono_04f3de64-51a9-466b-a489-ed331aba59c8</UserSecretsId>
   </PropertyGroup>
 

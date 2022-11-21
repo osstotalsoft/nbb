@@ -93,7 +93,7 @@ namespace NBB.Contracts.Worker
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
                     // OpenTracing
-                    services.AddOpenTracingCoreServices(builder => builder.AddGenericDiagnostics().AddMicrosoftSqlClient());
+                    //services.AddOpenTracingCoreServices(builder => builder.AddGenericDiagnostics().AddMicrosoftSqlClient());
 
 
                     services.AddSingleton<ITracer>(serviceProvider =>

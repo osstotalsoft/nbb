@@ -5,7 +5,6 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,6 +16,7 @@ using NBB.MultiTenancy.AspNet;
 using NBB.Todos.Data;
 using NBB.Tools.Serilog.Enrichers.TenantId;
 using System;
+using ProblemDetailsOptions = Hellang.Middleware.ProblemDetails.ProblemDetailsOptions;
 
 namespace NBB.Todo.Api
 {
@@ -81,6 +81,7 @@ namespace NBB.Todo.Api
 
         }
 
+        //TODO refactor ProblemDetails with AspNet.Core implementations 
         public static ProblemDetailsOptions ConfigureProblemDetails(ProblemDetailsOptions options, bool includeExceptionDetails = true)
         {
             includeExceptionDetails = includeExceptionDetails && Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
