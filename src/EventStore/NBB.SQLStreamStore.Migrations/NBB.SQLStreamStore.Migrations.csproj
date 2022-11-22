@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>NBB_SqlStreamStore_Migrations_cc6382af-cd19-4d46-8084-9dca6c4ab82b</UserSecretsId>
   </PropertyGroup>
 

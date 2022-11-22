@@ -73,12 +73,12 @@ namespace NBB.Contracts.Api
             services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
 
             // OpenTracing
-            services.AddOpenTracingCoreServices(builder => builder
-                .AddAspNetCore()
-                .AddHttpHandler()
-                .AddGenericDiagnostics(x => x.IgnoredListenerNames.Add("Grpc.Net.Client"))
-                .AddLoggerProvider()
-                .AddMicrosoftSqlClient());
+            //services.AddOpenTracingCoreServices(builder => builder
+            //    .AddAspNetCore()
+            //    .AddHttpHandler()
+            //    .AddGenericDiagnostics(x => x.IgnoredListenerNames.Add("Grpc.Net.Client"))
+            //    .AddLoggerProvider()
+            //    .AddMicrosoftSqlClient());
 
             services.AddSingleton<ITracer>(serviceProvider =>
             {

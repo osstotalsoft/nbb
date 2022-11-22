@@ -8,14 +8,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Description>Extensions for creating new columns in sql Server for Serilog Table</Description>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
