@@ -2,12 +2,12 @@
 // This source code is licensed under the MIT license.
 
 using NBB.Core.Abstractions;
-using NBB.Correlation;
 using NBB.Messaging.Abstractions;
-using OpenTracing;
-using OpenTracing.Propagation;
-using OpenTracing.Tag;
+using OpenTelemetry;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Context.Propagation;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,57 +16,56 @@ namespace NBB.Messaging.OpenTracing.Publisher
     public class OpenTracingPublisherDecorator : IMessageBusPublisher
     {
         private readonly IMessageBusPublisher _inner;
-        private readonly ITracer _tracer;
         private readonly ITopicRegistry _topicRegistry;
 
-        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITracer tracer, ITopicRegistry topicRegistry)
+        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITopicRegistry topicRegistry)
         {
             _inner = inner;
-            _tracer = tracer;
             _topicRegistry = topicRegistry;
         }
 
-        public Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
+        private static ActivitySource activitySource = new(MessagingTags.ComponentMessaging); //, System.Reflection.Assembly.GetCallingAssembly().GetName().Version.ToString());
+        private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
+
+        public async Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
             CancellationToken cancellationToken = default)
         {
             options ??= MessagingPublisherOptions.Default;
 
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {
-                if (_tracer.ActiveSpan != null)
-                {
-                    _tracer.Inject(_tracer.ActiveSpan.Context, BuiltinFormats.TextMap,
-                        new TextMapInjectAdapter(outgoingEnvelope.Headers));
-                }
 
+                if (Activity.Current != null)
+                {
+                    var contextToInject = Activity.Current.Context;
+                    Propagator.Inject(new PropagationContext(contextToInject, Baggage.Current), outgoingEnvelope.Headers, (headers, key, value) => headers[key] = value);
+                 }
+              
                 options.EnvelopeCustomizer?.Invoke(outgoingEnvelope);
-
-                if (_tracer.ActiveSpan != null)
-                {
-                    foreach (var header in outgoingEnvelope.Headers)
-                        _tracer.ActiveSpan.SetTag(MessagingTags.MessagingEnvelopeHeaderSpanTagPrefix + header.Key.ToLower(), header.Value);
-                }
             }
 
             var formattedTopicName = _topicRegistry.GetTopicForName(options.TopicName) ??
                                      _topicRegistry.GetTopicForMessageType(message.GetType());
             var operationName = $"Publisher {message.GetType().GetPrettyName()}";
 
-            using var scope = _tracer.BuildSpan(operationName)
-                .WithTag(Tags.Component, MessagingTags.ComponentMessaging)
-                .WithTag(Tags.SpanKind, Tags.SpanKindProducer)
-                .WithTag(Tags.MessageBusDestination, formattedTopicName)
-                .WithTag(MessagingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString())
-                .WithTag(Tags.SamplingPriority, 1)
-                .StartActive(true);
+                              
+            using var activity = activitySource.StartActivity(operationName, ActivityKind.Producer);
+            //activity?.SetTag(TraceSemanticConventions.AttributeMessagingSystem, "nats");
+            activity?.SetTag(TraceSemanticConventions.AttributeMessagingDestination, formattedTopicName);
+            activity?.SetTag(MessagingTags.CorrelationId, Correlation.CorrelationManager.GetCorrelationId()?.ToString());
+
+            //.WithTag(Tags.SamplingPriority, 1)
+
             try
             {
-                return _inner.PublishAsync(message, options with { EnvelopeCustomizer = NewCustomizer },
+                await _inner.PublishAsync(message, options with { EnvelopeCustomizer = NewCustomizer },
                     cancellationToken);
+
             }
             catch (Exception exception)
             {
-                scope.Span.SetException(exception);
+                activity?.SetStatus(ActivityStatusCode.Error, exception.Message );
+                activity?.RecordException(exception);
                 throw;
             }
         }

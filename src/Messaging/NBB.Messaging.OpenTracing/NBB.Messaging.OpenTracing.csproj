@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTracing" Version="$(OpenTracingPackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Api" Version="1.4.0-beta.3" />
+    <PackageReference Include="OpenTelemetry.SemanticConventions" Version="1.0.0-rc9.9" />
   </ItemGroup>
 
   <ItemGroup>
