@@ -11,9 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.OpenTracing;
-using NBB.Messaging.OpenTracing.Publisher;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Extensions.Propagators;
@@ -21,7 +19,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System;
-using System.Reflection;
 
 namespace NBB.Contracts.Api
 {
@@ -66,7 +63,7 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+            //services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
 
             // OpenTracing
             //services.AddOpenTracingCoreServices(builder => builder
@@ -108,7 +105,7 @@ namespace NBB.Contracts.Api
                         //    options.Endpoint = new Uri("http://kube-worker1.totalsoft.local:31034");//api/traces");
                         //})
                         .AddJaegerExporter()
-                        //.AddConsoleExporter()
+                    //.AddConsoleExporter()
                 );
                 services.Configure<JaegerExporterOptions>(Configuration.GetSection("OpenTelemetry:Jaeger"));
 

@@ -16,16 +16,19 @@ namespace NBB.Contracts.Application.CommandHandlers
         IRequestHandler<ValidateContract>
     {
         private readonly IEventSourcedRepository<Contract> _repository;
+        private readonly ContractDomainMetrics _domainMetrics;
 
-        public ContractCommandHandlers(IEventSourcedRepository<Contract> repository)
+        public ContractCommandHandlers(IEventSourcedRepository<Contract> repository, ContractDomainMetrics domainMetrics)
         {
             this._repository = repository;
+            _domainMetrics = domainMetrics;
         }
 
         public async Task<Unit> Handle(CreateContract command, CancellationToken cancellationToken)
         {
             var contract = new Contract(command.ClientId);
             await _repository.SaveAsync(contract, cancellationToken);
+            _domainMetrics.ContractCreated();
 
             return Unit.Value;
         }
@@ -44,6 +47,7 @@ namespace NBB.Contracts.Application.CommandHandlers
             var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
             contract.Validate();
             await _repository.SaveAsync(contract, cancellationToken);
+            _domainMetrics.ContractValidated();
 
             return Unit.Value;
         }

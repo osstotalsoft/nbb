@@ -1,32 +1,30 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Jaeger;
-using Jaeger.Reporters;
-using Jaeger.Samplers;
-using Jaeger.Senders.Thrift;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NBB.Contracts.Application;
 using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
-using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
-using NBB.Messaging.OpenTracing.Publisher;
-using OpenTracing;
-using OpenTracing.Noop;
-using OpenTracing.Util;
+using NBB.Messaging.OpenTracing;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace NBB.Contracts.Worker
 {
@@ -38,16 +36,11 @@ namespace NBB.Contracts.Worker
                 .CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, loggingBuilder) =>
                 {
-                    var env = hostingContext.HostingEnvironment.IsDevelopment();
-                    var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
-
                     Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Debug()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -89,42 +82,52 @@ namespace NBB.Contracts.Worker
                         b.UseAdoNetEventRepository(o => o.FromConfiguration());
                     });
 
-                    services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+                    //services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
-                    // OpenTracing
-                    //services.AddOpenTracingCoreServices(builder => builder.AddGenericDiagnostics().AddMicrosoftSqlClient());
+                    string serviceName = hostingContext.Configuration.GetValue<string>("OpenTelemetry:Jaeger:ServiceName");
+                    Action<ResourceBuilder> configureResource =
+                        r => r.AddService(serviceName, serviceVersion: "1.0", serviceInstanceId: Environment.MachineName);
 
-
-                    services.AddSingleton<ITracer>(serviceProvider =>
+                    if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
                     {
-                        if (!hostingContext.Configuration.GetValue<bool>("OpenTracing:Jaeger:IsEnabled"))
+                        Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+
+                        services.AddOpenTelemetryTracing(builder => builder
+                                .ConfigureResource(configureResource)
+                                .AddSource(MessagingTags.ComponentMessaging)
+                                .SetSampler(new AlwaysOnSampler())
+                                .AddEntityFrameworkCoreInstrumentation()
+                                .AddJaegerExporter()
+                        );
+                        services.Configure<JaegerExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Jaeger"));
+                    }
+
+                    if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
+                    {
+                        services.AddOpenTelemetryMetrics(options =>
                         {
-                            return NoopTracerFactory.Create();
-                        }
-
-                        string serviceName = Assembly.GetEntryAssembly().GetName().Name;
-
-                        ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
-                        ITracer tracer = new Tracer.Builder(serviceName)
-                            .WithLoggerFactory(loggerFactory)
-                            .WithSampler(new ConstSampler(true))
-                            .WithReporter(new RemoteReporter.Builder()
-                                .WithSender(new HttpSender(hostingContext.Configuration.GetValue<string>("OpenTracing:Jaeger:CollectorUrl")))
-                                .Build())
-                            .Build();
-
-                        GlobalTracer.Register(tracer);
-
-                        return tracer;
-                    });
-        
+                            options.ConfigureResource(configureResource)
+                                .AddRuntimeInstrumentation()
+                                .AddPrometheusHttpListener();
+                            AddContractMetrics(options);
+                        });
+                    }
+                    else
+                    {
+                        services.TryAddSingleton<ContractDomainMetrics>();
+                    }
                 });
 
             var host = builder.Build();
 
             await host.RunAsync();
+        }
+
+        public static MeterProviderBuilder AddContractMetrics(MeterProviderBuilder builder)
+        {
+            builder.AddMeter(ContractDomainMetrics.InstrumentationName);
+            return builder.AddInstrumentation<ContractDomainMetrics>();
         }
     }
 
@@ -141,7 +144,6 @@ namespace NBB.Contracts.Worker
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
-                    .UseOpenTracingMiddleware()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );
