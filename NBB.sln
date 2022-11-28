@@ -405,7 +405,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Configuration", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Core.Configuration.Tests", "test\UnitTests\Core\NBB.Core.Configuration.Tests\NBB.Core.Configuration.Tests.csproj", "{2A91E54D-F63C-4E92-9A6D-F15C7C55B0D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NBB.Messaging.Rusi.IntegrationTests", "test\Integration\NBB.Messaging.Rusi.IntegrationTests\NBB.Messaging.Rusi.IntegrationTests.csproj", "{2D002428-8D55-46BD-A588-84946E33B4EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.Rusi.IntegrationTests", "test\Integration\NBB.Messaging.Rusi.IntegrationTests\NBB.Messaging.Rusi.IntegrationTests.csproj", "{2D002428-8D55-46BD-A588-84946E33B4EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
