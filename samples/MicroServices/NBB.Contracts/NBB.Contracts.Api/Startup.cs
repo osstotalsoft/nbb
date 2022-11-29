@@ -11,7 +11,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.Abstractions;
 using NBB.Messaging.OpenTracing;
+using NBB.Messaging.OpenTracing.Publisher;
+using NBB.Messaging.OpenTracing.Subscriber;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Extensions.Propagators;
@@ -19,6 +22,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System;
+using System.Reflection;
 
 namespace NBB.Contracts.Api
 {
@@ -63,7 +67,7 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            //services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+            services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
 
             // OpenTracing
             //services.AddOpenTracingCoreServices(builder => builder
@@ -73,10 +77,10 @@ namespace NBB.Contracts.Api
             //    .AddLoggerProvider()
             //    .AddMicrosoftSqlClient());
 
-
+            var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
             string serviceName = Configuration.GetValue<string>("OpenTelemetry:Jaeger:ServiceName");
             Action<ResourceBuilder> configureResource =
-                r => r.AddService(serviceName, serviceVersion: "1.0", serviceInstanceId: Environment.MachineName);
+                r => r.AddService(serviceName, serviceVersion: assemblyVersion, serviceInstanceId: Environment.MachineName);
 
             if (Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
             {
@@ -84,28 +88,12 @@ namespace NBB.Contracts.Api
 
                 services.AddOpenTelemetryTracing(builder => builder
                         .ConfigureResource(configureResource)
-                        .AddSource(MessagingTags.ComponentMessaging)
+                        .AddSource(typeof(OpenTracingMiddleware).Assembly.GetName().Name)
                         .SetSampler(new AlwaysOnSampler())
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation(o => o.RecordException = true)
-                        //.AddAspNetInstrumentation(o => o.Enrich = (activity, eventName, rawObject) =>
-                        //{
-                        //    if (eventName.Equals("OnStartActivity"))
-                        //    {
-                        //        if (rawObject is HttpRequest httpRequest)
-                        //        {
-                        //            activity.SetTag("sampling.priority", "1");
-                        //        }
-                        //    }
-                        //})
-                        .AddEntityFrameworkCoreInstrumentation()
-                        //.AddJaegerExporter(options =>
-                        //{
-                        //    options.Protocol = OpenTelemetry.Exporter.JaegerExportProtocol.HttpBinaryThrift;
-                        //    options.Endpoint = new Uri("http://kube-worker1.totalsoft.local:31034");//api/traces");
-                        //})
+                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                         .AddJaegerExporter()
-                    //.AddConsoleExporter()
                 );
                 services.Configure<JaegerExporterOptions>(Configuration.GetSection("OpenTelemetry:Jaeger"));
 

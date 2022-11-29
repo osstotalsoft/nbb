@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NBB.Contracts.PublishedLanguage;
 using NBB.Contracts.ReadModel;
 using NBB.Messaging.Abstractions;
@@ -17,12 +18,14 @@ namespace NBB.Contracts.Api.Controllers
     public class ContractsController : Controller
     {
         private readonly IQueryable<ContractReadModel> _contractReadModelQuery;
+        private readonly ILogger<ContractsController> _logger;
         private readonly IMessageBusPublisher _messageBusPublisher;
 
-        public ContractsController(IMessageBusPublisher messageBusPublisher, IQueryable<ContractReadModel> contractReadModelQuery)
+        public ContractsController(IMessageBusPublisher messageBusPublisher, IQueryable<ContractReadModel> contractReadModelQuery, ILogger<ContractsController> logger)
         {
             _messageBusPublisher = messageBusPublisher;
             _contractReadModelQuery = contractReadModelQuery;
+            _logger = logger;
         }
 
 
@@ -67,6 +70,7 @@ namespace NBB.Contracts.Api.Controllers
         [HttpPost("{id}/validate")]
         public Task Post([FromBody]ValidateContract command, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Validating contract");
             return _messageBusPublisher.PublishAsync(command, cancellationToken);
         }
 

@@ -5,7 +5,6 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NBB.Contracts.Application;
 using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
@@ -21,10 +20,14 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
-using Serilog.Events;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using NBB.Messaging.Abstractions;
+using NBB.Messaging.OpenTracing.Publisher;
+using NBB.Tools.Serilog.OpenTracingSink;
+using System.Reflection;
+using NBB.Messaging.OpenTracing.Subscriber;
 
 namespace NBB.Contracts.Worker
 {
@@ -34,18 +37,14 @@ namespace NBB.Contracts.Worker
         {
             var builder = Host
                 .CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, loggingBuilder) =>
+                .UseSerilog((context, services, logConfig) =>
                 {
-                    Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Debug()
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                    logConfig
+                        .ReadFrom.Configuration(context.Configuration)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .CreateLogger();
-
-                    loggingBuilder.AddSerilog(dispose: true);
-                    loggingBuilder.AddFilter("Microsoft", logLevel => logLevel >= LogLevel.Warning);
-                    loggingBuilder.AddConsole();
+                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
+                        .WriteTo.OpenTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
@@ -82,12 +81,13 @@ namespace NBB.Contracts.Worker
                         b.UseAdoNetEventRepository(o => o.FromConfiguration());
                     });
 
-                    //services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+                    services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
+                    var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
                     string serviceName = hostingContext.Configuration.GetValue<string>("OpenTelemetry:Jaeger:ServiceName");
                     Action<ResourceBuilder> configureResource =
-                        r => r.AddService(serviceName, serviceVersion: "1.0", serviceInstanceId: Environment.MachineName);
+                        r => r.AddService(serviceName, serviceVersion: assemblyVersion, serviceInstanceId: Environment.MachineName);
 
                     if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
                     {
@@ -95,9 +95,9 @@ namespace NBB.Contracts.Worker
 
                         services.AddOpenTelemetryTracing(builder => builder
                                 .ConfigureResource(configureResource)
-                                .AddSource(MessagingTags.ComponentMessaging)
+                                .AddSource(typeof(OpenTracingMiddleware).Assembly.GetName().Name)
                                 .SetSampler(new AlwaysOnSampler())
-                                .AddEntityFrameworkCoreInstrumentation()
+                                .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                                 .AddJaegerExporter()
                         );
                         services.Configure<JaegerExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Jaeger"));
@@ -144,6 +144,7 @@ namespace NBB.Contracts.Worker
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
+                    .UseOpenTracingMiddleware()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );

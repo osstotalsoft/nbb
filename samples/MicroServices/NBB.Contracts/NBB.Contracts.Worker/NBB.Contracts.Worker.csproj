@@ -31,10 +31,12 @@
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
-    <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" />
-    <PackageReference Include="Jaeger.Senders.Thrift" Version="$(JaegerPackageVersion)" />
+	<PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+	<PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
+	<PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
 
-    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0-beta.3" />
+
+	<PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0-beta.3" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc9.9" />
     <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="1.4.0-beta.3" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.3" />
@@ -51,6 +53,7 @@
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj" />	  
     <ProjectReference Include="..\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
     <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
     <ProjectReference Include="..\NBB.Contracts.WriteModel.Data\NBB.Contracts.WriteModel.Data.csproj" />

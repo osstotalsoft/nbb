@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using MediatR;
+using Microsoft.Extensions.Logging;
 using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Contracts.PublishedLanguage;
 using NBB.Data.Abstractions;
@@ -17,11 +18,13 @@ namespace NBB.Contracts.Application.CommandHandlers
     {
         private readonly IEventSourcedRepository<Contract> _repository;
         private readonly ContractDomainMetrics _domainMetrics;
+        private readonly ILogger<ContractCommandHandlers> _logger;
 
-        public ContractCommandHandlers(IEventSourcedRepository<Contract> repository, ContractDomainMetrics domainMetrics)
+        public ContractCommandHandlers(IEventSourcedRepository<Contract> repository, ContractDomainMetrics domainMetrics, ILogger<ContractCommandHandlers> logger)
         {
             this._repository = repository;
             _domainMetrics = domainMetrics;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(CreateContract command, CancellationToken cancellationToken)
@@ -44,6 +47,8 @@ namespace NBB.Contracts.Application.CommandHandlers
 
         public async Task<Unit> Handle(ValidateContract command, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Validating contract");
+
             var contract = await _repository.GetByIdAsync(command.ContractId, cancellationToken);
             contract.Validate();
             await _repository.SaveAsync(contract, cancellationToken);

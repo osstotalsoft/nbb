@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace NBB.Messaging.OpenTracing.Publisher
 {
@@ -24,7 +25,8 @@ namespace NBB.Messaging.OpenTracing.Publisher
             _topicRegistry = topicRegistry;
         }
 
-        private static ActivitySource activitySource = new(MessagingTags.ComponentMessaging); //, System.Reflection.Assembly.GetCallingAssembly().GetName().Version.ToString());
+        private static readonly AssemblyName assemblyName = typeof(OpenTracingPublisherDecorator).Assembly.GetName();
+        private static readonly ActivitySource activitySource = new(assemblyName.Name, assemblyName.Version.ToString());
         private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 
         public async Task PublishAsync<T>(T message, MessagingPublisherOptions options = null,
@@ -46,16 +48,15 @@ namespace NBB.Messaging.OpenTracing.Publisher
 
             var formattedTopicName = _topicRegistry.GetTopicForName(options.TopicName) ??
                                      _topicRegistry.GetTopicForMessageType(message.GetType());
-            var operationName = $"Publisher {message.GetType().GetPrettyName()}";
+            var operationName = $"{message.GetType().GetPrettyName()} send";
 
-                              
+
             using var activity = activitySource.StartActivity(operationName, ActivityKind.Producer);
-            //activity?.SetTag(TraceSemanticConventions.AttributeMessagingSystem, "nats");
+            
             activity?.SetTag(TraceSemanticConventions.AttributeMessagingDestination, formattedTopicName);
             activity?.SetTag(MessagingTags.CorrelationId, Correlation.CorrelationManager.GetCorrelationId()?.ToString());
-
-            //.WithTag(Tags.SamplingPriority, 1)
-
+           
+ 
             try
             {
                 await _inner.PublishAsync(message, options with { EnvelopeCustomizer = NewCustomizer },

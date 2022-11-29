@@ -1,38 +1,31 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using OpenTracing;
-using OpenTracing.Util;
+using OpenTelemetry.Trace;
 using Serilog.Core;
 using Serilog.Events;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace NBB.Tools.Serilog.OpenTracingSink.Internal
 {
     internal class OpenTracingSink : ILogEventSink
     {
-        private readonly ITracer _tracer;
         private readonly Func<LogEvent, bool> _filter;
 
         public OpenTracingSink(Func<LogEvent, bool> filter = null)
         {
-            _tracer = GlobalTracer.Instance;
+           
             _filter = filter ?? (logEvent => false);
         }
 
         public void Emit(LogEvent logEvent)
         {
-            ISpan span = _tracer.ActiveSpan;
+            var activity = Activity.Current;
 
-            if (span == null)
+            if (!activity?.IsAllDataRequested ?? false)
             {
-                // Creating a new span for a log message seems brutal so we ignore messages if we can't attach it to an active span.
-                return;
-            }
-
-            if (_tracer.IsNoopTracer())
-            {
+                // Creating a new activity for a log message seems brutal so we ignore messages if we can't attach it to the current span.
                 return;
             }
 
@@ -40,32 +33,32 @@ namespace NBB.Tools.Serilog.OpenTracingSink.Internal
             {
                 return;
             }
-
-            var fields = new Dictionary<string, object>();
-
+           
             try
             {
-                fields[LogFields.Event] = "log";
-                fields[LogFields.Message] = logEvent.RenderMessage();
-                fields["level"] = logEvent.Level;
-
-                if (logEvent.Exception != null)
+                var tags = new ActivityTagsCollection
                 {
-                    fields[LogFields.ErrorKind] = logEvent.Exception.GetType().FullName;
-                    fields[LogFields.ErrorObject] = logEvent.Exception;
-                }
+                    { "Message", logEvent.RenderMessage() },
+                    { "LogLevel", logEvent.Level },
+                };
 
                 foreach (var property in logEvent.Properties)
                 {
-                    fields[property.Key] = property.Value.ToString();
+                    tags[property.Key] = property.Value.ToString();
+                }
+
+                var activityEvent = new ActivityEvent("log", logEvent.Timestamp, tags);
+                activity.AddEvent(activityEvent);
+
+                if (logEvent.Exception != null)
+                {
+                    activity.RecordException(logEvent.Exception);
                 }
             }
             catch (Exception logException)
             {
-                fields["opentracing.contrib.netcore.error"] = logException.ToString();
+                activity.RecordException(logException);               
             }
-
-            span.Log(fields);
         }
     }
 }
