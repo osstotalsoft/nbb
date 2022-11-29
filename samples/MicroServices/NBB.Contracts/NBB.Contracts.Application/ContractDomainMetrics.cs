@@ -17,7 +17,7 @@ namespace NBB.Contracts.Application
 
         public ContractDomainMetrics()
         {
-            _meter = new Meter(AssemblyName.Name, AssemblyName.Version.ToString());
+            _meter = new Meter(AssemblyName.Name);
             _contracts = _meter.CreateCounter<int>("nbb.contracts.created.count");
             _validatedContracts = _meter.CreateCounter<int>("nbb.contracts.validated.count");
 
