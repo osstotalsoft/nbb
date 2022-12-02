@@ -4,7 +4,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation.Serilog;
-using NBB.Tools.Serilog.OpenTracingSink;
+using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 using Serilog;
 
 namespace NBB.Contracts.Api
@@ -25,7 +25,7 @@ namespace NBB.Contracts.Api
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
-                        .WriteTo.OpenTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+                        .WriteTo.OpenTelemetryTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
                 })
                 //.ConfigureLogging(config =>
                 //{

@@ -138,7 +138,7 @@ services.AddMessagingHost(
             .UsePipeline(builder => builder
                 .UseCorrelationMiddleware()
                 .UseExceptionHandlingMiddleware()
-                .UseOpenTracing()
+                .UseOpenTelemetry()
                 .UseDefaultResiliencyMiddleware()
                 .UseMiddleware<ReceiveEventMediatRMiddleware>());
     }));
@@ -353,15 +353,15 @@ Includes the following resiliency policies for incoming messages:
 ```
 Tipically configured last in the pipeline, it acts as a message dispatcher (broker) that delivers messages to MediatR handlers
 
-#### built-in OpenTracing middleware
+#### built-in OpenTelemetry middleware
 
 ```csharp
-.UsePipeline(pipelineBuilder => pipelineBuilder.UseOpenTracing())
+.UsePipeline(pipelineBuilder => pipelineBuilder.UseOpenTelemetry())
 ```
 
-Typically configured early in the pipeline, it creates an OpenTracing span for incoming message processing and correlates it with the publisher span.
+Typically configured early in the pipeline, it creates an OpenTelemetry span for incoming message processing and correlates it with the publisher span.
 
-To use it you must reference the *NBB.Messaging.OpenTracing* package
+To use it you must reference the *NBB.Messaging.OpenTelemetry* package
 
 #### built-in Multi Tenant middleware
 

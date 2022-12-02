@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-namespace NBB.Messaging.OpenTracing
+namespace NBB.Messaging.OpenTelemetry
 {
     public static class MessagingTags
     {

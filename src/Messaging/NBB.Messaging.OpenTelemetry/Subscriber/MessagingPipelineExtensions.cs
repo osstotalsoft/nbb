@@ -3,7 +3,7 @@
 
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTracing.Subscriber;
+using NBB.Messaging.OpenTelemetry.Subscriber;
 
 // ReSharper disable once CheckNamespace
 namespace NBB.Messaging.Host;
@@ -11,13 +11,13 @@ namespace NBB.Messaging.Host;
 public static class MessagingPipelineExtensions
 {
     /// <summary>
-    /// Adds to the pipeline a middleware that creates an OpenTracing span.
+    /// Adds to the pipeline a middleware that creates an OpenTelemetry span.
     /// </summary>
     /// <param name="pipelineBuilder">The pipeline builder.</param>
     /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-    public static IPipelineBuilder<MessagingContext> UseOpenTracingMiddleware(
+    public static IPipelineBuilder<MessagingContext> UseOpenTelemetryMiddleware(
         this IPipelineBuilder<MessagingContext> pipelineBuilder)
-        => UseMiddleware<OpenTracingMiddleware>(pipelineBuilder);
+        => UseMiddleware<OpenTelemetryMiddleware>(pipelineBuilder);
 
 
     private static IPipelineBuilder<MessagingContext> UseMiddleware<TMiddleware>(

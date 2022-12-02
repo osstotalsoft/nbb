@@ -12,7 +12,7 @@ using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Messaging.Host;
-using NBB.Messaging.OpenTracing;
+using NBB.Messaging.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Extensions.Propagators;
@@ -24,10 +24,10 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTracing.Publisher;
-using NBB.Tools.Serilog.OpenTracingSink;
+using NBB.Messaging.OpenTelemetry.Publisher;
 using System.Reflection;
-using NBB.Messaging.OpenTracing.Subscriber;
+using NBB.Messaging.OpenTelemetry.Subscriber;
+using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 
 namespace NBB.Contracts.Worker
 {
@@ -44,7 +44,7 @@ namespace NBB.Contracts.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
-                        .WriteTo.OpenTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+                        .WriteTo.OpenTelemetryTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
@@ -81,7 +81,7 @@ namespace NBB.Contracts.Worker
                         b.UseAdoNetEventRepository(o => o.FromConfiguration());
                     });
 
-                    services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+                    services.Decorate<IMessageBusPublisher, OpenTelemetryPublisherDecorator>();
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
                     var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
@@ -95,7 +95,7 @@ namespace NBB.Contracts.Worker
 
                         services.AddOpenTelemetryTracing(builder => builder
                                 .ConfigureResource(configureResource)
-                                .AddSource(typeof(OpenTracingMiddleware).Assembly.GetName().Name)
+                                .AddSource(typeof(OpenTelemetryMiddleware).Assembly.GetName().Name)
                                 .SetSampler(new AlwaysOnSampler())
                                 .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                                 .AddJaegerExporter()
@@ -144,7 +144,7 @@ namespace NBB.Contracts.Worker
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
-                    .UseOpenTracingMiddleware()
+                    .UseOpenTelemetryMiddleware()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );

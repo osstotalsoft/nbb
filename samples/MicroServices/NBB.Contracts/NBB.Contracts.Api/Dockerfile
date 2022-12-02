@@ -24,7 +24,7 @@ COPY ["src/Messaging/NBB.Messaging.Nats/NBB.Messaging.Nats.csproj", "src/Messagi
 COPY ["src/Correlation/NBB.Correlation.AspNet/NBB.Correlation.AspNet.csproj", "src/Correlation/NBB.Correlation.AspNet/"]
 COPY ["samples/MicroServices/NBB.Contracts/NBB.Contracts.PublishedLanguage/NBB.Contracts.PublishedLanguage.csproj", "samples/MicroServices/NBB.Contracts/NBB.Contracts.PublishedLanguage/"]
 COPY ["src/Messaging/NBB.Messaging.BackwardCompatibility/NBB.Messaging.BackwardCompatibility.csproj", "src/Messaging/NBB.Messaging.BackwardCompatibility/"]
-COPY ["src/Messaging/NBB.Messaging.OpenTracing/NBB.Messaging.OpenTracing.csproj", "src/Messaging/NBB.Messaging.OpenTracing/"]
+COPY ["src/Messaging/NBB.Messaging.OpenTelemetry/NBB.Messaging.OpenTelemetry.csproj", "src/Messaging/NBB.Messaging.OpenTelemetry/"]
 COPY ["samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/NBB.Contracts.ReadModel.Data.csproj", "samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/"]
 COPY ["samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel/NBB.Contracts.ReadModel.csproj", "samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel/"]
 COPY ["src/Data/NBB.Data.EntityFramework/NBB.Data.EntityFramework.csproj", "src/Data/NBB.Data.EntityFramework/"]

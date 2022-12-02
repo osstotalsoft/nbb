@@ -6,4 +6,4 @@ The package [`NBB.Tools.Serilog.Enrichers.ServiceIdentifier`](NBB.Tools.Serilog.
 
 The package [`NBB.Tools.Serilog.Enrichers.TenantId`](NBB.Tools.Serilog.Enrichers.TenantId) provides an enricher for tenant id from nbb tenant context.
 
-The package [`NBB.Tools.Serilog.OpenTracingSink`](NBB.Tools.Serilog.OpenTracingSink) provides a sink for serilog and opentracing.
+The package [`NBB.Tools.Serilog.OpenTelemetryTracingSink`](NBB.Tools.Serilog.OpenTelemetrySink) provides a sink for serilog and OpenTelemetry.

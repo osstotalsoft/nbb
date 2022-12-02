@@ -3,9 +3,7 @@
 
 using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
-using NBB.Correlation;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTracing.Publisher;
 using OpenTelemetry;
 using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Trace;
@@ -16,11 +14,11 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBB.Messaging.OpenTracing.Subscriber
+namespace NBB.Messaging.OpenTelemetry.Subscriber
 {
-    public class OpenTracingMiddleware : IPipelineMiddleware<MessagingContext>
+    public class OpenTelemetryMiddleware : IPipelineMiddleware<MessagingContext>
     {
-        private static readonly AssemblyName assemblyName = typeof(OpenTracingMiddleware).Assembly.GetName();
+        private static readonly AssemblyName assemblyName = typeof(OpenTelemetryMiddleware).Assembly.GetName();
         private static readonly ActivitySource ActivitySource = new(assemblyName.Name, assemblyName.Version.ToString());
         private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 

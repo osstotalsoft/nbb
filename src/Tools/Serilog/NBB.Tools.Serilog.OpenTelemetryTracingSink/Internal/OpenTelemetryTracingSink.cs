@@ -7,15 +7,15 @@ using Serilog.Events;
 using System;
 using System.Diagnostics;
 
-namespace NBB.Tools.Serilog.OpenTracingSink.Internal
+namespace NBB.Tools.Serilog.OpenTelemetryTracingSink.Internal
 {
-    internal class OpenTracingSink : ILogEventSink
+    internal class OpenTelemetryTracingSink : ILogEventSink
     {
         private readonly Func<LogEvent, bool> _filter;
 
-        public OpenTracingSink(Func<LogEvent, bool> filter = null)
+        public OpenTelemetryTracingSink(Func<LogEvent, bool> filter = null)
         {
-           
+
             _filter = filter ?? (logEvent => false);
         }
 
@@ -33,7 +33,7 @@ namespace NBB.Tools.Serilog.OpenTracingSink.Internal
             {
                 return;
             }
-           
+
             try
             {
                 var tags = new ActivityTagsCollection
@@ -57,7 +57,7 @@ namespace NBB.Tools.Serilog.OpenTracingSink.Internal
             }
             catch (Exception logException)
             {
-                activity.RecordException(logException);               
+                activity.RecordException(logException);
             }
         }
     }

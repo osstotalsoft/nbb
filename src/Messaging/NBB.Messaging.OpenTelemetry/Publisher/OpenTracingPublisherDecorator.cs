@@ -12,20 +12,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
 
-namespace NBB.Messaging.OpenTracing.Publisher
+namespace NBB.Messaging.OpenTelemetry.Publisher
 {
-    public class OpenTracingPublisherDecorator : IMessageBusPublisher
+    public class OpenTelemetryPublisherDecorator : IMessageBusPublisher
     {
         private readonly IMessageBusPublisher _inner;
         private readonly ITopicRegistry _topicRegistry;
 
-        public OpenTracingPublisherDecorator(IMessageBusPublisher inner, ITopicRegistry topicRegistry)
+        public OpenTelemetryPublisherDecorator(IMessageBusPublisher inner, ITopicRegistry topicRegistry)
         {
             _inner = inner;
             _topicRegistry = topicRegistry;
         }
 
-        private static readonly AssemblyName assemblyName = typeof(OpenTracingPublisherDecorator).Assembly.GetName();
+        private static readonly AssemblyName assemblyName = typeof(OpenTelemetryPublisherDecorator).Assembly.GetName();
         private static readonly ActivitySource activitySource = new(assemblyName.Name, assemblyName.Version.ToString());
         private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 

@@ -12,9 +12,8 @@ using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTracing;
-using NBB.Messaging.OpenTracing.Publisher;
-using NBB.Messaging.OpenTracing.Subscriber;
+using NBB.Messaging.OpenTelemetry.Publisher;
+using NBB.Messaging.OpenTelemetry.Subscriber;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Extensions.Propagators;
@@ -67,10 +66,10 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+            services.Decorate<IMessageBusPublisher, OpenTelemetryPublisherDecorator>();
 
-            // OpenTracing
-            //services.AddOpenTracingCoreServices(builder => builder
+            // OpenTelemetry
+            //services.AddOpenTelemetryCoreServices(builder => builder
             //    .AddAspNetCore()
             //    .AddHttpHandler()
             //    .AddGenericDiagnostics(x => x.IgnoredListenerNames.Add("Grpc.Net.Client"))
@@ -88,7 +87,7 @@ namespace NBB.Contracts.Api
 
                 services.AddOpenTelemetryTracing(builder => builder
                         .ConfigureResource(configureResource)
-                        .AddSource(typeof(OpenTracingMiddleware).Assembly.GetName().Name)
+                        .AddSource(typeof(OpenTelemetryMiddleware).Assembly.GetName().Name)
                         .SetSampler(new AlwaysOnSampler())
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation(o => o.RecordException = true)

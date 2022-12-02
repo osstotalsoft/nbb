@@ -32,7 +32,6 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
 	<PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
-	<PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
 	<PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
 
 
@@ -51,9 +50,9 @@
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj" />	  
+    <ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTelemetryTracingSink\NBB.Tools.Serilog.OpenTelemetryTracingSink.csproj" />	  
     <ProjectReference Include="..\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
     <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
     <ProjectReference Include="..\NBB.Contracts.WriteModel.Data\NBB.Contracts.WriteModel.Data.csproj" />

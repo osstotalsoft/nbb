@@ -26,4 +26,4 @@ There is a dedicated messaging header **nbb-correlationID** interpreted by:
 ### Open Tracing integration
 A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans. 
 
-For details see [`NBB.Messaging.OpenTracing`](./../Messaging/NBB.Messaging.OpenTracing#readme)
+For details see [`NBB.Messaging.OpenTelemetry`](./../Messaging/NBB.Messaging.OpenTelemetry#readme)
