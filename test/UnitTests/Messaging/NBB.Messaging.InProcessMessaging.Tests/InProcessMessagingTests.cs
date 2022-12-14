@@ -30,6 +30,23 @@ namespace NBB.Messaging.InProcessMessaging.Tests
 
         }
 
+        //[Fact]
+        //public async Task unsubscribe_should_stop_broker_task()
+        //{
+        //    //Arrange
+        //    using var sp = BuildServiceProvider();
+        //    var msgBus = sp.GetRequiredService<IMessageBus>();
+
+        //    //Act
+        //    var sub = await msgBus.SubscribeAsync(e => Task.CompletedTask, options: MessagingSubscriberOptions.Default with { TopicName = "SomeTopic" });
+        //    sub.Dispose();
+        //    await Task.Delay(10000);
+
+        //    //Assert
+
+
+        //}
+
         private ServiceProvider BuildServiceProvider()
         {
             var services = new ServiceCollection();
