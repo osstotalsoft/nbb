@@ -29,7 +29,6 @@ namespace NBB.Messaging.OpenTelemetry.Subscriber
         public OpenTelemetrySubscriberDecorator(IMessageBusSubscriber inner)
         {
             _inner = inner;
-            //_topicRegistry = topicRegistry;
         }
 
         public Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler, MessagingSubscriberOptions options = null, CancellationToken cancellationToken = default)
