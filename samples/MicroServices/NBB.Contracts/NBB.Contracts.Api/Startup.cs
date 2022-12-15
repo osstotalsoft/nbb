@@ -77,7 +77,7 @@ namespace NBB.Contracts.Api
                         .SetSampler(new AlwaysOnSampler())
                         .AddMessageBusInstrumentation()
                         .AddHttpClientInstrumentation()
-                        .AddAspNetCoreInstrumentation(o => o.RecordException = true)
+                        .AddAspNetCoreInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                         .AddJaegerExporter()
                 );
