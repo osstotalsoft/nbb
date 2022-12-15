@@ -64,15 +64,6 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            // OpenTelemetry
-            //services.AddOpenTelemetryCoreServices(builder => builder
-            //    .AddAspNetCore()
-            //    .AddHttpHandler()
-            //    .AddGenericDiagnostics(x => x.IgnoredListenerNames.Add("Grpc.Net.Client"))
-            //    .AddLoggerProvider()
-            //    .AddMicrosoftSqlClient());
-
-
             var assembly = Assembly.GetExecutingAssembly().GetName();
             void configureResource(ResourceBuilder r) =>
                 r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
