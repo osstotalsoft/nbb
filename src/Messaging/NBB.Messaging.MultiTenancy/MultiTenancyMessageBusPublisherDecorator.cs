@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -42,6 +43,8 @@ namespace NBB.Messaging.MultiTenancy
 
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {
+                Activity.Current?.SetTag("nbb.tenant_id", tenantId);
+
                 outgoingEnvelope.SetHeader(MessagingHeaders.TenantId, tenantId.ToString());
                 options.EnvelopeCustomizer?.Invoke(outgoingEnvelope);
             }

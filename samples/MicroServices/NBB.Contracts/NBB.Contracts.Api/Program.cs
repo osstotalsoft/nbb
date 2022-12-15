@@ -25,20 +25,8 @@ namespace NBB.Contracts.Api
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
-                        .WriteTo.OpenTelemetryTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+                        .WriteTo.OpenTelemetryTracing();
                 })
-                //.ConfigureLogging(config =>
-                //{
-                //
-                //    config.AddOpenTelemetry(options =>
-                //    {
-                //        options.IncludeFormattedMessage = true;
-                //        //options.IncludeScopes = true;
-                //        //options.ParseStateValues = true;
-                //        options.AttachLogsToActivityEvent(); // <PackageReference Include="OpenTelemetry.Extensions" Version="1.0.0-beta.3" />
-                //        options.AddConsoleExporter();                        
-                //    });
-                //})
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

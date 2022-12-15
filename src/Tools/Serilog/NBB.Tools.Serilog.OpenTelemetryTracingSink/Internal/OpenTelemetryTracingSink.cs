@@ -23,7 +23,7 @@ namespace NBB.Tools.Serilog.OpenTelemetryTracingSink.Internal
         {
             var activity = Activity.Current;
 
-            if (!activity?.IsAllDataRequested ?? false)
+            if (!(activity?.IsAllDataRequested ?? false))
             {
                 // Creating a new activity for a log message seems brutal so we ignore messages if we can't attach it to the current span.
                 return;

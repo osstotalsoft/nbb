@@ -11,11 +11,19 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NBB.Correlation;
 using NBB.Correlation.AspNet;
+using NBB.Messaging.OpenTelemetry;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.AspNet;
 using NBB.Todos.Data;
 using NBB.Tools.Serilog.Enrichers.TenantId;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System;
+using System.Reflection;
 using ProblemDetailsOptions = Hellang.Middleware.ProblemDetails.ProblemDetailsOptions;
 
 namespace NBB.Todo.Api
@@ -52,6 +60,38 @@ namespace NBB.Todo.Api
             services.AddSingleton<TenantEnricher>();
 
             services.AddProblemDetails(config => ConfigureProblemDetails(config));
+
+            var assembly = Assembly.GetExecutingAssembly().GetName();
+            void configureResource(ResourceBuilder r) =>
+                r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
+
+            if (Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
+            {
+                Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+
+                services.AddOpenTelemetryTracing(builder => builder
+                        .ConfigureResource(configureResource)
+                        .SetSampler(new AlwaysOnSampler())
+                        .AddHttpClientInstrumentation()
+                        .AddAspNetCoreInstrumentation(o => o.RecordException = true)
+                        .AddMessageBusInstrumentation()
+                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                        .AddJaegerExporter()
+                );
+                services.Configure<JaegerExporterOptions>(Configuration.GetSection("OpenTelemetry:Jaeger"));
+            }
+
+            if (Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
+            {
+                services.AddOpenTelemetryMetrics(options =>
+                {
+                    options.ConfigureResource(configureResource)
+                        .AddRuntimeInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddAspNetCoreInstrumentation()
+                        .AddPrometheusExporter();
+                });
+            }
 
         }
 

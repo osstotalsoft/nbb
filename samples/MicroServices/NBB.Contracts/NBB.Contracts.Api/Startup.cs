@@ -11,9 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTelemetry.Publisher;
-using NBB.Messaging.OpenTelemetry.Subscriber;
+using NBB.Messaging.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Extensions.Propagators;
@@ -66,8 +64,6 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            services.Decorate<IMessageBusPublisher, OpenTelemetryPublisherDecorator>();
-
             // OpenTelemetry
             //services.AddOpenTelemetryCoreServices(builder => builder
             //    .AddAspNetCore()
@@ -76,10 +72,10 @@ namespace NBB.Contracts.Api
             //    .AddLoggerProvider()
             //    .AddMicrosoftSqlClient());
 
-            var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-            string serviceName = Configuration.GetValue<string>("OpenTelemetry:Jaeger:ServiceName");
-            Action<ResourceBuilder> configureResource =
-                r => r.AddService(serviceName, serviceVersion: assemblyVersion, serviceInstanceId: Environment.MachineName);
+
+            var assembly = Assembly.GetExecutingAssembly().GetName();
+            void configureResource(ResourceBuilder r) =>
+                r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
 
             if (Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
             {
@@ -87,20 +83,14 @@ namespace NBB.Contracts.Api
 
                 services.AddOpenTelemetryTracing(builder => builder
                         .ConfigureResource(configureResource)
-                        .AddSource(typeof(OpenTelemetryMiddleware).Assembly.GetName().Name)
                         .SetSampler(new AlwaysOnSampler())
+                        .AddMessageBusInstrumentation()
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation(o => o.RecordException = true)
                         .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                         .AddJaegerExporter()
                 );
                 services.Configure<JaegerExporterOptions>(Configuration.GetSection("OpenTelemetry:Jaeger"));
-
-                // Customize the HttpClient that will be used when JaegerExporter is configured for HTTP transport.
-                //services.AddHttpClient("JaegerExporter", configureClient: (client) => client.DefaultRequestHeaders.Add("X-MyCustomHeader", "value"));
-
-                // For options which can be bound from IConfiguration.
-                //services.Configure<AspNetCoreInstrumentationOptions>(Configuration.GetSection("AspNetCoreInstrumentation"));
             }
 
             if (Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))

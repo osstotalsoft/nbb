@@ -23,10 +23,7 @@ using Serilog;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTelemetry.Publisher;
 using System.Reflection;
-using NBB.Messaging.OpenTelemetry.Subscriber;
 using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 
 namespace NBB.Contracts.Worker
@@ -81,13 +78,11 @@ namespace NBB.Contracts.Worker
                         b.UseAdoNetEventRepository(o => o.FromConfiguration());
                     });
 
-                    services.Decorate<IMessageBusPublisher, OpenTelemetryPublisherDecorator>();
                     services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
 
-                    var assemblyVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
-                    string serviceName = hostingContext.Configuration.GetValue<string>("OpenTelemetry:Jaeger:ServiceName");
-                    Action<ResourceBuilder> configureResource =
-                        r => r.AddService(serviceName, serviceVersion: assemblyVersion, serviceInstanceId: Environment.MachineName);
+                    var assembly = Assembly.GetExecutingAssembly().GetName();
+                    void configureResource(ResourceBuilder r) =>
+                        r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
 
                     if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
                     {
@@ -95,8 +90,8 @@ namespace NBB.Contracts.Worker
 
                         services.AddOpenTelemetryTracing(builder => builder
                                 .ConfigureResource(configureResource)
-                                .AddSource(typeof(OpenTelemetryMiddleware).Assembly.GetName().Name)
                                 .SetSampler(new AlwaysOnSampler())
+                                .AddMessageBusInstrumentation()
                                 .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                                 .AddJaegerExporter()
                         );
@@ -144,7 +139,6 @@ namespace NBB.Contracts.Worker
                 .UsePipeline(pipelineBuilder => pipelineBuilder
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
-                    .UseOpenTelemetryMiddleware()
                     .UseDefaultResiliencyMiddleware()
                     .UseMediatRMiddleware()
                 );

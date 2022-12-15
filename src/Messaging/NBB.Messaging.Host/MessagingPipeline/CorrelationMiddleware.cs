@@ -2,11 +2,12 @@
 // This source code is licensed under the MIT license.
 
 using NBB.Core.Pipeline;
-using NBB.Correlation;
 using NBB.Messaging.Abstractions;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CorrelationManager = NBB.Correlation.CorrelationManager;
 
 // ReSharper disable once CheckNamespace
 namespace NBB.Messaging.Host
@@ -21,6 +22,8 @@ namespace NBB.Messaging.Host
         {
             using (CorrelationManager.NewCorrelationId(context.MessagingEnvelope.GetCorrelationId()))
             {
+                Activity.Current?.SetTag("nbb.correlation_id", CorrelationManager.GetCorrelationId()?.ToString());
+
                 await next();
             }
         }
