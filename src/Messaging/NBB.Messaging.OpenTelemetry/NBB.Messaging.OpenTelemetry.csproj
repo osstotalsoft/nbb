@@ -6,8 +6,8 @@
 
   <ItemGroup>
 	<PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
-    <PackageReference Include="OpenTelemetry" Version="1.4.0-beta.3" />
-    <PackageReference Include="OpenTelemetry.Api" Version="1.4.0-beta.3" />
+    <PackageReference Include="OpenTelemetry" Version="$(OpenTelemetryCorePackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Api" Version="$(OpenTelemetryCorePackageVersion)" />
     <PackageReference Include="OpenTelemetry.SemanticConventions" Version="1.0.0-rc9.9" />
   </ItemGroup>
 

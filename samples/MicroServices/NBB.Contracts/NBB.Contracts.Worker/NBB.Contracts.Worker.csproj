@@ -35,12 +35,12 @@
 	<PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
 
 
-	<PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0-beta.3" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc9.9" />
-    <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="1.4.0-beta.3" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.3" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.1.0-beta.1" />
-    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="1.4.0-beta.3" />
+	<PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OpenTelemetryCorePackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationRuntimePackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="$(OpenTelemetryExporterPrometheusHttpListenerPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
