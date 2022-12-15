@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR.Contracts" Version="$(MediatRContractsPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Domain\NBB.Domain\NBB.Domain.csproj" />
   </ItemGroup>
 
