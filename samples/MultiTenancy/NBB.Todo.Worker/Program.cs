@@ -24,6 +24,7 @@ using OpenTelemetry.Resources;
 using System.Reflection;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
+using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 
 namespace NBB.Todo.Worker
 {
@@ -62,6 +63,7 @@ namespace NBB.Todo.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .Enrich.With(services.GetRequiredService<TenantEnricher>())
+                        .WriteTo.OpenTelemetryTracing()
                         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
                 })
                 .UseConsoleLifetime()

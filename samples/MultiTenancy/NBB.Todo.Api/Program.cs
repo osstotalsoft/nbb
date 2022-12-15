@@ -7,6 +7,7 @@ using Serilog;
 using NBB.Correlation.Serilog;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Tools.Serilog.Enrichers.TenantId;
+using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 
 namespace NBB.Todo.Api
 {
@@ -28,8 +29,9 @@ namespace NBB.Todo.Api
                         .ReadFrom.Configuration(context.Configuration)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .Enrich.With(services.GetRequiredService<TenantEnricher>());
-                    logConfig.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
+                        .Enrich.With(services.GetRequiredService<TenantEnricher>())
+                        .WriteTo.OpenTelemetryTracing()
+                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

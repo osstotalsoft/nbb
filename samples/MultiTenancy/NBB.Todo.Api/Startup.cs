@@ -73,7 +73,7 @@ namespace NBB.Todo.Api
                         .ConfigureResource(configureResource)
                         .SetSampler(new AlwaysOnSampler())
                         .AddHttpClientInstrumentation()
-                        .AddAspNetCoreInstrumentation(o => o.RecordException = true)
+                        .AddAspNetCoreInstrumentation()
                         .AddMessageBusInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
                         .AddJaegerExporter()

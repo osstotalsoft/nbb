@@ -41,7 +41,7 @@ namespace NBB.Contracts.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
-                        .WriteTo.OpenTelemetryTracing(restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
+                        .WriteTo.OpenTelemetryTracing();
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
