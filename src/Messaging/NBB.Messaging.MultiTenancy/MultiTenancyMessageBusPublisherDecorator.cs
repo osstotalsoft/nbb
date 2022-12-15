@@ -43,7 +43,7 @@ namespace NBB.Messaging.MultiTenancy
 
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {
-                Activity.Current?.SetTag("nbb.tenant_id", tenantId);
+                Activity.Current?.SetTag(TracingTags.TenantId, tenantId);
 
                 outgoingEnvelope.SetHeader(MessagingHeaders.TenantId, tenantId.ToString());
                 options.EnvelopeCustomizer?.Invoke(outgoingEnvelope);

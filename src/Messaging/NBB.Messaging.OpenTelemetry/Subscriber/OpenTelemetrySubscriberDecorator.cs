@@ -44,13 +44,12 @@ namespace NBB.Messaging.OpenTelemetry.Subscriber
 
                 using var activity = activitySource.StartActivity(activityName, ActivityKind.Consumer, parentContext.ActivityContext);
                 activity?.SetTag(TraceSemanticConventions.AttributeMessagingDestination, options.TopicName);
-                activity?.SetTag(MessagingTags.CorrelationId, Correlation.CorrelationManager.GetCorrelationId()?.ToString());
                 activity?.SetTag(TraceSemanticConventions.AttributePeerService, incommingEnvelope.Headers.TryGetValue(MessagingHeaders.Source, out var value)
                     ? value
                     : default);
 
                 foreach (var header in incommingEnvelope.Headers)
-                    activity?.SetTag(MessagingTags.MessagingEnvelopeHeaderSpanTagPrefix + header.Key.ToLower(), header.Value);
+                    activity?.SetTag(TracingTags.MessagingEnvelopeHeaderSpanTagPrefix + header.Key.ToLower(), header.Value);
 
                 try
                 {

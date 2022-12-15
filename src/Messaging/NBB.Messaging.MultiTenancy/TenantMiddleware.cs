@@ -56,7 +56,7 @@ namespace NBB.Messaging.MultiTenancy
 
              _tenantContextAccessor.TenantContext = new TenantContext(tenant);
 
-            Activity.Current?.SetTag("nbb.tenant_id", tenantId);
+            Activity.Current?.SetTag(TracingTags.TenantId, tenantId);
 
             await next();
         }

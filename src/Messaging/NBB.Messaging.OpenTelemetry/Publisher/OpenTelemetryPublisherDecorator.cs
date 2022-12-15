@@ -52,7 +52,7 @@ namespace NBB.Messaging.OpenTelemetry.Publisher
             using var activity = activitySource.StartActivity(operationName, ActivityKind.Producer);
 
             activity?.SetTag(TraceSemanticConventions.AttributeMessagingDestination, formattedTopicName);
-            activity?.SetTag(MessagingTags.CorrelationId, Correlation.CorrelationManager.GetCorrelationId()?.ToString());
+            activity?.SetTag(TracingTags.CorrelationId, Correlation.CorrelationManager.GetCorrelationId()?.ToString());
 
             try
             {

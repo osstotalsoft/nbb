@@ -22,7 +22,7 @@ namespace NBB.Messaging.Host
         {
             using (CorrelationManager.NewCorrelationId(context.MessagingEnvelope.GetCorrelationId()))
             {
-                Activity.Current?.SetTag("nbb.correlation_id", CorrelationManager.GetCorrelationId()?.ToString());
+                Activity.Current?.SetTag(TracingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString());
 
                 await next();
             }

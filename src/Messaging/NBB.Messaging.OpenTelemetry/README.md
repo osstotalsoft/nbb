@@ -1,6 +1,6 @@
 # NBB.Messaging.OpenTelemetry
 
-This package provides open tracing support in the messaging publishers and subscribers.
+This package provides open telemetry support in the messaging publishers and subscribers.
 
 
 ## NuGet install
