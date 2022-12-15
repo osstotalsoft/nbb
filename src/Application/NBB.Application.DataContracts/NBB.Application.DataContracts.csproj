@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+    <PackageReference Include="MediatR.Contracts" Version="$(MediatRContractsPackageVersion)" />
   </ItemGroup>
 
 
