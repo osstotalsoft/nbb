@@ -27,7 +27,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
-            await _storage.AddSubscription(topic, async msg =>
+            var sub = await _storage.AddSubscription(topic, async msg =>
             {
                 try
                 {
@@ -48,7 +48,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
 
             //_logger.LogInformation("InProcessMessagingTopicSubscriber has subscribed to topic {Topic}", topic);
 
-            return new Subscription();
+            return sub;
         }
 
         public Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
@@ -63,14 +63,6 @@ namespace NBB.Messaging.InProcessMessaging.Internal
                 stopWatch.ElapsedMilliseconds);
 
             return Task.CompletedTask;
-        }
-
-        private sealed class Subscription : IDisposable
-        {
-            public void Dispose()
-            {
-                // Nothing to dispose
-            }
         }
     }
 }

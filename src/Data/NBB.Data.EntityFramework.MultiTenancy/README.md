@@ -19,22 +19,6 @@ When it comes to multi-tenant data access, there are 3 strategies:
 
 This package supports all 3 strategies stated above, so that you can write tenancy ignorant queries
 
-
-Tenant database configuration
-----------------
-You need to provide an implementation for `ITenantDatabaseConfigService` so the system can find the database settings for the current tenant.
-```csharp
-public interface ITenantDatabaseConfigService
-{
-    string GetConnectionString();
-}
-```
-
-NBB provides an implementation that reads the connection info from the application's configuration (appsettings.json). It can be registerd as follows:
-```csharp
-services.AddTenantDatabaseConfigService<ConfigurationDatabaseConfigService>();
-```
-
 Multi-tenant DbContext configuration
 ----------------
 * to configure a multi-tenant entity, you need to call `IsMultiTenant()` inside  entity configuration, like so:
@@ -94,8 +78,8 @@ When registering multi-tenant DbContext you can use the `ITenantDatabaseConfigSe
 ```csharp
 services.AddDbContext<KycDbContext>((serviceProvider, options) =>
 {
-    var databaseService = serviceProvider.GetRequiredService<ITenantDatabaseConfigService>();
-    var connectionString = databaseService.GetConnectionString();
+    var tenantConfiguration = serviceProvider.GetRequiredService<ITenantConfiguration>();
+    var connectionString = tenantConfiguration.GetConnectionString("DefaultConnection");
     
     options
         .UseSqlServer(connectionString)
