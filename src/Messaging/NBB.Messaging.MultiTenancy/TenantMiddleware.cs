@@ -12,6 +12,7 @@ using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Services;
 using NBB.MultiTenancy.Abstractions;
+using System.Diagnostics;
 
 namespace NBB.Messaging.MultiTenancy
 {
@@ -54,6 +55,8 @@ namespace NBB.Messaging.MultiTenancy
                          ?? throw new ApplicationException($"Tenant {tenantId} not found");
 
              _tenantContextAccessor.TenantContext = new TenantContext(tenant);
+
+            Activity.Current?.SetTag(TracingTags.TenantId, tenantId);
 
             await next();
         }

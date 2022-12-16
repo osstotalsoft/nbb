@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Serilog.Events;
 
-namespace NBB.Tools.Serilog.OpenTracingSink.Internal
+namespace NBB.Tools.Serilog.OpenTelemetryTracingSink.Internal
 {
-    internal static class OpenTracingContribFilter
+    internal static class OpenTelemetryTracingContribFilter
     {
         private static List<string> ExcludedLogSources = new()
         {

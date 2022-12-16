@@ -1,10 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Jaeger;
-using Jaeger.Reporters;
-using Jaeger.Samplers;
-using Jaeger.Senders.Thrift;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,15 +8,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.Abstractions;
-using NBB.Messaging.OpenTracing.Publisher;
-using OpenTracing;
-using OpenTracing.Noop;
-using OpenTracing.Util;
+using NBB.Messaging.OpenTelemetry;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System;
 using System.Reflection;
 
@@ -39,10 +36,7 @@ namespace NBB.Contracts.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contracts API", Version = "v1" });
-            });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contracts API", Version = "v1" }); });
 
             services.AddSingleton(Configuration);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -70,39 +64,37 @@ namespace NBB.Contracts.Api
 
             services.AddContractsReadModelDataAccess();
 
-            services.Decorate<IMessageBusPublisher, OpenTracingPublisherDecorator>();
+            var assembly = Assembly.GetExecutingAssembly().GetName();
+            void configureResource(ResourceBuilder r) =>
+                r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
 
-            // OpenTracing
-            //services.AddOpenTracingCoreServices(builder => builder
-            //    .AddAspNetCore()
-            //    .AddHttpHandler()
-            //    .AddGenericDiagnostics(x => x.IgnoredListenerNames.Add("Grpc.Net.Client"))
-            //    .AddLoggerProvider()
-            //    .AddMicrosoftSqlClient());
-
-            services.AddSingleton<ITracer>(serviceProvider =>
+            if (Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
             {
-                if (!Configuration.GetValue<bool>("OpenTracing:Jaeger:IsEnabled"))
+                Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+
+                services.AddOpenTelemetryTracing(builder => builder
+                        .ConfigureResource(configureResource)
+                        .SetSampler(new AlwaysOnSampler())
+                        .AddMessageBusInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddAspNetCoreInstrumentation()
+                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                        .AddJaegerExporter()
+                );
+                services.Configure<JaegerExporterOptions>(Configuration.GetSection("OpenTelemetry:Jaeger"));
+            }
+
+            if (Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
+            {
+                services.AddOpenTelemetryMetrics(options =>
                 {
-                    return NoopTracerFactory.Create();
-                }
-
-                string serviceName = Assembly.GetEntryAssembly().GetName().Name;
-
-                ILoggerFactory loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
-                ITracer tracer = new Tracer.Builder(serviceName)
-                    .WithLoggerFactory(loggerFactory)
-                    .WithSampler(new ConstSampler(true))
-                    .WithReporter(new RemoteReporter.Builder()
-                        .WithSender(new HttpSender(Configuration.GetValue<string>("OpenTracing:Jaeger:CollectorUrl")))
-                        .Build())
-                    .Build();
-
-                GlobalTracer.Register(tracer);
-
-                return tracer;
-            });
+                    options.ConfigureResource(configureResource)
+                        .AddRuntimeInstrumentation()
+                        .AddHttpClientInstrumentation()
+                        .AddAspNetCoreInstrumentation()
+                        .AddPrometheusExporter();
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -118,11 +110,11 @@ namespace NBB.Contracts.Api
             }
 
             app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
 
-            });
+            if (Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
+                app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

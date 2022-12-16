@@ -46,4 +46,4 @@ Other packages
 * *NBB.Messaging.DataContracts* - helps us formalize and instrument messaging data contracts
 * *NBB.Messaging.Effects* - messaging side effects and handlers for the NBB effects infrastructure
 * *NBB.Messaging.MultiTenancy* - support for messaging in multi-tenant environments
-* *NBB.Messaging.OpenTracing* - support for *OpenTracing* in messaging publishers and subscribers
+* *NBB.Messaging.OpenTelemetry* - support for *OpenTelemetry* in messaging publishers and subscribers

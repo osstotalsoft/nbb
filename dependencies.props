@@ -16,17 +16,24 @@
     <MicrosoftExtensionsPackagesVersion>7.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>7.0.0</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
+	<OpenTelemetryCorePackageVersion>1.4.0-rc.1</OpenTelemetryCorePackageVersion>
+	<OpenTelemetryExtensionsHostingPackageVersion>1.4.0-rc.1</OpenTelemetryExtensionsHostingPackageVersion>
+	<OpenTelemetryExtensionsPropagatorsPackageVersion>1.4.0-rc.1</OpenTelemetryExtensionsPropagatorsPackageVersion>
+	<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.0.0-rc9.10</OpenTelemetryInstrumentationAspNetCorePackageVersion>
+	<OpenTelemetryInstrumentationEFCorePackageVersion>1.0.0-beta.3</OpenTelemetryInstrumentationEFCorePackageVersion>
+	<OpenTelemetryInstrumentationHttpPackageVersion>1.0.0-rc9.10</OpenTelemetryInstrumentationHttpPackageVersion>
+	<OpenTelemetryInstrumentationRuntimePackageVersion>1.1.0-beta.2</OpenTelemetryInstrumentationRuntimePackageVersion>
+	<OpenTelemetryExporterPrometheusHttpListenerPackageVersion>1.4.0-rc.1</OpenTelemetryExporterPrometheusHttpListenerPackageVersion>
+	<OpenTelemetryExporterPrometheusAspnetCorePackageVersion>1.4.0-rc.1</OpenTelemetryExporterPrometheusAspnetCorePackageVersion>
     <PollyVersion>7.2.2</PollyVersion>
     <SerilogPackageVersion>2.10.0</SerilogPackageVersion>
     <SerilogExtensionsLoggingPackageVersion>3.1.0</SerilogExtensionsLoggingPackageVersion>
     <SerilogSinksConsole>4.0.1</SerilogSinksConsole>
     <SerilogSinksMSSqlServerPackageVersion>5.6.1</SerilogSinksMSSqlServerPackageVersion>
     <SerilogAspNetCorePackageVersion>4.1.0</SerilogAspNetCorePackageVersion>
-    <AutoMapperPackageVersion>12.0.0</AutoMapperPackageVersion>
-    <OpenTracingPackageVersion>0.12.1</OpenTracingPackageVersion>
+    <AutoMapperPackageVersion>12.0.0</AutoMapperPackageVersion>    
     <NJsonSchemaPackageVersion>10.6.6</NJsonSchemaPackageVersion>
     <AutoFixturePackageVersion>4.17.0</AutoFixturePackageVersion>
-    <OpenTracingContribPackageVersion>0.8.0</OpenTracingContribPackageVersion>
     <JaegerPackageVersion>1.0.3</JaegerPackageVersion>
     <SystemIdentityModelTokensJwtPackageVersion>6.15.0</SystemIdentityModelTokensJwtPackageVersion>
   </PropertyGroup>

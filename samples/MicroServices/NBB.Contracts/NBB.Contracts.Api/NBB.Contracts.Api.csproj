@@ -20,18 +20,29 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemetryCorePackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OpenTelemetryCorePackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OpenTelemetryExporterPrometheusAspnetCorePackageVersion)" />        
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationAspNetCorePackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationHttpPackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationRuntimePackageVersion)" />        		
+		<PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-        <PackageReference Include="Jaeger" Version="$(JaegerPackageVersion)" />
-        <PackageReference Include="Jaeger.Senders.Thrift" Version="$(JaegerPackageVersion)" />
-        <!--<PackageReference Include="OpenTracing.Contrib.NetCore" Version="$(OpenTracingContribPackageVersion)" />-->
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
+		<ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.BackwardCompatibility\NBB.Messaging.BackwardCompatibility.csproj" />
         <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
-        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" />
-        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />
+        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
+        <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Rusi\NBB.Messaging.Rusi.csproj" />		
+		<ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTelemetryTracingSink\NBB.Tools.Serilog.OpenTelemetryTracingSink.csproj" />
         <ProjectReference Include="..\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
         <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
     </ItemGroup>

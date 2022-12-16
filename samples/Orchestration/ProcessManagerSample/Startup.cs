@@ -43,7 +43,6 @@ namespace ProcessManagerSample
                     .UsePipeline(builder => builder
                         .UseCorrelationMiddleware()
                         .UseExceptionHandlingMiddleware()
-                        //.UseOpenTracingMiddleware()
                         .UseDefaultResiliencyMiddleware()
                         .UseMiddleware<SubscriberLoggingMiddleware>()
                         .UseMediatRMiddleware())

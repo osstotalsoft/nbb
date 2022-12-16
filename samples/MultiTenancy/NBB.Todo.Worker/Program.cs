@@ -12,11 +12,19 @@ using NBB.Todos.Data;
 using NBB.Todo.Worker.Application;
 using NBB.Messaging.Host;
 using NBB.Messaging.MultiTenancy;
+using NBB.Messaging.OpenTelemetry;
 using NBB.MultiTenancy.Abstractions.Repositories;
-using Serilog.Events;
-using Microsoft.Extensions.Logging;
 using NBB.Correlation.Serilog;
 using NBB.Tools.Serilog.Enrichers.TenantId;
+using Microsoft.Extensions.Configuration;
+using OpenTelemetry;
+using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using System.Reflection;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 
 namespace NBB.Todo.Worker
 {
@@ -55,6 +63,7 @@ namespace NBB.Todo.Worker
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .Enrich.With(services.GetRequiredService<TenantEnricher>())
+                        .WriteTo.OpenTelemetryTracing()
                         .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
                 })
                 .UseConsoleLifetime()
@@ -96,6 +105,37 @@ namespace NBB.Todo.Worker
                 .AddTenantRepository<ConfigurationTenantRepository>();
 
             services.AddSingleton<TenantEnricher>();
+
+
+            var assembly = Assembly.GetExecutingAssembly().GetName();
+            void configureResource(ResourceBuilder r) =>
+                r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
+
+
+            if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
+            {
+                Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+
+                services.AddOpenTelemetryTracing(builder => builder
+                        .ConfigureResource(configureResource)
+                        .SetSampler(new AlwaysOnSampler())
+                        .AddMessageBusInstrumentation()
+                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                        .AddJaegerExporter()
+                );
+                services.Configure<JaegerExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Jaeger"));
+            }
+
+
+            if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
+            {
+                services.AddOpenTelemetryMetrics(options =>
+                {
+                    options.ConfigureResource(configureResource)
+                        .AddRuntimeInstrumentation()
+                        .AddPrometheusHttpListener();
+                });
+            }
         }
     }
 }

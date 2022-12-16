@@ -38,7 +38,7 @@ COPY ["src/Messaging/NBB.Messaging.Nats/NBB.Messaging.Nats.csproj", "src/Messagi
 COPY ["src/EventStore/NBB.EventStore.AdoNet/NBB.EventStore.AdoNet.csproj", "src/EventStore/NBB.EventStore.AdoNet/"]
 COPY ["src/Correlation/NBB.Correlation.Serilog/NBB.Correlation.Serilog.csproj", "src/Correlation/NBB.Correlation.Serilog/"]
 COPY ["src/Messaging/NBB.Messaging.BackwardCompatibility/NBB.Messaging.BackwardCompatibility.csproj", "src/Messaging/NBB.Messaging.BackwardCompatibility/"]
-COPY ["src/Messaging/NBB.Messaging.OpenTracing/NBB.Messaging.OpenTracing.csproj", "src/Messaging/NBB.Messaging.OpenTracing/"]
+COPY ["src/Messaging/NBB.Messaging.OpenTelemetry/NBB.Messaging.OpenTelemetry.csproj", "src/Messaging/NBB.Messaging.OpenTelemetry/"]
 COPY ["samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/NBB.Contracts.ReadModel.Data.csproj", "samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/"]
 COPY ["src/Data/NBB.Data.EntityFramework/NBB.Data.EntityFramework.csproj", "src/Data/NBB.Data.EntityFramework/"]
 RUN dotnet restore "samples/MicroServices/NBB.Contracts/NBB.Contracts.Worker/NBB.Contracts.Worker.csproj"

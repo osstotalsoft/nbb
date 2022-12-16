@@ -23,7 +23,7 @@ There is a dedicated messaging header **nbb-correlationID** interpreted by:
 * [`message bus publisher`](../Messaging/NBB.Messaging.Abstractions#publish) - the publisher automatically adds the current correlation ID to the envelope headers
 * [`messaging host`](../Messaging/NBB.Messaging.Host#readme) - there is a built-in [`correlation middleware `](../Messaging/NBB.Messaging.Host#built-in-correlation-middleware) that reads the messaging header and sets the current correlation ID
 
-### Open Tracing integration
+### Open Telemetry integration
 A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans. 
 
-For details see [`NBB.Messaging.OpenTracing`](./../Messaging/NBB.Messaging.OpenTracing#readme)
+For details see [`NBB.Messaging.OpenTelemetry`](./../Messaging/NBB.Messaging.OpenTelemetry#readme)

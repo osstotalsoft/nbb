@@ -25,6 +25,13 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="$(MediatRExtensionsMicrosoftDIPackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OpenTelemetryCorePackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationAspNetCorePackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationRuntimePackageVersion)" />
+	<PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="$(OpenTelemetryExporterPrometheusHttpListenerPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,11 +41,11 @@
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.MultiTenancy\NBB.Messaging.MultiTenancy.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
-    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.OpenTracing\NBB.Messaging.OpenTracing.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
     <ProjectReference Include="..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Http\NBB.MultiTenancy.Identification.Http.csproj" />
     <ProjectReference Include="..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Messaging\NBB.MultiTenancy.Identification.Messaging.csproj" />
     <ProjectReference Include="..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.Enrichers.TenantId\NBB.Tools.Serilog.Enrichers.TenantId.csproj" />
-    <ProjectReference Include="..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTracingSink\NBB.Tools.Serilog.OpenTracingSink.csproj" />
+    <ProjectReference Include="..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTelemetryTracingSink\NBB.Tools.Serilog.OpenTelemetryTracingSink.csproj" />
     <ProjectReference Include="..\NBB.Todo.Data\NBB.Todo.Data.csproj" />
     <ProjectReference Include="..\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj" />
   </ItemGroup>

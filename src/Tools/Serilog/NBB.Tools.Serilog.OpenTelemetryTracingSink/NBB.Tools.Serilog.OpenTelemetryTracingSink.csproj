@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTracing" Version="$(OpenTracingPackageVersion)" />
+    <PackageReference Include="OpenTelemetry.Api" Version="$(OpenTelemetryCorePackageVersion)" />
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
   </ItemGroup>
 </Project>
