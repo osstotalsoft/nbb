@@ -1,15 +1,15 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.SqlServer.Server;
 using NBB.Core.Abstractions;
 using NBB.EventStore.AdoNet.Internal;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -23,7 +23,6 @@ namespace NBB.EventStore.AdoNet
         private readonly ILogger<AdoNetEventRepository> _logger;
         private readonly IOptionsSnapshot<EventStoreAdoNetOptions> _eventstoreOptions;
 
-        // TODO: migrate to Microsoft.Data.SqlClient
         private readonly SqlMetaData[] _appendEventsMetadata = new List<SqlMetaData>
         {
             new SqlMetaData("OrderNo", SqlDbType.Int, true, false, SortOrder.Unspecified, -1),
