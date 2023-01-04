@@ -88,7 +88,7 @@ namespace NBB.EventStore.IntegrationTests
             snapshot.AggregateVersion.Should().Be(threadCount - 1);
         }
 
-        //[Fact]
+        [Fact]
         public async Task Should_load_stored_snapshot()
         {
             //Arrange
@@ -111,7 +111,7 @@ namespace NBB.EventStore.IntegrationTests
             loadedSnapshotEnvelope.Should().BeEquivalentTo(snapshotEnvelope);
         }
 
-        //[Fact]
+        [Fact]
         public async Task Should_return_null_for_not_found_snapshot()
         {
             //Arrange
