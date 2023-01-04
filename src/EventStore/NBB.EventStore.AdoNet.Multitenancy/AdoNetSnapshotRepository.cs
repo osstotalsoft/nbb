@@ -1,13 +1,13 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NBB.EventStore.AdoNet.Internal;
 using NBB.MultiTenancy.Abstractions.Context;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 
 namespace NBB.EventStore.AdoNet.Multitenancy
 {

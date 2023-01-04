@@ -1,10 +1,10 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using NBB.MultiTenancy.Abstractions.Options;
 using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
 using System.Threading;

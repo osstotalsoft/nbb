@@ -13,6 +13,7 @@
     <MicrosoftNetTestSdkPackageVersion>17.0.0</MicrosoftNetTestSdkPackageVersion>
     <FsUnitPackageVersion>4.1.0</FsUnitPackageVersion>
     <FluentAssertionsPackageVersion>6.3.0</FluentAssertionsPackageVersion>
+	<MicrosoftDataSqlClientPackageVersion>5.0.1</MicrosoftDataSqlClientPackageVersion>
     <MicrosoftExtensionsPackagesVersion>7.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>7.0.0</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
