@@ -27,17 +27,21 @@ namespace NBB.Messaging.Abstractions
             CancellationToken cancellationToken = default)
             => _busPublisher.PublishAsync(message, options, cancellationToken);
 
-        public async Task<MessagingEnvelope<TMessage>> SubscriptionMessage<TMessage>(
+        public async Task<MessagingEnvelope<TMessage>> WhenMessage<TMessage>(
             Func<MessagingEnvelope<TMessage>, bool> predicate,
             CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<MessagingEnvelope<TMessage>>();
-
+            var tokenS = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            
             Task HandleMessage(MessagingEnvelope<TMessage> msg)
             {
                 if (predicate(msg))
                 {
                     tcs.SetResult(msg);
+
+                    //cancel ack task continuation
+                    tokenS.Cancel();
                 }
 
                 return Task.CompletedTask;
@@ -45,7 +49,7 @@ namespace NBB.Messaging.Abstractions
 
             using var subscription = await SubscribeAsync<TMessage>(HandleMessage,
                 new MessagingSubscriberOptions {Transport = SubscriptionTransportOptions.RequestReply},
-                cancellationToken);
+                tokenS.Token);
 
             return await tcs.Task;
         }
