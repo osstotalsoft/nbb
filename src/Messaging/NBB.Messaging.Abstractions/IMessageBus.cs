@@ -11,6 +11,7 @@ namespace NBB.Messaging.Abstractions
     {
         Task<MessagingEnvelope<TMessage>> WhenMessage<TMessage>(
             Func<MessagingEnvelope<TMessage>, bool> predicate,
+            int millisecondsTimeout = 0,
             CancellationToken cancellationToken = default);
     }
 }
