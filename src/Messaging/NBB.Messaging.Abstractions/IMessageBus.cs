@@ -9,8 +9,9 @@ namespace NBB.Messaging.Abstractions
 {
     public interface IMessageBus : IMessageBusSubscriber, IMessageBusPublisher
     {
-        Task<MessagingEnvelope<TMessage>> SubscriptionMessage<TMessage>(
+        Task<MessagingEnvelope<TMessage>> WhenMessage<TMessage>(
             Func<MessagingEnvelope<TMessage>, bool> predicate,
+            int millisecondsTimeout = 0,
             CancellationToken cancellationToken = default);
     }
 }
