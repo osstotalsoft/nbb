@@ -53,6 +53,6 @@ BEGIN
 		[StreamId] [varchar](200) NOT NULL,
 		[StreamVersion] int NOT NULL,
 		[TenantId] [uniqueidentifier] NOT NULL,
-	 CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([StreamId], [StreamVersion] ASC)
+	 CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([TenantId], [StreamId], [StreamVersion] ASC)
 	);
 END
