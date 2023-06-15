@@ -46,8 +46,8 @@ namespace Microsoft.Extensions.DependencyInjection
                                 RetryPolicy = new RetryPolicy()
                                 {
                                     MaxAttempts = 5,
-                                    InitialBackoff = TimeSpan.FromSeconds(0.1),
-                                    MaxBackoff = TimeSpan.FromSeconds(1),
+                                    InitialBackoff = TimeSpan.FromSeconds(1),
+                                    MaxBackoff = TimeSpan.FromSeconds(5),
                                     BackoffMultiplier = 1.5,
                                     RetryableStatusCodes = { StatusCode.Unavailable,
                                         StatusCode.Unknown,
