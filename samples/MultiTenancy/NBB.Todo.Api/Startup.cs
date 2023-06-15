@@ -69,7 +69,7 @@ namespace NBB.Todo.Api
             {
                 Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
 
-                services.AddOpenTelemetryTracing(builder => builder
+                services.AddOpenTelemetry().WithTracing(builder => builder
                         .ConfigureResource(configureResource)
                         .SetSampler(new AlwaysOnSampler())
                         .AddHttpClientInstrumentation()
@@ -83,7 +83,7 @@ namespace NBB.Todo.Api
 
             if (Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
             {
-                services.AddOpenTelemetryMetrics(options =>
+                services.AddOpenTelemetry().WithMetrics(options =>
                 {
                     options.ConfigureResource(configureResource)
                         .AddRuntimeInstrumentation()

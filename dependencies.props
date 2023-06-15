@@ -17,15 +17,15 @@
     <MicrosoftExtensionsPackagesVersion>7.0.0</MicrosoftExtensionsPackagesVersion>
     <MicrosoftEntityFrameworkPackagesVersion>7.0.0</MicrosoftEntityFrameworkPackagesVersion>
     <MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
-	<OpenTelemetryCorePackageVersion>1.4.0-rc.1</OpenTelemetryCorePackageVersion>
-	<OpenTelemetryExtensionsHostingPackageVersion>1.4.0-rc.1</OpenTelemetryExtensionsHostingPackageVersion>
-	<OpenTelemetryExtensionsPropagatorsPackageVersion>1.4.0-rc.1</OpenTelemetryExtensionsPropagatorsPackageVersion>
-	<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.0.0-rc9.10</OpenTelemetryInstrumentationAspNetCorePackageVersion>
-	<OpenTelemetryInstrumentationEFCorePackageVersion>1.0.0-beta.3</OpenTelemetryInstrumentationEFCorePackageVersion>
-	<OpenTelemetryInstrumentationHttpPackageVersion>1.0.0-rc9.10</OpenTelemetryInstrumentationHttpPackageVersion>
-	<OpenTelemetryInstrumentationRuntimePackageVersion>1.1.0-beta.2</OpenTelemetryInstrumentationRuntimePackageVersion>
-	<OpenTelemetryExporterPrometheusHttpListenerPackageVersion>1.4.0-rc.1</OpenTelemetryExporterPrometheusHttpListenerPackageVersion>
-	<OpenTelemetryExporterPrometheusAspnetCorePackageVersion>1.4.0-rc.1</OpenTelemetryExporterPrometheusAspnetCorePackageVersion>
+	<OpenTelemetryCorePackageVersion>1.5.0</OpenTelemetryCorePackageVersion>
+	<OpenTelemetryExtensionsHostingPackageVersion>1.5.0</OpenTelemetryExtensionsHostingPackageVersion>
+	<OpenTelemetryExtensionsPropagatorsPackageVersion>1.5.0</OpenTelemetryExtensionsPropagatorsPackageVersion>
+	<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.0.0-rc9.14</OpenTelemetryInstrumentationAspNetCorePackageVersion>
+	<OpenTelemetryInstrumentationEFCorePackageVersion>1.0.0-beta.7</OpenTelemetryInstrumentationEFCorePackageVersion>
+	<OpenTelemetryInstrumentationHttpPackageVersion>1.0.0-rc9.14</OpenTelemetryInstrumentationHttpPackageVersion>
+	<OpenTelemetryInstrumentationRuntimePackageVersion>1.5.0</OpenTelemetryInstrumentationRuntimePackageVersion>
+	<OpenTelemetryExporterPrometheusHttpListenerPackageVersion>1.5.0-rc.1</OpenTelemetryExporterPrometheusHttpListenerPackageVersion>
+	<OpenTelemetryExporterPrometheusAspnetCorePackageVersion>1.5.0-rc.1</OpenTelemetryExporterPrometheusAspnetCorePackageVersion>
     <PollyVersion>7.2.2</PollyVersion>
     <SerilogPackageVersion>2.10.0</SerilogPackageVersion>
     <SerilogExtensionsLoggingPackageVersion>3.1.0</SerilogExtensionsLoggingPackageVersion>
