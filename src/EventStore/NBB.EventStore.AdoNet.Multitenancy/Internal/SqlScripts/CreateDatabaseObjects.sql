@@ -8,6 +8,7 @@ BEGIN
 		[StreamId] [varchar](200) NOT NULL,
 		[StreamVersion] int NOT NULL,
 		[TenantId] [uniqueidentifier] NOT NULL,
+		[Timestamp] datetime NOT NULL default (GETUTCDATE()),
 	 CONSTRAINT [PK_EventStoreEvents] PRIMARY KEY NONCLUSTERED([EventId] ASC)
 	);
 END
@@ -53,6 +54,7 @@ BEGIN
 		[StreamId] [varchar](200) NOT NULL,
 		[StreamVersion] int NOT NULL,
 		[TenantId] [uniqueidentifier] NOT NULL,
+		[Timestamp] datetime NOT NULL default (GETUTCDATE()),
 	 CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([TenantId], [StreamId], [StreamVersion] ASC)
 	);
 END
