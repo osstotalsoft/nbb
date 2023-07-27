@@ -4,6 +4,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Abstractions;
@@ -12,12 +14,18 @@ namespace NBB.EventStore.InMemory
 {
     public class InMemoryRepository : IEventRepository
     {
-        private readonly ConcurrentDictionary<string, EventDescriptorStream> _storage =
+        private readonly ConcurrentDictionary<string, ImmutableList<EventDescriptor>> _storage =
             new();
 
         public Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
-            IList<EventDescriptor> list = _storage.GetValueOrDefault(stream, new EventDescriptorStream(startFromVersion ?? 0, ImmutableList<EventDescriptor>.Empty)).EventDescriptors;
+            IList<EventDescriptor> list = _storage.GetValueOrDefault(stream, ImmutableList<EventDescriptor>.Empty);
+
+            if (startFromVersion.HasValue)
+            {
+                list = list.Skip(startFromVersion.Value - 1).ToList();
+            }   
+
             return Task.FromResult(list);
         }
 
@@ -30,17 +38,13 @@ namespace NBB.EventStore.InMemory
                 {
                     CheckVersion(expectedVersion, 0);
 
-                    return new EventDescriptorStream(0, eventDescriptors.ToImmutableList());
+                    return eventDescriptors.ToImmutableList();
                 },
                 (key, value) =>
                 {
-                    CheckVersion(expectedVersion, value.Version);
+                    CheckVersion(expectedVersion, value.Count);
 
-                    return value with
-                    {
-                        LoadedAtVersion = value.Version,
-                        EventDescriptors = value.EventDescriptors.AddRange(eventDescriptors)
-                    };
+                    return value.AddRange(eventDescriptors);                    
                 });
 
             return Task.CompletedTask;
@@ -56,11 +60,6 @@ namespace NBB.EventStore.InMemory
             }
 
             throw new ConcurrencyException("EventStore concurrency exception");
-        }
-
-        private record EventDescriptorStream(int LoadedAtVersion, ImmutableList<EventDescriptor> EventDescriptors)
-        {
-            public int Version => EventDescriptors.Count + LoadedAtVersion;
         }
     }
 }
