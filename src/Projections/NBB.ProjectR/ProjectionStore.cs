@@ -37,7 +37,7 @@ namespace NBB.ProjectR
                 (projection, _) = _projector.Project(@event, projection);
             }
 
-            return (projection, events.Count);
+            return (projection, events.Count + (snapshotEnvelope?.AggregateVersion ?? 0));
         }
 
         public async Task<TModel> Load(object id, CancellationToken cancellationToken)
@@ -54,7 +54,7 @@ namespace NBB.ProjectR
             var projectionVersion = expectedVersion + 1;
             if (projectionVersion % snapshotFrequency == 0)
             {
-                await _snapshotStore.StoreSnapshotAsync(new SnapshotEnvelope(projection, default, stream), cancellationToken);
+                await _snapshotStore.StoreSnapshotAsync(new SnapshotEnvelope(projection, 1, stream), cancellationToken);
             }
         }
 
