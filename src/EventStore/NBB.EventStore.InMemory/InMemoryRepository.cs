@@ -3,6 +3,7 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 using NBB.Core.Abstractions;
@@ -11,12 +12,12 @@ namespace NBB.EventStore.InMemory
 {
     public class InMemoryRepository : IEventRepository
     {
-        private readonly ConcurrentDictionary<string, EventDescriptorCollection> _storage =
+        private readonly ConcurrentDictionary<string, EventDescriptorStream> _storage =
             new();
 
         public Task<IList<EventDescriptor>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default)
         {
-            IList<EventDescriptor> list = _storage.GetValueOrDefault(stream, new EventDescriptorCollection(startFromVersion ?? 0));
+            IList<EventDescriptor> list = _storage.GetValueOrDefault(stream, new EventDescriptorStream(startFromVersion ?? 0, ImmutableList<EventDescriptor>.Empty)).EventDescriptors;
             return Task.FromResult(list);
         }
 
@@ -29,15 +30,17 @@ namespace NBB.EventStore.InMemory
                 {
                     CheckVersion(expectedVersion, 0);
 
-                    return new EventDescriptorCollection(0, eventDescriptors);
+                    return new EventDescriptorStream(0, eventDescriptors.ToImmutableList());
                 },
                 (key, value) =>
                 {
                     CheckVersion(expectedVersion, value.Version);
 
-                    value.AddRange(eventDescriptors);
-
-                    return value;
+                    return value with
+                    {
+                        LoadedAtVersion = value.Version,
+                        EventDescriptors = value.EventDescriptors.AddRange(eventDescriptors)
+                    };
                 });
 
             return Task.CompletedTask;
@@ -55,22 +58,9 @@ namespace NBB.EventStore.InMemory
             throw new ConcurrencyException("EventStore concurrency exception");
         }
 
-        private class EventDescriptorCollection : List<EventDescriptor>
+        private record EventDescriptorStream(int LoadedAtVersion, ImmutableList<EventDescriptor> EventDescriptors)
         {
-            private readonly int _loadedAtVersion;
-
-            public EventDescriptorCollection(int loadedAtVersion)
-            {
-                _loadedAtVersion = loadedAtVersion;
-            }
-
-            public EventDescriptorCollection(int loadedAtVersion, IEnumerable<EventDescriptor> collection)
-                :base(collection)
-            {
-                _loadedAtVersion = loadedAtVersion;
-            }
-
-            public int Version => Count + _loadedAtVersion;
+            public int Version => EventDescriptors.Count + LoadedAtVersion;
         }
     }
 }
