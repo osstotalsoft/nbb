@@ -5,7 +5,6 @@ module CommandPipelineTests
 
 open Xunit
 open NBB.Core.Effects.FSharp
-open NBB.Core.Abstractions
 open NBB.Application.Mediator.FSharp
 open FsUnit.Xunit
 open NBB.Core.Effects.FSharp.Interpreter
@@ -17,35 +16,36 @@ type SomeOtherCommand = { Name: string } interface ICommand
 
 [<Fact>]
 let ``CommandHandler.upCast should call the handler if types match`` () =
-    //arrange
-    let handler = mock (fun (_:SomeCommand) -> effect { return Some () })
-    let commandHandler: CommandHandler = handler.Fn |> upCast
-    let interpreter = createInterpreter()
+    task {
+        //arrange
+        let handler = mock (fun (_: SomeCommand) -> effect { return Some() })
+        let commandHandler: CommandHandler = handler.Fn |> upCast
+        let interpreter = createInterpreter ()
 
-    //act
-    {Code = ""}
-        |> commandHandler
-        |> Effect.interpret interpreter
-        |> Async.RunSynchronously
-        |> ignore
+        //act
+        do! { Code = "" }
+            |> commandHandler
+            |> Effect.interpret interpreter
+            |> Task.ignore
 
-    //assert
-    handler |> wasCalled |> should be True
+        //assert
+        handler |> wasCalled |> should be True
+    }
 
 [<Fact>]
 let ``CommandHandler.upCast should not call the handler if types don't match`` () =
-    //arrange
-    let handler = mock (fun (_:SomeCommand) -> effect { return Some () })
-    let commandHandler: CommandHandler = handler.Fn |> upCast
-    let interpreter = createInterpreter()
+    task {
+        //arrange
+        let handler = mock (fun (_: SomeCommand) -> effect { return Some() })
+        let commandHandler: CommandHandler = handler.Fn |> upCast
+        let interpreter = createInterpreter ()
 
-    //act
-    {Name = ""}
-        |> commandHandler
-        |> Effect.interpret interpreter
-        |> Async.RunSynchronously
-        |> ignore
+        //act
+        do! { Name = "" }
+            |> commandHandler
+            |> Effect.interpret interpreter
+            |> Task.ignore
 
-    //assert
-    handler |> wasCalled |> should be False
-
+        //assert
+        handler |> wasCalled |> should be False
+    }
