@@ -187,7 +187,7 @@ let ``Effect computations are lazy evaluated`` () =
         eff |> ignore
         printfnWasCalled |> should equal false
 
-        let result = eff |> Effect.interpret interpreter
+        let! result = eff |> Effect.interpret interpreter
         result |> should equal ()
 
         printfnWasCalled |> should equal true
