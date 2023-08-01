@@ -30,8 +30,7 @@ module Effect =
 
     let flatten eff = bind id eff
 
-    let interpret (interpreter:IInterpreter) eff = interpreter.Interpret eff |> Async.AwaitTask
-
+    let interpret (interpreter:IInterpreter) eff = interpreter.Interpret eff 
 type EffectList<'a> = Effect<list<'a>>
 
 [<RequireQualifiedAccess>]

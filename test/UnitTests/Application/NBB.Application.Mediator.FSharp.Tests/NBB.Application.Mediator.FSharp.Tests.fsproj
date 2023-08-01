@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Task.fs" />
     <Compile Include="Mox.fs" />
     <Compile Include="Sample.fs" />
     <Compile Include="RequestPipelineTests.fs" />

@@ -17,31 +17,33 @@ type Benchmark() =
 
     [<Benchmark>]
     member this.RunLazy() =
-        let mapper crt =
-            effect {
-                let! x = Effect.from (fun _ -> 1)
-                let! y = Effect.from (fun _ -> 2)
-                return x + y + crt
-            }
-        let eff = [1..this.N] |> List.traverse mapper
+        task {
+            let mapper crt =
+                effect {
+                    let! x = Effect.from (fun _ -> 1)
+                    let! y = Effect.from (fun _ -> 2)
+                    return x + y + crt
+                }
+            let eff = [1..this.N] |> List.traverse mapper
 
-        eff
-            |> Effect.interpret interpreter
-            |> Async.RunSynchronously
+            let! _  = eff |> Effect.interpret interpreter
+            return ()
+        }
 
     [<Benchmark>]
     member this.RunStrict() =
-        let mapper crt =
-            Strict.effect {
-                let! x = Effect.from (fun _ -> 1)
-                let! y = Effect.from (fun _ -> 2)
-                return x + y + crt
-            }
-        let eff = [1..this.N] |> List.traverse mapper
+        task {
+            let mapper crt =
+                Strict.effect {
+                    let! x = Effect.from (fun _ -> 1)
+                    let! y = Effect.from (fun _ -> 2)
+                    return x + y + crt
+                }
+            let eff = [1..this.N] |> List.traverse mapper
 
-        eff
-            |> Effect.interpret interpreter
-            |> Async.RunSynchronously
+            let! _ = eff |> Effect.interpret interpreter
+            return ()
+        }
 
     [<GlobalCleanup>]
     member _.GlobalCleanup() =

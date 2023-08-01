@@ -23,35 +23,36 @@ type SomeOtherQuery =
 
 [<Fact>]
 let ``QueryHandler.upCast should call the handler if types match`` () =
-    //arrange
-    let handler = mock (fun (_:SomeQuery) -> effect { return Some true })
-    let queryHandler: QueryHandler = handler.Fn |> upCast
-    let interpreter = createInterpreter()
+    task {
+        //arrange
+        let handler = mock (fun (_: SomeQuery) -> effect { return Some true })
+        let queryHandler: QueryHandler = handler.Fn |> upCast
+        let interpreter = createInterpreter ()
 
-    //act
-    {Code = ""}
-        |> queryHandler
-        |> Effect.interpret interpreter
-        |> Async.RunSynchronously
-        |> ignore
+        //act
+        do!
+            { Code = "" }
+            |> queryHandler |> Effect.interpret interpreter |> Task.ignore
 
-    //assert
-    handler |> wasCalled |> should be True
+        //assert
+        handler |> wasCalled |> should be True
+    }
 
 [<Fact>]
 let ``QueryHandler.upCast should not call the handler if types don't match`` () =
-    //arrange
-    let handler = mock (fun (_:SomeQuery) -> effect { return Some true })
-    let queryHandler: QueryHandler = handler.Fn |> upCast
-    let interpreter = createInterpreter()
+    task {
+        //arrange
+        let handler = mock (fun (_: SomeQuery) -> effect { return Some true })
+        let queryHandler: QueryHandler = handler.Fn |> upCast
+        let interpreter = createInterpreter ()
 
-    //act
-    {Name = ""}
-        |> queryHandler
-        |> Effect.interpret interpreter
-        |> Async.RunSynchronously
-        |> ignore
+        //act
+        do!
+            { Name = "" }
+            |> queryHandler
+            |> Effect.interpret interpreter
+            |> Task.ignore
 
-    //assert
-    handler |> wasCalled |> should be False
-
+        //assert
+        handler |> wasCalled |> should be False
+    }
