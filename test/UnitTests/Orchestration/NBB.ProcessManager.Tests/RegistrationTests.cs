@@ -37,7 +37,7 @@ namespace NBB.ProcessManager.Tests
         {
             var sp = BuildServiceProvider();
             var orderCreatedHandlers = sp.GetServices<INotificationHandler<OrderCreated>>().OfType<ProcessManagerNotificationHandler<RegistrationProcessManager, RegistrationProcessManagerData, OrderCreated>>();
-            var orderPayemntCreatedHandlers = sp.GetServices<INotificationHandler<OrderCreated>>().OfType<ProcessManagerNotificationHandler<RegistrationProcessManager, RegistrationProcessManagerData, OrderPaymentCreated>>();
+            var orderPayemntCreatedHandlers = sp.GetServices<INotificationHandler<OrderPaymentCreated>>().OfType<ProcessManagerNotificationHandler<RegistrationProcessManager, RegistrationProcessManagerData, OrderPaymentCreated>>();
 
             orderCreatedHandlers.Count().Should().Be(1);
             orderPayemntCreatedHandlers.Count().Should().Be(1);
