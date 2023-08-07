@@ -16,5 +16,5 @@ namespace NBB.ProcessManager.Tests.Events
 
     public record OrderPaymentReceived(Guid OrderId, int DocumentId, int SiteId) : INotification;
 
-    public record OrderShipped(Guid OrderId, DateTime ShippingDate);
+    public record OrderShipped(Guid OrderId, DateTime ShippingDate) : INotification;
 }

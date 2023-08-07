@@ -49,7 +49,7 @@ namespace NBB.ProcessManager.Definition.Builder
             return null;
         }
 
-        IEnumerable<EventType> IDefinition.GetEventTypes() => _eventActivities.Select(x => new EventType(x.EventType, x.StartsProcess)).Distinct();
+        IEnumerable<EventType> IDefinition.GetEventTypes() => _eventActivities.Select(x => new EventType(x.EventType, _eventActivities.Count(e => e.GetType() == x.GetType() && e.StartsProcess) == 1)).Distinct();
 
         EffectFunc<TEvent, TData> IDefinition<TData>.GetEffectFunc<TEvent>()
         {

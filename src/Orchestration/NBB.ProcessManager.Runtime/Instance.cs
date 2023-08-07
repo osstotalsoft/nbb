@@ -64,7 +64,8 @@ namespace NBB.ProcessManager.Runtime
             {
                 if (_definition.IsObsolete())
                 {
-                    throw new Exception($"Definition {_definition.GetType().GetLongPrettyName()} is obsolete and new process instances cannot be started.");
+                    _logger.LogWarning($"Definition {_definition.GetType().GetLongPrettyName()} is obsolete and new process instances cannot be started.");
+                    return;
                 }
 
                 StartProcess(@event);
