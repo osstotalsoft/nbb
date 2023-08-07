@@ -294,15 +294,20 @@ namespace NBB.ProcessManager.Tests
         }
 
         [Fact]
-        public void Should_throw_when_starting_obsolete_processes()
+        public void Should_not_start_when_obsolete_processes()
         {
             var @event = new OrderCreated(Guid.NewGuid(), 100, 0, 0);
             var definition = new ObsoleteProcessManager();
             var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
 
             var instance = new Instance<OrderProcessManagerData>(definition, logger);
-            Action act = () => instance.ProcessEvent(@event);
-            act.Should().Throw<Exception>();
+            instance.ProcessEvent(@event);
+
+            instance.State.Should().Be(InstanceStates.NotStarted);
+
+            Mock.Get(logger).Verify(x => x.Log(LogLevel.Warning, It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, _) => v.ToString().Contains("obsolete")),
+                It.IsAny<Exception>(), It.IsAny<Func<It.IsAnyType, Exception, string>>()));
         }
 
         [Fact]

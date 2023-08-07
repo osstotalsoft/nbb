@@ -35,5 +35,5 @@ namespace NBB.ProcessManager.Definition
     {
     }
 
-    public record struct EventType(Type Type, bool StartsProcess);
+    public record struct EventType(Type Type, bool OnlyStartsProcess);
 }
