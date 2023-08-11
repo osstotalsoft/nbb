@@ -6,7 +6,8 @@ BEGIN
 		[EventType] [varchar](300) NOT NULL,
 		[CorrelationId] [uniqueidentifier] NULL,
 		[StreamId] [varchar](200) NOT NULL,
-		[StreamVersion] int NOT NULL
+		[StreamVersion] int NOT NULL,
+		[Timestamp] datetime NOT NULL default (GETUTCDATE()),
 	 CONSTRAINT [PK_EventStoreEvents] PRIMARY KEY NONCLUSTERED([EventId] ASC)
 	);
 END
@@ -49,7 +50,8 @@ BEGIN
 		[SnapshotData] [nvarchar](max) NOT NULL,
 		[SnapshotType] [varchar](300) NOT NULL,
 		[StreamId] [varchar](200) NOT NULL,
-		[StreamVersion] int NOT NULL
+		[StreamVersion] int NOT NULL,
+		[Timestamp] datetime NOT NULL default (GETUTCDATE()),
 	 CONSTRAINT [PK_EventStoreSnapshots] PRIMARY KEY ([StreamId], [StreamVersion] ASC)
 	);
 END
