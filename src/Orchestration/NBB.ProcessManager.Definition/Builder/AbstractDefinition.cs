@@ -1,10 +1,10 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using NBB.Core.Effects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NBB.Core.Effects;
 
 namespace NBB.ProcessManager.Definition.Builder
 {
@@ -35,15 +35,15 @@ namespace NBB.ProcessManager.Definition.Builder
             var configurator = new EventCorrelationBuilder<TEvent, TData>();
             configureEventCorrelation(configurator);
             var correl = configurator.Build();
-            _eventCorrelations.Add(typeof(TEvent), new EventCorrelation<object, TData>(@event => correl.CorrelationFilter((TEvent) @event)));
+            _eventCorrelations.Add(typeof(TEvent), new EventCorrelation<object, TData>((@event, headers) => correl.CorrelationFilter((TEvent)@event, headers)));
         }
 
-        Func<TEvent, object> IDefinition<TData>.GetCorrelationFilter<TEvent>()
+        Func<TEvent, IDictionary<string, string>, object> IDefinition<TData>.GetCorrelationFilter<TEvent>()
         {
             if (_eventCorrelations.ContainsKey(typeof(TEvent)))
             {
                 var func = _eventCorrelations[typeof(TEvent)];
-                return @event => func.CorrelationFilter(@event);
+                return (@event, headers) => func.CorrelationFilter(@event, headers);
             }
 
             return null;

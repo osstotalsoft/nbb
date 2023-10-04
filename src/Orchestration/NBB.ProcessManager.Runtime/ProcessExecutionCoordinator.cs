@@ -22,9 +22,10 @@ namespace NBB.ProcessManager.Runtime
             _definitions = definitions;
         }
 
-        public async Task Invoke<TDefinition, TData, TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-            where TDefinition : IDefinition<TData>
-            where TData:  IEquatable<TData>, new()
+
+        public async Task Invoke<TDefinition, TData, TEvent>(TEvent @event, IDictionary<string, string> headers, CancellationToken cancellationToken = default)
+        where TDefinition : IDefinition<TData>
+        where TData : IEquatable<TData>, new()
         {
             var definition = _definitions.OfType<TDefinition>().SingleOrDefault();
             if (definition == null)
@@ -34,8 +35,8 @@ namespace NBB.ProcessManager.Runtime
             if (identitySelector == null)
                 throw new ArgumentNullException($"No correlation defined for eventType {typeof(TEvent)} in definition {typeof(TDefinition)}");
 
-            var instance = await _dataRepository.Get(definition, identitySelector(@event), cancellationToken);
-            instance.ProcessEvent(@event);
+            var instance = await _dataRepository.Get(definition, identitySelector(@event, headers), cancellationToken);
+            instance.ProcessEvent(@event, headers);
             await _dataRepository.Save(instance, cancellationToken);
         }
     }

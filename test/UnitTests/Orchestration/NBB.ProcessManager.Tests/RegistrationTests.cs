@@ -2,30 +2,18 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NBB.Messaging.Abstractions;
 using NBB.ProcessManager.Definition.Builder;
 using NBB.ProcessManager.Runtime;
 using NBB.ProcessManager.Tests.Commands;
 using NBB.ProcessManager.Tests.Events;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using NBB.Messaging.Effects;
-using NBB.ProcessManager.Definition;
-using Xunit;
-using Moq;
-using Microsoft.Extensions.Logging;
-using NBB.ProcessManager.Runtime.Events;
-using Microsoft.Extensions.DependencyInjection;
-using NBB.Core.Effects;
-using NBB.EventStore.InMemory;
-using NBB.EventStore.Internal;
-using NBB.ProcessManager.Runtime.Persistence;
-using static NBB.ProcessManager.Tests.RegistrationTests.RegistrationProcessManager;
-using System.Collections.Generic;
 using System.Linq;
-using MediatR;
-using FluentAssertions.Common;
-
+using Xunit;
+using static NBB.ProcessManager.Tests.RegistrationTests.RegistrationProcessManager;
 
 namespace NBB.ProcessManager.Tests
 {
@@ -46,6 +34,7 @@ namespace NBB.ProcessManager.Tests
         public IServiceProvider BuildServiceProvider()
         {
             var services = new ServiceCollection();
+            services.AddSingleton<MessagingContextAccessor>();
             services.AddProcessManager(typeof(RegistrationProcessManager).Assembly);
             services.AddEventStore(es =>
             {
@@ -87,7 +76,7 @@ namespace NBB.ProcessManager.Tests
                     .SetState((@event, state) => state.Data with { PaidCount = state.Data.PaidCount + 1 })
                     .Then((ev, state) =>
                     {
-                        var effect = MessageBus.Publish(new DoPayment());
+                        var effect = Messaging.Effects.MessageBus.Publish(new DoPayment());
                         return effect;
                     });
             }
