@@ -36,6 +36,7 @@ Messaging transports
 -----------------
 The message bus uses an abstraction over the messaging transport. The following implementations are currently supported:
 * **NATS Streaming** (*NBB.Messaging.Nats* package) - https://nats.io
+* **JetStream NATS ** (*NBB.Messaging.JetStream* package) - https://nats.io
 * **In-process** (*NBB.Messaging.InProcessMessaging*) - can be used as *test doubles* in integration tests
 * **Noop** (*NBB.Messaging.Noop*) - NoOp implementation of messaging transport
 * **Rusi** (*NBB.Messaging.Rusi*) - it's a transport implementation for https://github.com/osstotalsoft/rusi, which will handle some messaging concerns externally 
