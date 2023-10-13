@@ -60,15 +60,15 @@ namespace NBB.Messaging.Host.Internal
                 return;
 
             _logger.LogInformation($"Messaging host is scheduled for restart in {delay.TotalSeconds} seconds");
+
+            if (!ExecutionContext.IsFlowSuppressed())
+                ExecutionContext.SuppressFlow();
+
             Task.Run(async () =>
             {
                 try
                 {
-                    await Task.Delay(delay);
-
-                    if (!ExecutionContext.IsFlowSuppressed())
-                        ExecutionContext.SuppressFlow(); 
-
+                    await Task.Delay(delay);                
                     await TryStopAsync();
                     await StartAsync();
                 }
