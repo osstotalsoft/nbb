@@ -60,14 +60,16 @@ namespace NBB.Messaging.Host.Internal
                 return;
 
             _logger.LogInformation($"Messaging host is scheduled for restart in {delay.TotalSeconds} seconds");
+
+            // TODO: when upgrading to .NET 8 remove the "suppressed" check since it doesn't throw any more
+            // https://github.com/dotnet/runtime/pull/82912
+            using IDisposable _ = ExecutionContext.IsFlowSuppressed() ? null : ExecutionContext.SuppressFlow();
+
             Task.Run(async () =>
             {
                 try
                 {
                     await Task.Delay(delay);
-
-                    if (!ExecutionContext.IsFlowSuppressed())
-                        ExecutionContext.SuppressFlow();
 
                     await TryStopAsync();
                     await StartAsync();
