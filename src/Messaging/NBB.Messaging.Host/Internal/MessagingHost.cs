@@ -67,7 +67,7 @@ namespace NBB.Messaging.Host.Internal
                     await Task.Delay(delay);
 
                     if (!ExecutionContext.IsFlowSuppressed())
-                        ExecutionContext.SuppressFlow();
+                        ExecutionContext.SuppressFlow(); 
 
                     await TryStopAsync();
                     await StartAsync();
