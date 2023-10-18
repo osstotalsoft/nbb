@@ -13,10 +13,10 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddNatsTransport(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<NatsOptions>(configuration.GetSection("Messaging").GetSection("Nats"));
-            services.AddSingleton<NatsConnectionProvider>();
-            services.AddSingleton<IMessagingTransport, NatsMessagingTransport>();
-            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<NatsConnectionProvider>());
+            services.Configure<JetStreamOptions>(configuration.GetSection("Messaging").GetSection("JetStream"));
+            services.AddSingleton<JetStreamConnectionProvider>();
+            services.AddSingleton<IMessagingTransport, JetStreamMessagingTransport>();
+            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<JetStreamConnectionProvider>());
 
             return services;
         }

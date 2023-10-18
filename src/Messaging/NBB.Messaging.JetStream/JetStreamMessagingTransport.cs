@@ -12,17 +12,16 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream
 {
-    public class NatsMessagingTransport : IMessagingTransport
+    public class JetStreamMessagingTransport : IMessagingTransport
     {
-        private readonly IOptions<NatsOptions> _natsOptions;
-        private readonly NatsConnectionProvider _natsConnectionManager;
+        private readonly IOptions<JetStreamOptions> _natsOptions;
+        private readonly JetStreamConnectionProvider _natsConnectionManager;
 
-        public NatsMessagingTransport(IOptions<NatsOptions> natsOptions, NatsConnectionProvider natsConnectionManager)
+        public JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, JetStreamConnectionProvider natsConnectionManager)
         {
             _natsOptions = natsOptions;
             _natsConnectionManager = natsConnectionManager;
         }
- 
 
         public Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
         {
@@ -48,20 +47,23 @@ namespace NBB.Messaging.JetStream
                 IJetStream js = con.CreateJetStreamContext();
 
                 // set's up the stream
-                var isCommand = topic.Contains("commands.");
+                var isCommand = topic.ToLower().Contains("commands.");
 
                 var stream = isCommand ? _natsOptions.Value.CommandsStream : _natsOptions.Value.EventsStream;
-                JsUtils.ExitIfStreamNotExists(con, stream);
+                var jsm = con.CreateJetStreamManagementContext();
+                jsm.GetStreamInfo(stream);
 
                 // get stream context, create consumer and get the consumer context
                 var streamContext = con.GetStreamContext(stream);
 
                 var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
-
                 var ccb = ConsumerConfiguration.Builder();
 
-                var clientId = (_natsOptions.Value.ClientId + topic).Replace(".", "_");
-                if (subscriberOptions.IsDurable) ccb.WithDurable(clientId);
+                if (subscriberOptions.IsDurable)
+                {
+                    var clientId = (_natsOptions.Value.ClientId + topic).Replace(".", "_");
+                    ccb.WithDurable(clientId);
+                }
 
                 if (subscriberOptions.DeliverNewMessagesOnly)
                     ccb.WithDeliverPolicy(DeliverPolicy.New);
@@ -80,7 +82,7 @@ namespace NBB.Messaging.JetStream
                 {
                     if (cancellationToken.IsCancellationRequested)
                         return;
-                
+
                     var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(args.Message.Data));
 
                     // Fire and forget

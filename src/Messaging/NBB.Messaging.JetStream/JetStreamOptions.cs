@@ -3,7 +3,7 @@
 
 namespace NBB.Messaging.JetStream
 {
-    public class NatsOptions
+    public class JetStreamOptions
     {
         /// <summary>
         /// URL of the Streaming NATS cluster

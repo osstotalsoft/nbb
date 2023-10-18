@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream.Internal
 {
-    public class NatsConnectionProvider : IDisposable, ITransportMonitor
+    public class JetStreamConnectionProvider : IDisposable, ITransportMonitor
     {
-        private readonly IOptions<NatsOptions> _natsOptions;
-        private readonly ILogger<NatsConnectionProvider> _logger;
+        private readonly IOptions<JetStreamOptions> _natsOptions;
+        private readonly ILogger<JetStreamConnectionProvider> _logger;
         private IConnection _connection;
         private static readonly object InstanceLoker = new();
         private Exception _unrecoverableException;
 
         public event TransportErrorHandler OnError;
 
-        public NatsConnectionProvider(IOptions<NatsOptions> natsOptions, ILogger<NatsConnectionProvider> logger)
+        public JetStreamConnectionProvider(IOptions<JetStreamOptions> natsOptions, ILogger<JetStreamConnectionProvider> logger)
         {
             _natsOptions = natsOptions;
             _logger = logger;
