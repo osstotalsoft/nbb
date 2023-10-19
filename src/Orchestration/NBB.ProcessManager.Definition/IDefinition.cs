@@ -10,7 +10,7 @@ namespace NBB.ProcessManager.Definition
     {
         EffectFunc<TEvent, TData> GetEffectFunc<TEvent>();
         SetStateFunc<TEvent, TData> GetSetStateFunc<TEvent>();
-        Func<TEvent, object> GetCorrelationFilter<TEvent>();
+        Func<TEvent, IDictionary<string,string>, object> GetCorrelationFilter<TEvent>();
         EventPredicate<TEvent, TData> GetStarterPredicate<TEvent>();
         EventPredicate<TEvent, TData> GetCompletionPredicate<TEvent>();
     }

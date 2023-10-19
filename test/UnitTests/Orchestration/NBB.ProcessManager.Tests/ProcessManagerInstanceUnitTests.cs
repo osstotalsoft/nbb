@@ -15,6 +15,7 @@ using Xunit;
 using Moq;
 using Microsoft.Extensions.Logging;
 using NBB.ProcessManager.Runtime.Events;
+using System.Collections.Generic;
 
 namespace NBB.ProcessManager.Tests
 {
@@ -38,7 +39,7 @@ namespace NBB.ProcessManager.Tests
             var identitySelector =
                 ((IDefinition<OrderProcessManagerData>) definition).GetCorrelationFilter<OrderCreated>();
             if (identitySelector != null)
-                instance = await _fixture.Repository.Get(definition, identitySelector(@event), CancellationToken.None);
+                instance = await _fixture.Repository.Get(definition, identitySelector(@event, null), CancellationToken.None);
 
             instance.ProcessEvent(@event);
             await _fixture.Repository.Save(instance, CancellationToken.None);
@@ -291,6 +292,35 @@ namespace NBB.ProcessManager.Tests
                 When<OrderShipped>()
                     .Complete((@event, data) => @event.ShippingDate < DateTime.Parse("2019-09-08"));
             }
+        }
+
+        class CorrelateByHeaders : AbstractDefinition<OrderProcessManagerData>
+        {
+            public CorrelateByHeaders()
+            {
+                Event<OrderCreated>(configurator => configurator.CorrelateById(orderCreated => orderCreated.OrderId));
+                Event<OrderShipped>(configurator =>configurator.CorrelateBy((orderCreated, headers) => headers["key"]));
+
+                StartWith<OrderCreated>();
+                When<OrderShipped>()
+                    .Complete();
+            }
+        }
+
+
+        [Fact]
+        public void correlate_by_headers()
+        {
+            var orderId = Guid.NewGuid();
+            var orderCreated = new OrderCreated(orderId, 100, 0, 0);
+            var orderShipped = new OrderShipped(orderId, DateTime.Parse("2019-09-09"));
+            var definition = new CorrelateByHeaders();
+            var logger = Mock.Of<ILogger<Instance<OrderProcessManagerData>>>();
+
+            var instance = new Instance<OrderProcessManagerData>(definition, logger);
+            instance.ProcessEvent(orderCreated);
+            instance.ProcessEvent(orderShipped, new Dictionary<string, string>() { { "key", orderId.ToString() } });
+            instance.State.Should().Be(InstanceStates.Completed);
         }
 
         [Fact]

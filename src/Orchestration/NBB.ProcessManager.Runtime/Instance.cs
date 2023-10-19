@@ -1,14 +1,14 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using NBB.ProcessManager.Definition;
-using NBB.ProcessManager.Runtime.Events;
-using System;
-using System.Collections.Generic;
-using NBB.Core.Effects;
 using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
+using NBB.Core.Effects;
+using NBB.ProcessManager.Definition;
+using NBB.ProcessManager.Runtime.Events;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace NBB.ProcessManager.Runtime
 {
@@ -36,7 +36,7 @@ namespace NBB.ProcessManager.Runtime
             Data = new TData();
         }
 
-        private void StartProcess<TEvent>(TEvent @event)
+        private void StartProcess<TEvent>(TEvent @event, IDictionary<string, string> headers)
         {
             var eventType = typeof(TEvent);
 
@@ -51,12 +51,12 @@ namespace NBB.ProcessManager.Runtime
             if (State != InstanceStates.NotStarted)
                 throw new Exception($"Cannot start an instance which is in state {State}");
 
-            var identity = idSelector(@event);
+            var identity = idSelector(@event, headers);
             Emit(new ProcessStarted(identity));
         }
 
        
-        public void ProcessEvent<TEvent>(TEvent @event)
+        public void ProcessEvent<TEvent>(TEvent @event, IDictionary<string, string> headers = null)
         {
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
 
@@ -68,7 +68,7 @@ namespace NBB.ProcessManager.Runtime
                     return;
                 }
 
-                StartProcess(@event);
+                StartProcess(@event, headers);
             }
 
             switch (State)
