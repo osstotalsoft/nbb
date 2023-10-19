@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
-        public static IServiceCollection AddNatsTransport(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJetStreamTransport(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JetStreamOptions>(configuration.GetSection("Messaging").GetSection("JetStream"));
             services.AddSingleton<JetStreamConnectionProvider>();
