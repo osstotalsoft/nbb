@@ -62,11 +62,11 @@ namespace NBB.Messaging.JetStream.Internal
 
             options.ClosedEventHandler += (_, args) =>
             {
-                SetConnectionLostState(args.Error ?? new Exception("NATS connection was lost"));
+                SetConnectionLostState(args.Error ?? new Exception("NATS Jetstream connection was lost"));
             };
 
             _connection = new ConnectionFactory().CreateConnection(options);
-            _logger.LogInformation($"NATS connection to {_natsOptions.Value.NatsUrl} was established");
+            _logger.LogInformation($"NATS Jetstream connection to {_natsOptions.Value.NatsUrl} was established");
 
             return _connection;
         }
@@ -82,7 +82,7 @@ namespace NBB.Messaging.JetStream.Internal
             if (existingException != null)
                 return;
 
-            _logger.LogError(exception, "NATS connection unrecoverable");
+            _logger.LogError(exception, "NATS Jetstream connection unrecoverable");
 
             OnError?.Invoke(exception);
         }
