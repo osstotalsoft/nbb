@@ -13,7 +13,7 @@ namespace NBB.ProjectR.Tests
         {
             var services = new ServiceCollection();
             services.AddProjectR(GetType().Assembly);
-            services.AddMediatR(GetType().Assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(GetType().Assembly));
             services
                 .AddEffects()
                 .AddMessagingEffects()

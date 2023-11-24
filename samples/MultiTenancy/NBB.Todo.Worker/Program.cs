@@ -72,7 +72,7 @@ namespace NBB.Todo.Worker
         private static void ConfigureServices(HostBuilderContext hostingContext, IServiceCollection services)
         {
             // MediatR 
-            services.AddMediatR(typeof(CreateTodoTaskHandler).Assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateTodoTaskHandler>());
 
             // Data
             services.AddTodoDataAccess();

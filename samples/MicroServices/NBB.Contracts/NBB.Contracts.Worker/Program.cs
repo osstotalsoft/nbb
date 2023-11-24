@@ -45,8 +45,7 @@ namespace NBB.Contracts.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
-
+                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<ContractCommandHandlers>());
 
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))

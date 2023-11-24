@@ -48,7 +48,7 @@ namespace NBB.Invoices.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(CreateInvoiceCommandHandler).Assembly);
+                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateInvoiceCommandHandler>());
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();

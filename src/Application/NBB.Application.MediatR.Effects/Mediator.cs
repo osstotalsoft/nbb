@@ -77,9 +77,9 @@ namespace NBB.Application.MediatR.Effects
             Effect.Of<MediatorEffects.Send.SideEffect<TResponse>, TResponse>(
                 new MediatorEffects.Send.SideEffect<TResponse>(query));
 
-        public static Effect<Unit> Send(IRequest cmd) =>
-            Effect.Of<MediatorEffects.Send.SideEffect<global::MediatR.Unit>, global::MediatR.Unit>(
-                new MediatorEffects.Send.SideEffect<global::MediatR.Unit>(cmd)).ToUnit();
+        //public static Effect<Unit> Send(IRequest cmd) =>
+        //    Effect.Of<MediatorEffects.Send.SideEffect<global::MediatR.Unit>, global::MediatR.Unit>(
+        //        new MediatorEffects.Send.SideEffect<global::MediatR.Unit>(cmd)).ToUnit();
 
         public static Effect<Unit> Publish(INotification notification) =>
             Effect.Of<MediatorEffects.Publish.SideEffect, Unit>(new MediatorEffects.Publish.SideEffect(notification));

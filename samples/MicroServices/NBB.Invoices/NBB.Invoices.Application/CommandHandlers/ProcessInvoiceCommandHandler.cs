@@ -22,7 +22,7 @@ namespace NBB.Invoices.Application.CommandHandlers
             this._invoiceLockRepository = invoiceLockRepository;
         }
 
-        public Task<Unit> Handle(ProcessInvoice command, CancellationToken cancellationToken)
+        public Task Handle(ProcessInvoice command, CancellationToken cancellationToken)
             => UsingInvoiceLock(command.InvoiceId, lockTimeoutMs: 10000, async () =>
             {
                 var invoice = await _invocieRepository.GetByIdAsync(command.InvoiceId, cancellationToken);

@@ -48,7 +48,7 @@ namespace NBB.Payments.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(PayPayableCommandHandler).Assembly);
+                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<PayPayableCommandHandler>());
                     //services.AddKafkaMessaging();
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 

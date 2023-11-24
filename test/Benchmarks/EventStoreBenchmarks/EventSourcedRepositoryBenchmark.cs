@@ -240,7 +240,7 @@ namespace TheBenchmarks
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
-            services.AddMediatR(typeof(Program).Assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
             services.AddEventStore(es =>
             {

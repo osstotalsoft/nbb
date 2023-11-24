@@ -18,13 +18,11 @@ namespace NBB.Invoices.Application.CommandHandlers
             this._repository = repository;
         }
 
-        public async Task<Unit> Handle(CreateInvoice command, CancellationToken cancellationToken)
+        public async Task Handle(CreateInvoice command, CancellationToken cancellationToken)
         {
             var invoice = new Invoice(command.ClientId, command.ContractId, command.Amount);
             await _repository.AddAsync(invoice, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
         }
     }
 }

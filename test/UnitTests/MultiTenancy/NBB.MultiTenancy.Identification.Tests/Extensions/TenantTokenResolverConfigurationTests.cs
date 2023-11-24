@@ -2,6 +2,8 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using NBB.MultiTenancy.Identification.Extensions;
 using NBB.MultiTenancy.Identification.Resolvers;
 using System;
@@ -48,7 +50,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             _sut.AddTenantTokenResolver<MockResolver>();
 
             // Act
-            var result = _sut.GetTenantTokenResolvers(null).ToList();
+            var result = _sut.GetTenantTokenResolvers(new ServiceCollection().BuildServiceProvider()).ToList();
 
             // Assert
             result.Should().NotBeNull();
@@ -66,7 +68,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             _sut.AddTenantTokenResolver<MockResolver>(parameter, parameter, parameter);
 
             // Act
-            var result = _sut.GetTenantTokenResolvers(null).ToList();
+            var result = _sut.GetTenantTokenResolvers(new ServiceCollection().BuildServiceProvider()).ToList();
             var args = ((MockResolver)result.First()).Args;
 
             // Assert
@@ -106,7 +108,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             _sut.AddTenantTokenResolver(typeof(MockResolver));
 
             // Act
-            var result = _sut.GetTenantTokenResolvers(null).ToList();
+            var result = _sut.GetTenantTokenResolvers(new ServiceCollection().BuildServiceProvider()).ToList();
 
             // Assert
             result.Should().NotBeNull();
@@ -150,7 +152,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
             _sut.AddTenantTokenResolver(typeof(MockResolver), parameter, parameter, parameter);
 
             // Act
-            var result = _sut.GetTenantTokenResolvers(null).ToList();
+            var result = _sut.GetTenantTokenResolvers(new ServiceCollection().BuildServiceProvider()).ToList();
             var args = ((MockResolver)result.First()).Args;
 
             // Assert
@@ -179,7 +181,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
 
             // Act
             _sut.AddTenantTokenResolver(resolver);
-            var result = _sut.GetTenantTokenResolvers(null).ToList();
+            var result = _sut.GetTenantTokenResolvers(new ServiceCollection().BuildServiceProvider()).ToList();
 
             // Assert
             result.Should().NotBeNull();
@@ -211,7 +213,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Extensions
 
             // Act
             _sut.AddTenantTokenResolver(ImplementationFactory);
-            var result = _sut.GetTenantTokenResolvers(null).ToList();
+            var result = _sut.GetTenantTokenResolvers(new ServiceCollection().BuildServiceProvider()).ToList();
 
             // Assert
             result.Should().NotBeNull();

@@ -20,13 +20,11 @@ namespace NBB.Payments.Application.CommandHandlers
             _repository = repository;
         }
 
-        public async Task<Unit> Handle(CreatePayable command, CancellationToken cancellationToken)
+        public async Task Handle(CreatePayable command, CancellationToken cancellationToken)
         {
             var payable = new Payable(command.ClientId, command.Amount, command.InvoiceId, command.ContractId);
             await _repository.AddAsync(payable, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
         }
     }
 

@@ -42,7 +42,7 @@ namespace NBB.MicroServicesOrchestration
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(Program).Assembly);
+                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
