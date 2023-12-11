@@ -21,7 +21,7 @@
 
     <ItemGroup>
         <PackageReference Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemetryCorePackageVersion)" />
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OpenTelemetryCorePackageVersion)" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCorePackageVersion)" />
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OpenTelemetryExporterPrometheusAspnetCorePackageVersion)" />        
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
         <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />
@@ -29,10 +29,10 @@
         <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />
         <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationHttpPackageVersion)" />
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationRuntimePackageVersion)" />        		
-		<PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
-		<PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+		    <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+		    <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
+		    <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -121,9 +121,9 @@ namespace NBB.Todo.Worker
                         .SetSampler(new AlwaysOnSampler())
                         .AddMessageBusInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
-                        .AddJaegerExporter()
+                        .AddOtlpExporter()
                 );
-                services.Configure<JaegerExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Jaeger"));
+                services.Configure<OtlpExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Otlp"));
             }
 
 

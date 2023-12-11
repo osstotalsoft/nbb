@@ -19,7 +19,7 @@ namespace TheBenchmarks
 {
     //[SimpleJob(runStrategy:RunStrategy.ColdStart, launchCount: 2, warmupCount: 0, targetCount: 5)]
     //[SimpleJob(runStrategy:RunStrategy.ColdStart, launchCount: 10, warmupCount: 0, targetCount: 1)]
-    [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 10)]
+    [SimpleJob(launchCount: 1, warmupCount: 0, iterationCount: 10)]
     [RPlotExporter, RankColumn]
     public class EventSourcedRepositoryBenchmark
     {

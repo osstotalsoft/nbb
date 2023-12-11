@@ -76,9 +76,9 @@ namespace NBB.Todo.Api
                         .AddAspNetCoreInstrumentation()
                         .AddMessageBusInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
-                        .AddJaegerExporter()
+                        .AddOtlpExporter()
                 );
-                services.Configure<JaegerExporterOptions>(Configuration.GetSection("OpenTelemetry:Jaeger"));
+                services.Configure<OtlpExporterOptions>(Configuration.GetSection("OpenTelemetry:Otlp"));
             }
 
             if (Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))

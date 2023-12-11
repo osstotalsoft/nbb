@@ -31,11 +31,11 @@
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
-	<PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
-	<PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
+	  <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+	  <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
 
 
-	<PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="$(OpenTelemetryCorePackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCorePackageVersion)" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
     <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />

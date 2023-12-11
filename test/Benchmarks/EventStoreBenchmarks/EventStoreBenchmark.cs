@@ -22,7 +22,7 @@ namespace TheBenchmarks
     public record TestEvent(Guid EventId, Guid? CorrelationId) : INotification;
 
 
-    [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 10)]
+    [SimpleJob(launchCount: 1, warmupCount: 0, iterationCount: 10)]
     public class EventStoreBenchmark
     {
         private IServiceProvider _container;

@@ -1,40 +1,40 @@
 ﻿<Project>
 	<PropertyGroup Label="Package Versions">
-		<NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
+		<NewtonsoftJsonPackageVersion>13.0.3</NewtonsoftJsonPackageVersion>
 		<MediatRPackageVersion>12.2.0</MediatRPackageVersion>
 		<MediatRContractsPackageVersion>2.0.1</MediatRContractsPackageVersion>
-		<ScrutorPackageVersion>3.3.0</ScrutorPackageVersion>
-		<BenchmarkDotNetPackageVersion>0.13.1</BenchmarkDotNetPackageVersion>
-		<MoqPackageVersion>4.20.69</MoqPackageVersion>
-		<XunitPackageVersion>2.4.1</XunitPackageVersion>
-		<XunitRunnerVisualStudioPackageVersion>2.4.3</XunitRunnerVisualStudioPackageVersion>
-		<CoverletCollectorPackageVersion>3.1.0</CoverletCollectorPackageVersion>
-		<MicrosoftNetTestSdkPackageVersion>17.0.0</MicrosoftNetTestSdkPackageVersion>
-		<FsUnitPackageVersion>4.1.0</FsUnitPackageVersion>
-		<FluentAssertionsPackageVersion>6.3.0</FluentAssertionsPackageVersion>
-		<MicrosoftDataSqlClientPackageVersion>5.0.1</MicrosoftDataSqlClientPackageVersion>
+		<ScrutorPackageVersion>4.2.2</ScrutorPackageVersion>
+		<BenchmarkDotNetPackageVersion>0.13.11</BenchmarkDotNetPackageVersion>
+		<MoqPackageVersion>4.20.70</MoqPackageVersion>
+		<XunitPackageVersion>2.6.3</XunitPackageVersion>
+		<XunitRunnerVisualStudioPackageVersion>2.5.5</XunitRunnerVisualStudioPackageVersion>
+		<CoverletCollectorPackageVersion>6.0.0</CoverletCollectorPackageVersion>
+		<MicrosoftNetTestSdkPackageVersion>17.8.0</MicrosoftNetTestSdkPackageVersion>
+		<FsUnitPackageVersion>5.6.1</FsUnitPackageVersion>
+		<FluentAssertionsPackageVersion>6.12.0</FluentAssertionsPackageVersion>
+		<MicrosoftDataSqlClientPackageVersion>5.1.2</MicrosoftDataSqlClientPackageVersion>
 		<MicrosoftExtensionsPackagesVersion>8.0.0</MicrosoftExtensionsPackagesVersion>
 		<MicrosoftEntityFrameworkPackagesVersion>8.0.0</MicrosoftEntityFrameworkPackagesVersion>
 		<MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
-		<OpenTelemetryCorePackageVersion>1.5.0</OpenTelemetryCorePackageVersion>
-		<OpenTelemetryExtensionsHostingPackageVersion>1.5.0</OpenTelemetryExtensionsHostingPackageVersion>
-		<OpenTelemetryExtensionsPropagatorsPackageVersion>1.5.0</OpenTelemetryExtensionsPropagatorsPackageVersion>
+		<OpenTelemetryCorePackageVersion>1.7.0</OpenTelemetryCorePackageVersion>
+		<OpenTelemetryExtensionsHostingPackageVersion>1.7.0</OpenTelemetryExtensionsHostingPackageVersion>
+		<OpenTelemetryExtensionsPropagatorsPackageVersion>1.7.0</OpenTelemetryExtensionsPropagatorsPackageVersion>
 		<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.0.0-rc9.14</OpenTelemetryInstrumentationAspNetCorePackageVersion>
 		<OpenTelemetryInstrumentationEFCorePackageVersion>1.0.0-beta.7</OpenTelemetryInstrumentationEFCorePackageVersion>
 		<OpenTelemetryInstrumentationHttpPackageVersion>1.0.0-rc9.14</OpenTelemetryInstrumentationHttpPackageVersion>
-		<OpenTelemetryInstrumentationRuntimePackageVersion>1.5.0</OpenTelemetryInstrumentationRuntimePackageVersion>
+		<OpenTelemetryInstrumentationRuntimePackageVersion>1.5.1</OpenTelemetryInstrumentationRuntimePackageVersion>
 		<OpenTelemetryExporterPrometheusHttpListenerPackageVersion>1.5.0-rc.1</OpenTelemetryExporterPrometheusHttpListenerPackageVersion>
 		<OpenTelemetryExporterPrometheusAspnetCorePackageVersion>1.5.0-rc.1</OpenTelemetryExporterPrometheusAspnetCorePackageVersion>
-		<PollyVersion>7.2.2</PollyVersion>
-		<SerilogPackageVersion>2.10.0</SerilogPackageVersion>
-		<SerilogExtensionsLoggingPackageVersion>3.1.0</SerilogExtensionsLoggingPackageVersion>
-		<SerilogSinksConsole>4.0.1</SerilogSinksConsole>
-		<SerilogSinksMSSqlServerPackageVersion>5.6.1</SerilogSinksMSSqlServerPackageVersion>
-		<SerilogAspNetCorePackageVersion>4.1.0</SerilogAspNetCorePackageVersion>
-		<AutoMapperPackageVersion>12.0.0</AutoMapperPackageVersion>
-		<NJsonSchemaPackageVersion>10.6.6</NJsonSchemaPackageVersion>
-		<AutoFixturePackageVersion>4.17.0</AutoFixturePackageVersion>
+		<PollyVersion>8.2.0</PollyVersion>
+		<SerilogPackageVersion>3.1.1</SerilogPackageVersion>
+		<SerilogExtensionsLoggingPackageVersion>8.0.0</SerilogExtensionsLoggingPackageVersion>
+		<SerilogSinksConsole>5.0.1</SerilogSinksConsole>
+		<SerilogSinksMSSqlServerPackageVersion>6.5.0</SerilogSinksMSSqlServerPackageVersion>
+		<SerilogAspNetCorePackageVersion>8.0.0</SerilogAspNetCorePackageVersion>
+		<AutoMapperPackageVersion>12.0.1</AutoMapperPackageVersion>
+		<NJsonSchemaPackageVersion>10.9.0</NJsonSchemaPackageVersion>
+		<AutoFixturePackageVersion>4.18.1</AutoFixturePackageVersion>
 		<JaegerPackageVersion>1.0.3</JaegerPackageVersion>
-		<SystemIdentityModelTokensJwtPackageVersion>6.15.0</SystemIdentityModelTokensJwtPackageVersion>
+		<SystemIdentityModelTokensJwtPackageVersion>7.0.3</SystemIdentityModelTokensJwtPackageVersion>
 	</PropertyGroup>
 </Project>
