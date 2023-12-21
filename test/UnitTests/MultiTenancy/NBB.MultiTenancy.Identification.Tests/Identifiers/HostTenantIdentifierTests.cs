@@ -23,7 +23,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
         }
 
         [Fact]
-        public void Should_Return_TenantId()
+        public async Task Should_Return_TenantId()
         {
             // Arrange
             var tenantId = Guid.NewGuid();
@@ -32,14 +32,14 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
             var sut = new HostTenantIdentifier(_tenantRepository.Object);
 
             // Act
-            var result = sut.GetTenantIdAsync(string.Empty).Result;
+            var result = await sut.GetTenantIdAsync(string.Empty);
 
             // Assert
             result.Should().Be(tenantId);
         }
 
         [Fact]
-        public void Should_Pass_Token_To_Repository()
+        public async Task Should_Pass_Token_To_Repository()
         {
             // Arrange
             const string tenantToken = "tenant token";
@@ -47,7 +47,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
             var sut = new HostTenantIdentifier(_tenantRepository.Object);
 
             // Act
-            var _ = sut.GetTenantIdAsync(tenantToken).Result;
+            _ = await sut.GetTenantIdAsync(tenantToken);
 
             // Assert
             _tenantRepository.Verify(r => r.GetByHost(It.Is<string>(s => string.Equals(s, tenantToken)), It.IsAny<CancellationToken>()), Times.Once());

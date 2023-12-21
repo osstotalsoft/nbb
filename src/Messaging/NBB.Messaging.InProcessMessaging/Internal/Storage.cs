@@ -57,7 +57,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
 
             await Task.Yield();
             var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            var _ = Task.Run(async () => { await StartBroker(topic, handler, cts.Token); }, cts.Token);
+            _ = Task.Run(async () => { await StartBroker(topic, handler, cts.Token); }, cts.Token);
             return new DelegateDisposable(() =>
             {
                 cts.Cancel();

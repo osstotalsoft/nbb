@@ -65,7 +65,7 @@ let ``RequestHandler.compose left identity law `` (f: int -> int option) (req: i
         req
         |> h
         |> Effect.interpret interpreter
-        |> fun t -> t.GetAwaiter().GetResult()
+        |> _.GetAwaiter().GetResult()
 
     run (identity >=> f') = run f'
 
@@ -78,7 +78,7 @@ let ``RequestHandler.compose right identity law`` (f: int -> int option) (req: i
         req
         |> h
         |> Effect.interpret interpreter
-        |> fun t -> t.GetAwaiter().GetResult()
+        |> _.GetAwaiter().GetResult()
 
     run (f' >=> identity) = run f'
 
@@ -98,7 +98,7 @@ let ``RequestHandler.compose associativity law``
         req
         |> h
         |> Effect.interpret interpreter
-        |> fun t -> t.GetAwaiter().GetResult()
+        |> _.GetAwaiter().GetResult()
 
     run ((f' >=> g') >=> h') = run (f' >=> (g' >=> h'))
 

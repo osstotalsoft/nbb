@@ -25,6 +25,8 @@ using System.Reflection;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Metrics;
 using NBB.Tools.Serilog.OpenTelemetryTracingSink;
+using Microsoft.Data.SqlClient;
+using System.Linq;
 
 namespace NBB.Todo.Worker
 {
@@ -120,7 +122,13 @@ namespace NBB.Todo.Worker
                         .ConfigureResource(configureResource)
                         .SetSampler(new AlwaysOnSampler())
                         .AddMessageBusInstrumentation()
-                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                        .AddEntityFrameworkCoreInstrumentation(options => {
+                            options.SetDbStatementForText = true;
+                            options.EnrichWithIDbCommand = (activity, command) =>
+                                activity.SetTag(
+                                    "db.statement.params",
+                                    string.Join(", ", command.Parameters.Cast<SqlParameter>().Select(p => $"{p.ParameterName} = {p.Value}")));                   
+                        })
                         .AddOtlpExporter()
                 );
                 services.Configure<OtlpExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Otlp"));

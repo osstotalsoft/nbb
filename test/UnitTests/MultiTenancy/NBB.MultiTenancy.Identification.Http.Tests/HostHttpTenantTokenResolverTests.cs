@@ -4,6 +4,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
@@ -30,40 +31,40 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
+            _ = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
         }
 
         [Fact]
-        public void Should_Retrieve_Context_From_Accessor()
+        public async Task Should_Retrieve_Context_From_Accessor()
         {
             // Arrange
             var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
-            var _ = sut.GetTenantToken().Result;
+            _ = await sut.GetTenantToken();
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
         }
 
         [Fact]
-        public void Should_Retrieve_Request_From_Context()
+        public async Task Should_Retrieve_Request_From_Context()
         {
             // Arrange
             var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
-            var _ = sut.GetTenantToken().Result;
+            _ = await sut.GetTenantToken();
 
             // Assert
             _mockHttpContext.Verify(c => c.Request, Times.Once());
         }
 
         [Fact]
-        public void Should_Retrieve_Host_From_Request()
+        public async Task Should_Retrieve_Host_From_Request()
         {
             // Arrange
             var host = new HostString("test.host");
@@ -71,14 +72,14 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
-            var _ = sut.GetTenantToken().Result;
+            _ = await sut.GetTenantToken();
 
             // Assert
             _mockHttpRequest.Verify(i => i.Host, Times.Once());
         }
 
         [Fact]
-        public void Should_Return_Host_Value()
+        public async Task Should_Return_Host_Value()
         {
             // Arrange
             var host = new HostString("test.host");
@@ -86,7 +87,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new HostHttpTenantTokenResolver(_mockHttpContextAccessor.Object);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().Be(host.Host);

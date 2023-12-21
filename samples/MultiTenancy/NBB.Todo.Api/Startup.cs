@@ -5,6 +5,7 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -23,6 +24,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System;
+using System.Linq;
 using System.Reflection;
 using ProblemDetailsOptions = Hellang.Middleware.ProblemDetails.ProblemDetailsOptions;
 
@@ -75,7 +77,18 @@ namespace NBB.Todo.Api
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation()
                         .AddMessageBusInstrumentation()
-                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                        .AddEntityFrameworkCoreInstrumentation(options =>
+                        {
+                            options.SetDbStatementForText = true;
+                            options.EnrichWithIDbCommand = (activity, command) =>
+                            {
+                                //activity.SetTag("db.statement", command.CommandText);
+                                activity.SetTag(
+                                    "db.statement.params",
+                                    string.Join(", ", command.Parameters.Cast<SqlParameter>().Select(p => $"{p.ParameterName} = {p.Value}")));
+                            };
+
+                        })
                         .AddOtlpExporter()
                 );
                 services.Configure<OtlpExporterOptions>(Configuration.GetSection("OpenTelemetry:Otlp"));
