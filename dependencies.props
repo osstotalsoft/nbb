@@ -19,12 +19,12 @@
 		<OpenTelemetryCorePackageVersion>1.7.0</OpenTelemetryCorePackageVersion>
 		<OpenTelemetryExtensionsHostingPackageVersion>1.7.0</OpenTelemetryExtensionsHostingPackageVersion>
 		<OpenTelemetryExtensionsPropagatorsPackageVersion>1.7.0</OpenTelemetryExtensionsPropagatorsPackageVersion>
-		<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.0.0-rc9.14</OpenTelemetryInstrumentationAspNetCorePackageVersion>
-		<OpenTelemetryInstrumentationEFCorePackageVersion>1.0.0-beta.7</OpenTelemetryInstrumentationEFCorePackageVersion>
-		<OpenTelemetryInstrumentationHttpPackageVersion>1.0.0-rc9.14</OpenTelemetryInstrumentationHttpPackageVersion>
+		<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.6.0-rc.1</OpenTelemetryInstrumentationAspNetCorePackageVersion>
+		<OpenTelemetryInstrumentationEFCorePackageVersion>1.0.0-beta.8</OpenTelemetryInstrumentationEFCorePackageVersion>
+		<OpenTelemetryInstrumentationHttpPackageVersion>1.6.0-rc.1</OpenTelemetryInstrumentationHttpPackageVersion>
 		<OpenTelemetryInstrumentationRuntimePackageVersion>1.5.1</OpenTelemetryInstrumentationRuntimePackageVersion>
 		<OpenTelemetryExporterPrometheusHttpListenerPackageVersion>1.5.0-rc.1</OpenTelemetryExporterPrometheusHttpListenerPackageVersion>
-		<OpenTelemetryExporterPrometheusAspnetCorePackageVersion>1.5.0-rc.1</OpenTelemetryExporterPrometheusAspnetCorePackageVersion>
+		<OpenTelemetryExporterPrometheusAspnetCorePackageVersion>1.7.0-rc.1</OpenTelemetryExporterPrometheusAspnetCorePackageVersion>
 		<PollyVersion>8.2.0</PollyVersion>
 		<SerilogPackageVersion>3.1.1</SerilogPackageVersion>
 		<SerilogExtensionsLoggingPackageVersion>8.0.0</SerilogExtensionsLoggingPackageVersion>
