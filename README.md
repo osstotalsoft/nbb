@@ -20,7 +20,7 @@ Architectural considerations
 >
 > -- <cite>Robert C. Martin</cite>
 
-With NBB you can power a great diversity of architectures from a Monolithic one to a Multi-Container Microservices based one.
+With NBB you can power a great diversity of architectures from a Monolithic one to a Multi-Container Microservices based one. 
 It is important to mention that NBB does not impose any kind of architecture.
 
 This repo contains a sample Microservices application decomposed around three bounded contexts: Contracts, Invoices and Payments. 
