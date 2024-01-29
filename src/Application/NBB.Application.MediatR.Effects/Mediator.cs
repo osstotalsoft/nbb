@@ -33,7 +33,6 @@ namespace NBB.Application.MediatR.Effects
                 }
             }
 
-
             public class QueryHandler<TResponse> : ISideEffectHandler<QuerySideEffect<TResponse>, TResponse>
             {
                 private readonly IMediator _mediator;
