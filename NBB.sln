@@ -221,6 +221,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.OpenTelemetry
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F57779EB-9107-427D-A65C-5AA262C348E1}"
 	ProjectSection(SolutionItems) = preProject
+		.github\release-drafter-v4.x.yml = .github\release-drafter-v4.x.yml
+		.github\release-drafter-v5.x.yml = .github\release-drafter-v5.x.yml
+		.github\release-drafter-v6.x.yml = .github\release-drafter-v6.x.yml
+		.github\release-drafter-v7.x.yml = .github\release-drafter-v7.x.yml
 		.github\release-drafter.yml = .github\release-drafter.yml
 	EndProjectSection
 EndProject
