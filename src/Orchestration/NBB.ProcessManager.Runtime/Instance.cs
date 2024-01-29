@@ -55,7 +55,7 @@ namespace NBB.ProcessManager.Runtime
             Emit(new ProcessStarted(identity));
         }
 
-       
+
         public void ProcessEvent<TEvent>(TEvent @event)
         {
             var starter = _definition.GetStarterPredicate<TEvent>()(@event, GetInstanceData());
@@ -71,13 +71,10 @@ namespace NBB.ProcessManager.Runtime
                 StartProcess(@event);
             }
 
-            switch (State)
+            if (State is InstanceStates.NotStarted or InstanceStates.Completed or InstanceStates.Aborted)
             {
-                case InstanceStates.NotStarted:
-                    return;
-                case InstanceStates.Completed:
-                case InstanceStates.Aborted:
-                    throw new Exception($"Cannot accept a new event. Instance is {State}");
+                _logger.LogInformation($"Event of type {@event.GetType().GetLongPrettyName()} will be ignored for process {_definition.GetType().GetLongPrettyName()}. Instance is {State}.");
+                return;
             }
 
             _effect = _effect.Then(_definition.GetEffectFunc<TEvent>()(@event, GetInstanceData()));

@@ -12,6 +12,7 @@ namespace NBB.Messaging.Host
         public Task StartAsync(CancellationToken cancellationToken = default);
         public Task StopAsync(CancellationToken cancellationToken = default);
         public void ScheduleRestart(TimeSpan delay = default);
+        public bool IsRunning();
     }
 
 

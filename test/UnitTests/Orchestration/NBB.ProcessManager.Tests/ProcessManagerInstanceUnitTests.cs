@@ -233,7 +233,8 @@ namespace NBB.ProcessManager.Tests
             instance.State.Should().Be(InstanceStates.Completed);
 
             Action act = () => instance.ProcessEvent(orderPaymentCreated);
-            act.Should().Throw<Exception>();
+            act.Should().NotThrow<Exception>();
+            instance.State.Should().Be(InstanceStates.Completed);
         }
 
 

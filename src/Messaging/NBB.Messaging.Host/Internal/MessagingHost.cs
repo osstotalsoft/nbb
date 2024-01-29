@@ -218,6 +218,8 @@ namespace NBB.Messaging.Host.Internal
 
         }
 
+        public bool IsRunning() => _isStarted == 1 && _isStarting == 0 && _isStopping == 0 && _isScheduledRestart == 0;
+
         private void ExecuteCancellation(CancellationTokenSource cancel)
         {
             // Noop if this is already cancelled
@@ -234,5 +236,6 @@ namespace NBB.Messaging.Host.Internal
         {
             _transportMonitor.OnError -= OnTransportError;
         }
+
     }
 }
