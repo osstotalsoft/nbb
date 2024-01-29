@@ -11,7 +11,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddMediatorEffects(this IServiceCollection services)
         {
-            services.AddSingleton(typeof(MediatorEffects.Send.Handler<>));
+            services.AddSingleton(typeof(MediatorEffects.Send.QueryHandler<>));
+            services.AddSingleton(typeof(MediatorEffects.Send.CommandHandler));
             services.AddSingleton<ISideEffectHandler<MediatorEffects.Publish.SideEffect, Unit>, MediatorEffects.Publish.Handler>();
             return services;
         }
