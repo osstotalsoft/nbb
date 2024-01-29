@@ -1,0 +1,110 @@
+{
+	"variables": [],
+	"info": {
+		"name": "NBB Samples",
+		"_postman_id": "8a8a47f1-d934-e859-1450-0f113a99bacb",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create contract",
+			"request": {
+				"url": "http://localhost:2047/api/contracts",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ClientId\": \"3317223e-22ea-48dc-bc34-fff6ab3b9481\"\n}"
+				},
+				"description": null
+			},
+			"response": []
+		},
+		{
+			"name": "add contract line",
+			"request": {
+				"url": "http://localhost:2047/api/contracts/99534474-4560-4240-88B7-8B14E03D2733/lines",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"Product\": \"Pere\",\n  \"Price\": 23,\n  \"Quantity\": 5,\n  \"ContractId\": \"6FD1AC92-B280-4ABC-AE7D-6ADFB2D2B5A8\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "validate contract",
+			"request": {
+				"url": "http://localhost:2047/api/contracts/A6159DB7-A23B-4A66-B011-B5644F0B8AED/validate",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ContractId\": \"6FD1AC92-B280-4ABC-AE7D-6ADFB2D2B5A8\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "pay payable",
+			"request": {
+				"url": "http://localhost:2046/api/payables/0d64be94-9a86-4d65-b862-c401227a2292/pay",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"PayableId\": \"9C2CF598-2F3C-4617-BD29-C6C39319AE7B\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get invoice",
+			"request": {
+				"url": "http://localhost:2048/api/invoices/80E80EDF-60C9-4A44-A524-522074592435",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"ClientId\": \"3317223e-22ea-48dc-bc34-fff6ab3b9481\"\n}"
+				},
+				"description": null
+			},
+			"response": []
+		}
+	]
+}

@@ -41,8 +41,8 @@ let ``Pure evented values should contain no events`` () =
 [<Fact>]
 let ``List traverse evented should accumulate events`` () =
     let xs = [1;2]
-    let fn = fun i ->
-        match i with
+    let fn =
+        function
         |1 -> Evented (1,[Added])
         |_ -> Evented (2,[Updated])
 

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <DockerComposeProjectPath>..\..\MicroServices\docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>NBB_Mono_04f3de64-51a9-466b-a489-ed331aba59c8</UserSecretsId>
   </PropertyGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="$(MediatRExtensionsMicrosoftDIPackageVersion)" />
+    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />

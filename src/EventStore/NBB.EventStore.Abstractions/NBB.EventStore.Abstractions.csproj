@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Description>This package should contain common event store abstractions and should be references by event store dependent building blocks.</Description>
   </PropertyGroup>
 

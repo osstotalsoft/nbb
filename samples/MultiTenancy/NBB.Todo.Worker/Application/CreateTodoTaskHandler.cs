@@ -19,7 +19,7 @@ namespace NBB.Todo.Worker.Application
             _todoTaskRepository = todoTaskRepository;
         }
 
-        public async Task<Unit> Handle(CreateTodoTask request, CancellationToken cancellationToken)
+        public async Task Handle(CreateTodoTask request, CancellationToken cancellationToken)
         {
             //throw new System.Exception("handler exception");
             var todoTask = new TodoTask
@@ -30,10 +30,7 @@ namespace NBB.Todo.Worker.Application
             };
 
             await _todoTaskRepository.AddAsync(todoTask, cancellationToken);
-
             await _todoTaskRepository.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
         }
     }
 }

@@ -124,7 +124,7 @@ let ``EventHandler.append left identity law `` (f: SomeEvent -> unit option) (re
         req
         |> h
         |> Effect.interpret interpreter
-        |> fun t -> t.GetAwaiter().GetResult()
+        |> _.GetAwaiter().GetResult()
 
 
     run (empty ++ f') = run f'
@@ -139,7 +139,7 @@ let ``EventHandler.append right identity law`` (f: SomeEvent -> unit option) (re
         req
         |> h
         |> Effect.interpret interpreter
-        |> fun t -> t.GetAwaiter().GetResult()
+        |> _.GetAwaiter().GetResult()
 
     run (f' ++ empty) = run f'
 
@@ -161,7 +161,7 @@ let ``EventHandler.append associativity law``
         req
         |> h
         |> Effect.interpret interpreter
-        |> fun t -> t.GetAwaiter().GetResult()
+        |> _.GetAwaiter().GetResult()
 
     run ((f' ++ g') ++ h') = run (f' ++ (g' ++ h'))
 

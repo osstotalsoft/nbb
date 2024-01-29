@@ -7,7 +7,7 @@ open BenchmarkDotNet.Attributes
 open NBB.Core.Effects.FSharp
 open NBB.Core.Effects.FSharp.Interpreter
 
-[<SimpleJob (launchCount= 1, warmupCount= 0, targetCount= 10)>]
+[<SimpleJob (launchCount= 1, warmupCount= 0, iterationCount= 10)>]
 type Benchmark() =
     let interpreter = createInterpreter()
 

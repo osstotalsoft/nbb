@@ -16,8 +16,7 @@ module MessageBus =
 module HandlerUtils =
     open Giraffe
     open NBB.Core.Effects
-    open Microsoft.AspNetCore.Http
-    open FSharp.Control.Tasks.Affine
+    open Microsoft.AspNetCore.Http    
     open Microsoft.Extensions.DependencyInjection
 
     type Effect<'a> = FSharp.Effect<'a>

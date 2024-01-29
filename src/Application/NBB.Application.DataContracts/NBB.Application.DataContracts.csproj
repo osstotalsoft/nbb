@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Description>Legacy code for compatibiltity with NBB 4.x. Reference this package only to support published language assemblies compiled against NBB 4</Description>
   </PropertyGroup>
 

@@ -18,7 +18,7 @@ namespace NBB.Messaging.Host
         private record TypeInfo(Type GenericTypeDef, Func<Type[], bool> Condition);
 
         private static readonly TypeInfo EventType = new(typeof(INotificationHandler<>), _ => true);
-        private static readonly TypeInfo CommandType = new(typeof(IRequestHandler<,>), types => types[1] == typeof(Unit));
+        private static readonly TypeInfo CommandType = new(typeof(IRequestHandler<>), _ => true);
         private static readonly TypeInfo QueryType = new(typeof(IRequestHandler<,>), types => types[1] != typeof(Unit));
 
         /// <summary>

@@ -71,7 +71,7 @@ module Program =
         |> ignore
 
     let configureLogging (builder : ILoggingBuilder) =
-        builder.AddFilter(fun l -> l.Equals LogLevel.Error)
+        builder.AddFilter(_.Equals(LogLevel.Error))
                .AddConsole()
                .AddDebug() |> ignore
 

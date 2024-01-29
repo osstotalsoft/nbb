@@ -7,10 +7,10 @@
 		<SccLocalPath>SAK</SccLocalPath>
 	</PropertyGroup>
 
-	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<Description>A few lightweight messaging abstractions</Description>
-	</PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>A few lightweight messaging abstractions</Description>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<None Remove="NBB.Messaging.Abstractions.csproj.vspscc" />

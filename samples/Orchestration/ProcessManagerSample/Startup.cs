@@ -20,7 +20,7 @@ namespace ProcessManagerSample
 
             services.AddMessageBus().AddInProcessTransport();
 
-            services.AddMediatR(typeof(GetPartnerQuery).Assembly);
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<GetPartnerQuery>());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
             //services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
 

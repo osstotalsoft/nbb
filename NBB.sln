@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D282
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MicroServices", "MicroServices", "{CC43326A-DD67-4B00-80EE-C244B31A319F}"
 	ProjectSection(SolutionItems) = preProject
+		samples\MicroServices\NBB Samples.postman_collection.json = samples\MicroServices\NBB Samples.postman_collection.json
 		samples\MicroServices\README.md = samples\MicroServices\README.md
 	EndProjectSection
 EndProject
@@ -220,6 +221,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.OpenTelemetry
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{F57779EB-9107-427D-A65C-5AA262C348E1}"
 	ProjectSection(SolutionItems) = preProject
+		.github\release-drafter-v4.x.yml = .github\release-drafter-v4.x.yml
+		.github\release-drafter-v5.x.yml = .github\release-drafter-v5.x.yml
+		.github\release-drafter-v6.x.yml = .github\release-drafter-v6.x.yml
+		.github\release-drafter-v7.x.yml = .github\release-drafter-v7.x.yml
 		.github\release-drafter.yml = .github\release-drafter.yml
 	EndProjectSection
 EndProject
@@ -334,6 +339,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NBB.Messaging.DataContracts
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MultiTenancy", "MultiTenancy", "{FA5EB6F2-9864-46B9-B62E-13D6578D9009}"
 	ProjectSection(SolutionItems) = preProject
+		samples\MultiTenancy\MultiTenantTodoList.postman_collection.json = samples\MultiTenancy\MultiTenantTodoList.postman_collection.json
 		samples\MultiTenancy\README.md = samples\MultiTenancy\README.md
 	EndProjectSection
 EndProject
@@ -372,6 +378,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{E7A719C2-1F6B-47DB-9708-3313EB2DBB4F}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
 		.github\workflows\release-drafter.yml = .github\workflows\release-drafter.yml
 		.github\workflows\release.yml = .github\workflows\release.yml
 	EndProjectSection

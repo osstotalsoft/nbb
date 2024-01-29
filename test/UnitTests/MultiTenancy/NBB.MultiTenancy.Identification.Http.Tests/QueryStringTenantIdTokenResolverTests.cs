@@ -4,6 +4,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
@@ -34,14 +35,14 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+            _ = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
         }
 
         [Fact]
-        public void Should_Retrieve_QueryString_From_Request_From_Context_From_Accessor()
+        public async Task Should_Retrieve_QueryString_From_Request_From_Context_From_Accessor()
         {
             // Arrange
             var paramName = "name";
@@ -50,7 +51,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, paramName);
 
             // Act
-            var _ = sut.GetTenantToken().Result;
+            _ = await sut.GetTenantToken();
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
@@ -59,7 +60,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         }
 
         [Fact]
-        public void Should_Return_Value_From_QueryString()
+        public async Task Should_Return_Value_From_QueryString()
         {
             // Arrange
             var paramName = "name";
@@ -68,14 +69,14 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, paramName);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().Be(paramValue);
         }
 
         [Fact]
-        public void Should_Return_Null_When_The_ParamName_Is_Incorrect()
+        public async Task Should_Return_Null_When_The_ParamName_Is_Incorrect()
         {
             // Arrange
             var paramName = "badName";
@@ -84,21 +85,21 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, "name");
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().BeNull();
         }
 
         [Fact]
-        public void Should_Return_Null_If_Context_Is_Null()
+        public async Task Should_Return_Null_If_Context_Is_Null()
         {
             // Arrange
             _mockHttpContextAccessor.Setup(a => a.HttpContext).Returns((HttpContext)null);
             var sut = new QueryStringHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().BeNull();

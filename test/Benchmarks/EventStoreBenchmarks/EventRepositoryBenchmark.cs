@@ -14,7 +14,7 @@ using NBB.EventStore.AdoNet.Migrations;
 
 namespace TheBenchmarks
 {
-    [SimpleJob(launchCount: 1, warmupCount: 0, targetCount: 10)]
+    [SimpleJob(launchCount: 1, warmupCount: 0, iterationCount: 10)]
     public class EventRepositoryBenchmark
     {
         private IServiceProvider _container;

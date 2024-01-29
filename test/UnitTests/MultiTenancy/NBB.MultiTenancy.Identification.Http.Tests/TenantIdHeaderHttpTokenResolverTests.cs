@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Http.Tests
@@ -34,14 +35,14 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             // Arrange
 
             // Act
-            var _ = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
+            _ = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Never());
         }
 
         [Fact]
-        public void Should_Retrieve_Headers_From_Request_From_Context_From_Accessor()
+        public async Task Should_Retrieve_Headers_From_Request_From_Context_From_Accessor()
         {
             // Arrange
             var hKey = "key";
@@ -50,7 +51,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
-            var _ = sut.GetTenantToken().Result;
+            _ = await sut.GetTenantToken();
 
             // Assert
             _mockHttpContextAccessor.Verify(a => a.HttpContext, Times.Once());
@@ -59,7 +60,7 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
         }
 
         [Fact]
-        public void Should_Return_Value_From_Header()
+        public async Task Should_Return_Value_From_Header()
         {
             // Arrange
             var hKey = "key";
@@ -68,35 +69,35 @@ namespace NBB.MultiTenancy.Identification.Http.Tests
             var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().Be(hValue);
         }
 
         [Fact]
-        public void Should_Return_Null_When_The_Key_Is_Bad()
+        public async Task Should_Return_Null_When_The_Key_Is_Bad()
         {
             // Arrange
             var hKey = "bad key";
             var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, hKey);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().BeNull();
         }
 
         [Fact]
-        public void Should_Return_Null_If_Context_Is_Null()
+        public async Task Should_Return_Null_If_Context_Is_Null()
         {
             // Arrange
             _mockHttpContextAccessor.Setup(a => a.HttpContext).Returns((HttpContext)null);
             var sut = new HeaderHttpTokenResolver(_mockHttpContextAccessor.Object, string.Empty);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().BeNull();

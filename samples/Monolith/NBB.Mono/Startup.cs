@@ -41,10 +41,10 @@ namespace NBB.Mono
         {
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddMediatR(
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
                 typeof(ContractCommandHandlers).Assembly,
                 typeof(CreateInvoiceCommandHandler).Assembly,
-                typeof(PayPayableCommandHandler).Assembly);
+                typeof(PayPayableCommandHandler).Assembly));
 
             services.AddMessageBus().AddInProcessTransport();
 

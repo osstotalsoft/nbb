@@ -36,7 +36,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             // Act
             Action act = () =>
             {
-                var _ = new TenantIdentificationStrategy(null, identifier.Object);
+                _ = new TenantIdentificationStrategy(null, identifier.Object);
             };
 
             // Assert
@@ -52,7 +52,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             // Act
             Action act = () =>
             {
-                var _ = new TenantIdentificationStrategy(new List<ITenantTokenResolver>(), identifier.Object);
+                _ = new TenantIdentificationStrategy(new List<ITenantTokenResolver>(), identifier.Object);
             };
 
             // Assert
@@ -68,7 +68,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             // Act
             Action act = () =>
             {
-                var _ = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { tokenResolver.Object }, null);
+                _ = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { tokenResolver.Object }, null);                
             };
 
             // Assert
@@ -76,7 +76,7 @@ namespace NBB.MultiTenancy.Identification.Tests
         }
 
         [Fact]
-        public void Strategy_Should_Pass_Token_To_Identifier()
+        public async Task Strategy_Should_Pass_Token_To_Identifier()
         {
             // Arrange
             const string tenantToken = "mock token";
@@ -84,14 +84,14 @@ namespace NBB.MultiTenancy.Identification.Tests
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
             // Act
-            var _ = sut.TryGetTenantIdAsync().Result;
+            _ = await sut.TryGetTenantIdAsync();
 
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
         }
 
         [Fact]
-        public void Strategy_Should_Pass_LastToken_ToIdentifier()
+        public async Task Strategy_Should_Pass_LastToken_ToIdentifier()
         {
             // Arrange
             const string tenantToken = "mock token";
@@ -101,14 +101,14 @@ namespace NBB.MultiTenancy.Identification.Tests
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
             // Act
-            var _ = sut.TryGetTenantIdAsync().Result;
+            _ = await sut.TryGetTenantIdAsync();
 
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
         }
 
         [Fact]
-        public void Service_Should_Return_Identifier_Result()
+        public async Task Service_Should_Return_Identifier_Result()
         {
             // Arrange
             const string tenantToken = "mock token";
@@ -118,28 +118,28 @@ namespace NBB.MultiTenancy.Identification.Tests
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
             // Act
-            var result = sut.TryGetTenantIdAsync().Result;
+            var result = await sut.TryGetTenantIdAsync();
 
             // Assert
             result.Should().Be(tenantId);
         }
 
         [Fact]
-        public void Should_Throw_Exception_If_Resolver_Fails_Unexpected()
+        public async Task Should_Throw_Exception_If_Resolver_Fails_Unexpected()
         {
             // Arrange
             _firstResolver.Setup(r => r.GetTenantToken()).Throws<Exception>();
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
             // Act
-            Action act = () => Task.WaitAll(sut.TryGetTenantIdAsync());
+            Func<Task> act = sut.TryGetTenantIdAsync;
 
             // Assert
-            act.Should().Throw<Exception>();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         [Fact]
-        public void Should_Return_Null_If_All_Resolvers_Fail()
+        public async Task Should_Return_Null_If_All_Resolvers_Fail()
         {
             // Arrange
             _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
@@ -148,7 +148,7 @@ namespace NBB.MultiTenancy.Identification.Tests
             var sut = new TenantIdentificationStrategy(new List<ITenantTokenResolver>() { _firstResolver.Object, _secondResolver.Object, _thirdResolver.Object }, _identifier.Object);
 
             // Act
-            var result = sut.TryGetTenantIdAsync().Result;
+            var result = await sut.TryGetTenantIdAsync();
 
             // Assert
             result.Should().BeNull();

@@ -45,8 +45,7 @@ namespace NBB.Contracts.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(typeof(ContractCommandHandlers).Assembly);
-
+                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<ContractCommandHandlers>());
 
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
@@ -93,9 +92,9 @@ namespace NBB.Contracts.Worker
                                 .SetSampler(new AlwaysOnSampler())
                                 .AddMessageBusInstrumentation()
                                 .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
-                                .AddJaegerExporter()
+                                .AddOtlpExporter()
                         );
-                        services.Configure<JaegerExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Jaeger"));
+                        services.Configure<OtlpExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Otlp"));
                     }
 
                     if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))

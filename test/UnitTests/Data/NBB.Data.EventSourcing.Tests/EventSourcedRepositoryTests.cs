@@ -326,6 +326,11 @@ namespace NBB.Data.EventSourcing.Tests
         {
             throw new NotImplementedException();
         }
+
+        public Task Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class TestEventStore : IEventStore

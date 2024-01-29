@@ -60,7 +60,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
 
             // Act
-            var _ = sut.GetTenantIdAsync().Result;
+            _ = sut.GetTenantIdAsync().Result;
 
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
@@ -97,7 +97,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
 
             // Act
-            var _ = sut.TryGetTenantIdAsync().Result;
+            _ = sut.TryGetTenantIdAsync().Result;
 
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
