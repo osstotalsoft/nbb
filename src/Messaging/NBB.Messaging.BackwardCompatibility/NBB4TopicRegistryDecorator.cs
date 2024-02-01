@@ -23,7 +23,7 @@ namespace NBB.Messaging.BackwardCompatibility
             static string Prepend(string prefix, string str)
                 => str.StartsWith(prefix) ? str : $"{prefix}{str}";
 
-            if (typeof(IRequest<Unit>).IsAssignableFrom(messageType))
+            if (typeof(IRequest).IsAssignableFrom(messageType))
             {
                 topic = Prepend("ch.commands.", topic);
             }
