@@ -36,7 +36,7 @@ namespace NBB.Messaging.Abstractions
 
             var topicName = _topicRegistry.GetTopicForName(topicNameWithoutPrefix);
 
-            async Task MsgHandler(TransportReceiveContext receiveContext)
+            async Task<PipelineResult> MsgHandler(TransportReceiveContext receiveContext)
             {
                 _logger.LogDebug("Messaging subscriber received message from subject {Subject}", topicName);
 
@@ -53,6 +53,7 @@ namespace NBB.Messaging.Abstractions
                     };
 
                     await handler(messageEnvelope);
+                    return PipelineResult.SuccessResult;
                 }
                 catch (Exception ex)
                 {
@@ -60,10 +61,11 @@ namespace NBB.Messaging.Abstractions
                        topicName);
 
                     if (messageEnvelope != null)
-                        _deadLetterQueue.Push(messageEnvelope, topicNameWithoutPrefix, ex);
+                        _deadLetterQueue.Push(messageEnvelope, topicName, ex);
                     else
-                        _deadLetterQueue.Push(receiveContext.ReceivedData, topicNameWithoutPrefix, ex);
+                        _deadLetterQueue.Push(receiveContext.ReceivedData, topicName, ex);
 
+                    return new PipelineResult(false, ex.Message);
                 }
             }
 

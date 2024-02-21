@@ -10,6 +10,7 @@
       "src\\Messaging\\NBB.Messaging.Nats\\NBB.Messaging.Nats.csproj",
       "src\\Messaging\\NBB.Messaging.Noop\\NBB.Messaging.Noop.csproj",
       "src\\Messaging\\NBB.Messaging.Rusi\\NBB.Messaging.Rusi.csproj",
+      "src\\Messaging\\NBB.Messaging.JetStream\\NBB.Messaging.JetStream.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.Abstractions.Tests\\NBB.Messaging.Abstractions.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.DataContracts.Tests\\NBB.Messaging.DataContracts.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.Effects.Tests\\NBB.Messaging.Effects.Tests.csproj",

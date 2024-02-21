@@ -22,7 +22,7 @@ namespace NBB.Messaging.Nats
             _natsOptions = natsOptions;
         }
 
-        public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+        public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task<PipelineResult>> handler,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {

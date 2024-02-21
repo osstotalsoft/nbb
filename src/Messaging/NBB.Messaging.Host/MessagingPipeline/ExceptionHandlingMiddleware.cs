@@ -51,7 +51,9 @@ namespace NBB.Messaging.Host
                 Activity.Current?.SetException(ex);
                 Activity.Current?.SetStatus(Status.Error);
 
-                _deadLetterQueue.Push(context.MessagingEnvelope, context.TopicName, ex);
+                //_deadLetterQueue.Push(context.MessagingEnvelope, context.TopicName, ex);
+
+                throw;
             }
             finally
             {
