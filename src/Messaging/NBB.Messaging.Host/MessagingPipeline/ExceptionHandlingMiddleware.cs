@@ -48,8 +48,8 @@ namespace NBB.Messaging.Host
                     "An unhandled exception has occurred while processing message of type {MessageType}.",
                     context.MessagingEnvelope.Payload.GetType().GetPrettyName());
 
-                Activity.Current?.SetException(ex);
-                Activity.Current?.SetStatus(Status.Error);
+                //Activity.Current?.SetException(ex);
+                //Activity.Current?.SetStatus(Status.Error);
 
                 //_deadLetterQueue.Push(context.MessagingEnvelope, context.TopicName, ex);
 
