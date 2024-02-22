@@ -51,7 +51,6 @@ namespace NBB.Messaging.Abstractions
                             => new MessagingEnvelope<TMessage>(headers, _messageSerDes.DeserializePayload<TMessage>(payloadBytes, headers, options?.SerDes)),
                         _ => throw new Exception("Invalid received message data")
                     };
-                    throw new Exception("Invalid received message data");
 
                     await handler(messageEnvelope);
                     return PipelineResult.SuccessResult;
