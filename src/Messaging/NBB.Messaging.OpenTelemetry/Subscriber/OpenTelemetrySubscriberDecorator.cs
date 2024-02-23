@@ -1,21 +1,16 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using NBB.Core.Abstractions;
 using NBB.Messaging.Abstractions;
-using OpenTelemetry.Trace;
 using OpenTelemetry;
+using OpenTelemetry.Context.Propagation;
+using OpenTelemetry.Trace;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using OpenTelemetry.Context.Propagation;
-using NBB.Core.Abstractions;
-using NBB.Messaging.OpenTelemetry.Publisher;
-using System.Reflection.PortableExecutable;
 
 namespace NBB.Messaging.OpenTelemetry.Subscriber
 {
