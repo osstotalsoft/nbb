@@ -34,10 +34,8 @@ namespace NBB.Messaging.JetStream
             });
         }
 
-        public Task<IDisposable> SubscribeAsync(string topic,
-            Func<TransportReceiveContext, Task> handler,
-            SubscriptionTransportOptions options = null,
-            CancellationToken cancellationToken = default)
+        public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task<PipelineResult>> handler,
+            SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default)
         {
 
             IDisposable consumer = null;

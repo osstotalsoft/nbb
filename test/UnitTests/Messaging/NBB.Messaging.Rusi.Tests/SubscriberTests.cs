@@ -45,7 +45,7 @@ namespace NBB.Messaging.Rusi.Tests
             var subscriber = new RusiMessagingTransport(rusiClient,
                 new OptionsWrapper<RusiOptions>(new RusiOptions() { PubsubName = "pubsub1" }), null);
 
-            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var handler = Mock.Of<Func<TransportReceiveContext, Task<PipelineResult>>>();
 
             // Act
             using var subscription = await subscriber.SubscribeAsync(topic, handler);

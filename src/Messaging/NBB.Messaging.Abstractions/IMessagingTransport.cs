@@ -18,7 +18,7 @@ namespace NBB.Messaging.Abstractions
         /// <param name="options">Subscription options</param>
         /// <param name="cancellationToken"></param>
         /// <returns>An object that when disposed unsubscribes the handler from the topic</returns>
-        Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+        Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task<PipelineResult>> handler,
             SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -44,6 +44,11 @@ namespace NBB.Messaging.Abstractions
         Func<IDictionary<string, string>> HeadersAccessor);
 
     public record TransportReceiveContext(TransportReceivedData ReceivedData);
+
+    public record PipelineResult(bool Success, string Error)
+    {
+        public static PipelineResult SuccessResult = new PipelineResult(true, null);
+    }
 
     
     public abstract record TransportReceivedData
