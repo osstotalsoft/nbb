@@ -51,6 +51,7 @@ namespace NBB.Messaging.OpenTelemetry.Publisher
             var prettyName = message.GetType().GetPrettyName();
             if (prettyName.Contains("AnonymousType"))
                 prettyName = formattedTopicName;
+
             var operationName = $"{prettyName} send";
 
             using var activity = activitySource.StartActivity(operationName, ActivityKind.Producer);
