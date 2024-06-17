@@ -24,33 +24,24 @@ namespace NBB.Messaging.MultiTenancy
     /// obtained from the current identification strategy and builds the tenant context.
     /// </summary>
     /// <seealso cref="IPipelineMiddleware{MessagingEnvelope}" />
-    public class TenantMiddleware : IPipelineMiddleware<MessagingContext>
+    public class TenantMiddleware(
+        ITenantContextAccessor tenantContextAccessor,
+        ITenantIdentificationService tenantIdentificationService,
+        IOptions<TenancyHostingOptions> tenancyOptions,
+        ITenantRepository tenantRepository,
+        ILogger<TenantMiddleware> logger
+    ) : IPipelineMiddleware<MessagingContext>
     {
-        private readonly ITenantContextAccessor _tenantContextAccessor;
-        private readonly ITenantIdentificationService _tenantIdentificationService;
-        private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
-        private readonly ITenantRepository _tenantRepository;
-        private readonly ILogger<TenantMiddleware> _logger;
-
-        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantIdentificationService tenantIdentificationService, IOptions<TenancyHostingOptions> tenancyOptions, ITenantRepository tenantRepository, ILogger<TenantMiddleware> logger)
-        {
-            _tenantContextAccessor = tenantContextAccessor;
-            _tenantIdentificationService = tenantIdentificationService;
-            _tenancyOptions = tenancyOptions;
-            _tenantRepository = tenantRepository;
-            _logger = logger;
-        }
-
         public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
-            if (_tenantContextAccessor.TenantContext != null)
+            if (tenantContextAccessor.TenantContext != null)
             {
                 throw new ApplicationException("Tenant context is already set");
             }
 
-            if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
+            if (tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
-                _tenantContextAccessor.TenantContext = new TenantContext(Tenant.Default);
+                tenantContextAccessor.TenantContext = new TenantContext(Tenant.Default);
                 await next();
                 return;
             }
@@ -71,7 +62,7 @@ namespace NBB.Messaging.MultiTenancy
             }
 
 
-            _tenantContextAccessor.TenantContext = new TenantContext(tenant);
+            tenantContextAccessor.TenantContext = new TenantContext(tenant);
 
             Activity.Current?.SetTag(TracingTags.TenantId, tenant.TenantId);
 
@@ -80,8 +71,8 @@ namespace NBB.Messaging.MultiTenancy
 
         private async Task<Tenant> LoadTenant(CancellationToken cancellationToken)
         {
-            var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
-            var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
+            var tenantId = await tenantIdentificationService.GetTenantIdAsync();
+            var tenant = await tenantRepository.Get(tenantId, cancellationToken)
                             ?? throw new ApplicationException($"Tenant {tenantId} not found");
 
             return tenant;
@@ -90,17 +81,17 @@ namespace NBB.Messaging.MultiTenancy
 
         private async Task<Tenant> TryLoadTenant(string topic, CancellationToken cancellationToken)
         {
-            var tenantId = await _tenantIdentificationService.TryGetTenantIdAsync();
+            var tenantId = await tenantIdentificationService.TryGetTenantIdAsync();
             if (!tenantId.HasValue)
             {
-                _logger.LogDebug("Tenant could not be identified. Message {Topic} will be ignored.", topic);
+                logger.LogDebug("Tenant could not be identified. Message {Topic} will be ignored.", topic);
                 return null;
             }
 
-            var tenant = await _tenantRepository.TryGet(tenantId.Value, cancellationToken);
+            var tenant = await tenantRepository.TryGet(tenantId.Value, cancellationToken);
             if (tenant == null)
             {
-                _logger.LogDebug("Tenant {Tenant} not found or not enabled. Message {Topic} will be ignored.", tenantId.Value, topic);
+                logger.LogDebug("Tenant {Tenant} not found or not enabled. Message {Topic} will be ignored.", tenantId.Value, topic);
                 return null;
             }
 
