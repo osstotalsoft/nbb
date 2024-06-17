@@ -31,7 +31,7 @@ namespace NBB.Messaging.MultiTenancy
         ITenantRepository tenantRepository,
         ILogger<TenantMiddleware> logger
     ) : IPipelineMiddleware<MessagingContext>
-    {
+    {        
         public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
         {
             if (tenantContextAccessor.TenantContext != null)

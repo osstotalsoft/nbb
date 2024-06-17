@@ -197,7 +197,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                 await repo.Get(Guid.Parse(tenantId));
 
             //Assert
-            await action.Should().ThrowAsync<Exception>().WithMessage("*disabled*");
+            await action.Should().ThrowAsync<TenantNotFoundException>();
         }
 
         [Fact]

@@ -15,14 +15,6 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
         Task<List<Tenant>> GetAll(CancellationToken token = default);
 
         async Task<Tenant> Get(Guid id, CancellationToken token = default)
-        {
-            var result = await TryGet(id, token);
-            if (result == null)
-            {
-                throw new TenantNotFoundException(id);
-            }
-
-            return result.Enabled ? result : throw new Exception($"Tenant {result.Code} is disabled ");
-        }
+            => await TryGet(id, token) ?? throw new TenantNotFoundException(id);
     }
 }
