@@ -190,14 +190,14 @@ namespace NBB.MultiTenancy.Abstractions.Tests
 
             var options = new OptionsWrapper<TenancyHostingOptions>(tenancyHostingOptions);
 
-            var repo = new ConfigurationTenantRepository(configuration, options);
+            ITenantRepository repo = new ConfigurationTenantRepository(configuration, options);
 
             //Act
             Func<Task> action = async() => 
                 await repo.Get(Guid.Parse(tenantId));
 
             //Assert
-            await action.Should().ThrowAsync<Exception>().WithMessage("*disabled*");
+            await action.Should().ThrowAsync<TenantNotFoundException>();
         }
 
         [Fact]
@@ -232,7 +232,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             var repo = new ConfigurationTenantRepository(configuration, options);
 
             //arrange
-            var actual = await repo.Get(System.Guid.Parse("ef8d5362-9969-4e02-8794-0d1af56816f6"));
+            var actual = await repo.TryGet(Guid.Parse("ef8d5362-9969-4e02-8794-0d1af56816f6"));
 
             // Assert
             actual.Should().NotBeNull();

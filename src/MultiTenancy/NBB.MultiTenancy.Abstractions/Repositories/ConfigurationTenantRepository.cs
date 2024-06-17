@@ -43,15 +43,14 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
             };
         }
 
-        public Task<Tenant> Get(Guid id, CancellationToken token = default)
+        public Task<Tenant> TryGet(Guid id, CancellationToken token = default)
         {
-            if (!tenantMap.TryGetValue(id, out var result))
+            if (!tenantMap.TryGetValue(id, out var result) || !result.Enabled)
             {
-                throw new TenantNotFoundException(id);
+                return Task.FromResult(default(Tenant));
             }
 
-
-            return Task.FromResult(result.Enabled ? result : throw new Exception($"Tenant {result.Code} is disabled "));
+            return Task.FromResult(result);
         }
 
         public Task<Tenant> GetByHost(string host, CancellationToken token = default)
