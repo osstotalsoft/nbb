@@ -13,6 +13,9 @@ using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Services;
 using NBB.MultiTenancy.Abstractions;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
+using MediatR;
+using System.Linq;
 
 namespace NBB.Messaging.MultiTenancy
 {
@@ -27,13 +30,15 @@ namespace NBB.Messaging.MultiTenancy
         private readonly ITenantIdentificationService _tenantIdentificationService;
         private readonly IOptions<TenancyHostingOptions> _tenancyOptions;
         private readonly ITenantRepository _tenantRepository;
+        private readonly ILogger<TenantMiddleware> _logger;
 
-        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantIdentificationService tenantIdentificationService, IOptions<TenancyHostingOptions> tenancyOptions, ITenantRepository tenantRepository)
+        public TenantMiddleware(ITenantContextAccessor tenantContextAccessor, ITenantIdentificationService tenantIdentificationService, IOptions<TenancyHostingOptions> tenancyOptions, ITenantRepository tenantRepository, ILogger<TenantMiddleware> logger)
         {
             _tenantContextAccessor = tenantContextAccessor;
             _tenantIdentificationService = tenantIdentificationService;
             _tenancyOptions = tenancyOptions;
             _tenantRepository = tenantRepository;
+            _logger = logger;
         }
 
         public async Task Invoke(MessagingContext context, CancellationToken cancellationToken, Func<Task> next)
@@ -45,21 +50,63 @@ namespace NBB.Messaging.MultiTenancy
 
             if (_tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
-                 _tenantContextAccessor.TenantContext = new TenantContext(Tenant.Default);
+                _tenantContextAccessor.TenantContext = new TenantContext(Tenant.Default);
                 await next();
                 return;
             }
 
-            var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
-            var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
-                         ?? throw new ApplicationException($"Tenant {tenantId} not found");
+            Tenant tenant;
 
-             _tenantContextAccessor.TenantContext = new TenantContext(tenant);
+            if (context.MessagingEnvelope.Payload is INotification)
+            {
+                tenant = await TryLoadTenant(context.TopicName, cancellationToken);
+                if (tenant == null)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                tenant = await LoadTenant(cancellationToken);
+            }
 
-            Activity.Current?.SetTag(TracingTags.TenantId, tenantId);
+
+            _tenantContextAccessor.TenantContext = new TenantContext(tenant);
+
+            Activity.Current?.SetTag(TracingTags.TenantId, tenant.TenantId);
 
             await next();
         }
+
+        private async Task<Tenant> LoadTenant(CancellationToken cancellationToken)
+        {
+            var tenantId = await _tenantIdentificationService.GetTenantIdAsync();
+            var tenant = await _tenantRepository.Get(tenantId, cancellationToken)
+                            ?? throw new ApplicationException($"Tenant {tenantId} not found");
+
+            return tenant;
+        }
+
+
+        private async Task<Tenant> TryLoadTenant(string topic, CancellationToken cancellationToken)
+        {
+            var tenantId = await _tenantIdentificationService.TryGetTenantIdAsync();
+            if (!tenantId.HasValue)
+            {
+                _logger.LogDebug("Tenant could not be identified. Message {Topic} will be ignored.", topic);
+                return null;
+            }
+
+            var tenant = await _tenantRepository.TryGet(tenantId.Value, cancellationToken);
+            if (tenant == null)
+            {
+                _logger.LogDebug("Tenant {Tenant} not found or not enabled. Message {Topic} will be ignored.", tenantId.Value, topic);
+                return null;
+            }
+
+            return tenant;
+        }
+
     }
 
 

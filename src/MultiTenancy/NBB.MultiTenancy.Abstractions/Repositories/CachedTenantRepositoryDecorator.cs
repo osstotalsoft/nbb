@@ -43,6 +43,26 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
             return dbTenant;
         }
 
+        public async Task<Tenant> TryGet(Guid id, CancellationToken token)
+        {
+            var cacheKey = CacheTenantByIdKey(id);
+            var cachedTenant = await GetTenantFromCache(cacheKey, token);
+            if (cachedTenant != null)
+            {
+                return cachedTenant;
+            }
+
+            var dbTenant = await _tenantRepository.TryGet(id, token);
+            if (dbTenant == null)
+            {
+                return null;
+            }
+
+            await SetTenantToCache(dbTenant, cacheKey, token);
+
+            return dbTenant;
+        }
+
         private async Task<Tenant> GetTenantFromCache(string key, CancellationToken token = default)
         {
             var sTenant = await _cache.GetStringAsync(key, token);

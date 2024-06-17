@@ -54,6 +54,16 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
             return Task.FromResult(result.Enabled ? result : throw new Exception($"Tenant {result.Code} is disabled "));
         }
 
+        public Task<Tenant> TryGet(Guid id, CancellationToken token = default)
+        {
+            if (!tenantMap.TryGetValue(id, out var result) || !result.Enabled)
+            {
+                return Task.FromResult(default(Tenant));
+            }
+
+            return Task.FromResult(result);
+        }
+
         public Task<Tenant> GetByHost(string host, CancellationToken token = default)
         {
             throw new NotImplementedException();
