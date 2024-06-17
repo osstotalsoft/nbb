@@ -22,7 +22,6 @@ namespace NBB.MultiTenancy.Abstractions.Repositories
                 throw new TenantNotFoundException(id);
             }
 
-
             return result.Enabled ? result : throw new Exception($"Tenant {result.Code} is disabled ");
         }
     }
