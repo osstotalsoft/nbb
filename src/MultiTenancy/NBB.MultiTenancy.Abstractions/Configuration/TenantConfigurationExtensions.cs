@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Linq;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
@@ -46,12 +47,25 @@ public static class TenantConfigurationExtensions
         var splitted = config.GetValue<ConnectionStringDetails>($"ConnectionStrings:{name}");
         if (splitted != null)
         {
+            CheckMandatoryField(splitted.Server, nameof(splitted.Server));
+            CheckMandatoryField(splitted.Database, nameof(splitted.Database));
+            CheckMandatoryField(splitted.UserName, nameof(splitted.UserName));
+            CheckMandatoryField(splitted.Password, nameof(splitted.Password));
+
             return
                 $"Server={splitted.Server};Database={splitted.Database};User Id={splitted.UserName};Password={splitted.Password};{splitted.OtherParams}";
         }
 
         return config.GetValue<string>($"ConnectionStrings:{name}");
     }
+
+    private static void CheckMandatoryField(string fieldValue, string fieldName) {
+        if (string.IsNullOrWhiteSpace(fieldValue))
+        {
+            throw new ArgumentException($"Connection string part {fieldName} is not provided!");
+        }
+    }
+
 
     private class ConnectionStringDetails
     {

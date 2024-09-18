@@ -476,6 +476,54 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             tenantConfig.GetValue<string>("TenantId").Should().Be("68a448a2-e7d8-4875-8127-f18668217eb6");
         }
 
-        
+        [Fact]
+        public void load_connectionString_splitted_tenant1_missing_database()
+        {
+            // Arrange
+            var myConfiguration = @"{
+                      ""MultiTenancy"": {
+                        ""Tenants"": {
+                          ""MBFS"": {
+                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
+                            ""ConnectionStrings"": {
+                              ""Leasing_Database"": {
+                                ""Server"": ""server1"",
+                                ""Database"": """",
+                                ""UserName"": ""web"",
+                                ""OtherParams"": ""MultipleActiveResultSets=true""
+                              }
+                            }
+                          },
+                          ""BCR"": {
+                            ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
+                            ""Code"": ""BCR""
+                          },
+                          ""DEV"": {
+                            ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
+                            ""Code"": ""DEV""
+                          }
+                        }
+                      }
+                    }";
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection()
+                .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(myConfiguration)))
+                .Build();
+
+            var tid = Guid.Parse("68a448a2-e7d8-4875-8127-f18668217eb6");
+            var tca = new TenantContextAccessor();
+
+            tca.TenantContext = new TenantContext(new Tenant(tid, "MBFS"));
+            var tenantConfig = new TenantConfiguration(configuration,
+                new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
+                    { TenancyType = TenancyType.MultiTenant }), tca);
+
+            // Act
+            Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
+
+            // Assert
+            act.Should().Throw<Exception>().WithMessage("Connection string part Database is not provided!");
+        }
     }
 }
