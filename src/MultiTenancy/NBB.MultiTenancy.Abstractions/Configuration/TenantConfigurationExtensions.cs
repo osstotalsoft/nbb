@@ -53,6 +53,9 @@ public static class TenantConfigurationExtensions
         return config.GetValue<string>($"ConnectionStrings:{name}");
     }
 
+    /// <summary>
+    /// Exception thrown when connection string builder is not properly configured
+    /// </summary>
     public class TenantConnectionStringBuilderException : Exception
     {
         public TenantConnectionStringBuilderException(string message) : base(message)
