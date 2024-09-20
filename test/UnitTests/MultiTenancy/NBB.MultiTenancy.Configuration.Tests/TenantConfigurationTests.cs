@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
+using static NBB.MultiTenancy.Abstractions.Configuration.TenantConfigurationExtensions;
 
 namespace NBB.MultiTenancy.Abstractions.Tests
 {
@@ -526,7 +527,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
 
             // Assert
-            act.Should().Throw<Exception>().WithMessage("Connection string part Database is not provided!");
+            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part Database is not provided!");
         }
     }
 }
