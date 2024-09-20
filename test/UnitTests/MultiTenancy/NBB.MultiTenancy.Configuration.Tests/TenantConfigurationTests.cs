@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
+using static NBB.MultiTenancy.Abstractions.Configuration.TenantConfigurationExtensions;
 
 namespace NBB.MultiTenancy.Abstractions.Tests
 {
@@ -209,6 +210,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                                 ""Server"": ""server1"",
                                 ""Database"": ""db1"",
                                 ""UserName"": ""web"",
+                                ""Password"": ""pass"",
                                 ""OtherParams"": ""MultipleActiveResultSets=true""
                               }
                             }
@@ -242,7 +244,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
 
             // Assert
             tenantConfig.GetConnectionString("ConnectionString_").Should().BeNull();
-            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server1;Database=db1;User Id=web;Password=;MultipleActiveResultSets=true");
+            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server1;Database=db1;User Id=web;Password=pass;MultipleActiveResultSets=true");
             tenantConfig.GetValue<string>("TenantId").Should().Be("68a448a2-e7d8-4875-8127-f18668217eb6");
         }
 
@@ -258,7 +260,8 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                             ""Leasing_Database"": {
                               ""Server"": ""cf-erp17\\mama"",
                               ""Database"": ""db1"",
-                              ""UserName"": ""web""
+                              ""UserName"": ""web"",
+                              ""Password"": ""pass""
                             }
                           }
                         },
@@ -303,7 +306,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
 
             // Assert
             tenantConfig.GetConnectionString("ConnectionString_").Should().BeNull();
-            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=cf-erp17\\mama;Database=db1;User Id=web;Password=;");
+            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=cf-erp17\\mama;Database=db1;User Id=web;Password=pass;");
             tenantConfig.GetValue<string>("TenantId").Should().Be("ef8d5362-9969-4e02-8794-0d1af56816f6");
         }
 
@@ -383,6 +386,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
                                 ""Server"": ""server1"",
                                 ""Database"": ""db1"",
                                 ""UserName"": ""web"",
+                                ""Password"": ""pass"",
                                 ""OtherParams"": ""MultipleActiveResultSets=true""
                               }
                             }
@@ -416,7 +420,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
 
             // Assert
             tenantConfig.GetConnectionString("ConnectionString_").Should().BeNull();
-            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server1;Database=db1;User Id=web;Password=;MultipleActiveResultSets=true");
+            tenantConfig.GetConnectionString("Leasing_Database").Should().Be("Server=server1;Database=db1;User Id=web;Password=pass;MultipleActiveResultSets=true");
             tenantConfig.GetValue<string>("TenantId").Should().Be("68a448a2-e7d8-4875-8127-f18668217eb6");
         }
 
@@ -476,6 +480,54 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             tenantConfig.GetValue<string>("TenantId").Should().Be("68a448a2-e7d8-4875-8127-f18668217eb6");
         }
 
-        
+        [Fact]
+        public void load_connectionString_splitted_tenant1_missing_database()
+        {
+            // Arrange
+            var myConfiguration = @"{
+                      ""MultiTenancy"": {
+                        ""Tenants"": {
+                          ""MBFS"": {
+                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
+                            ""ConnectionStrings"": {
+                              ""Leasing_Database"": {
+                                ""Server"": ""server1"",
+                                ""Database"": """",
+                                ""UserName"": ""web"",
+                                ""OtherParams"": ""MultipleActiveResultSets=true""
+                              }
+                            }
+                          },
+                          ""BCR"": {
+                            ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
+                            ""Code"": ""BCR""
+                          },
+                          ""DEV"": {
+                            ""TenantId"": ""da84628a-2925-4b69-9116-a90dd5a72b1f"",
+                            ""Code"": ""DEV""
+                          }
+                        }
+                      }
+                    }";
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection()
+                .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(myConfiguration)))
+                .Build();
+
+            var tid = Guid.Parse("68a448a2-e7d8-4875-8127-f18668217eb6");
+            var tca = new TenantContextAccessor();
+
+            tca.TenantContext = new TenantContext(new Tenant(tid, "MBFS"));
+            var tenantConfig = new TenantConfiguration(configuration,
+                new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
+                    { TenancyType = TenancyType.MultiTenant }), tca);
+
+            // Act
+            Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
+
+            // Assert
+            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part Database is not provided!");
+        }
     }
 }

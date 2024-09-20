@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Linq;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
@@ -43,22 +44,54 @@ public static class TenantConfigurationExtensions
     /// <returns></returns>
     public static string GetConnectionString(this ITenantConfiguration config, string name)
     {
-        var splitted = config.GetValue<ConnectionStringDetails>($"ConnectionStrings:{name}");
-        if (splitted != null)
+        var connStrBuilder = config.GetValue<TenantConnectionStringBuilder>($"ConnectionStrings:{name}");
+        if (connStrBuilder != null)
         {
-            return
-                $"Server={splitted.Server};Database={splitted.Database};User Id={splitted.UserName};Password={splitted.Password};{splitted.OtherParams}";
+            return connStrBuilder.Build();
         }
 
         return config.GetValue<string>($"ConnectionStrings:{name}");
     }
 
-    private class ConnectionStringDetails
+    /// <summary>
+    /// Exception thrown when connection string builder is not properly configured
+    /// </summary>
+    public class TenantConnectionStringBuilderException : Exception
+    {
+        public TenantConnectionStringBuilderException(string message) : base(message)
+        {
+        }
+    }
+
+    private class TenantConnectionStringBuilder
     {
         public string Server { get; set; }
         public string Database { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
         public string OtherParams { get; set; }
+
+        public string Build()
+        {
+            Validate();
+
+            return $"Server={Server};Database={Database};User Id={UserName};Password={Password};{OtherParams}";
+        }
+
+        private static void CheckMandatoryField(string fieldValue, string fieldName)
+        {
+            if (string.IsNullOrWhiteSpace(fieldValue))
+            {
+                throw new TenantConnectionStringBuilderException($"Connection string part {fieldName} is not provided!");
+            }
+        }
+
+        private void Validate()
+        {
+            CheckMandatoryField(Server, nameof(Server));
+            CheckMandatoryField(Database, nameof(Database));
+            CheckMandatoryField(UserName, nameof(UserName));
+            CheckMandatoryField(Password, nameof(Password));
+        }
     }
 }
