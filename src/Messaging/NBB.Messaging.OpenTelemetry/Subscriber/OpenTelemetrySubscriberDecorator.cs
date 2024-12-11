@@ -57,7 +57,7 @@ namespace NBB.Messaging.OpenTelemetry.Subscriber
                 catch (Exception exception)
                 {
                     activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
-                    activity?.RecordException(exception);
+                    activity?.AddException(exception);
                     throw;
                 }
             }

@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
     {
         // IntegrationTest (integrates with CorrelationManager)
         [Fact]
-        public async void Should_setNewCorrelationId()
+        public async Task Should_setNewCorrelationId()
         {
             //Arrange
             var correlationMiddleWare = new CorrelationMiddleware();
@@ -34,7 +34,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
 
         // IntegrationTest (integrates with CorrelationManager)
         [Fact]
-        public async void Should_takeCorrelationIdFromMessage()
+        public async Task Should_takeCorrelationIdFromMessage()
         {
             //Arrange
             var correlationMiddleWare = new CorrelationMiddleware();
@@ -53,7 +53,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_callNextPipelineMiddleware()
+        public async Task Should_callNextPipelineMiddleware()
         {
             //Arrange
             var correlationMiddleWare = new CorrelationMiddleware();

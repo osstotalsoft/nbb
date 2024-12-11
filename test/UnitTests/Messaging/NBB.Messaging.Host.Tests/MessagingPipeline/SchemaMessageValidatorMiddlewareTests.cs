@@ -12,7 +12,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
     public class SchemaMessageValidatorMiddlewareTests
     {
         [Fact]
-        public async void Should_throwExceptionWhenAHeaderFieldIsNotProvided()
+        public async Task Should_throwExceptionWhenAHeaderFieldIsNotProvided()
         {
             //Arrange
             var schemaMessageValidationMiddleware = new SchemaMessageValidatorMiddleware();
@@ -34,7 +34,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_callNextPipelineMiddlewareWhenAllHeaderFieldsAreProvided()
+        public async Task Should_callNextPipelineMiddlewareWhenAllHeaderFieldsAreProvided()
         {
             //Arrange
             bool isNextMiddlewareCalled = false;

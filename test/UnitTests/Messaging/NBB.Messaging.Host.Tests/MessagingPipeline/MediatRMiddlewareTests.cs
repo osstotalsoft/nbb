@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
     public class MediatRMiddlewareTests
     {
         [Fact]
-        public async void Should_publishEventsToMediatR()
+        public async Task Should_publishEventsToMediatR()
         {
             //Arrange
             var mockedMediator = Mock.Of<IMediator>();
@@ -34,7 +34,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_sendCommandsToMediatR()
+        public async Task Should_sendCommandsToMediatR()
         {
             //Arrange
             var mockedMediator = Mock.Of<IMediator>();
@@ -54,7 +54,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_throwExceptionForUnhandledMessageType()
+        public async Task Should_throwExceptionForUnhandledMessageType()
         {
             //Arrange
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());
@@ -75,7 +75,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_callNextPipelineMiddleware()
+        public async Task Should_callNextPipelineMiddleware()
         {
             //Arrange
             var mediatRMiddleware = new MediatRMiddleware(Mock.Of<IMediator>());

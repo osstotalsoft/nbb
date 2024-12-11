@@ -47,7 +47,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
         }
 
         [Fact]
-        public void Should_Pass_Token_And_Stop()
+        public async Task Should_Pass_Token_And_Stop()
         {
             // Arrange
             const string tenantToken = "mock token";
@@ -60,14 +60,14 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
 
             // Act
-            _ = sut.GetTenantIdAsync().Result;
+            _ = await sut.GetTenantIdAsync();
 
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());
         }
 
         [Fact]
-        public void Try_Method_Should_Return_Null_If_All_Resolvers_Return_Null()
+        public async Task Try_Method_Should_Return_Null_If_All_Resolvers_Return_Null()
         {
             // Arrange
             _firstResolver.Setup(r => r.GetTenantToken()).Returns(Task.FromResult<string>(null));
@@ -77,14 +77,14 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { identifierPair });
 
             // Act
-            var result = sut.TryGetTenantIdAsync().Result;
+            var result = await sut.TryGetTenantIdAsync();
 
             // Assert
             result.Should().BeNull();
         }
 
         [Fact]
-        public void Try_Method_Should_Pass_Token_And_Stop()
+        public async Task Try_Method_Should_Pass_Token_And_Stop()
         {
             // Arrange
             const string tenantToken = "mock token";
@@ -97,7 +97,7 @@ namespace NBB.MultiTenancy.Identification.Tests.Services
             var sut = new DefaultTenantIdentificationService(new List<TenantIdentificationStrategy>() { firstPair, secondPair, thirdPair });
 
             // Act
-            _ = sut.TryGetTenantIdAsync().Result;
+            _ = await sut.TryGetTenantIdAsync();
 
             // Assert
             _identifier.Verify(i => i.GetTenantIdAsync(It.Is<string>(s => string.Equals(s, tenantToken))), Times.Once());

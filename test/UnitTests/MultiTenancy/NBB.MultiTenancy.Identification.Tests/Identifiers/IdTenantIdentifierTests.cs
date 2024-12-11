@@ -4,6 +4,7 @@
 using FluentAssertions;
 using NBB.MultiTenancy.Identification.Identifiers;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NBB.MultiTenancy.Identification.Tests.Identifiers
@@ -11,14 +12,14 @@ namespace NBB.MultiTenancy.Identification.Tests.Identifiers
     public class IdTenantIdentifierTests
     {
         [Fact]
-        public void Should_Return_Given_Guid()
+        public async Task Should_Return_Given_Guid()
         {
             // Arrange
             var sut = new IdTenantIdentifier();
             var testGuid = Guid.NewGuid();
 
             // Act
-            var tenantId = sut.GetTenantIdAsync(testGuid.ToString()).Result;
+            var tenantId = await sut.GetTenantIdAsync(testGuid.ToString());
 
             // Assert
             tenantId.Should().Be(testGuid);
