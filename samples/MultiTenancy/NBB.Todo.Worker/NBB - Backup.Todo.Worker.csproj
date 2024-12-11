@@ -1,0 +1,56 @@
+﻿<Project>
+  <Sdk Name="Microsoft.NET.Sdk" />
+  
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>NBB_Todo_a9328d3a-7681-452a-9dbe-a52a9b6a0593</UserSecretsId>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="appsettings*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />      
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
+    <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
+    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCorePackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationAspNetCorePackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationRuntimePackageVersion)" />
+	  <PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="$(OpenTelemetryExporterPrometheusHttpListenerPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />
+    <ProjectReference Include="..\..\..\src\Correlation\NBB.Correlation\NBB.Correlation.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.MultiTenancy\NBB.Messaging.MultiTenancy.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
+    <ProjectReference Include="..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Http\NBB.MultiTenancy.Identification.Http.csproj" />
+    <ProjectReference Include="..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Messaging\NBB.MultiTenancy.Identification.Messaging.csproj" />
+    <ProjectReference Include="..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.Enrichers.TenantId\NBB.Tools.Serilog.Enrichers.TenantId.csproj" />
+    <ProjectReference Include="..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTelemetryTracingSink\NBB.Tools.Serilog.OpenTelemetryTracingSink.csproj" />
+    <ProjectReference Include="..\NBB.Todo.Data\NBB.Todo.Data.csproj" />
+    <ProjectReference Include="..\NBB.Todo.PublishedLanguage\NBB.Todo.PublishedLanguage.csproj" />
+  </ItemGroup>
+
+
+
+</Project>
+
