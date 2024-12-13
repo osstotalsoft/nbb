@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
     public class DefaultResiliencyMiddlewareTests
     {
         [Fact]
-        public async void Should_callNextPipelineMiddleware()
+        public async Task Should_callNextPipelineMiddleware()
         {
             //Arrange
             var resiliencyMiddleware = new DefaultResiliencyMiddleware(

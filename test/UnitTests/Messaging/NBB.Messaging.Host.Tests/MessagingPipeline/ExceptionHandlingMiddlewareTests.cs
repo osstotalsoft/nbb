@@ -14,7 +14,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
     public class ExceptionHandlingMiddlewareTests
     {
         [Fact]
-        public async void Should_logSuccessMessage()
+        public async Task Should_logSuccessMessage()
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
@@ -34,7 +34,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_logErrorMessageWhenExceptionIsThrown()
+        public async Task Should_logErrorMessageWhenExceptionIsThrown()
         {
             //Arrange
             var mockedLogger = Mock.Of<ILogger<ExceptionHandlingMiddleware>>();
@@ -61,7 +61,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
         }
 
         [Fact]
-        public async void Should_callNextPipelineMiddleware()
+        public async Task Should_callNextPipelineMiddleware()
         {
             //Arrange
 

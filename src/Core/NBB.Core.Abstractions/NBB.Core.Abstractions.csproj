@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Description>This package provides cross-cutting abstractions and type extensions that other packages rely upon. The interfaces of this package are not intended to be directly referenced by the end-consumer.</Description>
   </PropertyGroup>
 

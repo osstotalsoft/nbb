@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <UserSecretsId>NBB_EventStoreAdoNetMigrations_f43f7048-9bff-4649-881c-97774e23e9f8</UserSecretsId>
   </PropertyGroup>
 

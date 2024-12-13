@@ -16,7 +16,7 @@ namespace NBB.Core.Pipeline.Tests
     public class PipelineTests
     {
         [Fact]
-        public async void Should_execute_nesting_in_order_class_middleware()
+        public async Task Should_execute_nesting_in_order_class_middleware()
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
@@ -35,7 +35,7 @@ namespace NBB.Core.Pipeline.Tests
         }
 
         [Fact]
-        public async void Should_execute_nesting_in_order_inline()
+        public async Task Should_execute_nesting_in_order_inline()
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
@@ -67,7 +67,7 @@ namespace NBB.Core.Pipeline.Tests
 
 
         [Fact]
-        public async void Should_support_constructor_injection_in_middleware()
+        public async Task Should_support_constructor_injection_in_middleware()
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>(sp =>
@@ -87,7 +87,7 @@ namespace NBB.Core.Pipeline.Tests
         }
 
         [Fact]
-        public async void Should_pass_execution_parameters_to_middleware()
+        public async Task Should_pass_execution_parameters_to_middleware()
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
@@ -125,7 +125,7 @@ namespace NBB.Core.Pipeline.Tests
         }
 
         [Fact]
-        public async void Should_not_swallow_exception_async()
+        public async Task Should_not_swallow_exception_async()
         {
             //Arrange
             var mockedServiceProvider = Mock.Of<IServiceProvider>();
@@ -185,7 +185,7 @@ namespace NBB.Core.Pipeline.Tests
         }
 
         [Fact]
-        public async void Should_build_pipeline_in_container_scope()
+        public async Task Should_build_pipeline_in_container_scope()
         {
             //Arrange
             var services = new ServiceCollection();

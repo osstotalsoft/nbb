@@ -19,7 +19,7 @@ namespace NBB.Messaging.MultiTenancy.Tests
     public class MessageBusPublisherDecoratorTests
     {
         [Fact]
-        public async void ShouldCallInnerPublisher()
+        public async Task ShouldCallInnerPublisher()
         {
             // Arrange
             var publisherMock = new Mock<IMessageBusPublisher>();
@@ -39,7 +39,7 @@ namespace NBB.Messaging.MultiTenancy.Tests
         }
 
         [Fact]
-        public async void ShouldSetTenantIdInEnvelopeHeader()
+        public async Task ShouldSetTenantIdInEnvelopeHeader()
         {
             // Arrange
             var tenantId = Guid.NewGuid();

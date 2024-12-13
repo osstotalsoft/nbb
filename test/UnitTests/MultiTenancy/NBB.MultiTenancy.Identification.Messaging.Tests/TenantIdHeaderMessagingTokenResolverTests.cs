@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NBB.Messaging.Abstractions;
 using Xunit;
@@ -24,7 +25,7 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
         }
 
         [Fact]
-        public void Should_Resolve_Token_FromHeader()
+        public async Task Should_Resolve_Token_FromHeader()
         {
             // Arrange
             const string key = "test token key";
@@ -33,21 +34,21 @@ namespace NBB.MultiTenancy.Identification.Messaging.Tests
             var sut = new TenantIdHeaderMessagingTokenResolver(_mockMessagingContextAccessor, key);
 
             // Act
-            var result = sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().Be(value);
         }
 
         [Fact]
-        public void Should_Return_Null_For_Bad_Keys()
+        public async Task Should_Return_Null_For_Bad_Keys()
         {
             // Arrange
             const string key = "bad token key";
             var sut = new TenantIdHeaderMessagingTokenResolver(_mockMessagingContextAccessor, key);
 
             // Act
-            var result= sut.GetTenantToken().Result;
+            var result = await sut.GetTenantToken();
 
             // Assert
             result.Should().BeNull();

@@ -52,12 +52,12 @@ namespace NBB.Tools.Serilog.OpenTelemetryTracingSink.Internal
 
                 if (logEvent.Exception != null)
                 {
-                    activity.RecordException(logEvent.Exception);
+                    activity.AddException(logEvent.Exception);
                 }
             }
             catch (Exception logException)
             {
-                activity.RecordException(logException);
+                activity.AddException(logException);
             }
         }
     }
