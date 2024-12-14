@@ -59,7 +59,7 @@ namespace NBB.Messaging.Rusi
             await _client.PublishAsync(request);
         }
 
-        public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+        public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task<PipelineResult>> handler,
             SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default)
         {
             var transport = options ?? SubscriptionTransportOptions.Default;
@@ -108,8 +108,8 @@ namespace NBB.Messaging.Rusi
                         {
                             try
                             {
-                                await handler(receiveContext);
-                                await ackChannel.Writer.WriteAsync(new() { MessageId = msg.Id });
+                                var result = await handler(receiveContext);
+                                await ackChannel.Writer.WriteAsync(new() { MessageId = msg.Id, Error = result.Error });
                             }
                             catch (Exception ex)
                             {

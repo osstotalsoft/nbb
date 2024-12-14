@@ -23,7 +23,7 @@ namespace NBB.Messaging.InProcessMessaging.Internal
 
         public event TransportErrorHandler OnError;
 
-        public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+        public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task<PipelineResult>> handler,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {

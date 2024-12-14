@@ -10,7 +10,7 @@ namespace NBB.Messaging.Noop
 {
     public class NoopMessagingTransport : IMessagingTransport
     {
-        public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+        public Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task<PipelineResult>> handler,
             SubscriptionTransportOptions options = null,
             CancellationToken cancellationToken = default)
         {
