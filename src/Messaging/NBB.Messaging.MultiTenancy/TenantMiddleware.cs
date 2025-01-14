@@ -66,7 +66,10 @@ namespace NBB.Messaging.MultiTenancy
 
             Activity.Current?.SetTag(TracingTags.TenantId, tenant.TenantId);
 
-            await next();
+            using (logger.BeginScope(new TenantLogScope(tenantContextAccessor.TenantContext)))
+            {
+                await next();
+            }
         }
 
         private async Task<Tenant> LoadTenant(CancellationToken cancellationToken)
