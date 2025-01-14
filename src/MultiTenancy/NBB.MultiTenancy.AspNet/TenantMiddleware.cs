@@ -10,18 +10,12 @@ using NBB.MultiTenancy.Abstractions.Options;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.MultiTenancy.Identification.Services;
 using NBB.MultiTenancy.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace NBB.MultiTenancy.AspNet
 {
-    public class TenantMiddleware
+    public class TenantMiddleware(RequestDelegate next, ILogger<TenantMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-
-        public TenantMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task Invoke(HttpContext context, ITenantIdentificationService tenantIdentificationService,
             ITenantContextAccessor tenantContextAccessor, ITenantRepository tenantRepository, IOptions<TenancyHostingOptions> tenancyOptions)
         {
@@ -34,7 +28,7 @@ namespace NBB.MultiTenancy.AspNet
             if (tenancyOptions.Value.TenancyType == TenancyType.MonoTenant)
             {
                 tenantContextAccessor.TenantContext = new TenantContext(Tenant.Default);
-                await _next(context);
+                await next(context);
                 return;
             }
 
@@ -44,9 +38,10 @@ namespace NBB.MultiTenancy.AspNet
 
             tenantContextAccessor.TenantContext = new TenantContext(tenant);
 
-            await _next(context);
+            using (logger.BeginScope(new TenantLogScope(tenantContextAccessor.TenantContext)))
+            {
+                await next(context);
+            }
         }
-
-
     }
 }
