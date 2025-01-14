@@ -16,7 +16,7 @@ Applying concepts from the Microservices architectural style, you get a new begi
 
 Architectural considerations
 ----------------
-> The goal of software architecture is to minimize the human resources required to build and maintain the required system.
+> The goal of software architecture is to minimize the human resources required to build and maintain the required system. 
 >
 > -- <cite>Robert C. Martin</cite>
 
