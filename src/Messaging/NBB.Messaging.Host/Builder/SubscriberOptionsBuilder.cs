@@ -42,7 +42,7 @@ namespace NBB.Messaging.Host
         {
             _subscriberOptions = _subscriberOptions with
             {
-                SerDes = _subscriberOptions.SerDes with
+                SerDes = (_subscriberOptions.SerDes ?? new()) with
                 {
                     UseDynamicDeserialization = true,
                     DynamicDeserializationScannedAssemblies = dynamicDeserializationScannedAssemblies
