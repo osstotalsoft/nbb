@@ -4,7 +4,7 @@ NBB [![CI](https://github.com/osstotalsoft/nbb/actions/workflows/ci.yml/badge.sv
 
 ![Building blocks](assets/img/icon.png)
 
-Our philosophy
+Our philosophy 
 ----------------
 Build cutting-edge, cloud-ready, scalable, maintainable and fun LOB services with .Net Building Blocks
 
