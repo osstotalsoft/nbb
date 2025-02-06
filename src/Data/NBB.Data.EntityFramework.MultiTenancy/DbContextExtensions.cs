@@ -14,12 +14,16 @@ namespace NBB.Data.EntityFramework.MultiTenancy
     {
         public static void SetTenantIdFromContext(this DbContext context)
         {
-            var tenantId = context.GetTenantIdFromContext();
-
             var multiTenantEntities =
                 context.ChangeTracker.Entries()
                     .Where(e => e.IsMultiTenant() && e.State != EntityState.Unchanged);
 
+            if (!multiTenantEntities.Any())
+            {
+                return;
+            }
+
+            var tenantId = context.GetTenantIdFromContext();
             foreach (var e in multiTenantEntities)
             {
                 var attemptedTenantId = e.GetTenantId();
