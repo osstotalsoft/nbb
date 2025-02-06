@@ -155,6 +155,9 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
 
         private IServiceProvider GetServiceProvider<TDBContext>(bool isSharedDB, bool isSingleSharedDB = false) where TDBContext : DbContext
         {
+            if(!isSharedDB && isSingleSharedDB)
+                throw new ArgumentException("isSharedDB must be true if isSingleSharedDB is true");
+
             var tenantService = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == null);
 
             var connectionStringKey = isSingleSharedDB ? "ConnectionStrings:myDb" : "MultiTenancy:Defaults:ConnectionStrings:myDb";
