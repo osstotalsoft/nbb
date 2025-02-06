@@ -166,7 +166,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             var isSharedDB = dbStrategy == DbStrategy.Shared;
             var isHybridDB = dbStrategy == DbStrategy.Hybrid;
             var connectionStringKey = isSharedDB ? "ConnectionStrings:myDb" : "MultiTenancy:Defaults:ConnectionStrings:myDb";
-            var connectionStringValue = isHybridDB || isSharedDB ? "Test" : Guid.NewGuid().ToString();
+            var connectionStringValue = isSharedDB || isHybridDB ? "Test" : Guid.NewGuid().ToString();
             IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
             {
