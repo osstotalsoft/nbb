@@ -8,6 +8,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
     public class TestDbContext : MultiTenantDbContext
     {
         public DbSet<TestEntity> TestEntities { get; set; }
+        public DbSet<SimpleEntity> SimpleEntities { get; set; }
 
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
         {
@@ -16,6 +17,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new TestEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new SimpleEntityConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }
