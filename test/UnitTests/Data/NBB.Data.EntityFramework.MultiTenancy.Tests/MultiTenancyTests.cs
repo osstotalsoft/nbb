@@ -1,10 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +11,10 @@ using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace NBB.Data.EntityFramework.MultiTenancy.Tests
@@ -26,7 +26,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             // arrange
             var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(true);
+            var sp = GetServiceProvider<TestDbContext>();
             var testEntity = new TestEntity { Id = 1 };
 
             await WithTenantScope(sp, testTenantId, async sp =>
@@ -48,7 +48,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             // arrange
             var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(true);
+            var sp = GetServiceProvider<TestDbContext>();
             var testEntity = new TestEntity { Id = 1 };
             var testEntityOtherId = new TestEntity { Id = 2 };
             await WithTenantScope(sp, testTenantId, async sp =>
@@ -75,7 +75,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             var testTenantId2 = Guid.NewGuid();
             var testEntity = new TestEntity { Id = 1 };
             var testEntityOtherId = new TestEntity { Id = 2 };
-            var sp = GetServiceProvider<TestDbContext>(true);
+            var sp = GetServiceProvider<TestDbContext>();
 
             await WithTenantScope(sp, testTenantId1, async sp =>
             {
@@ -109,7 +109,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
         {
             // arrange
             var testTenantId = Guid.NewGuid();
-            var sp = GetServiceProvider<TestDbContext>(true);
+            var sp = GetServiceProvider<TestDbContext>();
             var testEntity = new TestEntity { Id = 1 };
             var testEntity1 = new TestEntity { Id = 2 };
 
@@ -133,13 +133,44 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             });
         }
 
-        private IServiceProvider GetServiceProvider<TDBContext>(bool isSharedDB) where TDBContext : DbContext
+        [Fact]
+        public async Task Can_Save_MultiTenantDbContext_WO_TennatContext_When_Only_NonMultiTenant_Entities_Changed()
+        {
+            // arrange
+            var sp = GetServiceProvider<TestDbContext>(DbStrategy.Shared);
+            var testEntity = new SimpleEntity { Id = 1 };
+            var testEntityOtherId = new SimpleEntity { Id = 2 };
+
+            var dbContext = sp.GetRequiredService<TestDbContext>();
+
+            dbContext.SimpleEntities.Add(testEntity);
+            dbContext.SimpleEntities.Add(testEntityOtherId);
+
+            // act
+            var count = await dbContext.SaveChangesAsync();
+
+            // assert
+            count.Should().Be(2);
+        }
+
+        enum DbStrategy
+        {
+            DatabasePerTenant,
+            Shared,
+            Hybrid
+        }
+
+        private IServiceProvider GetServiceProvider<TDBContext>(DbStrategy dbStrategy = DbStrategy.Hybrid) where TDBContext : DbContext
         {
             var tenantService = Mock.Of<ITenantContextAccessor>(x => x.TenantContext == null);
+            var isSharedDB = dbStrategy == DbStrategy.Shared;
+            var isHybridDB = dbStrategy == DbStrategy.Hybrid;
+            var connectionStringKey = isSharedDB ? "ConnectionStrings:myDb" : "MultiTenancy:Defaults:ConnectionStrings:myDb";
+            var connectionStringValue = isSharedDB || isHybridDB ? "Test" : Guid.NewGuid().ToString();
             IConfiguration configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string>
             {
-                { "MultiTenancy:Defaults:ConnectionStrings:myDb", isSharedDB ? "Test" : Guid.NewGuid().ToString()}
+                { connectionStringKey, connectionStringValue }
             })
             .Build();
 
@@ -156,7 +187,9 @@ namespace NBB.Data.EntityFramework.MultiTenancy.Tests
             services.AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<TDBContext>((sp, options) =>
                 {
-                    var conn = sp.GetRequiredService<ITenantConfiguration>().GetConnectionString("myDb");
+                    var conn = isSharedDB ?
+                        configuration.GetConnectionString("myDb") :
+                        sp.GetRequiredService<ITenantConfiguration>().GetConnectionString("myDb");
                     options.UseInMemoryDatabase(conn).UseInternalServiceProvider(sp);
                 });
 
