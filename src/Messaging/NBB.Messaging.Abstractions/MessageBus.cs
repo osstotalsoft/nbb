@@ -53,7 +53,11 @@ namespace NBB.Messaging.Abstractions
                 tokenSource.Token);
 
             if (millisecondsTimeout > 0)
+#if NET6_0_OR_GREATER
                 return await tcs.Task.WaitAsync(TimeSpan.FromMilliseconds(millisecondsTimeout));
+#else
+                return await Task.WhenAny(tcs.Task, Task.Delay(millisecondsTimeout)) == tcs.Task ? await tcs.Task : throw new TimeoutException();
+#endif
 
             return await tcs.Task;
         }

@@ -8,10 +8,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;netstandard2.0</TargetFrameworks>
     <Description>This package provides cross-cutting abstractions and type extensions that other packages rely upon. The interfaces of this package are not intended to be directly referenced by the end-consumer.</Description>
   </PropertyGroup>
 
+		<ItemGroup>
+				<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.0" Condition="'$(TargetFramework)' == 'netstandard2.0'"></PackageReference>
+		</ItemGroup>
+		
   <ItemGroup>
     <None Remove="NBB.Core.Abstractions.csproj.vspscc" />
   </ItemGroup>

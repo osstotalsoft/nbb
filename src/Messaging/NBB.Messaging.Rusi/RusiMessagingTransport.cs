@@ -11,7 +11,9 @@ using Proto.V1;
 using System;
 using System.Linq;
 using System.Threading;
+#if NETCOREAPP3_0_OR_GREATER
 using System.Threading.Channels;
+#endif
 using System.Threading.Tasks;
 
 namespace NBB.Messaging.Rusi
@@ -62,6 +64,7 @@ namespace NBB.Messaging.Rusi
         public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
             SubscriptionTransportOptions options = null, CancellationToken cancellationToken = default)
         {
+#if NETCOREAPP3_0_OR_GREATER
             var transport = options ?? SubscriptionTransportOptions.Default;
             var subscriptionOptions = new SubscriptionOptions()
             {
@@ -132,6 +135,9 @@ namespace NBB.Messaging.Rusi
             }, cancellationToken);
 
             return subscription;
+#else
+            throw new NotSupportedException("Rusi subscriptions are only supported on netcoreapp3.0 or greater");
+#endif
         }
     }
 }

@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using OpenTelemetry.Context.Propagation;
 using NBB.Core.Abstractions;
 using NBB.Messaging.OpenTelemetry.Publisher;
-using System.Reflection.PortableExecutable;
 
 namespace NBB.Messaging.OpenTelemetry.Subscriber
 {

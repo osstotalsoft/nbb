@@ -12,9 +12,10 @@ namespace NBB.Messaging.Abstractions
         Task<IDisposable> SubscribeAsync<TMessage>(Func<MessagingEnvelope<TMessage>, Task> handler,
             MessagingSubscriberOptions options = null, CancellationToken cancellationToken = default);
 
-
+#if NETCOREAPP3_0_OR_GREATER
         Task<IDisposable> SubscribeAsync(Func<MessagingEnvelope, Task> handler,
             MessagingSubscriberOptions options = null, CancellationToken cancellationToken = default)
             => SubscribeAsync<object>(handler, options, cancellationToken);
+#endif
     }
 }

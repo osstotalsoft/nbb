@@ -11,7 +11,9 @@ namespace NBB.Messaging.Abstractions
         Task PublishAsync<T>(T message, MessagingPublisherOptions publisherOptions = null,
             CancellationToken cancellationToken = default);
 
+#if NETCOREAPP3_0_OR_GREATER
         Task PublishAsync<T>(T message, CancellationToken cancellationToken) =>
             PublishAsync(message, null, cancellationToken);
+#endif
     }
 }

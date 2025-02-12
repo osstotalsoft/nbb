@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>net9.0;netstandard2.0</TargetFrameworks>
 		<Description>Nats JetStream messaging</Description>
 	</PropertyGroup>
 

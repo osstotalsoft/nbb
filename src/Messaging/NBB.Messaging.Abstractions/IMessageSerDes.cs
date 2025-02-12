@@ -18,7 +18,19 @@ namespace NBB.Messaging.Abstractions
         MessagingEnvelope<TMessage> DeserializeMessageEnvelope<TMessage>(byte[] envelopeData,
             MessageSerDesOptions options = null);
 
+#if NETCOREAPP3_0_OR_GREATER
         MessagingEnvelope DeserializeMessageEnvelope(byte[] envelopeData, MessageSerDesOptions options = null)
             => DeserializeMessageEnvelope<object>(envelopeData, options);
+#endif
     }
+
+#if !NETCOREAPP3_0_OR_GREATER
+    public static class MessageSerDesExtensions
+    {
+
+        public static MessagingEnvelope DeserializeMessageEnvelope(this IMessageSerDes serDes,
+            byte[] envelopeData, MessageSerDesOptions options = null)
+            => serDes.DeserializeMessageEnvelope<object>(envelopeData, options);
+    }
+#endif
 }
