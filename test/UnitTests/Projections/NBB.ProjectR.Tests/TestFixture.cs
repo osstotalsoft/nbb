@@ -11,6 +11,7 @@ namespace NBB.ProjectR.Tests
     {
         public ServiceProvider BuildServiceProvider()
         {
+            var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddProjectR(GetType().Assembly);
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(GetType().Assembly));
@@ -18,10 +19,10 @@ namespace NBB.ProjectR.Tests
                 .AddEffects()
                 .AddMessagingEffects()
                 .AddMediatorEffects();
-            services.AddMessageBus().AddInProcessTransport();
+            services.AddMessageBus(configuration).AddInProcessTransport();
             services.AddEventStore(b => b.UseNewtownsoftJson().UseInMemoryEventRepository());
             services.AddLogging();
-            services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
+            services.AddSingleton<IConfiguration>(configuration);
 
             return services.BuildServiceProvider();
 

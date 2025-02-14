@@ -18,7 +18,7 @@ namespace ProcessManagerSample
         {
             services.AddAutoMapper(Assembly.GetEntryAssembly());
 
-            services.AddMessageBus().AddInProcessTransport();
+            services.AddMessageBus(context.Configuration).AddInProcessTransport();
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<GetPartnerQuery>());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));

@@ -59,7 +59,7 @@ module Program =
         |> ignore
 
         services
-            .AddMessageBus()
+            .AddMessageBus(context.Configuration)
             .AddNatsTransport(context.Configuration)
         |> ignore
 

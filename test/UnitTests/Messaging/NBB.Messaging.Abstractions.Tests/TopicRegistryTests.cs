@@ -4,6 +4,7 @@
 using System;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Moq;
 using NBB.Messaging.DataContracts;
 using Xunit;
@@ -30,7 +31,7 @@ namespace NBB.Messaging.Abstractions.Tests
         public void Should_resolve_topic_name_from_custom_resolver()
         {
             //Arrange
-            var sut = new DefaultTopicRegistry(Mock.Of<IConfiguration>());
+            var sut = new DefaultTopicRegistry(Mock.Of<IOptions<MessagingOptions>>(), Mock.Of<IConfiguration>());
 
             //Act
             var topicName = sut.GetTopicForMessageType(typeof(MyEvent));

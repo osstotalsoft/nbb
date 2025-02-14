@@ -25,7 +25,7 @@ namespace NBB.Payments.Api
         {
             services.AddMvc();
             services.AddSingleton(Configuration);
-            services.AddMessageBus().AddNatsTransport(Configuration);
+            services.AddMessageBus(Configuration).AddNatsTransport(Configuration);
             services.AddPaymentsReadDataAccess();
         }
 

@@ -51,14 +51,14 @@ namespace NBB.Contracts.Worker
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
                     {
                         services
-                            .AddMessageBus()
+                            .AddMessageBus(hostingContext.Configuration)
                             .AddNatsTransport(hostingContext.Configuration)
                             .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
                     }
                     else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
                     {
                         services
-                            .AddMessageBus()
+                            .AddMessageBus(hostingContext.Configuration)
                             .AddRusiTransport(hostingContext.Configuration)
                             .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
                     }

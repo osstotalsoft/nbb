@@ -36,7 +36,7 @@ namespace NBB.Messaging.Rusi.IntegrationTests
             var configuration = configurationBuilder.Build();
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
-            services.AddMessageBus().AddRusiTransport(configuration);
+            services.AddMessageBus(configuration).AddRusiTransport(configuration);
 
             return services.BuildServiceProvider();
 

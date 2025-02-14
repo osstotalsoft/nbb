@@ -4,20 +4,14 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using NBB.Core.Abstractions;
 using NBB.Messaging.DataContracts;
 
 namespace NBB.Messaging.Abstractions
 {
-    public class DefaultTopicRegistry : ITopicRegistry
+    public class DefaultTopicRegistry(IOptions<MessagingOptions> options, IConfiguration configuration) : ITopicRegistry
     {
-        private readonly IConfiguration _configuration;
-
-        public DefaultTopicRegistry(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
         {
             var topic = GetTopicNameFromAttribute(messageType) ?? messageType.GetLongPrettyName();
@@ -45,19 +39,20 @@ namespace NBB.Messaging.Abstractions
         private string GetTopicNameFromAttribute(Type messageType)
         {
             var topicNameResolver = messageType.GetCustomAttributes(typeof(TopicNameResolverAttribute), true).FirstOrDefault() as TopicNameResolverAttribute;
-            return topicNameResolver?.ResolveTopicName(messageType, _configuration);
+            return topicNameResolver?.ResolveTopicName(messageType, configuration);
         }
 
         public string GetTopicPrefix()
         {
-            var messagingSection = _configuration.GetSection("Messaging");
-            var envPrefix = messagingSection?["Env"];
+            var envPrefix = options.Value?.Env;
             if (!string.IsNullOrWhiteSpace(envPrefix))
             {
                 envPrefix += ".";
             }
 
-            var topicPrefix = envPrefix ?? messagingSection?["TopicPrefix"];
+#pragma warning disable CS0618 // Type or member is obsolete
+            var topicPrefix = envPrefix ?? options.Value?.TopicPrefix;
+#pragma warning restore CS0618 // Type or member is obsolete
             return topicPrefix ?? string.Empty;
         }
     }

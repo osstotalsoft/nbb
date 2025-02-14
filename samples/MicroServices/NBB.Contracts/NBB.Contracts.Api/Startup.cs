@@ -45,7 +45,7 @@ namespace NBB.Contracts.Api
             if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
             {
                 services
-                    .AddMessageBus()
+                    .AddMessageBus(Configuration)
                     .AddNatsTransport(Configuration)
                     .UseTopicResolutionBackwardCompatibility(Configuration);
             }
@@ -53,7 +53,7 @@ namespace NBB.Contracts.Api
             {
 
                 services
-                    .AddMessageBus()
+                    .AddMessageBus(Configuration)
                     .AddRusiTransport(Configuration)
                     .UseTopicResolutionBackwardCompatibility(Configuration);
             }

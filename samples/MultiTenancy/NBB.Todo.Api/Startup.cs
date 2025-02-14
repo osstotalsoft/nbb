@@ -43,7 +43,7 @@ namespace NBB.Todo.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddMessageBus().AddNatsTransport(Configuration);
+            services.AddMessageBus(Configuration).AddNatsTransport(Configuration);
             services.AddTodoDataAccess();
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

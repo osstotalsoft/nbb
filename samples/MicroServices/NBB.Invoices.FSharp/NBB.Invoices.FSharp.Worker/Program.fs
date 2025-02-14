@@ -22,7 +22,7 @@ let main argv =
         |> ignore
 
         services
-            .AddMessageBus()
+            .AddMessageBus(context.Configuration)
             .AddNatsTransport(context.Configuration)
         |> ignore
 

@@ -44,7 +44,7 @@ namespace NBB.MicroServicesOrchestration
                 {
                     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
 
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+                    services.AddMessageBus(hostingContext.Configuration).AddNatsTransport(hostingContext.Configuration);
 
                     services.AddEventStore(es =>
                     {

@@ -46,7 +46,7 @@ namespace NBB.Mono
                 typeof(CreateInvoiceCommandHandler).Assembly,
                 typeof(PayPayableCommandHandler).Assembly));
 
-            services.AddMessageBus().AddInProcessTransport();
+            services.AddMessageBus(Configuration).AddInProcessTransport();
 
             services.AddContractsWriteModelDataAccess();
             services.AddContractsReadModelDataAccess();

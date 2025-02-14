@@ -49,10 +49,11 @@ namespace NBB.Messaging.InProcessMessaging.Tests
 
         private ServiceProvider BuildServiceProvider()
         {
+            var configuration = new ConfigurationBuilder().Build();
             var services = new ServiceCollection();
             services.AddLogging();
             services.AddSingleton<IConfiguration>(new ConfigurationBuilder().Build());
-            services.AddMessageBus().AddInProcessTransport();
+            services.AddMessageBus(configuration).AddInProcessTransport();
 
             return services.BuildServiceProvider();
 

@@ -26,7 +26,7 @@ namespace NBB.Invoices.Api
             services.AddMvc();
             services.AddSingleton(Configuration);
             //services.AddKafkaMessaging();
-            services.AddMessageBus().AddNatsTransport(Configuration);
+            services.AddMessageBus(Configuration).AddNatsTransport(Configuration);
             services.AddInvoicesReadDataAccess();
         }
 

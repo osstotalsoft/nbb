@@ -50,7 +50,7 @@ namespace NBB.Invoices.Worker
                 {
                     services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateInvoiceCommandHandler>());
 
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+                    services.AddMessageBus(hostingContext.Configuration).AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();
                     services.AddEventStore(e =>
                     {

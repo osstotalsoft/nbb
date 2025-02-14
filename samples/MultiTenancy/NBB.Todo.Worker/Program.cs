@@ -80,7 +80,7 @@ namespace NBB.Todo.Worker
             services.AddTodoDataAccess();
 
             // Messaging
-            services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+            services.AddMessageBus(hostingContext.Configuration).AddNatsTransport(hostingContext.Configuration);
 
             services.AddMessagingHost(
                 hostingContext.Configuration,
