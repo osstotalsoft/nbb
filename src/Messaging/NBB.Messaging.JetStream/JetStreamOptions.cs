@@ -19,8 +19,6 @@ namespace NBB.Messaging.JetStream
         /// The time the server awaits for acknowledgement from the client before redelivering the message (in milliseconds)
         /// </summary>
         public int? AckWait { get; set; }
-        public string CommandsStream { get; set; }
-        public string EventsStream { get; set; }
 
     }
 }
