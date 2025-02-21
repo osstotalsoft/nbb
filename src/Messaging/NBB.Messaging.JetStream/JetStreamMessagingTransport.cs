@@ -43,7 +43,7 @@ public class JetStreamMessagingTransport : IMessagingTransport, ITransportMonito
         var cc = new ConsumerConfig();
         if (subscriberOptions.IsDurable)
         {
-            var clientId = (_natsOptions.Value.ClientId + topic).Replace(".", "_");
+            var clientId = (_natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
             cc.Name = clientId;
             cc.DurableName = clientId;
         }
