@@ -15,8 +15,9 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.Configure<JetStreamOptions>(configuration.GetSection("Messaging").GetSection("JetStream"));
             services.AddSingleton<JetStreamConnectionProvider>();
-            services.AddSingleton<IMessagingTransport, JetStreamMessagingTransport>();
-            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<JetStreamConnectionProvider>());
+            services.AddSingleton<JetStreamMessagingTransport>();
+            services.AddSingleton<IMessagingTransport>(sp => sp.GetRequiredService<JetStreamMessagingTransport>());
+            services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<JetStreamMessagingTransport>());
 
             return services;
         }

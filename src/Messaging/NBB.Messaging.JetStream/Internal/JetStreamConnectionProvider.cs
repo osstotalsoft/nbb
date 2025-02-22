@@ -3,45 +3,35 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NATS.Client;
-using NBB.Messaging.Abstractions;
+using NATS.Client.Core;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream.Internal
 {
-    public class JetStreamConnectionProvider : IDisposable, ITransportMonitor
+    public class JetStreamConnectionProvider : IAsyncDisposable
     {
         private readonly IOptions<JetStreamOptions> _natsOptions;
         private readonly ILogger<JetStreamConnectionProvider> _logger;
-        private IConnection _connection;
+        private readonly ILoggerFactory _loggerFactory;
+        private INatsConnection _connection;
         private static readonly object InstanceLoker = new();
-        private Exception _unrecoverableException;
 
-        public event TransportErrorHandler OnError;
-
-        public JetStreamConnectionProvider(IOptions<JetStreamOptions> natsOptions, ILogger<JetStreamConnectionProvider> logger)
+        public JetStreamConnectionProvider(IOptions<JetStreamOptions> natsOptions,
+            ILogger<JetStreamConnectionProvider> logger, ILoggerFactory loggerFactory)
         {
             _natsOptions = natsOptions;
             _logger = logger;
+            _loggerFactory = loggerFactory;
         }
 
-        public async Task ExecuteAsync(Func<IConnection, Task> action)
+        public INatsConnection GetConnection()
         {
             var connection = GetAndCheckConnection();
-
-            await action(connection);
+            return connection;
         }
 
-        public void Execute(Action<IConnection> action)
-        {
-            var connection = GetAndCheckConnection();
-
-            action(connection);
-        }
-
-        private IConnection GetAndCheckConnection()
+        private INatsConnection GetAndCheckConnection()
         {
             if (_connection == null)
                 lock (InstanceLoker)
@@ -52,53 +42,27 @@ namespace NBB.Messaging.JetStream.Internal
             return _connection;
         }
 
-        private IConnection CreateConnection()
+        private INatsConnection CreateConnection()
         {
-            var options = ConnectionFactory.GetDefaultOptions();
-            options.Url = _natsOptions.Value.NatsUrl;
+            var options = NatsOpts.Default with { Url = _natsOptions.Value.NatsUrl, LoggerFactory = _loggerFactory };
 
-            //https://github.com/nats-io/nats.net/issues/804
-            options.AllowReconnect = false;
-
-            options.ClosedEventHandler += (_, args) =>
-            {
-                SetConnectionLostState(args.Error ?? new Exception("NATS Jetstream connection was lost"));
-            };
-
-            _connection = new ConnectionFactory().CreateConnection(options);
+            _connection = new NatsConnection(options);
+            //_connection.ConnectionDisconnected += Connection_ConnectionDisconnected;
+            //_connection.ReconnectFailed += Connection_ReconnectFailed;
             _logger.LogInformation($"NATS Jetstream connection to {_natsOptions.Value.NatsUrl} was established");
 
             return _connection;
         }
 
-        private void SetConnectionLostState(Exception exception)
+        private ValueTask Connection_ConnectionDisconnected(object sender, NatsEventArgs args)
         {
-            _connection = null;
-
-            // Set the field to the current exception if not already set
-            var existingException = Interlocked.CompareExchange(ref _unrecoverableException, exception, null);
-
-            // Send the application stop signal only once
-            if (existingException != null)
-                return;
-
-            _logger.LogError(exception, "NATS Jetstream connection unrecoverable");
-
-            OnError?.Invoke(exception);
+            _logger.LogWarning($"NATS Jetstream connection was disconnected, {args.Message}");
+            return ValueTask.CompletedTask;
         }
 
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _connection?.Dispose();
-            }
+            return _connection?.DisposeAsync() ?? ValueTask.CompletedTask;
         }
     }
 }

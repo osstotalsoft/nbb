@@ -2,96 +2,103 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Options;
-using NATS.Client;
 using NATS.Client.JetStream;
+using NATS.Client.JetStream.Models;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.JetStream.Internal;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NBB.Messaging.JetStream
+namespace NBB.Messaging.JetStream;
+
+public class JetStreamMessagingTransport : IMessagingTransport, ITransportMonitor
 {
-    public class JetStreamMessagingTransport : IMessagingTransport
+    private readonly IOptions<JetStreamOptions> _natsOptions;
+    private readonly JetStreamConnectionProvider _natsConnectionManager;
+
+    public JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, JetStreamConnectionProvider natsConnectionManager)
     {
-        private readonly IOptions<JetStreamOptions> _natsOptions;
-        private readonly JetStreamConnectionProvider _natsConnectionManager;
+        _natsOptions = natsOptions;
+        _natsConnectionManager = natsConnectionManager;
+    }
 
-        public JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, JetStreamConnectionProvider natsConnectionManager)
+    public event TransportErrorHandler OnError;
+
+    public async Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
+    {
+        var envelopeData = sendContext.EnvelopeBytesAccessor.Invoke();
+        await _natsConnectionManager.GetConnection().PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
+    }
+
+    public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
+        SubscriptionTransportOptions options = null, CancellationToken token = default)
+    {
+        var stream = string.Empty;
+        var js = new NatsJSContext(_natsConnectionManager.GetConnection());
+        await foreach (var item in js.ListStreamNamesAsync(topic, token)) { stream = item; }
+
+        var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
+
+        var cc = new ConsumerConfig();
+        if (subscriberOptions.IsDurable)
         {
-            _natsOptions = natsOptions;
-            _natsConnectionManager = natsConnectionManager;
+            var clientId = (_natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
+            cc.Name = clientId;
+            cc.DurableName = clientId;
         }
 
-        public Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
-        {
-            var envelopeData = sendContext.EnvelopeBytesAccessor.Invoke();
+        if (subscriberOptions.DeliverNewMessagesOnly)
+            cc.DeliverPolicy = ConsumerConfigDeliverPolicy.New;
 
-            return _natsConnectionManager.ExecuteAsync(con =>
+        cc.AckWait = TimeSpan.FromMilliseconds(subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000);
+        cc.FilterSubject = topic;
+        //cc.InactiveThreshold = TimeSpan.FromMinutes(5s);
+        cc.AckPolicy = ConsumerConfigAckPolicy.Explicit;
+
+        var consumeOptions = new NatsJSConsumeOpts
+        {
+            MaxMsgs = subscriberOptions.MaxConcurrentMessages,
+        };
+        var consumer = await js.CreateOrUpdateConsumerAsync(stream, cc, token);
+
+        var cts = new CancellationTokenSource();
+        var t = Task.Run(async () =>
+        {
+            try
             {
-                IJetStream js = con.CreateJetStreamContext();
-                return js.PublishAsync(topic, envelopeData);
-            });
-        }
-
-        public Task<IDisposable> SubscribeAsync(string topic,
-            Func<TransportReceiveContext, Task> handler,
-            SubscriptionTransportOptions options = null,
-            CancellationToken cancellationToken = default)
-        {
-
-            IDisposable consumer = null;
-
-            _natsConnectionManager.Execute(con =>
+                //await consumer.RefreshAsync(token);
+                await foreach (var msg in consumer.ConsumeAsync<byte[]>(opts: consumeOptions, cancellationToken: cts.Token))
+                {
+                    var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(msg.Data));
+                    await handler(receiveContext);
+                    await msg.AckAsync(cancellationToken: cts.Token);
+                }
+            }
+            //catch (NatsJSProtocolException e)
+            //catch (NatsJSException e)
+            catch (OperationCanceledException)
             {
-                IJetStream js = con.CreateJetStreamContext();
+            }
+            catch (Exception e)
+            {
+                OnError?.Invoke(e);
+            }
+        });
 
-                // set's up the stream
-                var isCommand = topic.ToLower().Contains("commands.");
+        //should be asyncDisposable
+        return new SubscriptionDisposable(() =>
+        {
+            cts.Cancel();
+            t.Wait();
+        });
+    }
+}
 
-                var stream = isCommand ? _natsOptions.Value.CommandsStream : _natsOptions.Value.EventsStream;
-                var jsm = con.CreateJetStreamManagementContext();
-                jsm.GetStreamInfo(stream);
-
-                // get stream context, create consumer and get the consumer context
-                var streamContext = con.GetStreamContext(stream);
-
-                var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
-                var ccb = ConsumerConfiguration.Builder();
-
-                if (subscriberOptions.IsDurable)
-                {
-                    var clientId = (_natsOptions.Value.ClientId + topic).Replace(".", "_");
-                    ccb.WithDurable(clientId);
-                }
-
-                if (subscriberOptions.DeliverNewMessagesOnly)
-                    ccb.WithDeliverPolicy(DeliverPolicy.New);
-                else
-                    ccb.WithDeliverPolicy(DeliverPolicy.All);
-
-                ccb.WithAckWait(subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000);
-
-                //https://docs.nats.io/nats-concepts/jetstream/consumers#maxackpending
-                ccb.WithMaxAckPending(subscriberOptions.MaxConcurrentMessages);
-                ccb.WithFilterSubject(topic);
-
-                var consumerContext = streamContext.CreateOrUpdateConsumer(ccb.Build());
-
-                void NatsMsgHandler(object obj, MsgHandlerEventArgs args)
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-
-                    var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(args.Message.Data));
-
-                    // Fire and forget
-                    _ = handler(receiveContext).ContinueWith(_ => args.Message.Ack(), cancellationToken);
-                }
-                consumer = consumerContext.Consume(NatsMsgHandler);
-
-            });
-            return Task.FromResult(consumer);
-        }
+internal record SubscriptionDisposable(Action dispose) : IDisposable
+{
+    public void Dispose()
+    {
+        dispose();
     }
 }
