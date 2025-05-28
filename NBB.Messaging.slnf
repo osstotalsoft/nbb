@@ -7,6 +7,7 @@
       "src\\Messaging\\NBB.Messaging.Host\\NBB.Messaging.Host.csproj",
       "src\\Messaging\\NBB.Messaging.InProcessMessaging\\NBB.Messaging.InProcessMessaging.csproj",
       "src\\Messaging\\NBB.Messaging.JetStream\\NBB.Messaging.JetStream.csproj",
+      "src\\Messaging\\NBB.Messaging.Kafka\\NBB.Messaging.Kafka.csproj",
       "src\\Messaging\\NBB.Messaging.MultiTenancy\\NBB.Messaging.MultiTenancy.csproj",
       "src\\Messaging\\NBB.Messaging.Nats\\NBB.Messaging.Nats.csproj",
       "src\\Messaging\\NBB.Messaging.Noop\\NBB.Messaging.Noop.csproj",
