@@ -20,7 +20,7 @@ public class TenantConfiguration : ITenantConfiguration
     private readonly IOptions<TenancyHostingOptions> _tenancyHostingOptions;
     private readonly ITenantContextAccessor _tenantContextAccessor;
 
-    public string this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public string this[string key] { get => GetTenantConfiguration()[key]; set => throw new NotImplementedException(); }
 
     public TenantConfiguration(IConfiguration configuration, IOptions<TenancyHostingOptions> tenancyHostingOptions,
         ITenantContextAccessor tenantContextAccessor)
