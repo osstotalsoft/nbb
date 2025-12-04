@@ -78,6 +78,16 @@ namespace NBB.SQLStreamStore
             return result;
         }
 
+        public async Task DeleteStreamAsync(string stream, CancellationToken cancellationToken = default)
+        {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            await _streamStore.DeleteStream(stream, cancellationToken: cancellationToken);
+
+            stopWatch.Stop();
+            _logger.LogDebug("SqlStreamStore.DeleteStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
+        }
 
         private static string GetFullTypeName(Type type)
         {
