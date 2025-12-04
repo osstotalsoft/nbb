@@ -36,7 +36,7 @@ services.AddMessagingTransport(JetStreamMessagingTransport.CreateTransport);
 
 ## Dependencies
 
-This package uses the `NATS.Net` client library (currently v2.5.8) to communicate with NATS JetStream servers.
+This package uses the `NATS.Net` client library to communicate with NATS JetStream servers. See the project file for the specific version in use.
 
 ## Related Packages
 
