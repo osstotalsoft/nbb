@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### [v9.0.2] - 2025-02-22
 #### Changed
-- Upgrade JetStream library to NATS.Net (#283)
+- Upgrade NATS.Net client library dependency (#283)
 - MultiTenant entities - Get tenant from context only if there is any modified multitenant entity (#281)
 
 ### [v7.0.12] - 2023-10-19
