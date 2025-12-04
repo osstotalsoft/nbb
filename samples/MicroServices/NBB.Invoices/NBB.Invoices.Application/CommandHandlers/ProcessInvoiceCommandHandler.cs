@@ -13,10 +13,10 @@ namespace NBB.Invoices.Application.CommandHandlers
 {
     public class ProcessInvoiceCommandHandler : IRequestHandler<ProcessInvoice>
     {
-        private readonly ICrudRepository<Invoice> _invocieRepository;
+        private readonly IInvoiceRepository _invocieRepository;
         private readonly IEventSourcedRepository<InvoiceLock> _invoiceLockRepository;
 
-        public ProcessInvoiceCommandHandler(ICrudRepository<Invoice> invocieRepository, IEventSourcedRepository<InvoiceLock> invoiceLockRepository)
+        public ProcessInvoiceCommandHandler(IInvoiceRepository invocieRepository, IEventSourcedRepository<InvoiceLock> invoiceLockRepository)
         {
             this._invocieRepository = invocieRepository;
             this._invoiceLockRepository = invoiceLockRepository;

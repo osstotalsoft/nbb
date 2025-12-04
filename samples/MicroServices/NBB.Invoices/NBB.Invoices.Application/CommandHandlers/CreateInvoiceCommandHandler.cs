@@ -2,7 +2,6 @@
 // This source code is licensed under the MIT license.
 
 using MediatR;
-using NBB.Data.Abstractions;
 using NBB.Invoices.Domain.InvoiceAggregate;
 using NBB.Invoices.PublishedLanguage;
 using System.Threading;
@@ -12,8 +11,8 @@ namespace NBB.Invoices.Application.CommandHandlers
 {
     public class CreateInvoiceCommandHandler : IRequestHandler<CreateInvoice>
     {
-        private readonly ICrudRepository<Invoice> _repository;
-        public CreateInvoiceCommandHandler(ICrudRepository<Invoice> repository)
+        private readonly IInvoiceRepository _repository;
+        public CreateInvoiceCommandHandler(IInvoiceRepository repository)
         {
             this._repository = repository;
         }
