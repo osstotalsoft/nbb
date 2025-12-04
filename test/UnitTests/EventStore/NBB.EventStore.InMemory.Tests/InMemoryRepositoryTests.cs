@@ -100,5 +100,43 @@ namespace NBB.EventStore.InMemory.Tests
             //Assert
             await action2.Should().ThrowAsync<ConcurrencyUnrecoverableException>();
         }
+
+        [Fact]
+        public async Task Should_delete_stream_successfully()
+        {
+            //Arrange
+            var sut = new InMemoryRepository();
+            var stream = "stream";
+            var appendedDescriptors = new List<EventDescriptor>
+            {
+                new EventDescriptor(Guid.NewGuid(), "type", "data", stream, Guid.NewGuid()),
+                new EventDescriptor(Guid.NewGuid(), "type", "data", stream, Guid.NewGuid())
+            };
+
+            //Act
+            await sut.AppendEventsToStreamAsync(stream, appendedDescriptors, 0, CancellationToken.None);
+            await sut.DeleteStreamAsync(stream, CancellationToken.None);
+            var receivedEvents = await sut.GetEventsFromStreamAsync(stream, null, CancellationToken.None);
+
+            //Assert
+            receivedEvents.Should().NotBeNull();
+            receivedEvents.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task Should_delete_nonexistent_stream_without_error()
+        {
+            //Arrange
+            var sut = new InMemoryRepository();
+            var stream = "nonexistent";
+
+            //Act
+            await sut.DeleteStreamAsync(stream, CancellationToken.None);
+            var receivedEvents = await sut.GetEventsFromStreamAsync(stream, null, CancellationToken.None);
+
+            //Assert
+            receivedEvents.Should().NotBeNull();
+            receivedEvents.Should().BeEmpty();
+        }
     }
 }

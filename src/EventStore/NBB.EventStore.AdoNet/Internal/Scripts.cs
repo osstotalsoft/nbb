@@ -28,6 +28,7 @@ namespace NBB.EventStore.AdoNet.Internal
         public string AppendEventsToStreamExpectedVersion => GetScript(nameof(AppendEventsToStreamExpectedVersion));
         public string AppendEventsToStreamExpectedVersionAny => GetScript(nameof(AppendEventsToStreamExpectedVersionAny));
         public string CreateDatabaseObjects => GetScript(nameof(CreateDatabaseObjects));
+        public string DeleteStream => GetScript(nameof(DeleteStream));
         public string DropDatabaseObjects => GetScript(nameof(DropDatabaseObjects));
         public string GetEventsFromStream => GetScript(nameof(GetEventsFromStream));
         public string GetSnapshotForStream => GetScript(nameof(GetSnapshotForStream));

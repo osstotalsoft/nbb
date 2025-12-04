@@ -50,6 +50,12 @@ namespace NBB.EventStore.InMemory
             return Task.CompletedTask;
         }
 
+        public Task DeleteStreamAsync(string stream, CancellationToken cancellationToken = default)
+        {
+            _storage.TryRemove(stream, out _);
+            return Task.CompletedTask;
+        }
+
         private static void CheckVersion(int? expectedVersion, int actualVersion)
         {
             if (!expectedVersion.HasValue || actualVersion == expectedVersion) return;

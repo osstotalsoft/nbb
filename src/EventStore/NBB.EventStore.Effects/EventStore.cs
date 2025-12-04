@@ -51,12 +51,34 @@ namespace NBB.EventStore.Effects
         }
     }
 
+    public static class DeleteStream
+    {
+        public record SideEffect(string Stream) : ISideEffect;
+        internal class Handler : ISideEffectHandler<SideEffect, Unit>
+        {
+            private readonly IEventStore _eventStore;
+
+            public Handler(IEventStore eventStore)
+            {
+                _eventStore = eventStore;
+            }
+
+            public async Task<Unit> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
+            {
+                await _eventStore.DeleteStreamAsync(sideEffect.Stream, cancellationToken);
+                return Unit.Value;
+            }
+        }
+    }
+
     public static class EventStore
     {
         public static Effect<Unit> AppendEventsToStream(string stream, IEnumerable<object> events, int? expectedVersion = null)
             => Effect.Of<AppendEventsToStream.SideEffect, Unit>(new AppendEventsToStream.SideEffect(stream, events, expectedVersion));
         public static Effect<List<object>> GetEventsFromStream(string stream, int? startFromVersion = null)
             => Effect.Of<GetEventsFromStream.SideEffect, List<object>>(new GetEventsFromStream.SideEffect(stream, startFromVersion));
+        public static Effect<Unit> DeleteStream(string stream)
+            => Effect.Of<DeleteStream.SideEffect, Unit>(new DeleteStream.SideEffect(stream));
     }
 
     public static class DependencyInjectionExtensions
@@ -65,6 +87,7 @@ namespace NBB.EventStore.Effects
         {
             services.AddScoped<ISideEffectHandler<AppendEventsToStream.SideEffect, Unit>, AppendEventsToStream.Handler>();
             services.AddScoped<ISideEffectHandler<GetEventsFromStream.SideEffect, List<object>>, GetEventsFromStream.Handler>();
+            services.AddScoped<ISideEffectHandler<DeleteStream.SideEffect, Unit>, DeleteStream.Handler>();
             return services;
         }
     }
