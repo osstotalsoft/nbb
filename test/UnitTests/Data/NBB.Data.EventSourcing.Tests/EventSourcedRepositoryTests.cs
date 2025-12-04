@@ -347,5 +347,10 @@ namespace NBB.Data.EventSourcing.Tests
         {
             throw new NotImplementedException();
         }
+
+        public Task DeleteStreamAsync(string stream, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

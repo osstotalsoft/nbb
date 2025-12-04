@@ -11,5 +11,6 @@ namespace NBB.EventStore.Abstractions
     {
         Task AppendEventsToStreamAsync(string stream, IEnumerable<object> events, int? expectedVersion, CancellationToken cancellationToken = default);
         Task<List<object>> GetEventsFromStreamAsync(string stream, int? startFromVersion, CancellationToken cancellationToken = default);
+        Task DeleteStreamAsync(string stream, CancellationToken cancellationToken = default);
     }
 }

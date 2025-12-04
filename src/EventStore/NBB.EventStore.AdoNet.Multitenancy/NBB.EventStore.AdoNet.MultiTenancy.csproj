@@ -17,6 +17,7 @@
     <None Remove="AppendEventsToStreamExpectedVersionAny.sql" />
     <None Remove="Charisma.BuildingBlocks.EventStore.AdoNet.csproj.vspscc" />
     <None Remove="CreateTableEventStoreStreams.sql" />
+    <None Remove="Internal\SqlScripts\DeleteStream.sql" />
     <None Remove="Internal\SqlScripts\DropDatabaseObjects.sql" />
     <None Remove="Internal\SqlScripts\GetEventsFromStream.sql" />
     <None Remove="Internal\SqlScripts\GetSnapshotForStream.sql" />
@@ -28,6 +29,7 @@
     <EmbeddedResource Include="Internal\SqlScripts\GetSnapshotForStream.sql" />
     <EmbeddedResource Include="Internal\SqlScripts\GetEventsFromStream.sql" />
     <EmbeddedResource Include="Internal\SqlScripts\DropDatabaseObjects.sql" />
+    <EmbeddedResource Include="Internal\SqlScripts\DeleteStream.sql" />
     <EmbeddedResource Include="Internal\SqlScripts\CreateDatabaseObjects.sql" />
     <EmbeddedResource Include="Internal\SqlScripts\AppendEventsToStreamExpectedVersionAny.sql" />
     <EmbeddedResource Include="Internal\SqlScripts\AppendEventsToStreamExpectedVersion.sql" />

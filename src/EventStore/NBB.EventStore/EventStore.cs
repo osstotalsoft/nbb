@@ -62,6 +62,17 @@ namespace NBB.EventStore
             return results;
         }
 
+        public async Task DeleteStreamAsync(string stream, CancellationToken cancellationToken = default)
+        {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            await _eventRepository.DeleteStreamAsync(stream, cancellationToken);
+
+            stopWatch.Stop();
+            _logger.LogDebug("EventStore.DeleteStreamAsync for {Stream} took {ElapsedMilliseconds} ms", stream, stopWatch.ElapsedMilliseconds);
+        }
+
         private static string GetFullTypeName(Type type)
         {
             var typeName = type.FullName;

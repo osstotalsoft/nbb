@@ -34,6 +34,22 @@ namespace NBB.EventStore.Tests
                 null, It.IsAny<CancellationToken>()), Times.Once);
         }
 
+        [Fact]
+        public async Task Should_delete_stream_in_event_repository()
+        {
+            //Arrange
+            var eventRepository = new Mock<IEventRepository>();
+            var eventSerDes = new Mock<IEventStoreSerDes>();
+            var sut = new EventStore(eventRepository.Object, eventSerDes.Object, Mock.Of<ILogger<EventStore>>());
+            var stream = "stream";
+
+            //Act
+            await sut.DeleteStreamAsync(stream);
+
+            //Assert
+            eventRepository.Verify(er => er.DeleteStreamAsync(stream, It.IsAny<CancellationToken>()), Times.Once);
+        }
+
         public record GenericEvent<T>(T field);
 
     }

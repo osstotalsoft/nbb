@@ -93,6 +93,27 @@ namespace NBB.EventStore.AdoNet
             return eventDescriptors;
         }
 
+        public async Task DeleteStreamAsync(string stream, CancellationToken cancellationToken = default)
+        {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            await using var cnx = new SqlConnection(_eventstoreOptions.Value.ConnectionString);
+            await cnx.OpenAsync(cancellationToken);
+
+            var cmd = new SqlCommand(_scripts.DeleteStream, cnx);
+            cmd.Parameters.Add(new SqlParameter("@StreamId", SqlDbType.VarChar, 200) { Value = stream });
+            foreach (var param in GetGlobalFilterParams())
+            {
+                cmd.Parameters.Add(param);
+            }
+
+            await cmd.ExecuteNonQueryAsync(cancellationToken);
+
+            stopWatch.Stop();
+            _logger.LogDebug("AdoNetEventRepository.DeleteStreamAsync for {Stream} took {ElapsedMilliseconds} ms.", stream, stopWatch.ElapsedMilliseconds);
+        }
+
         protected virtual IEnumerable<SqlParameter> GetGlobalFilterParams()
         {
             yield break;
