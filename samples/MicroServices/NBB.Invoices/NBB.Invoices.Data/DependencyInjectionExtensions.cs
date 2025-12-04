@@ -15,7 +15,6 @@ namespace NBB.Invoices.Data
         {
             services.AddEntityFrameworkDataAccess();
 
-            services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
             services.AddDbContext<InvoicesDbContext>(
@@ -52,7 +51,6 @@ namespace NBB.Invoices.Data
 
             //services.AddEfAsyncEnumerable<Invoice, InvoicesDbContext>();
             services.AddEfQuery<Invoice, InvoicesDbContext>();
-            services.AddEfCrudRepository<Invoice, InvoicesDbContext>();
             services.AddScoped<IInvoiceRepository, InvoiceRepository>();
 
             services.AddDbContextPool<InvoicesDbContext>(

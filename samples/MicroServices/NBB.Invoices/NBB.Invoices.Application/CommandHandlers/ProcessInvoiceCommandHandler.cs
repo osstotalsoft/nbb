@@ -13,21 +13,21 @@ namespace NBB.Invoices.Application.CommandHandlers
 {
     public class ProcessInvoiceCommandHandler : IRequestHandler<ProcessInvoice>
     {
-        private readonly IInvoiceRepository _invocieRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
         private readonly IEventSourcedRepository<InvoiceLock> _invoiceLockRepository;
 
-        public ProcessInvoiceCommandHandler(IInvoiceRepository invocieRepository, IEventSourcedRepository<InvoiceLock> invoiceLockRepository)
+        public ProcessInvoiceCommandHandler(IInvoiceRepository invoiceRepository, IEventSourcedRepository<InvoiceLock> invoiceLockRepository)
         {
-            this._invocieRepository = invocieRepository;
+            this._invoiceRepository = invoiceRepository;
             this._invoiceLockRepository = invoiceLockRepository;
         }
 
         public Task Handle(ProcessInvoice command, CancellationToken cancellationToken)
             => UsingInvoiceLock(command.InvoiceId, lockTimeoutMs: 10000, async () =>
             {
-                var invoice = await _invocieRepository.GetByIdAsync(command.InvoiceId, cancellationToken);
+                var invoice = await _invoiceRepository.GetByIdAsync(command.InvoiceId, cancellationToken);
                 invoice.Process(); //takes 1000 ms cpu time
-                await _invocieRepository.SaveChangesAsync(cancellationToken);
+                await _invoiceRepository.SaveChangesAsync(cancellationToken);
 
                 return Unit.Value;
             });
