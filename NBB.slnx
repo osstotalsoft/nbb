@@ -1,0 +1,248 @@
+<Solution>
+  <Folder Name="/assets/" />
+  <Folder Name="/assets/img/">
+    <File Path="assets/img/icon.png" />
+  </Folder>
+  <Folder Name="/samples/">
+    <File Path="samples/README.md" />
+  </Folder>
+  <Folder Name="/samples/MicroServices/">
+    <File Path="samples/MicroServices/NBB Samples.postman_collection.json" />
+    <File Path="samples/MicroServices/README.md" />
+    <Project Path="samples/MicroServices/NBB.MicroServicesOrchestration/NBB.MicroServicesOrchestration.csproj" />
+  </Folder>
+  <Folder Name="/samples/MicroServices/NBB.Contracts/">
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Api/NBB.Contracts.Api.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application/NBB.Contracts.Application.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Domain/NBB.Contracts.Domain.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Migrations/NBB.Contracts.Migrations.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.PublishedLanguage/NBB.Contracts.PublishedLanguage.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel.Data/NBB.Contracts.ReadModel.Data.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.ReadModel/NBB.Contracts.ReadModel.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Worker/NBB.Contracts.Worker.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.WriteModel.Data/NBB.Contracts.WriteModel.Data.csproj" />
+  </Folder>
+  <Folder Name="/samples/MicroServices/NBB.Invoices.FSharp/">
+    <File Path="samples/MicroServices/NBB.Invoices.FSharp/NBB.Invoices.FSharp.postman_collection.json" />
+    <File Path="samples/MicroServices/NBB.Invoices.FSharp/README.md" />
+    <Project Path="samples/MicroServices/NBB.Invoices.FSharp/NBB.Invoices.FSharp.Api/NBB.Invoices.FSharp.Api.fsproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices.FSharp/NBB.Invoices.FSharp.Worker/NBB.Invoices.FSharp.Worker.fsproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices.FSharp/NBB.Invoices.FSharp/NBB.Invoices.FSharp.fsproj" />
+  </Folder>
+  <Folder Name="/samples/MicroServices/NBB.Invoices/">
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.Api/NBB.Invoices.Api.csproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.Application/NBB.Invoices.Application.csproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.Data/NBB.Invoices.Data.csproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.Domain/NBB.Invoices.Domain.csproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.Migrations/NBB.Invoices.Migrations.csproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.PublishedLanguage/NBB.Invoices.PublishedLanguage.csproj" />
+    <Project Path="samples/MicroServices/NBB.Invoices/NBB.Invoices.Worker/NBB.Invoices.Worker.csproj" />
+  </Folder>
+  <Folder Name="/samples/MicroServices/NBB.Payments/">
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Api/NBB.Payments.Api.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application/NBB.Payments.Application.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Data/NBB.Payments.Data.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Domain/NBB.Payments.Domain.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Migrations/NBB.Payments.Migrations.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.PublishedLanguage/NBB.Payments.PublishedLanguage.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Worker/NBB.Payments.Worker.csproj" />
+  </Folder>
+  <Folder Name="/samples/Monolith/">
+    <Project Path="samples/Monolith/NBB.Mono.Migrations/NBB.Mono.Migrations.csproj" />
+    <Project Path="samples/Monolith/NBB.Mono/NBB.Mono.csproj" />
+  </Folder>
+  <Folder Name="/samples/MultiTenancy/">
+    <File Path="samples/MultiTenancy/MultiTenantTodoList.postman_collection.json" />
+    <File Path="samples/MultiTenancy/README.md" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.Api/NBB.Todo.Api.csproj" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.Data/NBB.Todo.Data.csproj" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.Migrations/NBB.Todo.Migrations.csproj" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.PublishedLanguage/NBB.Todo.PublishedLanguage.csproj" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.Worker/NBB.Todo.Worker.csproj" />
+  </Folder>
+  <Folder Name="/samples/Orchestration/">
+    <Project Path="samples/Orchestration/ProcessManagerSample/ProcessManagerSample.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Build.ps1" />
+    <File Path="CODE_OF_CONDUCT.md" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="dependencies.props" />
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
+    <File Path="NuGet.config" />
+    <File Path="Push.ps1" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/">
+    <File Path=".github/release-drafter-v4.x.yml" />
+    <File Path=".github/release-drafter-v5.x.yml" />
+    <File Path=".github/release-drafter-v6.x.yml" />
+    <File Path=".github/release-drafter-v7.x.yml" />
+    <File Path=".github/release-drafter.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/codeql-analysis.yml" />
+    <File Path=".github/workflows/release-drafter.yml" />
+    <File Path=".github/workflows/release.yml" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Application/">
+    <File Path="src/Application/README.md" />
+    <Project Path="src/Application/NBB.Application.DataContracts.Schema/NBB.Application.DataContracts.Schema.csproj" />
+    <Project Path="src/Application/NBB.Application.DataContracts/NBB.Application.DataContracts.csproj" />
+    <Project Path="src/Application/NBB.Application.Mediator.FSharp/NBB.Application.Mediator.FSharp.fsproj" />
+    <Project Path="src/Application/NBB.Application.MediatR.Effects/NBB.Application.MediatR.Effects.csproj" />
+    <Project Path="src/Application/NBB.Application.MediatR/NBB.Application.MediatR.csproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <File Path="src/Core/README.md" />
+    <Project Path="src/Core/NBB.Core.Abstractions/NBB.Core.Abstractions.csproj" />
+    <Project Path="src/Core/NBB.Core.Configuration/NBB.Core.Configuration.csproj" />
+    <Project Path="src/Core/NBB.Core.DependencyInjection/NBB.Core.DependencyInjection.csproj" />
+    <Project Path="src/Core/NBB.Core.Effects.FSharp/NBB.Core.Effects.FSharp.fsproj" />
+    <Project Path="src/Core/NBB.Core.Effects/NBB.Core.Effects.csproj" />
+    <Project Path="src/Core/NBB.Core.Evented.FSharp/NBB.Core.Evented.FSharp.fsproj" />
+    <Project Path="src/Core/NBB.Core.FSharp/NBB.Core.FSharp.fsproj" />
+    <Project Path="src/Core/NBB.Core.Pipeline/NBB.Core.Pipeline.csproj" />
+  </Folder>
+  <Folder Name="/src/Correlation/">
+    <File Path="src/Correlation/README.md" />
+    <Project Path="src/Correlation/NBB.Correlation.AspNet/NBB.Correlation.AspNet.csproj" />
+    <Project Path="src/Correlation/NBB.Correlation.Serilog.SqlServer/NBB.Correlation.Serilog.SqlServer.csproj" />
+    <Project Path="src/Correlation/NBB.Correlation.Serilog/NBB.Correlation.Serilog.csproj" />
+    <Project Path="src/Correlation/NBB.Correlation/NBB.Correlation.csproj" />
+  </Folder>
+  <Folder Name="/src/Data/">
+    <File Path="src/Data/README.md" />
+    <Project Path="src/Data/NBB.Data.Abstractions/NBB.Data.Abstractions.csproj" />
+    <Project Path="src/Data/NBB.Data.EntityFramework.MultiTenancy/NBB.Data.EntityFramework.MultiTenancy.csproj" />
+    <Project Path="src/Data/NBB.Data.EntityFramework/NBB.Data.EntityFramework.csproj" />
+    <Project Path="src/Data/NBB.Data.EventSourcing/NBB.Data.EventSourcing.csproj" />
+  </Folder>
+  <Folder Name="/src/Domain/">
+    <File Path="src/Domain/README.md" />
+    <Project Path="src/Domain/NBB.Domain.Abstractions/NBB.Domain.Abstractions.csproj" />
+    <Project Path="src/Domain/NBB.Domain/NBB.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/EventStore/">
+    <File Path="src/EventStore/README.md" />
+    <Project Path="src/EventStore/NBB.EventStore.Abstractions/NBB.EventStore.Abstractions.csproj" />
+    <Project Path="src/EventStore/NBB.EventStore.AdoNet.Migrations/NBB.EventStore.AdoNet.Migrations.csproj" />
+    <Project Path="src/EventStore/NBB.EventStore.AdoNet.Multitenancy/NBB.EventStore.AdoNet.MultiTenancy.csproj" />
+    <Project Path="src/EventStore/NBB.EventStore.AdoNet/NBB.EventStore.AdoNet.csproj" />
+    <Project Path="src/EventStore/NBB.EventStore.Effects/NBB.EventStore.Effects.csproj" />
+    <Project Path="src/EventStore/NBB.EventStore.InMemory/NBB.EventStore.InMemory.csproj" />
+    <Project Path="src/EventStore/NBB.EventStore/NBB.EventStore.csproj" />
+    <Project Path="src/EventStore/NBB.SQLStreamStore.Migrations/NBB.SQLStreamStore.Migrations.csproj" />
+    <Project Path="src/EventStore/NBB.SQLStreamStore/NBB.SQLStreamStore.csproj" />
+  </Folder>
+  <Folder Name="/src/Http/">
+    <Project Path="src/Http/NBB.Http.Effects/NBB.Http.Effects.csproj" />
+  </Folder>
+  <Folder Name="/src/Messaging/">
+    <File Path="src/Messaging/README.md" />
+    <Project Path="src/Messaging/NBB.Messaging.Abstractions/NBB.Messaging.Abstractions.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.BackwardCompatibility/NBB.Messaging.BackwardCompatibility.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.DataContracts/NBB.Messaging.DataContracts.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Effects/NBB.Messaging.Effects.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Host/NBB.Messaging.Host.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.InProcessMessaging/NBB.Messaging.InProcessMessaging.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.JetStream/NBB.Messaging.JetStream.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.MultiTenancy/NBB.Messaging.MultiTenancy.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Nats/NBB.Messaging.Nats.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Noop/NBB.Messaging.Noop.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.OpenTelemetry/NBB.Messaging.OpenTelemetry.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Rusi/NBB.Messaging.Rusi.csproj" />
+  </Folder>
+  <Folder Name="/src/MultiTenancy/">
+    <File Path="src/MultiTenancy/README.md" />
+    <Project Path="src/MultiTenancy/NBB.MultiTenancy.Abstractions/NBB.MultiTenancy.Abstractions.csproj" />
+    <Project Path="src/MultiTenancy/NBB.MultiTenancy.AspNet/NBB.MultiTenancy.AspNet.csproj" />
+    <Project Path="src/MultiTenancy/NBB.MultiTenancy.Identification.Http/NBB.MultiTenancy.Identification.Http.csproj" />
+    <Project Path="src/MultiTenancy/NBB.MultiTenancy.Identification.Messaging/NBB.MultiTenancy.Identification.Messaging.csproj" />
+    <Project Path="src/MultiTenancy/NBB.MultiTenancy.Identification/NBB.MultiTenancy.Identification.csproj" />
+  </Folder>
+  <Folder Name="/src/Orchestration/">
+    <File Path="src/Orchestration/README.md" />
+    <Project Path="src/Orchestration/NBB.ProcessManager.Definition/NBB.ProcessManager.Definition.csproj" />
+    <Project Path="src/Orchestration/NBB.ProcessManager.Runtime/NBB.ProcessManager.Runtime.csproj" />
+  </Folder>
+  <Folder Name="/src/Projections/">
+    <Project Path="src/Projections/NBB.ProjectR/NBB.ProjectR.csproj" />
+  </Folder>
+  <Folder Name="/src/Tools/" />
+  <Folder Name="/src/Tools/Serilog/">
+    <File Path="src/Tools/Serilog/README.md" />
+    <Project Path="src/Tools/Serilog/NBB.Tools.Serilog.Enrichers.ServiceIdentifier/NBB.Tools.Serilog.Enrichers.ServiceIdentifier.csproj" />
+    <Project Path="src/Tools/Serilog/NBB.Tools.Serilog.Enrichers.TenantId/NBB.Tools.Serilog.Enrichers.TenantId.csproj" />
+    <Project Path="src/Tools/Serilog/NBB.Tools.Serilog.OpenTelemetryTracingSink/NBB.Tools.Serilog.OpenTelemetryTracingSink.csproj" />
+  </Folder>
+  <Folder Name="/test/" />
+  <Folder Name="/test/Benchmarks/">
+    <Project Path="test/Benchmarks/EffectsBenchmarks/EffectsBenchmarks/EffectsBenchmarks.fsproj" />
+    <Project Path="test/Benchmarks/EventStoreBenchmarks/EventStoreBenchmarks.csproj" />
+  </Folder>
+  <Folder Name="/test/Integration/">
+    <Project Path="test/Integration/NBB.EventStore.IntegrationTests/NBB.EventStore.IntegrationTests.csproj" />
+    <Project Path="test/Integration/NBB.Messaging.Rusi.IntegrationTests/NBB.Messaging.Rusi.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/" />
+  <Folder Name="/test/UnitTests/Application/">
+    <Project Path="test/UnitTests/Application/NBB.Application.Effects.Tests/NBB.Application.Effects.Tests.csproj" />
+    <Project Path="test/UnitTests/Application/NBB.Application.Mediator.FSharp.Tests/NBB.Application.Mediator.FSharp.Tests.fsproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Core/">
+    <Project Path="test/UnitTests/Core/NBB.Core.Configuration.Tests/NBB.Core.Configuration.Tests.csproj" />
+    <Project Path="test/UnitTests/Core/NBB.Core.Effects.FSharp.Tests/NBB.Core.Effects.FSharp.Tests.fsproj" />
+    <Project Path="test/UnitTests/Core/NBB.Core.Effects.Tests/NBB.Core.Effects.Tests.csproj" />
+    <Project Path="test/UnitTests/Core/NBB.Core.Evented.FSharp.Tests/NBB.Core.Evented.FSharp.Tests.fsproj" />
+    <Project Path="test/UnitTests/Core/NBB.Core.Pipeline.Tests/NBB.Core.Pipeline.Tests.csproj" />
+    <Project Path="test/UnitTests/NBB.Core.FSharp.Tests/NBB.Core.FSharp.Tests.fsproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Data/">
+    <Project Path="test/UnitTests/Data/NBB.Data.EntityFramework.MultiTenancy.Tests/NBB.Data.EntityFramework.MultiTenancy.Tests.csproj" />
+    <Project Path="test/UnitTests/Data/NBB.Data.EntityFramework.Tests/NBB.Data.EntityFramework.Tests.csproj" />
+    <Project Path="test/UnitTests/Data/NBB.Data.EventSourcing.Tests/NBB.Data.EventSourcing.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Domain/">
+    <Project Path="test/UnitTests/Domain/NBB.Domain.Tests/NBB.Domain.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/EventStore/">
+    <Project Path="test/UnitTests/EventStore/NBB.EventStore.AdoNet.Tests/NBB.EventStore.AdoNet.Tests.csproj" />
+    <Project Path="test/UnitTests/EventStore/NBB.EventStore.InMemory.Tests/NBB.EventStore.InMemory.Tests.csproj" />
+    <Project Path="test/UnitTests/EventStore/NBB.EventStore.Tests/NBB.EventStore.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Http/">
+    <Project Path="test/UnitTests/Http/NBB.Http.Effects.Tests/NBB.Http.Effects.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Messaging/">
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.Abstractions.Tests/NBB.Messaging.Abstractions.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.DataContracts.Tests/NBB.Messaging.DataContracts.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.Effects.Tests/NBB.Messaging.Effects.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.Host.Tests/NBB.Messaging.Host.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.InProcessMessaging.Tests/NBB.Messaging.InProcessMessaging.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.MultiTenancy.Tests/NBB.Messaging.MultiTenancy.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.Rusi.Tests/NBB.Messaging.Rusi.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/MultiTenancy/">
+    <Project Path="test/UnitTests/MultiTenancy/NBB.MultiTenancy.Configuration.Tests/NBB.MultiTenancy.Abstractions.Tests.csproj" />
+    <Project Path="test/UnitTests/MultiTenancy/NBB.MultiTenancy.Identification.Http.Tests/NBB.MultiTenancy.Identification.Http.Tests.csproj" />
+    <Project Path="test/UnitTests/MultiTenancy/NBB.MultiTenancy.Identification.Messaging.Tests/NBB.MultiTenancy.Identification.Messaging.Tests.csproj" />
+    <Project Path="test/UnitTests/MultiTenancy/NBB.MultiTenancy.Identification.Tests/NBB.MultiTenancy.Identification.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Orchestration/">
+    <Project Path="test/UnitTests/Orchestration/NBB.ProcessManager.Tests/NBB.ProcessManager.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Projections/">
+    <Project Path="test/UnitTests/Projections/NBB.ProjectR.Tests/NBB.ProjectR.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/UnitTests/Tools/">
+    <Project Path="test/UnitTests/Tools/NBB.Tools.Serilog.Enrichers.ServiceIdentifier.Tests/NBB.Tools.Serilog.Enrichers.ServiceIdentifier.Tests.csproj" />
+    <Project Path="test/UnitTests/Tools/NBB.Tools.Serilog.Enrichers.TenantId.Tests/NBB.Tools.Serilog.Enrichers.TenantId.Tests.csproj" />
+  </Folder>
+</Solution>
