@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 	<PropertyGroup Label="Package Versions">
 		<NewtonsoftJsonPackageVersion>13.0.3</NewtonsoftJsonPackageVersion>
 		<MediatRPackageVersion>12.4.1</MediatRPackageVersion>
@@ -14,7 +14,7 @@
 		<FluentAssertionsPackageVersion>7.0.0</FluentAssertionsPackageVersion>
 		<MicrosoftDataSqlClientPackageVersion>5.2.2</MicrosoftDataSqlClientPackageVersion>
 		<MicrosoftExtensionsPackagesVersion>10.0.1</MicrosoftExtensionsPackagesVersion>
-		<MicrosoftEntityFrameworkPackagesVersion>9.0.0</MicrosoftEntityFrameworkPackagesVersion>
+		<MicrosoftEntityFrameworkPackagesVersion>10.0.1</MicrosoftEntityFrameworkPackagesVersion>
 		<MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
 		<OpenTelemetryCorePackageVersion>1.10.0</OpenTelemetryCorePackageVersion>
 		<OpenTelemetryExtensionsHostingPackageVersion>1.10.0</OpenTelemetryExtensionsHostingPackageVersion>
