@@ -13,7 +13,7 @@
 		<FsUnitPackageVersion>6.0.1</FsUnitPackageVersion>
 		<FluentAssertionsPackageVersion>7.0.0</FluentAssertionsPackageVersion>
 		<MicrosoftDataSqlClientPackageVersion>5.2.2</MicrosoftDataSqlClientPackageVersion>
-		<MicrosoftExtensionsPackagesVersion>9.0.0</MicrosoftExtensionsPackagesVersion>
+		<MicrosoftExtensionsPackagesVersion>10.0.1</MicrosoftExtensionsPackagesVersion>
 		<MicrosoftEntityFrameworkPackagesVersion>9.0.0</MicrosoftEntityFrameworkPackagesVersion>
 		<MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
 		<OpenTelemetryCorePackageVersion>1.10.0</OpenTelemetryCorePackageVersion>
