@@ -91,7 +91,7 @@ namespace NBB.Contracts.Worker
                                 .ConfigureResource(configureResource)
                                 .SetSampler(new AlwaysOnSampler())
                                 .AddMessageBusInstrumentation()
-                                .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                                .AddEntityFrameworkCoreInstrumentation()
                                 .AddOtlpExporter()
                         );
                         services.Configure<OtlpExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Otlp"));

@@ -15,11 +15,11 @@
     <Compile Include="CommandPipelineTests.fs" />
     <Compile Include="QueryPipelineTests.fs" />
     <Compile Include="EventPipelineTests.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="Program.fs"  CompileOrder="CompileLast" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FsCheck.Xunit" Version="3.0.0-alpha4" />
+    <PackageReference Include="FsCheck.Xunit" Version="3.3.2" />
     <PackageReference Include="FsUnit.xUnit" Version="$(FsUnitPackageVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNetTestSdkPackageVersion)" />
     <PackageReference Include="xunit" Version="$(XunitPackageVersion)" />

@@ -79,7 +79,6 @@ namespace NBB.Todo.Api
                         .AddMessageBusInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation(options =>
                         {
-                            options.SetDbStatementForText = true;
                             options.EnrichWithIDbCommand = (activity, command) =>
                             {
                                 //activity.SetTag("db.statement", command.CommandText);

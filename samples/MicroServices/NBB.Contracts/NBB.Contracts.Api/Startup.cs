@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
 using NBB.Messaging.OpenTelemetry;
@@ -78,7 +78,7 @@ namespace NBB.Contracts.Api
                         .AddMessageBusInstrumentation()
                         .AddHttpClientInstrumentation()
                         .AddAspNetCoreInstrumentation()
-                        .AddEntityFrameworkCoreInstrumentation(options => options.SetDbStatementForText = true)
+                        .AddEntityFrameworkCoreInstrumentation()
                         .AddOtlpExporter()
                 );
                 services.Configure<OtlpExporterOptions>(Configuration.GetSection("OpenTelemetry:Otlp"));

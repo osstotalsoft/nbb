@@ -1,8 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using System.Collections.Generic;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace NBB.Todo.Api
@@ -12,13 +11,13 @@ namespace NBB.Todo.Api
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             if (operation.Parameters == null)
-                operation.Parameters = new List<OpenApiParameter>();
+                operation.Parameters = [];
 
             operation.Parameters.Add(new OpenApiParameter()
             {
                 Name = "tenantid",
                 In = ParameterLocation.Header,
-                Schema = new OpenApiSchema { Type = "string", Format = "uuid" },
+                Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "uuid" },
                 Required = true // set to false if this is optional
             });
         }
