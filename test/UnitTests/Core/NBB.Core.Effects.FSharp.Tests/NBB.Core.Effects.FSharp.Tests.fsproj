@@ -4,14 +4,12 @@
     <TargetFramework>net10.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
-    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Sample.fs" />
     <Compile Include="Sample2.fs" />
     <Compile Include="Tests.fs" />
-    <CompileAfter Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
