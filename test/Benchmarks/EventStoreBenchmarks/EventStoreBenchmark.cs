@@ -8,7 +8,6 @@ using NBB.EventStore.Abstractions;
 using NBB.EventStore.AdoNet.Migrations;
 using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
-using NBB.SQLStreamStore.Migrations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -58,16 +57,6 @@ namespace TheBenchmarks
 
         }
 
-        [GlobalSetup(Target = nameof(SqlStreamStoreSave))]
-        public void GlobalSetupSqlStreamStoreSave()
-        {
-            MigrateSqlStreamStore();
-
-            _container = BuildServiceProvider((services, _) =>
-                services.AddSqlStreamStore());
-        }
-
-
         [GlobalSetup(Target = nameof(NBBEventStoreLoad))]
         public void GlobalSetupNBBEventStoreLoad()
         {
@@ -79,13 +68,6 @@ namespace TheBenchmarks
         public void GlobalMultiTenantSetupNBBEventStoreLoad()
         {
             GlobalSetupNBBMultiTenantEventStoreSave();
-            SeedEventRepository(_loadTestStream);
-        }
-
-        [GlobalSetup(Target = nameof(SqlStreamStoreLoad))]
-        public void GlobalSetupSqlStreamStoreLoad()
-        {
-            GlobalSetupSqlStreamStoreSave();
             SeedEventRepository(_loadTestStream);
         }
 
@@ -156,13 +138,6 @@ namespace TheBenchmarks
         private static void MigrateNbbEventStore(bool forceMultiTenant)
         {
             new AdoNetEventStoreDatabaseMigrator(forceMultiTenant).ReCreateDatabaseObjects(default).Wait();
-        }
-
-        private static void MigrateSqlStreamStore()
-        {
-            var migrator = new SqlStreamStoreMigrator();
-            migrator.EnsureDatabaseDeleted().Wait();
-            migrator.MigrateDatabaseToLatestVersion().Wait();
         }
 
         private static TestEvent GetATestEvent()

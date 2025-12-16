@@ -9,18 +9,17 @@ namespace NBB.Messaging.Noop
     public class NoopTransportMonitor : ITransportMonitor, IDisposable
     {
         private bool disposedValue;
-        public event TransportErrorHandler OnError;
+        public event TransportErrorHandler OnError
+        {
+            add { }
+            remove { }
+        }
 
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                if (disposing)
-                {
-                    OnError = null;
-                }
-
-                disposedValue = true;
+                 disposedValue = true;
             }
         }
 

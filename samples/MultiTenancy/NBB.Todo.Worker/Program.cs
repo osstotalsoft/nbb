@@ -123,7 +123,6 @@ namespace NBB.Todo.Worker
                         .SetSampler(new AlwaysOnSampler())
                         .AddMessageBusInstrumentation()
                         .AddEntityFrameworkCoreInstrumentation(options => {
-                            options.SetDbStatementForText = true;
                             options.EnrichWithIDbCommand = (activity, command) =>
                                 activity.SetTag(
                                     "db.statement.params",

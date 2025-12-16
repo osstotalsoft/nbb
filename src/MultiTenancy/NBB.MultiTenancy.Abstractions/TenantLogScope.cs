@@ -11,7 +11,7 @@ namespace NBB.MultiTenancy.Abstractions
 {
     public sealed class TenantLogScope(TenantContext tenantContext) : IReadOnlyList<KeyValuePair<string, object>>
     {
-        private string? _cachedToString;
+        private string _cachedToString;
 
         public Guid TenantId => tenantContext?.GetTenantId() ?? throw new ArgumentNullException(nameof(tenantContext));
         public string TenantCode => tenantContext?.GetTenantCode() ?? throw new ArgumentNullException(nameof(tenantContext));
