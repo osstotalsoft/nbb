@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System;
-using MediatR;
+using Mediator;
 
 namespace ProcessManagerSample.Events
 {
@@ -18,7 +18,9 @@ namespace ProcessManagerSample.Events
 
     public record OrderShipped(Guid OrderId, int DocumentId, int SiteId) : INotification;
 
-    public record TimerTicked<T>(T Id) : INotification;
+    // Mediator's source generator does not support open-generic message types,
+    // so the timer event is closed over Guid.
+    public record TimerTicked(Guid Id) : INotification;
 
     public record LoopcycleCompleted(Guid Id) : INotification;
 

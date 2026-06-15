@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System.Collections.Generic;
-using MediatR;
+using Mediator;
 
 namespace NBB.Application.DataContracts.Schema
 {

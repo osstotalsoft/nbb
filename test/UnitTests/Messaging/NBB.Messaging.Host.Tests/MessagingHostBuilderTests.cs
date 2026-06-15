@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Pipeline;
@@ -50,7 +50,7 @@ namespace NBB.Messaging.Host.Tests
             Mock.Get(services).Setup(x => x.GetEnumerator())
                 .Returns(new List<ServiceDescriptor>
                 {
-                    new ServiceDescriptor(typeof(IRequestHandler<CommandMessage>), new CommandHandler())
+                    new ServiceDescriptor(typeof(IRequestHandler<CommandMessage, Unit>), new CommandHandler())
                 }.GetEnumerator());
 
             //Act
@@ -218,7 +218,7 @@ namespace NBB.Messaging.Host.Tests
 
         public class CommandHandler : IRequestHandler<CommandMessage>
         {
-            public Task Handle(CommandMessage request, CancellationToken cancellationToken)
+            public ValueTask<Unit> Handle(CommandMessage request, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -226,7 +226,7 @@ namespace NBB.Messaging.Host.Tests
 
         public class EventHandler : INotificationHandler<EventMessage>
         {
-            public Task Handle(EventMessage notification, CancellationToken cancellationToken)
+            public ValueTask Handle(EventMessage notification, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -234,7 +234,7 @@ namespace NBB.Messaging.Host.Tests
 
         public class QueryHandler : IRequestHandler<QueryMessage, string>
         {
-            public Task<string> Handle(QueryMessage request, CancellationToken cancellationToken)
+            public ValueTask<string> Handle(QueryMessage request, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }

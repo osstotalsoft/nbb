@@ -4,7 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using MediatR;
+using Mediator;
 using Moq;
 using NBB.Messaging.Abstractions;
 using Xunit;
@@ -50,7 +50,7 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             await mediatRMiddleware.Invoke(new MessagingContext(envelope, string.Empty, null), default, Next);
 
             //Assert
-            Mock.Get(mockedMediator).Verify(x => x.Send<IRequest>(sentMessage, default), Times.Once);
+            Mock.Get(mockedMediator).Verify(x => x.Send((IRequest)sentMessage, default), Times.Once);
         }
 
         [Fact]

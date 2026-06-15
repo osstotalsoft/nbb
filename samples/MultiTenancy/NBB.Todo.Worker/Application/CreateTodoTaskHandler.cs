@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Data.Abstractions;
 using NBB.Todo.Data.Entities;
 using NBB.Todo.PublishedLanguage;
@@ -19,7 +19,7 @@ namespace NBB.Todo.Worker.Application
             _todoTaskRepository = todoTaskRepository;
         }
 
-        public async Task Handle(CreateTodoTask request, CancellationToken cancellationToken)
+        public async ValueTask<Unit> Handle(CreateTodoTask request, CancellationToken cancellationToken)
         {
             //throw new System.Exception("handler exception");
             var todoTask = new TodoTask
@@ -31,6 +31,8 @@ namespace NBB.Todo.Worker.Application
 
             await _todoTaskRepository.AddAsync(todoTask, cancellationToken);
             await _todoTaskRepository.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
 }

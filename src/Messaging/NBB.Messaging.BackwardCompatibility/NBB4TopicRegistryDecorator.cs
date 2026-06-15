@@ -3,7 +3,7 @@
 
 using NBB.Messaging.Abstractions;
 using System;
-using MediatR;
+using Mediator;
 
 namespace NBB.Messaging.BackwardCompatibility
 {

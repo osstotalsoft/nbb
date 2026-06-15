@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,7 +48,7 @@ namespace NBB.Invoices.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateInvoiceCommandHandler>());
+                    services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();

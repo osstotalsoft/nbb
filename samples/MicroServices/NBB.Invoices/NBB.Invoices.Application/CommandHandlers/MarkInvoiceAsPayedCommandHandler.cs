@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Data.Abstractions;
 using NBB.Invoices.Domain.InvoiceAggregate;
 using NBB.Invoices.PublishedLanguage;
@@ -18,7 +18,7 @@ namespace NBB.Invoices.Application.CommandHandlers
             this._repository = repository;
         }
 
-        public async Task Handle(MarkInvoiceAsPayed command, CancellationToken cancellationToken)
+        public async ValueTask<Unit> Handle(MarkInvoiceAsPayed command, CancellationToken cancellationToken)
         {
             var invoice = await _repository.GetByIdAsync(command.InvoiceId, cancellationToken);
             if (invoice != null)
@@ -27,6 +27,8 @@ namespace NBB.Invoices.Application.CommandHandlers
 
                 await _repository.SaveChangesAsync(cancellationToken);
             }
+
+            return Unit.Value;
         }
     }
 }

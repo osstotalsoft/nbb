@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +13,7 @@ namespace NBB.ProjectR.Tests
         {
             var services = new ServiceCollection();
             services.AddProjectR(GetType().Assembly);
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(GetType().Assembly));
+            services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
             services
                 .AddEffects()
                 .AddMessagingEffects()

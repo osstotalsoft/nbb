@@ -5,13 +5,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using NBB.Core.Abstractions;
 using NBB.Core.Effects;
 using NBB.EventStore.Abstractions;
 using Xunit;
-using Mediator = NBB.Application.MediatR.Effects.Mediator;
+using MediatorEffects = NBB.Application.MediatR.Effects.Mediator;
 using MessageBus = NBB.Messaging.Effects.MessageBus;
 
 namespace NBB.ProjectR.Tests
@@ -19,11 +19,11 @@ namespace NBB.ProjectR.Tests
 
     public class ProjectRTests : IClassFixture<TestFixture>
     {
-        record ContractCreated(Guid ContractId, decimal Value) : INotification;
+        public record ContractCreated(Guid ContractId, decimal Value) : INotification;
 
-        record ContractValidated(Guid ContractId, Guid UserId) : INotification;
+        public record ContractValidated(Guid ContractId, Guid UserId) : INotification;
 
-        record ContractSigned(Guid ContractId, Guid SignerId) : INotification;
+        public record ContractSigned(Guid ContractId, Guid SignerId) : INotification;
 
 
 
@@ -69,7 +69,7 @@ namespace NBB.ProjectR.Tests
 
                         (Message.ValidateContract msg, { IsValidated: false }) => (
                             model with { IsValidated = true, ValidatedByUserId = msg.UserId },
-                            Mediator.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
+                            MediatorEffects.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
                                 Eff.OfMsg<Message>(new Message.SetUserName(msg.ContractId, x.UserName)))),
 
                         (Message.SetUserName msg, not null) => (
@@ -98,11 +98,11 @@ namespace NBB.ProjectR.Tests
 
             public record Model(Guid UserId, string UserName);
 
-            class Handler : IRequestHandler<Query, Model>
+            public class Handler : IRequestHandler<Query, Model>
             {
-                public Task<Model> Handle(Query request, CancellationToken cancellationToken)
+                public ValueTask<Model> Handle(Query request, CancellationToken cancellationToken)
                 {
-                    return Task.FromResult(new Model(request.UserId, "rpopovici"));
+                    return ValueTask.FromResult(new Model(request.UserId, "rpopovici"));
                 }
             }
         }

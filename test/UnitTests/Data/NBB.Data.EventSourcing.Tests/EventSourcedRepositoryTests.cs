@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Core.Abstractions;
@@ -252,21 +252,9 @@ namespace NBB.Data.EventSourcing.Tests
         {
             //Arrange
             var eventStoreMock = new Mock<IEventStore>();
-            //var wasCalled = false;
-            //var mediatorMock = new Mock<IMediator>();
-            //mediatorMock
-            //    .Setup(m => m.Publish(It.IsAny<TestDomainEvent>(), It.IsAny<CancellationToken>()))
-            //    .Callback(() =>
-            //    {
-            //        wasCalled = true;
-            //    });
-            //    .Returns(Task.CompletedTask);
+            var mediatorMock = new Mock<IMediator>();
 
-            //.ReturnsAsync(Task.CompletedTask); //<-- return Task to allow await to continue
-            //mediatorMock.Setup(x=> x.Publish())
-            var mediatorMock = new TestMediator();
-
-            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), mediatorMock, new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), mediatorMock.Object, new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
             var testAggregate = new Mock<TestEventSourcedAggregateRoot>();
             var domainEvent = new TestDomainEvent();
             var domainEvents = new List<object> { domainEvent };
@@ -275,10 +263,7 @@ namespace NBB.Data.EventSourcing.Tests
             await sut.SaveAsync(testAggregate.Object, CancellationToken.None);
 
             //Assert
-            //mediatorMock.Verify(m => m.Publish(domainEvent, It.IsAny<CancellationToken>()), Times.Once());
-
-            mediatorMock.PublishCallsCount.Should().Be(1);
-
+            mediatorMock.Verify(m => m.Publish((INotification)domainEvent, It.IsAny<CancellationToken>()), Times.Once());
         }
     }
 
@@ -289,48 +274,6 @@ namespace NBB.Data.EventSourcing.Tests
         public Guid EventId => Guid.Empty;
 
         public int SequenceNumber { get; set; }
-    }
-
-    public class TestMediator : IMediator
-    {
-        public int PublishCallsCount { get; private set; }
-
-        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Publish(object notification, CancellationToken cancellationToken = default)
-        {
-            this.PublishCallsCount++;
-            return Task.CompletedTask;
-        }
-
-        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
-        {
-            this.PublishCallsCount++;
-            return Task.CompletedTask;
-        }
-
-        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<object> Send(object request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class TestEventStore : IEventStore

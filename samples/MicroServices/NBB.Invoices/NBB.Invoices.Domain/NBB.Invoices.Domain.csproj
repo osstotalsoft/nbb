@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR.Contracts" Version="$(MediatRContractsPackageVersion)" />
+    <PackageReference Include="Mediator.Abstractions" Version="$(MediatorPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>

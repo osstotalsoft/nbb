@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using System;
 
 namespace NBB.Application.DataContracts

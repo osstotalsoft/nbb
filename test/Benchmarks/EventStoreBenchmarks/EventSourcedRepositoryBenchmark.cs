@@ -13,7 +13,7 @@ using System.Linq;
 using NBB.Data.Abstractions;
 using NBB.Domain;
 using System.Reflection;
-using MediatR;
+using Mediator;
 
 namespace TheBenchmarks
 {
@@ -240,7 +240,7 @@ namespace TheBenchmarks
             services.AddSingleton<IConfiguration>(configuration);
             services.AddLogging();
 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+            services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
             services.AddEventStore(es =>
             {

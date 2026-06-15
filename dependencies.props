@@ -1,8 +1,7 @@
 ﻿<Project>
 	<PropertyGroup Label="Package Versions">
 		<NewtonsoftJsonPackageVersion>13.0.4</NewtonsoftJsonPackageVersion>
-		<MediatRPackageVersion>12.5.0</MediatRPackageVersion>
-		<MediatRContractsPackageVersion>2.0.1</MediatRContractsPackageVersion>
+		<MediatorPackageVersion>3.0.2</MediatorPackageVersion>
 		<ScrutorPackageVersion>7.0.0</ScrutorPackageVersion>
 		<BenchmarkDotNetPackageVersion>0.15.8</BenchmarkDotNetPackageVersion>
 		<MoqPackageVersion>4.20.72</MoqPackageVersion>

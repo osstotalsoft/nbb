@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using NBB.Core.Effects;
 
-using NBB.Application.MediatR.Effects;
+using MediatorEffects = NBB.Application.MediatR.Effects.Mediator;
 using NBB.Messaging.Effects;
 
 namespace ProcessManagerSample
@@ -41,8 +41,8 @@ namespace ProcessManagerSample
                     .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
                     .Then((orderCreated, data) =>
                     {
-                        var q1 = Mediator.Send(new GetClientQuery());
-                        var q2 = Effect.Parallel(Mediator.Send(new GetPartnerQuery()), Mediator.Send(new GetClientQuery()));
+                        var q1 = MediatorEffects.Send(new GetClientQuery());
+                        var q2 = Effect.Parallel(MediatorEffects.Send(new GetPartnerQuery()), MediatorEffects.Send(new GetClientQuery()));
 
                         var queries =
                             from x in q1
@@ -104,8 +104,8 @@ namespace ProcessManagerSample
                     .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
                     .Then((orderCreated, data) =>
                     {
-                        var q1 = Mediator.Send(new GetClientQuery());
-                        var q2 = Effect.Parallel(Mediator.Send(new GetPartnerQuery()), Mediator.Send(new GetClientQuery()));
+                        var q1 = MediatorEffects.Send(new GetClientQuery());
+                        var q2 = Effect.Parallel(MediatorEffects.Send(new GetPartnerQuery()), MediatorEffects.Send(new GetClientQuery()));
 
                         var queries =
                             from x in q1

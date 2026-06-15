@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using NBB.Application.MediatR.Effects;
+using MediatorEffects = NBB.Application.MediatR.Effects.Mediator;
 using NBB.Core.Effects;
 using NBB.Messaging.Effects;
 using NBB.ProcessManager.Definition.Builder;
@@ -18,20 +18,20 @@ public class PollingLoopPM : AbstractDefinition<PollingLoopPM.State>
     public PollingLoopPM()
     {
         Event<OrderCreated>(builder => builder.CorrelateById(@event => @event.OrderId));
-        Event<TimerTicked<Guid>>(builder => builder.CorrelateById(@event => @event.Id));
+        Event<TimerTicked>(builder => builder.CorrelateById(@event => @event.Id));
         Event<LoopCompleted>(builder => builder.CorrelateById(@event => @event.Id));
         Event<LoopcycleCompleted>(builder => builder.CorrelateById(@event => @event.Id));
 
         StartWith<OrderCreated>()
             .SetState((orderCreated, state) => state.Data with { OrderId = orderCreated.OrderId })
-            .Schedule((orderCreated, state) => new TimerTicked<Guid>(orderCreated.OrderId),
+            .Schedule((orderCreated, state) => new TimerTicked(orderCreated.OrderId),
                 TimeSpan.FromSeconds(5));
 
-        When<TimerTicked<Guid>>((_, state) => !state.Data.IsWorking)
+        When<TimerTicked>((_, state) => !state.Data.IsWorking)
             .SetState((_, state) => state.Data with { IsWorking = true, LoopsNr = state.Data.LoopsNr + 1 })
             .Then((_, state) =>
             {
-                var q1 = Mediator.Send(new GetClientQuery());
+                var q1 = MediatorEffects.Send(new GetClientQuery());
                 return q1
                     .Then(client =>
                     {
@@ -44,7 +44,7 @@ public class PollingLoopPM : AbstractDefinition<PollingLoopPM.State>
 
         When<LoopcycleCompleted>()
             .SetState((_, state) => state.Data with { IsWorking = false })
-            .Schedule((_, state) => new TimerTicked<Guid>(state.Data.OrderId), TimeSpan.FromSeconds(5));
+            .Schedule((_, state) => new TimerTicked(state.Data.OrderId), TimeSpan.FromSeconds(5));
 
         When<LoopcycleCompleted>()
             .Complete((@event, state) => state.Data.LoopsNr > 100);

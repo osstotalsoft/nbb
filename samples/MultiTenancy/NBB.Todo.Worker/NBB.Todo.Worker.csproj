@@ -24,7 +24,8 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+    <PackageReference Include="Mediator.Abstractions" Version="$(MediatorPackageVersion)" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
 	  <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCorePackageVersion)" />
 	  <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryExtensionsHostingPackageVersion)" />
 	  <PackageReference Include="OpenTelemetry.Extensions.Propagators" Version="$(OpenTelemetryExtensionsPropagatorsPackageVersion)" />

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.ProcessManager.Definition;
 using System;
 using System.Threading;
@@ -21,7 +21,7 @@ namespace NBB.ProcessManager.Runtime
             _pec = pec;
         }
 
-        public async Task Handle(TEvent notification, CancellationToken cancellationToken)
+        public async ValueTask Handle(TEvent notification, CancellationToken cancellationToken)
         {
             await _pec.Invoke<TDefinition, TData, TEvent>(notification, cancellationToken);
         }

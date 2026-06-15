@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using MediatR;
+using Mediator;
 using NBB.Todos.Data;
 using NBB.Todo.Worker.Application;
 using NBB.Messaging.Host;
@@ -73,8 +73,8 @@ namespace NBB.Todo.Worker
 
         private static void ConfigureServices(HostBuilderContext hostingContext, IServiceCollection services)
         {
-            // MediatR 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateTodoTaskHandler>());
+            // Mediator
+            services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
             // Data
             services.AddTodoDataAccess();

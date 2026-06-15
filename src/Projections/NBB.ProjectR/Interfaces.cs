@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Mediator;
 using NBB.Core.Effects;
 
 namespace NBB.ProjectR

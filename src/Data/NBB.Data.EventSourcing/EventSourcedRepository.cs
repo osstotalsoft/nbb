@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Logging;
 using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing.Infrastructure;

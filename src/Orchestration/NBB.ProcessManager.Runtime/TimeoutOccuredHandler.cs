@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Messaging.Abstractions;
 using NBB.ProcessManager.Runtime.Timeouts;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace NBB.ProcessManager.Runtime
             _busPublisher = busPublisher;
         }
 
-        public Task Handle(TimeoutOccured notification, CancellationToken cancellationToken)
-            => _busPublisher.PublishAsync(notification.Message, cancellationToken);
+        public async ValueTask Handle(TimeoutOccured notification, CancellationToken cancellationToken)
+            => await _busPublisher.PublishAsync(notification.Message, cancellationToken);
     }
 }

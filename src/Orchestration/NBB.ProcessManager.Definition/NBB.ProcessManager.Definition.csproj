@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+    <PackageReference Include="Mediator.Abstractions" Version="$(MediatorPackageVersion)" />
     <PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
   </ItemGroup>
 
