@@ -12,12 +12,12 @@
 		<FsUnitPackageVersion>7.1.1</FsUnitPackageVersion>
 		<FluentAssertionsPackageVersion>8.8.0</FluentAssertionsPackageVersion>
 		<MicrosoftDataSqlClientPackageVersion>6.1.3</MicrosoftDataSqlClientPackageVersion>
-		<MicrosoftExtensionsPackagesVersion>10.0.1</MicrosoftExtensionsPackagesVersion>
-		<MicrosoftEntityFrameworkPackagesVersion>10.0.1</MicrosoftEntityFrameworkPackagesVersion>
+		<MicrosoftExtensionsPackagesVersion>10.0.9</MicrosoftExtensionsPackagesVersion>
+		<MicrosoftEntityFrameworkPackagesVersion>10.0.9</MicrosoftEntityFrameworkPackagesVersion>
 		<MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
-		<OpenTelemetryCorePackageVersion>1.14.0</OpenTelemetryCorePackageVersion>
+		<OpenTelemetryCorePackageVersion>1.16.0</OpenTelemetryCorePackageVersion>
 		<OpenTelemetryExtensionsHostingPackageVersion>1.14.0</OpenTelemetryExtensionsHostingPackageVersion>
-		<OpenTelemetryExtensionsPropagatorsPackageVersion>1.14.0</OpenTelemetryExtensionsPropagatorsPackageVersion>
+		<OpenTelemetryExtensionsPropagatorsPackageVersion>1.16.0</OpenTelemetryExtensionsPropagatorsPackageVersion>
 		<OpenTelemetryInstrumentationAspNetCorePackageVersion>1.14.0</OpenTelemetryInstrumentationAspNetCorePackageVersion>
 		<OpenTelemetryInstrumentationEFCorePackageVersion>1.14.0-beta.1</OpenTelemetryInstrumentationEFCorePackageVersion>
 		<OpenTelemetryInstrumentationHttpPackageVersion>1.14.0</OpenTelemetryInstrumentationHttpPackageVersion>
