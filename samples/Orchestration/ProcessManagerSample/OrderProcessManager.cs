@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using AutoMapper;
 using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.Builder;
 using ProcessManagerSample.Commands;
@@ -22,9 +21,9 @@ namespace ProcessManagerSample
         {
             public record struct OrderProcessManagerData(Guid OrderId, bool IsPaid);
 
-            private readonly IMapper _mapper;
+            private readonly OrderMapper _mapper;
 
-            public V2(IMapper mapper)
+            public V2(OrderMapper mapper)
             {
                 _mapper = mapper;
 
@@ -34,7 +33,7 @@ namespace ProcessManagerSample
                 Event<OrderPaymentExpired>(builder => builder.CorrelateById(orderShipped => orderShipped.OrderId));
 
                 StartWith<OrderCreated>()
-                    .PublishEvent((orderCreated, data) => _mapper.Map<OrderCompleted>(orderCreated))
+                    .PublishEvent((orderCreated, data) => _mapper.ToCompleted(orderCreated))
                     .Then(OrderCreatedHandler);
 
                 When<OrderPaymentCreated>()
@@ -60,7 +59,7 @@ namespace ProcessManagerSample
 
                 When<OrderShipped>((@event, data) => !data.Data.IsPaid)
                     .SendCommand(OrderShippedHandler)
-                    .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
+                    .PublishEvent((orderShipped, data) => _mapper.ToCompleted(orderShipped))
                     .Complete();
             }
 
@@ -85,9 +84,9 @@ namespace ProcessManagerSample
         {
             public record struct OrderProcessManagerData(Guid OrderId, bool IsPaid);
 
-            private readonly IMapper _mapper;
+            private readonly OrderMapper _mapper;
 
-            public V1(IMapper mapper)
+            public V1(OrderMapper mapper)
             {
                 _mapper = mapper;
 
@@ -97,7 +96,7 @@ namespace ProcessManagerSample
                 Event<OrderPaymentExpired>(builder => builder.CorrelateById(orderShipped => orderShipped.OrderId));
 
                 StartWith<OrderCreated>()
-                    .PublishEvent((orderCreated, data) => _mapper.Map<OrderCompleted>(orderCreated))
+                    .PublishEvent((orderCreated, data) => _mapper.ToCompleted(orderCreated))
                     .Then(OrderCreatedHandler);
 
                 When<OrderPaymentCreated>()
@@ -123,7 +122,7 @@ namespace ProcessManagerSample
 
                 When<OrderShipped>((@event, data) => !data.Data.IsPaid)
                     .SendCommand(OrderShippedHandler)
-                    .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
+                    .PublishEvent((orderShipped, data) => _mapper.ToCompleted(orderShipped))
                     .Complete();
             }
 

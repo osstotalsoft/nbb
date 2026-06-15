@@ -31,7 +31,7 @@
 		<SerilogSinksConsole>6.1.1</SerilogSinksConsole>
 		<SerilogSinksMSSqlServerPackageVersion>9.0.2</SerilogSinksMSSqlServerPackageVersion>
 		<SerilogAspNetCorePackageVersion>10.0.0</SerilogAspNetCorePackageVersion>
-		<AutoMapperPackageVersion>14.0.0</AutoMapperPackageVersion>
+		<MapperlyPackageVersion>4.3.1</MapperlyPackageVersion>
 		<NJsonSchemaPackageVersion>11.5.2</NJsonSchemaPackageVersion>
 		<AutoFixturePackageVersion>4.18.1</AutoFixturePackageVersion>
 		<JaegerPackageVersion>1.0.3</JaegerPackageVersion>

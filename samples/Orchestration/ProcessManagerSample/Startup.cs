@@ -16,7 +16,7 @@ namespace ProcessManagerSample
     {
         public static void ConfigureServicesDelegate(HostBuilderContext context, IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetEntryAssembly());
+            services.AddSingleton<OrderMapper>();
 
             services.AddMessageBus().AddInProcessTransport();
 

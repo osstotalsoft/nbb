@@ -18,7 +18,7 @@ namespace NBB.ProcessManager.Runtime
             _busPublisher = busPublisher;
         }
 
-        public async ValueTask Handle(TimeoutOccured notification, CancellationToken cancellationToken)
-            => await _busPublisher.PublishAsync(notification.Message, cancellationToken);
+        public ValueTask Handle(TimeoutOccured notification, CancellationToken cancellationToken)
+            => new(_busPublisher.PublishAsync(notification.Message, cancellationToken));
     }
 }
