@@ -14,7 +14,7 @@ Philosophy
 It offers an `EventSourcedRepository` that:
 * reads/persists events from/into an `IEventStore`
 * manages snapshots using an `ISnapshotStore`
-* dispatches events using `MediatR`
+* dispatches events using `Mediator`
 
 `EventSourcedRepository` offers two operations needed when working with ES domains:
 ```csharp
@@ -44,7 +44,7 @@ When saving domain aggregates, the repository uses the following algorithm:
 * fetches uncommitted events from the aggregate
 * saves the events in the event store, with the concurrency control set to aggregate-loaded-at-version
 * if the entity is snapshot-able it checks if it should persist a snapshot
-* dispatches events using `MediatR`
+* dispatches events using `Mediator`
 
 
 Stream identity

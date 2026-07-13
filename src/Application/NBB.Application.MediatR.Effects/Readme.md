@@ -1,6 +1,6 @@
 ﻿# NBB.Application.MediatR.Effects
 
-This package provides effects for working with MediatR
+This package provides effects for working with Mediator
 
 ## NuGet install
 ```

@@ -11,7 +11,7 @@ namespace NBB.Messaging.Host
 {
     /// <summary>
     /// Extend the <seealso cref="NBB.Messaging.Host.Builder.TypeSelector.ITypeSourceSelector" />
-    /// with methods for selecting message types from MediatR IoC handler registrations.
+    /// with methods for selecting message types from Mediator IoC handler registrations.
     /// </summary>
     public static class MediatorMessagingHostBuilderExtensions
     {
@@ -22,7 +22,7 @@ namespace NBB.Messaging.Host
         private static readonly TypeInfo QueryType = new(typeof(IRequestHandler<,>), types => types[1] != typeof(Unit));
 
         /// <summary>
-        /// Scans the the MediatR IoC registrations for handled messages types (commands, queries and events).
+        /// Scans the the Mediator IoC registrations for handled messages types (commands, queries and events).
         /// </summary>
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
@@ -31,7 +31,7 @@ namespace NBB.Messaging.Host
             => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { EventType, CommandType, QueryType });
 
         /// <summary>
-        /// Scans the the MediatR IoC registrations for handled events.
+        /// Scans the the Mediator IoC registrations for handled events.
         /// </summary>
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
@@ -39,7 +39,7 @@ namespace NBB.Messaging.Host
             => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { EventType });
 
         /// <summary>
-        /// Scans the the MediatR IoC registrations for handled commands.
+        /// Scans the the Mediator IoC registrations for handled commands.
         /// </summary>
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
@@ -47,7 +47,7 @@ namespace NBB.Messaging.Host
             => FromMediatRHandledMessagesInternal(typeSourceSelector, new[] { CommandType });
 
         /// <summary>
-        /// Scans the the MediatR IoC registrations for handled queries.
+        /// Scans the the Mediator IoC registrations for handled queries.
         /// </summary>
         /// <param name="typeSourceSelector">The type source selector.</param>
         /// <returns></returns>
