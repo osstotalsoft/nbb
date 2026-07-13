@@ -14,7 +14,7 @@ using NBB.Correlation.AspNet;
 using NBB.Messaging.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
-using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -70,7 +70,7 @@ namespace NBB.Contracts.Api
 
             if (Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
             {
-                Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+                Sdk.SetDefaultTextMapPropagator(new TraceContextPropagator());
 
                 services.AddOpenTelemetry().WithTracing(builder => builder
                         .ConfigureResource(configureResource)

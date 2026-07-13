@@ -18,7 +18,7 @@ using NBB.Correlation.Serilog;
 using NBB.Tools.Serilog.Enrichers.TenantId;
 using Microsoft.Extensions.Configuration;
 using OpenTelemetry;
-using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using System.Reflection;
@@ -116,7 +116,7 @@ namespace NBB.Todo.Worker
 
             if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
             {
-                Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+                Sdk.SetDefaultTextMapPropagator(new TraceContextPropagator());
 
                 services.AddOpenTelemetry().WithTracing(builder => builder
                         .ConfigureResource(configureResource)
