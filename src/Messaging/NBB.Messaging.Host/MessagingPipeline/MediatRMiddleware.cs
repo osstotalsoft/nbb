@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using System;
@@ -36,7 +36,7 @@ namespace NBB.Messaging.Host
             }
             else
             {
-                throw new ApplicationException($"Message type {context.MessagingEnvelope.Payload.GetType()} cannot be handled by mediatR");
+                throw new ApplicationException($"Message type {context.MessagingEnvelope.Payload.GetType()} cannot be handled by mediator");
             }
 
             await next();

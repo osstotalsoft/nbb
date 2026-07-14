@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Mediator;
 using NBB.Core.Effects;
 using Unit = NBB.Core.Effects.Unit;
 
@@ -44,7 +44,7 @@ namespace NBB.Application.MediatR.Effects
 
                 public Task<TResponse> Handle(QuerySideEffect<TResponse> sideEffect, CancellationToken cancellationToken = default)
                 {
-                    return _mediator.Send(sideEffect.Query, cancellationToken);
+                    return _mediator.Send(sideEffect.Query, cancellationToken).AsTask();
                 }
             }
 

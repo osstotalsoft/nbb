@@ -13,7 +13,7 @@
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(MicrosoftExtensionsPackagesVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
 		<PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
-		<PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+		<PackageReference Include="Mediator.Abstractions" Version="$(MediatorPackageVersion)" />
 		<PackageReference Include="Polly" Version="$(PollyVersion)" />
 	</ItemGroup>
 

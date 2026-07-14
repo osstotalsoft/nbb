@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Data.Abstractions;
 using NBB.Payments.Domain.PayableAggregate;
 using NBB.Payments.PublishedLanguage;
@@ -20,11 +20,13 @@ namespace NBB.Payments.Application.CommandHandlers
             _repository = repository;
         }
 
-        public async Task Handle(CreatePayable command, CancellationToken cancellationToken)
+        public async ValueTask<Unit> Handle(CreatePayable command, CancellationToken cancellationToken)
         {
             var payable = new Payable(command.ClientId, command.Amount, command.InvoiceId, command.ContractId);
             await _repository.AddAsync(payable, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
+
+            return Unit.Value;
         }
     }
 

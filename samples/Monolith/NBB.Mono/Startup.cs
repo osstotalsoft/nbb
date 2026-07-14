@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -41,10 +41,7 @@ namespace NBB.Mono
         {
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
-                typeof(ContractCommandHandlers).Assembly,
-                typeof(CreateInvoiceCommandHandler).Assembly,
-                typeof(PayPayableCommandHandler).Assembly));
+            services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
             services.AddMessageBus().AddInProcessTransport();
 

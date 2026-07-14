@@ -210,20 +210,20 @@ The fluent API for configuration starts with specifying the sources of message t
    - `AddType<TMessage>()`
    - `AddTypes(params Type[] types)`
    - `AddTypes(IEnumerable<Type> types)`
-- MediatR handled messages: finds MediatR handlers registered in the IoC container and extracts the handled types:
+- Mediator handled messages: finds Mediator handlers registered in the IoC container and extracts the handled types:
    - `FromMediatRHandledEvents()`
    - `FromMediatRHandledCommands()`
    - `FromMediatRHandledQueries()`
    - `FromMediatRHandledMessages()` - includes all handled types (commands, events, queries)
 
-For the Assembly and MediatR sources, the types should be selected using the following methods:
+For the Assembly and Mediator sources, the types should be selected using the following methods:
    - `AddAllClasses(bool publicOnly = true)` - selects all (public) types from the current source 
    - `AddClassesAssignableTo<TBase>(bool publicOnly = true)` - selects all (public) types from the current source that inherit/implement TBase
    - `AddClassesWhere(Func<Type, bool> predicate, bool publicOnly = true)` - selects all (public) types that match the predicate
 
 **Examples**
 
-Add subscribers for all messages that are handled by a registered MediatR request or notification handler:
+Add subscribers for all messages that are handled by a registered Mediator request or notification handler:
 * *notice that registrations can be chained*
 ```csharp
 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
@@ -345,12 +345,12 @@ Typically configured very early in the pipeline, it swallows exceptions and logs
 Includes the following resiliency policies for incoming messages:
 * Retry forever when a **ConcurrencyException** is received
 * Retry three times with a progressive delay when an **OutOfOrderException** is received
-#### built-in MediatR middleware
+#### built-in Mediator middleware
 
 ```csharp
 .UsePipeline(pipelineBuilder => pipelineBuilder.UseMediatRMiddleware())
 ```
-Tipically configured last in the pipeline, it acts as a message dispatcher (broker) that delivers messages to MediatR handlers
+Tipically configured last in the pipeline, it acts as a message dispatcher (broker) that delivers messages to Mediator handlers
 
 #### built-in Multi Tenant middleware
 
@@ -382,7 +382,7 @@ When processing incoming messages we have access to a messaging context that con
 
 In the pipeline middleware we have direct access to the messaging context as a parameter
 
-To access the context from other contexts - like a MediatR handler we must inject the *MessagingContextAccessor*
+To access the context from other contexts - like a Mediator handler we must inject the *MessagingContextAccessor*
 
 ```csharp
 public class MyHandler : IRequestHandler<MyCommand>

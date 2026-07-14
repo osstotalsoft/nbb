@@ -72,7 +72,7 @@ public class OrderProcessManager
     {
         public record struct OrderProcessManagerData(string OrderId);
 
-        public V1(IMapper mapper)
+        public V1(OrderMapper mapper)
         {
             Event<OrderCreated>(builder => builder.CorrelateById(orderCreated => orderCreated.OrderId));
 

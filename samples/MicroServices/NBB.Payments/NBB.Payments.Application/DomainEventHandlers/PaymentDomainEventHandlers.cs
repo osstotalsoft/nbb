@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Mediator;
 using NBB.Messaging.Abstractions;
 using NBB.Payments.Domain.PayableAggregate;
 
@@ -20,9 +20,9 @@ namespace NBB.Payments.Application.DomainEventHandlers
             _messageBusPublisher = messageBusPublisher;
         }
 
-        public Task Handle(PaymentReceived domainEvent, CancellationToken cancellationToken)
+        public async ValueTask Handle(PaymentReceived domainEvent, CancellationToken cancellationToken)
         {
-            return _messageBusPublisher.PublishAsync(
+            await _messageBusPublisher.PublishAsync(
                 new PublishedLanguage.PaymentReceived(domainEvent.PayableId, domainEvent.PaymentId,
                     domainEvent.InvoiceId,
                     domainEvent.PaymentDate,
@@ -30,9 +30,9 @@ namespace NBB.Payments.Application.DomainEventHandlers
                     ), cancellationToken);
         }
 
-        public Task Handle(PayableCreated domainEvent, CancellationToken cancellationToken)
+        public async ValueTask Handle(PayableCreated domainEvent, CancellationToken cancellationToken)
         {
-             return _messageBusPublisher.PublishAsync(
+             await _messageBusPublisher.PublishAsync(
                 new PublishedLanguage.PayableCreated(domainEvent.PayableId, domainEvent.InvoiceId,
                     domainEvent.ClientId,
                     domainEvent.Amount,

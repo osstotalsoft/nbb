@@ -2,7 +2,7 @@
 
 This package provides legacy base application data contracts, useful when referencing published language assemblies compiled against NBB4.
 
-Starting with version 5, NBB does not formalize application data contracts any more, because there are packages like MediatR, that offer application mediator functionality and they usually formalize application requests and events.
+Starting with version 5, NBB does not formalize application data contracts any more, because there are packages like Mediator, that offer application mediator functionality and they usually formalize application requests and events.
 
 Projects targeting NBB can still formalize application requests, and maybe segregate them into commands and queries using interface and/or base classes. It is their choice.
 

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -42,7 +42,13 @@ namespace NBB.MicroServicesOrchestration
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+                    services.AddMediator(options =>
+                    {
+                        options.ServiceLifetime = ServiceLifetime.Scoped;
+                        // NBB.Mono references this host project; internal generated types
+                        // avoid an ambiguous AddMediator with Mono's own generated one.
+                        options.GenerateTypesAsInternal = true;
+                    });
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 

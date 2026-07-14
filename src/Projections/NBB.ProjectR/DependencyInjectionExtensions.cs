@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System.Reflection;
-using MediatR;
+using Mediator;
 using NBB.ProjectR;
 
 // ReSharper disable once CheckNamespace

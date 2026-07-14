@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Data.Abstractions;
 using NBB.Invoices.Domain.InvoiceAggregate;
 using NBB.Invoices.PublishedLanguage;
@@ -22,15 +22,15 @@ namespace NBB.Invoices.Application.CommandHandlers
             this._invoiceLockRepository = invoiceLockRepository;
         }
 
-        public Task Handle(ProcessInvoice command, CancellationToken cancellationToken)
-            => UsingInvoiceLock(command.InvoiceId, lockTimeoutMs: 10000, async () =>
+        public ValueTask<Unit> Handle(ProcessInvoice command, CancellationToken cancellationToken)
+            => new(UsingInvoiceLock(command.InvoiceId, lockTimeoutMs: 10000, async () =>
             {
                 var invoice = await _invocieRepository.GetByIdAsync(command.InvoiceId, cancellationToken);
                 invoice.Process(); //takes 1000 ms cpu time
                 await _invocieRepository.SaveChangesAsync(cancellationToken);
 
                 return Unit.Value;
-            });
+            }));
 
         private async Task<T> UsingInvoiceLock<T>(Guid invoiceId, int lockTimeoutMs, Func<Task<T>> func)
         {

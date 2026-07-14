@@ -91,12 +91,12 @@ When creating projections, one has to provide the following information:
 This library depends on:
    - NBB effect system
    - NBB EventStore
-   - MediatR
+   - Mediator
 
 so you will need to register the dependent services, like so:
 ```csharp
 services.AddProjectR(GetType().Assembly);
-services.AddMediatR(GetType().Assembly);
+services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 services
     .AddEffects()
     .AddMessagingEffects()

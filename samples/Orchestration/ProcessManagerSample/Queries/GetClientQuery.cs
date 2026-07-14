@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Mediator;
 
 namespace ProcessManagerSample.Queries
 {
@@ -11,9 +11,9 @@ namespace ProcessManagerSample.Queries
 
     public class GetClientQueryHandler : IRequestHandler<GetClientQuery, Client>
     {
-        public Task<Client> Handle(GetClientQuery request, CancellationToken cancellationToken)
+        public ValueTask<Client> Handle(GetClientQuery request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new Client("ion", "vasile"));
+            return ValueTask.FromResult(new Client("ion", "vasile"));
         }
     }
 

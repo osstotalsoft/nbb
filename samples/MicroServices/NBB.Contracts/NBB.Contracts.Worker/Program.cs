@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,7 +15,7 @@ using NBB.Messaging.Host;
 using NBB.Messaging.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
-using OpenTelemetry.Extensions.Propagators;
+using OpenTelemetry.Context.Propagation;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -45,7 +45,7 @@ namespace NBB.Contracts.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<ContractCommandHandlers>());
+                    services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
 
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
@@ -85,7 +85,7 @@ namespace NBB.Contracts.Worker
 
                     if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
                     {
-                        Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
+                        Sdk.SetDefaultTextMapPropagator(new TraceContextPropagator());
 
                         services.AddOpenTelemetry().WithTracing(builder => builder
                                 .ConfigureResource(configureResource)

@@ -1,5 +1,5 @@
 ﻿using System;
-using MediatR;
+using Mediator;
 
 namespace NBB.Invoices.Application.Commands
 {

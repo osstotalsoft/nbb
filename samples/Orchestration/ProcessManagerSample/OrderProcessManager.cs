@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using AutoMapper;
 using NBB.ProcessManager.Definition;
 using NBB.ProcessManager.Definition.Builder;
 using ProcessManagerSample.Commands;
@@ -11,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using NBB.Core.Effects;
 
-using NBB.Application.MediatR.Effects;
+using MediatorEffects = NBB.Application.MediatR.Effects.Mediator;
 using NBB.Messaging.Effects;
 
 namespace ProcessManagerSample
@@ -22,9 +21,9 @@ namespace ProcessManagerSample
         {
             public record struct OrderProcessManagerData(Guid OrderId, bool IsPaid);
 
-            private readonly IMapper _mapper;
+            private readonly OrderMapper _mapper;
 
-            public V2(IMapper mapper)
+            public V2(OrderMapper mapper)
             {
                 _mapper = mapper;
 
@@ -34,15 +33,15 @@ namespace ProcessManagerSample
                 Event<OrderPaymentExpired>(builder => builder.CorrelateById(orderShipped => orderShipped.OrderId));
 
                 StartWith<OrderCreated>()
-                    .PublishEvent((orderCreated, data) => _mapper.Map<OrderCompleted>(orderCreated))
+                    .PublishEvent((orderCreated, data) => _mapper.ToCompleted(orderCreated))
                     .Then(OrderCreatedHandler);
 
                 When<OrderPaymentCreated>()
                     .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
                     .Then((orderCreated, data) =>
                     {
-                        var q1 = Mediator.Send(new GetClientQuery());
-                        var q2 = Effect.Parallel(Mediator.Send(new GetPartnerQuery()), Mediator.Send(new GetClientQuery()));
+                        var q1 = MediatorEffects.Send(new GetClientQuery());
+                        var q2 = Effect.Parallel(MediatorEffects.Send(new GetPartnerQuery()), MediatorEffects.Send(new GetClientQuery()));
 
                         var queries =
                             from x in q1
@@ -60,7 +59,7 @@ namespace ProcessManagerSample
 
                 When<OrderShipped>((@event, data) => !data.Data.IsPaid)
                     .SendCommand(OrderShippedHandler)
-                    .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
+                    .PublishEvent((orderShipped, data) => _mapper.ToCompleted(orderShipped))
                     .Complete();
             }
 
@@ -85,9 +84,9 @@ namespace ProcessManagerSample
         {
             public record struct OrderProcessManagerData(Guid OrderId, bool IsPaid);
 
-            private readonly IMapper _mapper;
+            private readonly OrderMapper _mapper;
 
-            public V1(IMapper mapper)
+            public V1(OrderMapper mapper)
             {
                 _mapper = mapper;
 
@@ -97,15 +96,15 @@ namespace ProcessManagerSample
                 Event<OrderPaymentExpired>(builder => builder.CorrelateById(orderShipped => orderShipped.OrderId));
 
                 StartWith<OrderCreated>()
-                    .PublishEvent((orderCreated, data) => _mapper.Map<OrderCompleted>(orderCreated))
+                    .PublishEvent((orderCreated, data) => _mapper.ToCompleted(orderCreated))
                     .Then(OrderCreatedHandler);
 
                 When<OrderPaymentCreated>()
                     .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
                     .Then((orderCreated, data) =>
                     {
-                        var q1 = Mediator.Send(new GetClientQuery());
-                        var q2 = Effect.Parallel(Mediator.Send(new GetPartnerQuery()), Mediator.Send(new GetClientQuery()));
+                        var q1 = MediatorEffects.Send(new GetClientQuery());
+                        var q2 = Effect.Parallel(MediatorEffects.Send(new GetPartnerQuery()), MediatorEffects.Send(new GetClientQuery()));
 
                         var queries =
                             from x in q1
@@ -123,7 +122,7 @@ namespace ProcessManagerSample
 
                 When<OrderShipped>((@event, data) => !data.Data.IsPaid)
                     .SendCommand(OrderShippedHandler)
-                    .PublishEvent((orderShipped, data) => _mapper.Map<OrderCompleted>(orderShipped))
+                    .PublishEvent((orderShipped, data) => _mapper.ToCompleted(orderShipped))
                     .Complete();
             }
 

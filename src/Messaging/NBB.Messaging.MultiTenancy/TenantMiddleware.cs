@@ -14,7 +14,7 @@ using NBB.MultiTenancy.Identification.Services;
 using NBB.MultiTenancy.Abstractions;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using MediatR;
+using Mediator;
 using System.Linq;
 
 namespace NBB.Messaging.MultiTenancy

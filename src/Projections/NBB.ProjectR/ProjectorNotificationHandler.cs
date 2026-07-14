@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Mediator;
 using NBB.Core.Effects;
 
 namespace NBB.ProjectR
@@ -23,7 +23,7 @@ namespace NBB.ProjectR
         }
 
 
-        public async Task Handle(TEvent ev, CancellationToken cancellationToken)
+        public async ValueTask Handle(TEvent ev, CancellationToken cancellationToken)
         {
             var (projectionId, message)  = _projector.Subscribe(ev);
             while (message is not null)

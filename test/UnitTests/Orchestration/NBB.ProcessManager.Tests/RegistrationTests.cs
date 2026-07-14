@@ -23,7 +23,7 @@ using NBB.ProcessManager.Runtime.Persistence;
 using static NBB.ProcessManager.Tests.RegistrationTests.RegistrationProcessManager;
 using System.Collections.Generic;
 using System.Linq;
-using MediatR;
+using Mediator;
 using FluentAssertions.Common;
 
 

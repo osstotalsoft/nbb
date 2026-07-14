@@ -1,8 +1,8 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
-using MediatR.Pipeline;
+using Mediator;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host;
@@ -16,12 +16,11 @@ namespace ProcessManagerSample
     {
         public static void ConfigureServicesDelegate(HostBuilderContext context, IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetEntryAssembly());
+            services.AddSingleton<OrderMapper>();
 
             services.AddMessageBus().AddInProcessTransport();
 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<GetPartnerQuery>());
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
+            services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
             //services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
 
             services.AddProcessManager(Assembly.GetEntryAssembly());
