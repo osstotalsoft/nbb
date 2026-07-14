@@ -36,7 +36,7 @@ namespace NBB.Messaging.Host
             }
             else
             {
-                throw new ApplicationException($"Message type {context.MessagingEnvelope.Payload.GetType()} cannot be handled by mediatR");
+                throw new ApplicationException($"Message type {context.MessagingEnvelope.Payload.GetType()} cannot be handled by mediator");
             }
 
             await next();

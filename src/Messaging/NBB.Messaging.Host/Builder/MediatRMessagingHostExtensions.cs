@@ -65,10 +65,10 @@ namespace NBB.Messaging.Host
                         typeInfo.GenericTypeDef == t.GetGenericTypeDefinition() &&
                         typeInfo.Condition.Invoke(t.GetGenericArguments())));
 
-            var integrationEventTypes = handlers
+            var integrationMessageTypes = handlers
                 .Select(t => t.GetGenericArguments()[0]).ToList();
 
-            var selector = new ImplementationTypeSelector(typeSourceSelector, integrationEventTypes);
+            var selector = new ImplementationTypeSelector(typeSourceSelector, integrationMessageTypes);
             ((IMessageTypeProvider)typeSourceSelector).RegisterTypes(selector);
 
             return selector;
