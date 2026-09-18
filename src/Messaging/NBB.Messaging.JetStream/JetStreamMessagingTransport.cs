@@ -5,45 +5,36 @@ using Microsoft.Extensions.Options;
 using NATS.Client.JetStream;
 using NATS.Client.JetStream.Models;
 using NBB.Messaging.Abstractions;
-using NBB.Messaging.JetStream.Internal;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream;
 
-public class JetStreamMessagingTransport : IMessagingTransport, ITransportMonitor
+public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsJSContext natsJSContext) : IMessagingTransport, ITransportMonitor
 {
-    private readonly IOptions<JetStreamOptions> _natsOptions;
-    private readonly JetStreamConnectionProvider _natsConnectionManager;
-
-    public JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, JetStreamConnectionProvider natsConnectionManager)
-    {
-        _natsOptions = natsOptions;
-        _natsConnectionManager = natsConnectionManager;
-    }
-
     public event TransportErrorHandler OnError;
 
     public async Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
     {
         var envelopeData = sendContext.EnvelopeBytesAccessor.Invoke();
-        await _natsConnectionManager.GetConnection().PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
+        await natsJSContext.Connection.PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
+        //PubAckResponse ack = await natsJSContext.PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
+        //ack.EnsureSuccess();
     }
 
     public async Task<IDisposable> SubscribeAsync(string topic, Func<TransportReceiveContext, Task> handler,
         SubscriptionTransportOptions options = null, CancellationToken token = default)
     {
         var stream = string.Empty;
-        var js = new NatsJSContext(_natsConnectionManager.GetConnection());
-        await foreach (var item in js.ListStreamNamesAsync(topic, token)) { stream = item; }
+        await foreach (var item in natsJSContext.ListStreamNamesAsync(topic, token)) { stream = item; }
 
         var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
 
         var cc = new ConsumerConfig();
         if (subscriberOptions.IsDurable)
         {
-            var clientId = (_natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
+            var clientId = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
             cc.Name = clientId;
             cc.DurableName = clientId;
         }
@@ -51,7 +42,7 @@ public class JetStreamMessagingTransport : IMessagingTransport, ITransportMonito
         if (subscriberOptions.DeliverNewMessagesOnly)
             cc.DeliverPolicy = ConsumerConfigDeliverPolicy.New;
 
-        cc.AckWait = TimeSpan.FromMilliseconds(subscriberOptions.AckWait ?? _natsOptions.Value.AckWait ?? 50000);
+        cc.AckWait = TimeSpan.FromMilliseconds(subscriberOptions.AckWait ?? natsOptions.Value.AckWait ?? 50000);
         cc.FilterSubject = topic;
         //cc.InactiveThreshold = TimeSpan.FromMinutes(5s);
         cc.AckPolicy = ConsumerConfigAckPolicy.Explicit;
@@ -60,7 +51,7 @@ public class JetStreamMessagingTransport : IMessagingTransport, ITransportMonito
         {
             MaxMsgs = subscriberOptions.MaxConcurrentMessages,
         };
-        var consumer = await js.CreateOrUpdateConsumerAsync(stream, cc, token);
+        var consumer = await natsJSContext.CreateOrUpdateConsumerAsync(stream, cc, token);
 
         var cts = new CancellationTokenSource();
         var t = Task.Run(async () =>
