@@ -47,33 +47,35 @@ public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions,
         //cc.InactiveThreshold = TimeSpan.FromMinutes(5s);
         cc.AckPolicy = ConsumerConfigAckPolicy.Explicit;
 
-        var consumeOptions = new NatsJSConsumeOpts
-        {
-            MaxMsgs = subscriberOptions.MaxConcurrentMessages,
-        };
         var consumer = await natsJSContext.CreateOrUpdateConsumerAsync(stream, cc, token);
-
         var cts = new CancellationTokenSource();
+
+        async Task HandleMessage(INatsJSMsg<byte[]> msg)
+        {
+            var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(msg.Data));
+            await handler(receiveContext);
+            await msg.AckAsync(cancellationToken: cts.Token);
+        }
+
         var t = Task.Run(async () =>
         {
+            var consumeOptions = new NatsJSConsumeOpts { MaxMsgs = subscriberOptions.MaxConcurrentMessages };
+
             try
             {
-                //await consumer.RefreshAsync(token);
-                await foreach (var msg in consumer.ConsumeAsync<byte[]>(opts: consumeOptions, cancellationToken: cts.Token))
-                {
-                    var receiveContext = new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(msg.Data));
-                    await handler(receiveContext);
-                    await msg.AckAsync(cancellationToken: cts.Token);
-                }
+                await Parallel.ForEachAsync(
+                    consumer.ConsumeAsync<byte[]>(opts: consumeOptions, cancellationToken: cts.Token),
+                    new ParallelOptions
+                    {
+                        MaxDegreeOfParallelism = subscriberOptions.MaxConcurrentMessages,
+                        CancellationToken = cts.Token,
+                    },
+                    async (msg, _) => await HandleMessage(msg));
             }
-            //catch (NatsJSProtocolException e)
-            //catch (NatsJSException e)
-            catch (OperationCanceledException)
-            {
-            }
+            catch (OperationCanceledException) { }
             catch (Exception e)
             {
-                OnError?.Invoke(e);
+                _ = Task.Run(() => OnError?.Invoke(e));
             }
         });
 
