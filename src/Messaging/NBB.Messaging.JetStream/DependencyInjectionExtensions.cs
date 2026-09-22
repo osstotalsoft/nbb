@@ -3,9 +3,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using NATS.Client.Core;
 using NATS.Extensions.Microsoft.DependencyInjection;
-using NATS.Net;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.JetStream;
 using System;
