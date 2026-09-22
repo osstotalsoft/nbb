@@ -33,8 +33,6 @@ namespace Microsoft.Extensions.DependencyInjection
                         }));
             });
 
-            services.AddSingleton(sp => sp.GetRequiredService<INatsConnection>().CreateJetStreamContext());
-
             services.AddSingleton<JetStreamMessagingTransport>();
             services.AddSingleton<IMessagingTransport>(sp => sp.GetRequiredService<JetStreamMessagingTransport>());
             services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<JetStreamMessagingTransport>());

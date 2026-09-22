@@ -2,8 +2,10 @@
 // This source code is licensed under the MIT license.
 
 using Microsoft.Extensions.Options;
+using NATS.Client.Core;
 using NATS.Client.JetStream;
 using NATS.Client.JetStream.Models;
+using NATS.Net;
 using NBB.Messaging.Abstractions;
 using System;
 using System.Threading;
@@ -11,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream;
 
-public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsJSContext natsJSContext) : IMessagingTransport, ITransportMonitor
+public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsConnectionPool connectionPool) : IMessagingTransport, ITransportMonitor
 {
     public event TransportErrorHandler OnError;
 
     public async Task PublishAsync(string topic, TransportSendContext sendContext, CancellationToken cancellationToken = default)
     {
         var envelopeData = sendContext.EnvelopeBytesAccessor.Invoke();
-        await natsJSContext.Connection.PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
+        await connectionPool.GetConnection().PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
         //PubAckResponse ack = await natsJSContext.PublishAsync(topic, envelopeData, cancellationToken: cancellationToken);
         //ack.EnsureSuccess();
     }
@@ -27,6 +29,7 @@ public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions,
         SubscriptionTransportOptions options = null, CancellationToken token = default)
     {
         var stream = string.Empty;
+        var natsJSContext = connectionPool.GetConnection().CreateJetStreamContext();
         await foreach (var item in natsJSContext.ListStreamNamesAsync(topic, token)) { stream = item; }
 
         var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
