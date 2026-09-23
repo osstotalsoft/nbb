@@ -20,5 +20,20 @@ namespace NBB.Messaging.JetStream
         /// </summary>
         public int? AckWait { get; set; }
 
+        /// <summary>
+        /// The time the client awaits for a connection to be established before giving up (in milliseconds)
+        /// </summary>
+        public int? ConnectTimeout { get; set; }
+
+        /// <summary>
+        /// The time the client awaits for a command to be completed before giving up (in milliseconds)
+        /// </summary>
+        public int? CommandTimeout { get; set; }
+
+        /// <summary>
+        /// The time the client awaits for a request to be completed before giving up (in milliseconds)
+        /// </summary>
+        public int? RequestTimeout { get; set; }
+
     }
 }
