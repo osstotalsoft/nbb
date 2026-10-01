@@ -34,6 +34,7 @@
 		<SerilogSinksMSSqlServerPackageVersion>9.0.2</SerilogSinksMSSqlServerPackageVersion>
 		<SerilogAspNetCorePackageVersion>10.0.0</SerilogAspNetCorePackageVersion>
 		<NJsonSchemaPackageVersion>11.5.2</NJsonSchemaPackageVersion>
+		<SwashbuckleAspNetCorePackageVersion>10.2.3</SwashbuckleAspNetCorePackageVersion>
 		<AutoFixturePackageVersion>4.18.1</AutoFixturePackageVersion>
 		<JaegerPackageVersion>1.0.3</JaegerPackageVersion>
 		<SystemIdentityModelTokensJwtPackageVersion>8.15.0</SystemIdentityModelTokensJwtPackageVersion>
