@@ -11,11 +11,15 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
+        /// <summary>
+        /// Registers the handlers of the <see cref="MediatorEff"/> side effects.
+        /// The handlers are scoped: they resolve the mediator, and through it the request and notification handlers, from the scope of the effect interpreter.
+        /// </summary>
         public static IServiceCollection AddMediatREffects(this IServiceCollection services)
         {
-            services.TryAddSingleton(typeof(MediatorEffects.Send.QueryHandler<>));
-            services.TryAddSingleton(typeof(MediatorEffects.Send.CommandHandler));
-            services.TryAddSingleton<ISideEffectHandler<MediatorEffects.Publish.SideEffect, Unit>, MediatorEffects.Publish.Handler>();
+            services.TryAddScoped(typeof(MediatorEffects.Send.QueryHandler<>));
+            services.TryAddScoped(typeof(MediatorEffects.Send.CommandHandler));
+            services.TryAddScoped<ISideEffectHandler<MediatorEffects.Publish.SideEffect, Unit>, MediatorEffects.Publish.Handler>();
             return services;
         }
 
