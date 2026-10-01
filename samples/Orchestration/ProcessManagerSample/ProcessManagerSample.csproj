@@ -22,15 +22,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
     <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
     <ProjectReference Include="..\..\..\src\Core\NBB.Core.Abstractions\NBB.Core.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.InMemory\NBB.EventStore.InMemory.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Effects\NBB.Messaging.Effects.csproj" />
-    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.MediatR\NBB.Messaging.MediatR.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.InProcessMessaging\NBB.Messaging.InProcessMessaging.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
-    <ProjectReference Include="..\..\..\src\Orchestration\NBB.ProcessManager.Runtime\NBB.ProcessManager.Runtime.csproj" />
+    <ProjectReference Include="..\..\..\src\Orchestration\NBB.ProcessManager.MediatR\NBB.ProcessManager.MediatR.csproj" />
   </ItemGroup>
 
   <ItemGroup>

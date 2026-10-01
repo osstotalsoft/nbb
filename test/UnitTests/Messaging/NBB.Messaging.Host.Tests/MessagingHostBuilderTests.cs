@@ -2,7 +2,6 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NBB.Core.Pipeline;
@@ -37,91 +36,6 @@ namespace NBB.Messaging.Host.Tests
             //Assert
             config.Subscribers.Should().NotBeEmpty();
             config.Subscribers[0].MessageType.Should().Be(typeof(MessageToScan));
-            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
-            config.Subscribers[0].Pipeline.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void Should_register_handled_commands_singleton()
-        {
-            //Arrange
-            var services = Mock.Of<IServiceCollection>();
-            var provider = Mock.Of<IServiceProvider>();
-            Mock.Get(services).Setup(x => x.GetEnumerator())
-                .Returns(new List<ServiceDescriptor>
-                {
-                    new ServiceDescriptor(typeof(IRequestHandler<CommandMessage>), new CommandHandler())
-                }.GetEnumerator());
-
-            //Act
-            var builder = new MessagingHostConfigurationBuilder(provider, services);
-            builder
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledCommands().AddAllClasses())
-                .WithDefaultOptions()
-                .UsePipeline(_ => { });
-
-            var config = builder.Build();
-
-            //Assert
-            config.Subscribers.Should().NotBeEmpty();
-            config.Subscribers[0].MessageType.Should().Be(typeof(CommandMessage));
-            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
-            config.Subscribers[0].Pipeline.Should().NotBeNull();
-        }
-
-        [Fact]
-        public void Should_register_handled_events_singleton()
-        {
-            //Arrange
-            var services = Mock.Of<IServiceCollection>();
-            var provider = Mock.Of<IServiceProvider>();
-            Mock.Get(services).Setup(x => x.GetEnumerator())
-                .Returns(new List<ServiceDescriptor>
-                {
-                    new ServiceDescriptor(typeof(INotificationHandler<EventMessage>), new EventHandler())
-                }.GetEnumerator());
-
-            //Act
-            var builder = new MessagingHostConfigurationBuilder(provider, services);
-            builder
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledEvents().AddAllClasses())
-                .WithDefaultOptions()
-                .UsePipeline(_ => { });
-
-            var config = builder.Build();
-
-            //Assert
-            config.Subscribers.Should().NotBeEmpty();
-            config.Subscribers[0].MessageType.Should().Be(typeof(EventMessage));
-            config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
-            config.Subscribers[0].Pipeline.Should().NotBeNull();
-        }
-
-
-        [Fact]
-        public void Should_register_handled_queries_singleton()
-        {
-            //Arrange
-            var services = Mock.Of<IServiceCollection>();
-            var provider = Mock.Of<IServiceProvider>();
-            Mock.Get(services).Setup(x => x.GetEnumerator())
-                .Returns(new List<ServiceDescriptor>
-                {
-                    new ServiceDescriptor(typeof(IRequestHandler<QueryMessage, string>), new QueryHandler())
-                }.GetEnumerator());
-
-            //Act
-            var builder = new MessagingHostConfigurationBuilder(provider, services);
-            builder
-                .AddSubscriberServices(cfg => cfg.FromMediatRHandledQueries().AddAllClasses())
-                .WithDefaultOptions()
-                .UsePipeline(_ => { });
-
-            var config = builder.Build();
-
-            //Assert
-            config.Subscribers.Should().NotBeEmpty();
-            config.Subscribers[0].MessageType.Should().Be(typeof(QueryMessage));
             config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
             config.Subscribers[0].Pipeline.Should().NotBeNull();
         }
@@ -201,11 +115,19 @@ namespace NBB.Messaging.Host.Tests
             config.Subscribers[2].Pipeline.Should().NotBe(mockMiddlewareFunc);
         }
 
-        public record CommandMessage : IRequest;
+        [Fact]
+        public void FromServiceCollection_should_reject_a_null_service_collection()
+        {
+            var selector = new TypeSourceSelector(new ServiceCollection());
 
-        public record EventMessage : INotification;
+            var act = () => selector.FromServiceCollection(null);
 
-        public record QueryMessage : IRequest<string>;
+            act.Should().Throw<ArgumentNullException>().WithParameterName("services");
+        }
+
+        public record CommandMessage;
+
+        public record EventMessage;
 
         public abstract class MessageToScanBase
         {
@@ -214,30 +136,6 @@ namespace NBB.Messaging.Host.Tests
 
         public class MessageToScan : MessageToScanBase
         {
-        }
-
-        public class CommandHandler : IRequestHandler<CommandMessage>
-        {
-            public Task Handle(CommandMessage request, CancellationToken cancellationToken)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public class EventHandler : INotificationHandler<EventMessage>
-        {
-            public Task Handle(EventMessage notification, CancellationToken cancellationToken)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public class QueryHandler : IRequestHandler<QueryMessage, string>
-        {
-            public Task<string> Handle(QueryMessage request, CancellationToken cancellationToken)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

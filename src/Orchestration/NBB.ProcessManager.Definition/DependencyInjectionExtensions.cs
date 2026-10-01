@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddProcessManagerDefinition(this IServiceCollection services, params Assembly[] assemblies)
+        public static IServiceCollection AddProcessManagerDefinition(this IServiceCollection services, params Assembly[] assemblies)
         {
             //scan for pm definitions 
             services.Scan(scan => scan
@@ -23,22 +22,23 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AsImplementedInterfaces()
                 .WithSingletonLifetime()
             );
+
+            return services;
         }
 
-        public static void AddNotificationHandlers(this IServiceCollection services, Type processManagerNotificationHandlerImplementationType)
+        /// <summary>
+        /// Gets the events handled by the process manager definitions registered in the service collection.
+        /// Events that start an obsolete process manager are skipped.
+        /// </summary>
+        public static IEnumerable<ProcessManagerEventRegistration> GetProcessManagerEventRegistrations(this IServiceCollection services)
         {
-            if (!processManagerNotificationHandlerImplementationType.IsGenericType
-                || processManagerNotificationHandlerImplementationType.GetGenericTypeDefinition().GetGenericArguments().Length != 3)
-                throw new Exception("Invalid definition handler");
-
-            services.Remove(services.FirstOrDefault(x => x.ImplementationType == processManagerNotificationHandlerImplementationType));
-
             var tempServiceCollection = new ServiceCollection();
             foreach (var serviceDesc in services)
                 tempServiceCollection.Add(serviceDesc);
 
-            var sp = tempServiceCollection.BuildServiceProvider();
+            using var sp = tempServiceCollection.BuildServiceProvider();
             var defs = sp.GetRequiredService<IEnumerable<IDefinition>>();
+            var registrations = new List<ProcessManagerEventRegistration>();
 
             foreach (var def in defs)
             {
@@ -53,10 +53,11 @@ namespace Microsoft.Extensions.DependencyInjection
                         continue;
                     }
 
-                    services.AddScoped(typeof(INotificationHandler<>).MakeGenericType(eventType),
-                        processManagerNotificationHandlerImplementationType.MakeGenericType(def.GetType(), dataType, eventType));
+                    registrations.Add(new ProcessManagerEventRegistration(def.GetType(), dataType, eventType));
                 }
             }
+
+            return registrations;
         }
     }
 }

@@ -1,12 +1,10 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Contracts.Application;
-using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Correlation.Serilog;
@@ -45,7 +43,9 @@ namespace NBB.Contracts.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<ContractCommandHandlers>());
+                    services
+                        .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+                        .AddMediatorIntegration();
 
                     var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
                     if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
@@ -131,7 +131,7 @@ namespace NBB.Contracts.Worker
         {
             hostConfigurationBuilder
                 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                    .FromMediatRHandledCommands().AddAllClasses())
+                    .FromMediatorHandledCommands().AddAllClasses())
                 .WithOptions(optionsBuilder => optionsBuilder
                     .ConfigureTransport(transportOptions =>
                         transportOptions with { MaxConcurrentMessages = 2 }))
@@ -139,7 +139,7 @@ namespace NBB.Contracts.Worker
                     .UseCorrelationMiddleware()
                     .UseExceptionHandlingMiddleware()
                     .UseDefaultResiliencyMiddleware()
-                    .UseMediatRMiddleware()
+                    .UseMediatorMiddleware()
                 );
 
             return Task.CompletedTask;

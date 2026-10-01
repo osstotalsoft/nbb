@@ -1,4 +1,4 @@
-// Copyright (c) TotalSoft.
+﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
 using System;
@@ -7,9 +7,10 @@ using FluentAssertions;
 using MediatR;
 using Moq;
 using NBB.Messaging.Abstractions;
+using NBB.Messaging.Host;
 using Xunit;
 
-namespace NBB.Messaging.Host.Tests.MessagingPipeline
+namespace NBB.Messaging.MediatR.Tests
 {
     public class MediatRMiddlewareTests
     {

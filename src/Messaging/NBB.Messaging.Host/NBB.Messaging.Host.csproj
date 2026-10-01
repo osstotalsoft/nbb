@@ -13,7 +13,6 @@
 		<PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(MicrosoftExtensionsPackagesVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
 		<PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
-		<PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
 		<PackageReference Include="Polly" Version="$(PollyVersion)" />
 	</ItemGroup>
 
@@ -28,6 +27,12 @@
 	<ItemGroup>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
 			<_Parameter1>$(AssemblyName).Tests</_Parameter1>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>NBB.Messaging.MediatR.Tests</_Parameter1>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+			<_Parameter1>NBB.Messaging.Mediator.Tests</_Parameter1>
 		</AssemblyAttribute>
 	</ItemGroup>
 

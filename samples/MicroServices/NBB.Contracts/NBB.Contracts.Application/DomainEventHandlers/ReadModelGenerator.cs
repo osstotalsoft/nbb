@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Contracts.ReadModel;
 using NBB.Data.Abstractions;
@@ -24,7 +24,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             _contractReadModelRepository = contractReadModelRepository;
         }
 
-        public async Task Handle(ContractCreated @event, CancellationToken cancellationToken)
+        public async ValueTask Handle(ContractCreated @event, CancellationToken cancellationToken)
         {
             var c = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
             if (c == null)
@@ -35,7 +35,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             }
         }
 
-        public async Task Handle(ContractAmountUpdated @event, CancellationToken cancellationToken)
+        public async ValueTask Handle(ContractAmountUpdated @event, CancellationToken cancellationToken)
         {
             var e = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
 
@@ -51,7 +51,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             }
         }
 
-        public async Task Handle(ContractLineAdded @event, CancellationToken cancellationToken)
+        public async ValueTask Handle(ContractLineAdded @event, CancellationToken cancellationToken)
         {
             var e = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken,
                 nameof(ContractReadModel.ContractLines));
@@ -70,7 +70,7 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             }
         }
 
-        public async Task Handle(ContractValidated @event, CancellationToken cancellationToken)
+        public async ValueTask Handle(ContractValidated @event, CancellationToken cancellationToken)
         {
             var contract = await _contractReadModelRepository.GetByIdAsync(@event.ContractId, cancellationToken);
 

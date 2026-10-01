@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Description>MediatR integration for NBB.ProjectR: dispatches MediatR notifications to projectors.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NBB.ProjectR\NBB.ProjectR.csproj" />
+  </ItemGroup>
+
+</Project>

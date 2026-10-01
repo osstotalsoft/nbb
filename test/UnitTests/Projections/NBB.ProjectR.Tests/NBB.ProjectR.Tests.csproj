@@ -16,14 +16,14 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsPackageVersion)" />
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.InMemory\NBB.EventStore.InMemory.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.InProcessMessaging\NBB.Messaging.InProcessMessaging.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Projections\NBB.ProjectR\NBB.ProjectR.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Projections\NBB.ProjectR.MediatR\NBB.ProjectR.MediatR.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.MediatR.Effects\NBB.Application.MediatR.Effects.csproj" />
   </ItemGroup>
 
 </Project>

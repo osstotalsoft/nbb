@@ -3,8 +3,14 @@
     "path": "NBB.sln",
     "projects": [
       "samples\\Orchestration\\ProcessManagerSample\\ProcessManagerSample.csproj",
+      "src\\Application\\NBB.Application.Mediator.Effects\\NBB.Application.Mediator.Effects.csproj",
+      "src\\Application\\NBB.Application.MediatR.Effects\\NBB.Application.MediatR.Effects.csproj",
+      "src\\Messaging\\NBB.Messaging.MediatR\\NBB.Messaging.MediatR.csproj",
       "src\\Orchestration\\NBB.ProcessManager.Definition\\NBB.ProcessManager.Definition.csproj",
+      "src\\Orchestration\\NBB.ProcessManager.Mediator\\NBB.ProcessManager.Mediator.csproj",
+      "src\\Orchestration\\NBB.ProcessManager.MediatR\\NBB.ProcessManager.MediatR.csproj",
       "src\\Orchestration\\NBB.ProcessManager.Runtime\\NBB.ProcessManager.Runtime.csproj",
+      "test\\UnitTests\\Orchestration\\NBB.ProcessManager.Mediator.Tests\\NBB.ProcessManager.Mediator.Tests.csproj",
       "test\\UnitTests\\Orchestration\\NBB.ProcessManager.Tests\\NBB.ProcessManager.Tests.csproj"
     ]
   }

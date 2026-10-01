@@ -1,9 +1,18 @@
 # NBB.Core.DependencyInjection
 
-This package is based on [Scrutor](https://www.nuget.org/packages/Scrutor/) which allows registering decorators in ASP.Net DI containers.
-Currently it adds just one functionality on top of Scrutor, it allows one to register constrained generic decorators for open generic interfaces.
+Registration helpers for the Microsoft.Extensions.DependencyInjection container:
+* constrained generic decorators, on top of [Scrutor](https://www.nuget.org/packages/Scrutor/)
+* registration requirements validated when the generic host starts
+
+The extensions are in the `NBB.Core.DependencyInjection` namespace.
+
+## NuGet install
+```
+dotnet add package NBB.Core.DependencyInjection
+```
 
 ## DecorateOpenGenericWhen
+Registers a constrained generic decorator for an open generic interface:
 ```csharp
 public class DomainUowDecorator<TEntity> : IUow<TEntity>
         where TEntity : IEventedAggregateRoot
@@ -15,11 +24,13 @@ services.DecorateOpenGenericWhen(
         serviceType.GetGenericArguments()[0]));
 ```
 
-As this is the only functionality of this package, we should try to make a pull request in Scrutor with this functionality and Obsolete this one.
-
-## NuGet install
+## RequireRegistration / RequireNonSingletonLifetime
+Declare requirements on registrations made elsewhere (e.g. by the application), validated when the generic host starts (`ValidateOnStart`).
+The checks inspect the service collection, so registrations made after the call are taken into account; the last registration of a service (the one the container resolves) is checked.
+```csharp
+services
+    .RequireRegistration(typeof(IMediator), "NBB.ProcessManager.Mediator", "call services.AddMediator(...)")
+    .RequireNonSingletonLifetime(typeof(IMediator), "NBB.ProcessManager.Mediator", "call services.AddMediator(...)");
 ```
-dotnet add package NBB.Core.Abstractions
-```
-
-
+* `RequireRegistration` - the host fails to start if the service is not registered
+* `RequireNonSingletonLifetime` - the host fails to start if the service is registered as Singleton (a missing registration is not reported, combine it with `RequireRegistration` when the service is mandatory)

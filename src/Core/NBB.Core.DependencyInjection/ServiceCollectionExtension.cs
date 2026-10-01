@@ -23,7 +23,7 @@ namespace NBB.Core.DependencyInjection
         public static IServiceCollection Decorate<TService, TDecorator>(this IServiceCollection services)
             where TDecorator : TService
         {
-            Preconditions.NotNull(services, nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
 
             return services.DecorateDescriptors(typeof(TService), x => x.Decorate(typeof(TDecorator)));
         }
@@ -37,7 +37,7 @@ namespace NBB.Core.DependencyInjection
         public static bool TryDecorate<TService, TDecorator>(this IServiceCollection services)
             where TDecorator : TService
         {
-            Preconditions.NotNull(services, nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
 
             return services.TryDecorateDescriptors(typeof(TService), out _, x => x.Decorate(typeof(TDecorator)));
         }
@@ -54,9 +54,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decoratorType"/> arguments are <c>null</c>.</exception>
         public static IServiceCollection Decorate(this IServiceCollection services, Type serviceType, Type decoratorType)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decoratorType, nameof(decoratorType));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decoratorType);
 
             if (serviceType.IsOpenGeneric() && decoratorType.IsOpenGeneric())
             {
@@ -79,9 +79,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decoratorType"/> arguments are <c>null</c>.</exception>
         public static IServiceCollection DecorateOpenGenericWhen(this IServiceCollection services, Type serviceType, Type decoratorType, Predicate<Type> serviceTypePredicate)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decoratorType, nameof(decoratorType));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decoratorType);
 
             if (serviceType.IsOpenGeneric() && decoratorType.IsOpenGeneric())
             {
@@ -106,9 +106,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decoratorType"/> arguments are <c>null</c>.</exception>
         public static bool TryDecorate(this IServiceCollection services, Type serviceType, Type decoratorType)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decoratorType, nameof(decoratorType));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decoratorType);
 
             if (serviceType.IsOpenGeneric() && decoratorType.IsOpenGeneric())
             {
@@ -130,8 +130,8 @@ namespace NBB.Core.DependencyInjection
         /// or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static IServiceCollection Decorate<TService>(this IServiceCollection services, Func<TService, IServiceProvider, TService> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.DecorateDescriptors(typeof(TService), x => x.Decorate(decorator));
         }
@@ -147,8 +147,8 @@ namespace NBB.Core.DependencyInjection
         /// or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static bool TryDecorate<TService>(this IServiceCollection services, Func<TService, IServiceProvider, TService> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.TryDecorateDescriptors(typeof(TService), out _, x => x.Decorate(decorator));
         }
@@ -165,8 +165,8 @@ namespace NBB.Core.DependencyInjection
         /// or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static IServiceCollection Decorate<TService>(this IServiceCollection services, Func<TService, TService> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.DecorateDescriptors(typeof(TService), x => x.Decorate(decorator));
         }
@@ -182,8 +182,8 @@ namespace NBB.Core.DependencyInjection
         /// or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static bool TryDecorate<TService>(this IServiceCollection services, Func<TService, TService> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.TryDecorateDescriptors(typeof(TService), out _, x => x.Decorate(decorator));
         }
@@ -200,9 +200,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static IServiceCollection Decorate(this IServiceCollection services, Type serviceType, Func<object, IServiceProvider, object> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.DecorateDescriptors(serviceType, x => x.Decorate(decorator));
         }
@@ -218,9 +218,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static bool TryDecorate(this IServiceCollection services, Type serviceType, Func<object, IServiceProvider, object> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.TryDecorateDescriptors(serviceType, out _, x => x.Decorate(decorator));
         }
@@ -237,9 +237,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static IServiceCollection Decorate(this IServiceCollection services, Type serviceType, Func<object, object> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.DecorateDescriptors(serviceType, x => x.Decorate(decorator));
         }
@@ -255,9 +255,9 @@ namespace NBB.Core.DependencyInjection
         /// <paramref name="serviceType"/> or <paramref name="decorator"/> arguments are <c>null</c>.</exception>
         public static bool TryDecorate(this IServiceCollection services, Type serviceType, Func<object, object> decorator)
         {
-            Preconditions.NotNull(services, nameof(services));
-            Preconditions.NotNull(serviceType, nameof(serviceType));
-            Preconditions.NotNull(decorator, nameof(decorator));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(serviceType);
+            ArgumentNullException.ThrowIfNull(decorator);
 
             return services.TryDecorateDescriptors(serviceType, out _, x => x.Decorate(decorator));
         }

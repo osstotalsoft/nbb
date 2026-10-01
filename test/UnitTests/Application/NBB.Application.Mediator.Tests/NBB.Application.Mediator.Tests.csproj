@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsPackagesVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNetTestSdkPackageVersion)" />
+    <PackageReference Include="Moq" Version="$(MoqPackageVersion)" />
+    <PackageReference Include="xunit" Version="$(XunitPackageVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioPackageVersion)" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.Mediator\NBB.Application.Mediator.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.Mediator.Effects\NBB.Application.Mediator.Effects.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Data\NBB.Data.Abstractions\NBB.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
+  </ItemGroup>
+
+</Project>

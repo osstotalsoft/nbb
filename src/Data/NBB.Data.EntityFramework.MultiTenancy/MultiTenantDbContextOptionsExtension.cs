@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -46,7 +45,7 @@ namespace NBB.Data.EntityFramework.MultiTenancy
 
         public override int GetServiceProviderHashCode() => 0;
 
-        public override void PopulateDebugInfo([NotNull] IDictionary<string, string> debugInfo)
+        public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
         {
 
         }

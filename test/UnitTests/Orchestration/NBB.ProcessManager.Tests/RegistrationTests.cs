@@ -43,10 +43,33 @@ namespace NBB.ProcessManager.Tests
             orderPayemntCreatedHandlers.Count().Should().Be(1);
         }
 
-        public IServiceProvider BuildServiceProvider()
+        [Fact]
+        public void EventRegistrationsShouldBeLibraryFree()
         {
             var services = new ServiceCollection();
             services.AddProcessManager(typeof(RegistrationProcessManager).Assembly);
+
+            var registrations = services.GetProcessManagerEventRegistrations();
+
+            registrations.Should().Contain(new ProcessManagerEventRegistration(typeof(RegistrationProcessManager), typeof(RegistrationProcessManagerData), typeof(OrderCreated)));
+            registrations.Should().Contain(new ProcessManagerEventRegistration(typeof(RegistrationProcessManager), typeof(RegistrationProcessManagerData), typeof(OrderPaymentCreated)));
+            services.Should().NotContain(d => d.ServiceType.IsGenericType && d.ServiceType.GetGenericTypeDefinition() == typeof(INotificationHandler<>));
+        }
+
+        [Fact]
+        public void MediatRHandlersRequireAddProcessManager()
+        {
+            var act = () => new ServiceCollection().AddProcessManagerMediatRHandlers();
+
+            act.Should().Throw<InvalidOperationException>();
+        }
+
+        public IServiceProvider BuildServiceProvider()
+        {
+            var services = new ServiceCollection();
+            services
+                .AddProcessManager(typeof(RegistrationProcessManager).Assembly)
+                .AddProcessManagerMediatRHandlers();
             services.AddEventStore(es =>
             {
                 es.UseNewtownsoftJson();

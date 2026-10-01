@@ -7,26 +7,37 @@ The messaging host is a background (hosted) service that receives messages from 
 dotnet add package NBB.Messaging.Host
 ```
 
-**Sample usage:**
+**Sample usage** (with [`NBB.Messaging.Mediator`](../NBB.Messaging.Mediator#readme); for MediatR use [`NBB.Messaging.MediatR`](../NBB.Messaging.MediatR#readme) and the `FromMediatRHandled*()` / `UseMediatRMiddleware()` equivalents):
 ```csharp
 services.AddMessagingHost(
     Configuration,
     hostBuilder => hostBuilder
     .Configure(configBuilder => configBuilder
         .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-            .FromMediatRHandledCommands().AddAllClasses()
-            .FromMediatRHandledEvents().AddAllClasses()
+            .FromMediatorHandledCommands().AddAllClasses()
+            .FromMediatorHandledEvents().AddAllClasses()
         )
         .WithDefaultOptions()
         .UsePipeline(pipelineBuilder => pipelineBuilder
             .UseCorrelationMiddleware()
             .UseExceptionHandlingMiddleware()
             .UseDefaultResiliencyMiddleware()
-            .UseMediatRMiddleware()
+            .UseMediatorMiddleware()
         )
     )
 );
 
+```
+
+`NBB.Messaging.Host` itself does not depend on any mediator library: subscriber discovery from mediator handlers and the dispatch middleware are provided by the adapter packages
+[`NBB.Messaging.Mediator`](../NBB.Messaging.Mediator#readme) (source generated [Mediator](https://github.com/martinothamar/Mediator)) and [`NBB.Messaging.MediatR`](../NBB.Messaging.MediatR#readme) ([MediatR](https://github.com/jbogard/MediatR)).
+
+The adapters discover the handlers registered in the service collection the messaging host is configured on. When they are registered in a separate container
+(e.g. one container per module in a modular monolith), select that collection first; the discovered types are added to the same subscriber group:
+```csharp
+.AddSubscriberServices(subscriberBuilder => subscriberBuilder
+    .FromServiceCollection(moduleServices)
+    .FromMediatorHandledEvents().AddAllClasses())
 ```
 
 
@@ -139,7 +150,7 @@ services.AddMessagingHost(
                 .UseCorrelationMiddleware()
                 .UseExceptionHandlingMiddleware()
                 .UseDefaultResiliencyMiddleware()
-                .UseMiddleware<ReceiveEventMediatRMiddleware>());
+                .UseMediatorMiddleware());
     }));
 ```
 
@@ -171,14 +182,14 @@ class MessagingHostStartup : IMessagingHostStartup
 
         hostConfigurationBuilder
             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                .FromMediatRHandledCommands().AddAllClasses())
+                .FromMediatorHandledCommands().AddAllClasses())
             .WithDefaultOptions()
             .UsePipeline(pipelineBuilder => pipelineBuilder
                 .UseCorrelationMiddleware()
                 .UseExceptionHandlingMiddleware()
                 .When(isMultiTenant, x => x.UseTenantMiddleware())
                 .UseDefaultResiliencyMiddleware()
-                .UseMediatRMiddleware()
+                .UseMediatorMiddleware()
             );
 
         return Task.CompletedTask;
@@ -210,25 +221,23 @@ The fluent API for configuration starts with specifying the sources of message t
    - `AddType<TMessage>()`
    - `AddTypes(params Type[] types)`
    - `AddTypes(IEnumerable<Type> types)`
-- MediatR handled messages: finds MediatR handlers registered in the IoC container and extracts the handled types:
-   - `FromMediatRHandledEvents()`
-   - `FromMediatRHandledCommands()`
-   - `FromMediatRHandledQueries()`
-   - `FromMediatRHandledMessages()` - includes all handled types (commands, events, queries)
+- Mediator handled messages: finds the handlers registered in the IoC container by a mediator library and extracts the handled types (provided by the adapter packages):
+   - [`NBB.Messaging.Mediator`](../NBB.Messaging.Mediator#readme): `FromMediatorHandledEvents()`, `FromMediatorHandledCommands()`, `FromMediatorHandledQueries()`, `FromMediatorHandledMessages()`
+   - [`NBB.Messaging.MediatR`](../NBB.Messaging.MediatR#readme): `FromMediatRHandledEvents()`, `FromMediatRHandledCommands()`, `FromMediatRHandledQueries()`, `FromMediatRHandledMessages()`
 
-For the Assembly and MediatR sources, the types should be selected using the following methods:
+For the Assembly and mediator sources, the types should be selected using the following methods:
    - `AddAllClasses(bool publicOnly = true)` - selects all (public) types from the current source 
    - `AddClassesAssignableTo<TBase>(bool publicOnly = true)` - selects all (public) types from the current source that inherit/implement TBase
    - `AddClassesWhere(Func<Type, bool> predicate, bool publicOnly = true)` - selects all (public) types that match the predicate
 
 **Examples**
 
-Add subscribers for all messages that are handled by a registered MediatR request or notification handler:
+Add subscribers for all messages that are handled by a registered Mediator request/command or notification handler:
 * *notice that registrations can be chained*
 ```csharp
 .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-    .FromMediatRHandledCommands().AddAllClasses()
-    .FromMediatRHandledEvents().AddAllClasses())
+    .FromMediatorHandledCommands().AddAllClasses()
+    .FromMediatorHandledEvents().AddAllClasses())
 ```
 
 Add subscribers for the specified topics:
@@ -345,12 +354,13 @@ Typically configured very early in the pipeline, it swallows exceptions and logs
 Includes the following resiliency policies for incoming messages:
 * Retry forever when a **ConcurrencyException** is received
 * Retry three times with a progressive delay when an **OutOfOrderException** is received
-#### built-in MediatR middleware
+#### mediator dispatch middleware
 
 ```csharp
-.UsePipeline(pipelineBuilder => pipelineBuilder.UseMediatRMiddleware())
+.UsePipeline(pipelineBuilder => pipelineBuilder.UseMediatorMiddleware()) // NBB.Messaging.Mediator
+.UsePipeline(pipelineBuilder => pipelineBuilder.UseMediatRMiddleware())  // NBB.Messaging.MediatR
 ```
-Tipically configured last in the pipeline, it acts as a message dispatcher (broker) that delivers messages to MediatR handlers
+Tipically configured last in the pipeline, it acts as a message dispatcher (broker) that delivers messages to the mediator handlers
 
 #### built-in Multi Tenant middleware
 
@@ -382,7 +392,7 @@ When processing incoming messages we have access to a messaging context that con
 
 In the pipeline middleware we have direct access to the messaging context as a parameter
 
-To access the context from other contexts - like a MediatR handler we must inject the *MessagingContextAccessor*
+To access the context from other contexts - like a mediator handler we must inject the *MessagingContextAccessor*
 
 ```csharp
 public class MyHandler : IRequestHandler<MyCommand>

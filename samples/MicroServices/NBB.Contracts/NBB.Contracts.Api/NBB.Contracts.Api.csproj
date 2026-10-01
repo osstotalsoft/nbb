@@ -20,6 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
         <PackageReference Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemetryCorePackageVersion)" />
         <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryCorePackageVersion)" />
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="$(OpenTelemetryExporterPrometheusAspnetCorePackageVersion)" />        
@@ -45,6 +46,7 @@
 		<ProjectReference Include="..\..\..\..\src\Tools\Serilog\NBB.Tools.Serilog.OpenTelemetryTracingSink\NBB.Tools.Serilog.OpenTelemetryTracingSink.csproj" />
         <ProjectReference Include="..\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
         <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
+        <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.Mediator\NBB.Application.Mediator.csproj" />
     </ItemGroup>
 
 </Project>

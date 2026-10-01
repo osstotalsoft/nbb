@@ -47,4 +47,6 @@ Other packages
 * *NBB.Messaging.DataContracts* - helps us formalize and instrument messaging data contracts
 * *NBB.Messaging.Effects* - messaging side effects and handlers for the NBB effects infrastructure
 * *NBB.Messaging.MultiTenancy* - support for messaging in multi-tenant environments
+* *NBB.Messaging.Mediator* - messaging host integration for the source generated [Mediator](https://github.com/martinothamar/Mediator) library (subscriber discovery, dispatch middleware, message classification)
+* *NBB.Messaging.MediatR* - messaging host integration for [MediatR](https://github.com/jbogard/MediatR) (subscriber discovery, dispatch middleware, message classification)
 * *NBB.Messaging.OpenTelemetry* - support for *OpenTelemetry* in messaging publishers and subscribers

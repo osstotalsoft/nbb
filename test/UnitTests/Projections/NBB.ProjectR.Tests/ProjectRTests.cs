@@ -1,4 +1,4 @@
-// Copyright (c) TotalSoft.
+﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
 using System;
@@ -11,7 +11,7 @@ using NBB.Core.Abstractions;
 using NBB.Core.Effects;
 using NBB.EventStore.Abstractions;
 using Xunit;
-using Mediator = NBB.Application.MediatR.Effects.Mediator;
+using NBB.Application.MediatR.Effects;
 using MessageBus = NBB.Messaging.Effects.MessageBus;
 
 namespace NBB.ProjectR.Tests
@@ -69,7 +69,7 @@ namespace NBB.ProjectR.Tests
 
                         (Message.ValidateContract msg, { IsValidated: false }) => (
                             model with { IsValidated = true, ValidatedByUserId = msg.UserId },
-                            Mediator.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
+                            MediatorEff.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
                                 Eff.OfMsg<Message>(new Message.SetUserName(msg.ContractId, x.UserName)))),
 
                         (Message.SetUserName msg, not null) => (
@@ -82,7 +82,7 @@ namespace NBB.ProjectR.Tests
                         _ => (model, Eff.None<Message>())
                     };
 
-                public (Guid Identity, Message Message) Subscribe(INotification @event) => @event switch
+                public (Guid Identity, Message Message) Subscribe(object @event) => @event switch
                 {
                     ContractCreated ev => (ev.ContractId, new Message.CreateContract(ev.ContractId, ev.Value)),
                     ContractValidated ev => (ev.ContractId, new Message.ValidateContract(ev.ContractId, ev.UserId)),

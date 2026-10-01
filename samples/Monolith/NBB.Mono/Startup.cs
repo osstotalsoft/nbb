@@ -1,22 +1,18 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Application.MediatR;
-using NBB.Contracts.Application.CommandHandlers;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Core.Abstractions;
+using NBB.Data.Abstractions;
 using NBB.Correlation.AspNet;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
-using NBB.Invoices.Application.CommandHandlers;
 using NBB.Invoices.Data;
-using NBB.Payments.Application.CommandHandlers;
 using NBB.Payments.Data;
 using NBB.Domain;
 using NBB.Messaging.Host;
@@ -41,13 +37,14 @@ namespace NBB.Mono
         {
             services.AddMvc();
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
-                typeof(ContractCommandHandlers).Assembly,
-                typeof(CreateInvoiceCommandHandler).Assembly,
-                typeof(PayPayableCommandHandler).Assembly));
+            // the generator (referenced only by this host) registers the handlers of all referenced assemblies
+            services
+                .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+                .AddMediatorIntegration();
 
             services.AddMessageBus().AddInProcessTransport();
 
+            services.AddSingleton<NBB.Contracts.Application.ContractDomainMetrics>();
             services.AddContractsWriteModelDataAccess();
             services.AddContractsReadModelDataAccess();
             services.AddInvoicesDataAccess();
@@ -70,24 +67,26 @@ namespace NBB.Mono
                 hostBuilder => hostBuilder
                 .Configure(configBuilder => configBuilder
                     .AddSubscriberServices(subscriberBuiler => subscriberBuiler
-                        .FromMediatRHandledCommands().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
-                        .FromMediatRHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
+                        .FromMediatorHandledCommands().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
+                        .FromMediatorHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
                     )
                     .WithDefaultOptions()
                     .UsePipeline(pipelineBuilder => pipelineBuilder
                         .UseExceptionHandlingMiddleware()
                         .UseCorrelationMiddleware()
                         .UseDefaultResiliencyMiddleware()
-                        .UseMediatRMiddleware()
+                        .UseMediatorMiddleware()
                     )
                 )
             );
 
-            services.AddProcessManager(typeof(InvoicingProcessManager).Assembly);
+            services
+                .AddProcessManager(typeof(InvoicingProcessManager).Assembly)
+                .AddProcessManagerMediatorHandlers();
 
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(DomainUowDecorator<>),
                 serviceType => typeof(IEventedAggregateRoot).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
-            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(MediatorUowDecorator<>),
+            services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventPublishingUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]));
             services.DecorateOpenGenericWhen(typeof(IUow<>), typeof(EventStoreUowDecorator<>),
                 serviceType => typeof(IEventedEntity).IsAssignableFrom(serviceType.GetGenericArguments()[0]) &&

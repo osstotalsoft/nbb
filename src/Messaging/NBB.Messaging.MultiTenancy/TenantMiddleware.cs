@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using NBB.Core.Abstractions;
 using NBB.Core.Pipeline;
 using NBB.Messaging.Abstractions;
 using System;
@@ -14,7 +15,6 @@ using NBB.MultiTenancy.Identification.Services;
 using NBB.MultiTenancy.Abstractions;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using MediatR;
 using System.Linq;
 
 namespace NBB.Messaging.MultiTenancy
@@ -29,6 +29,7 @@ namespace NBB.Messaging.MultiTenancy
         ITenantIdentificationService tenantIdentificationService,
         IOptions<TenancyHostingOptions> tenancyOptions,
         ITenantRepository tenantRepository,
+        IContractKindClassifier contractKindClassifier,
         ILogger<TenantMiddleware> logger
     ) : IPipelineMiddleware<MessagingContext>
     {        
@@ -48,7 +49,7 @@ namespace NBB.Messaging.MultiTenancy
 
             Tenant tenant;
 
-            if (context.MessagingEnvelope.Payload is INotification)
+            if (IsEvent(context.MessagingEnvelope.Payload))
             {
                 tenant = await TryLoadTenant(context.TopicName, cancellationToken);
                 if (tenant == null)
@@ -71,6 +72,9 @@ namespace NBB.Messaging.MultiTenancy
                 await next();
             }
         }
+
+        private bool IsEvent(object payload)
+            => payload != null && contractKindClassifier.Classify(payload.GetType()) == ContractKind.Event;
 
         private async Task<Tenant> LoadTenant(CancellationToken cancellationToken)
         {

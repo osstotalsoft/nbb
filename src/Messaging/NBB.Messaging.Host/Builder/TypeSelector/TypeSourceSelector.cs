@@ -10,16 +10,11 @@ using Microsoft.Extensions.DependencyInjection;
 // ReSharper disable once CheckNamespace
 namespace NBB.Messaging.Host
 {
-    public class TypeSourceSelector : ITypeSourceSelector, IMessageTypeProvider, IMessageTopicProvider, IServiceCollectionProvider
+    public class TypeSourceSelector(IServiceCollection serviceCollection) : ITypeSourceSelector, IMessageTypeProvider, IMessageTopicProvider, IServiceCollectionProvider
     {
-        private readonly List<IMessageTypeProvider> _typeSelectors = new();
-        private readonly IList<IEnumerable<string>> _selectedTopics = new List<IEnumerable<string>>();
-        private readonly IServiceCollection _serviceCollection;
-
-        public TypeSourceSelector(IServiceCollection serviceCollection)
-        {
-            _serviceCollection = serviceCollection;
-        }
+        // shared with the selectors created by FromServiceCollection, so their types and topics belong to the same subscriber group
+        private List<IMessageTypeProvider> TypeSelectors { get; init; } = [];
+        private IList<IEnumerable<string>> SelectedTopics { get; init; } = [];
 
         public IImplementationTypeSelector FromAssemblyOf<T>()
             => InternalFromAssembliesOf(new[] {typeof(T).GetTypeInfo()});
@@ -61,7 +56,7 @@ namespace NBB.Messaging.Host
 
             var selector = new ImplementationTypeSelector(this, types);
 
-            _typeSelectors.Add(selector);
+            TypeSelectors.Add(selector);
 
             return selector.AddAllClasses();
         }
@@ -77,25 +72,32 @@ namespace NBB.Messaging.Host
             return this;
         }
 
+        public ITypeSourceSelector FromServiceCollection(IServiceCollection services)
+        {
+            ArgumentNullException.ThrowIfNull(services);
+
+            return new TypeSourceSelector(services) { TypeSelectors = TypeSelectors, SelectedTopics = SelectedTopics };
+        }
+
         IServiceCollection IServiceCollectionProvider.ServiceCollection
         {
-            get => _serviceCollection;
+            get => serviceCollection;
         }
 
         IEnumerable<Type> IMessageTypeProvider.GetTypes()
-            => _typeSelectors.SelectMany(x => x.GetTypes()).Distinct();
+            => TypeSelectors.SelectMany(x => x.GetTypes()).Distinct();
 
         void IMessageTypeProvider.RegisterTypes(IEnumerable<Type> types)
         {
             var selector = new ImplementationTypeSelector(this, types);
-            _typeSelectors.Add(selector);
+            TypeSelectors.Add(selector);
         }
 
         void IMessageTypeProvider.RegisterTypes(IMessageTypeProvider provider)
-            => _typeSelectors.Add(provider);
+            => TypeSelectors.Add(provider);
 
         IEnumerable<string> IMessageTopicProvider.GetTopics()
-            =>_selectedTopics.SelectMany(x => x).Distinct();
+            =>SelectedTopics.SelectMany(x => x).Distinct();
 
         void IMessageTopicProvider.RegisterTopics(IEnumerable<string> topics)
             => SelectTopicsInternal(topics);
@@ -107,14 +109,14 @@ namespace NBB.Messaging.Host
 
             var types = assemblies.SelectMany(asm => asm.DefinedTypes).Select(x => x.AsType());
             var selector = new ImplementationTypeSelector(this, types);
-            _typeSelectors.Add(selector);
+            TypeSelectors.Add(selector);
 
             return selector;
         }
 
         private void SelectTopicsInternal(IEnumerable<string> topics)
         {
-            _selectedTopics.Add(topics.ToList());
+            SelectedTopics.Add(topics.ToList());
         }
     }
 }

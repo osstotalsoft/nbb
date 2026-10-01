@@ -14,7 +14,7 @@ Philosophy
 It offers an `EventSourcedRepository` that:
 * reads/persists events from/into an `IEventStore`
 * manages snapshots using an `ISnapshotStore`
-* dispatches events using `MediatR`
+* publishes events in-process using an `IEventPublisher`
 
 `EventSourcedRepository` offers two operations needed when working with ES domains:
 ```csharp
@@ -44,7 +44,14 @@ When saving domain aggregates, the repository uses the following algorithm:
 * fetches uncommitted events from the aggregate
 * saves the events in the event store, with the concurrency control set to aggregate-loaded-at-version
 * if the entity is snapshot-able it checks if it should persist a snapshot
-* dispatches events using `MediatR`
+* publishes the events using the registered `IEventPublisher` (`NBB.Core.Abstractions`)
+
+An `IEventPublisher` registration is required (resolving the repository fails otherwise):
+```csharp
+services.AddMediatorIntegration(); // NBB.Application.Mediator - publishes Mediator notifications
+services.AddMediatRIntegration();  // NBB.Application.MediatR - publishes MediatR notifications
+```
+To publish nothing in-process, register your own `IEventPublisher` implementation (after `AddMediatorIntegration()` / `AddMediatRIntegration()` when you call it: the last registration wins).
 
 
 Stream identity

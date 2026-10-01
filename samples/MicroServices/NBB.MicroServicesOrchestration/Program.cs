@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -42,7 +41,12 @@ namespace NBB.MicroServicesOrchestration
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+                    // generated types are internal because NBB.Mono references this host and generates its own Mediator
+                    services.AddMediator(options =>
+                    {
+                        options.ServiceLifetime = ServiceLifetime.Scoped;
+                        options.GenerateTypesAsInternal = true;
+                    });
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
@@ -63,18 +67,20 @@ namespace NBB.MicroServicesOrchestration
                         hostBuilder => hostBuilder
                         .Configure(configBuilder => configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                                .FromMediatRHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
+                                .FromMediatorHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
                             )
                             .WithDefaultOptions()
                             .UsePipeline(pipelineBuilder => pipelineBuilder
                                 .UseCorrelationMiddleware()
                                 .UseExceptionHandlingMiddleware()
                                 .UseDefaultResiliencyMiddleware()
-                                .UseMediatRMiddleware()
+                                .UseMediatorMiddleware()
                             )
                         ));
 
-                    services.AddProcessManager(Assembly.GetEntryAssembly());
+                    services
+                        .AddProcessManager(Assembly.GetEntryAssembly())
+                        .AddProcessManagerMediatorHandlers();
                 });
 
             var host = builder.UseConsoleLifetime().Build();

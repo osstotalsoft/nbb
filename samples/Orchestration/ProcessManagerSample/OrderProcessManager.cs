@@ -41,8 +41,8 @@ namespace ProcessManagerSample
                     .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
                     .Then((orderCreated, data) =>
                     {
-                        var q1 = Mediator.Send(new GetClientQuery());
-                        var q2 = Effect.Parallel(Mediator.Send(new GetPartnerQuery()), Mediator.Send(new GetClientQuery()));
+                        var q1 = MediatorEff.Send(new GetClientQuery());
+                        var q2 = Effect.Parallel(MediatorEff.Send(new GetPartnerQuery()), MediatorEff.Send(new GetClientQuery()));
 
                         var queries =
                             from x in q1
@@ -104,8 +104,8 @@ namespace ProcessManagerSample
                     .SetState((received, state) => state.Data with { OrderId = Guid.NewGuid() })
                     .Then((orderCreated, data) =>
                     {
-                        var q1 = Mediator.Send(new GetClientQuery());
-                        var q2 = Effect.Parallel(Mediator.Send(new GetPartnerQuery()), Mediator.Send(new GetClientQuery()));
+                        var q1 = MediatorEff.Send(new GetClientQuery());
+                        var q2 = Effect.Parallel(MediatorEff.Send(new GetPartnerQuery()), MediatorEff.Send(new GetClientQuery()));
 
                         var queries =
                             from x in q1

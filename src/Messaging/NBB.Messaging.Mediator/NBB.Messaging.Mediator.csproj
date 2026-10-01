@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Description>Mediator (source generated mediator) integration for the NBB messaging host: subscriber discovery from Mediator handlers, dispatch middleware and message kind classification.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mediator.Abstractions" Version="$(MediatorPackageVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
+    <ProjectReference Include="..\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
+  </ItemGroup>
+
+</Project>

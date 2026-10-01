@@ -22,9 +22,10 @@ namespace ProcessManagerSample
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<GetPartnerQuery>());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPreProcessorBehavior<,>));
-            //services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
 
-            services.AddProcessManager(Assembly.GetEntryAssembly());
+            services
+                .AddProcessManager(Assembly.GetEntryAssembly())
+                .AddProcessManagerMediatRHandlers();
 
             services.AddEventStore(es =>
             {

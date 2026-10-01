@@ -9,7 +9,8 @@ namespace NBB.Messaging.Host
     /// <seealso cref="NBB.Messaging.Host.Builder.TypeSelector.IAssemblySelector" />
     /// <seealso cref="NBB.Messaging.Host.Builder.TypeSelector.ITypeSelector" />
     /// <seealso cref="NBB.Messaging.Host.Builder.TypeSelector.ITopicSelector" />
-    public interface ITypeSourceSelector : IAssemblySelector, ITypeSelector, ITopicSelector
+    /// <seealso cref="NBB.Messaging.Host.IServiceCollectionSelector" />
+    public interface ITypeSourceSelector : IAssemblySelector, ITypeSelector, ITopicSelector, IServiceCollectionSelector
     {
     }
 }

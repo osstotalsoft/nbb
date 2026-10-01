@@ -2,7 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System;
-using MediatR;
+using Mediator;
 
 namespace NBB.Invoices.Domain.InvoiceAggregate
 {

@@ -24,21 +24,21 @@ namespace NBB.Core.DependencyInjection
 
         public IImplementationTypeFilter AssignableTo(Type type)
         {
-            Preconditions.NotNull(type, nameof(type));
+            ArgumentNullException.ThrowIfNull(type);
 
             return AssignableToAny(type);
         }
 
         public IImplementationTypeFilter AssignableToAny(params Type[] types)
         {
-            Preconditions.NotNull(types, nameof(types));
+            ArgumentNullException.ThrowIfNull(types);
 
             return AssignableToAny(types.AsEnumerable());
         }
 
         public IImplementationTypeFilter AssignableToAny(IEnumerable<Type> types)
         {
-            Preconditions.NotNull(types, nameof(types));
+            ArgumentNullException.ThrowIfNull(types);
 
             return Where(t => types.Any(t.IsAssignableTo));
         }
@@ -50,14 +50,14 @@ namespace NBB.Core.DependencyInjection
 
         public IImplementationTypeFilter WithAttribute(Type attributeType)
         {
-            Preconditions.NotNull(attributeType, nameof(attributeType));
+            ArgumentNullException.ThrowIfNull(attributeType);
 
             return Where(t => t.HasAttribute(attributeType));
         }
 
         public IImplementationTypeFilter WithAttribute<T>(Func<T, bool> predicate) where T : Attribute
         {
-            Preconditions.NotNull(predicate, nameof(predicate));
+            ArgumentNullException.ThrowIfNull(predicate);
 
             return Where(t => t.HasAttribute(predicate));
         }
@@ -69,14 +69,14 @@ namespace NBB.Core.DependencyInjection
 
         public IImplementationTypeFilter WithoutAttribute(Type attributeType)
         {
-            Preconditions.NotNull(attributeType, nameof(attributeType));
+            ArgumentNullException.ThrowIfNull(attributeType);
 
             return Where(t => !t.HasAttribute(attributeType));
         }
 
         public IImplementationTypeFilter WithoutAttribute<T>(Func<T, bool> predicate) where T : Attribute
         {
-            Preconditions.NotNull(predicate, nameof(predicate));
+            ArgumentNullException.ThrowIfNull(predicate);
 
             return Where(t => !t.HasAttribute(predicate));
         }
@@ -88,21 +88,21 @@ namespace NBB.Core.DependencyInjection
 
         public IImplementationTypeFilter InNamespaceOf(params Type[] types)
         {
-            Preconditions.NotNull(types, nameof(types));
+            ArgumentNullException.ThrowIfNull(types);
 
             return InNamespaces(types.Select(t => t.Namespace));
         }
 
         public IImplementationTypeFilter InNamespaces(params string[] namespaces)
         {
-            Preconditions.NotNull(namespaces, nameof(namespaces));
+            ArgumentNullException.ThrowIfNull(namespaces);
 
             return InNamespaces(namespaces.AsEnumerable());
         }
 
         public IImplementationTypeFilter InNamespaces(IEnumerable<string> namespaces)
         {
-            Preconditions.NotNull(namespaces, nameof(namespaces));
+            ArgumentNullException.ThrowIfNull(namespaces);
 
             return Where(t => namespaces.Any(t.IsInNamespace));
         }
@@ -114,28 +114,28 @@ namespace NBB.Core.DependencyInjection
 
         public IImplementationTypeFilter NotInNamespaceOf(params Type[] types)
         {
-            Preconditions.NotNull(types, nameof(types));
+            ArgumentNullException.ThrowIfNull(types);
 
             return NotInNamespaces(types.Select(t => t.Namespace));
         }
 
         public IImplementationTypeFilter NotInNamespaces(params string[] namespaces)
         {
-            Preconditions.NotNull(namespaces, nameof(namespaces));
+            ArgumentNullException.ThrowIfNull(namespaces);
 
             return NotInNamespaces(namespaces.AsEnumerable());
         }
 
         public IImplementationTypeFilter NotInNamespaces(IEnumerable<string> namespaces)
         {
-            Preconditions.NotNull(namespaces, nameof(namespaces));
+            ArgumentNullException.ThrowIfNull(namespaces);
 
             return Where(t => namespaces.All(ns => !t.IsInNamespace(ns)));
         }
 
         public IImplementationTypeFilter Where(Func<Type, bool> predicate)
         {
-            Preconditions.NotNull(predicate, nameof(predicate));
+            ArgumentNullException.ThrowIfNull(predicate);
 
             Types = Types.Where(predicate);
             return this;
@@ -148,13 +148,13 @@ namespace NBB.Core.DependencyInjection
 
         public IImplementationTypeFilter InExactNamespaceOf(params Type[] types)
         {
-            Preconditions.NotNull(types, nameof(types));
+            ArgumentNullException.ThrowIfNull(types);
             return Where(t => types.Any(x => t.IsInExactNamespace(x.Namespace)));
         }
 
         public IImplementationTypeFilter InExactNamespaces(params string[] namespaces)
         {
-            Preconditions.NotNull(namespaces, nameof(namespaces));
+            ArgumentNullException.ThrowIfNull(namespaces);
 
             return Where(t => namespaces.Any(t.IsInExactNamespace));
         }
