@@ -18,7 +18,8 @@ namespace NBB.Application.MediatR
             if (typeof(IRequest).IsAssignableFrom(contractType))
                 return ContractKind.Command;
 
-            if (ImplementsGeneric(contractType, typeof(IRequest<>)))
+            // IRequest and IRequest<TResponse> both derive from IBaseRequest: what is left is a request with a response
+            if (typeof(IBaseRequest).IsAssignableFrom(contractType))
                 return ContractKind.Query;
 
             if (typeof(INotification).IsAssignableFrom(contractType))
@@ -26,8 +27,5 @@ namespace NBB.Application.MediatR
 
             return ContractKind.Other;
         }
-
-        private static bool ImplementsGeneric(Type type, Type genericInterface)
-            => Array.Exists(type.GetInterfaces(), i => i.IsGenericType && i.GetGenericTypeDefinition() == genericInterface);
     }
 }
