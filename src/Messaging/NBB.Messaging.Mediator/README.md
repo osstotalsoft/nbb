@@ -43,7 +43,13 @@ The handled message types are read from the handler registrations made by the ge
 | `FromMediatorHandledQueries()` | `IQueryHandler<T, R>`, `IRequestHandler<T, R>` and `ICommandHandler<T, R>` with a response |
 | `FromMediatorHandledMessages()` | all of the above |
 
-Handlers registered manually as `INotificationHandler<T>` (e.g. the NBB process manager and ProjectR bridges) are discovered too.
+The methods scan the service collection the messaging host is configured on. When the handlers live in a separate container (e.g. one container per module in a modular monolith),
+select that collection first with `FromServiceCollection(...)` (`NBB.Messaging.Host`):
+```csharp
+.AddSubscriberServices(subscriberBuilder => subscriberBuilder
+    .FromServiceCollection(moduleServices)
+    .FromMediatorHandledEvents().AddAllClasses())
+```
 
 ## Dispatch middleware
 `UseMediatorMiddleware()` publishes `INotification` payloads (`IPublisher.Publish(object)`) and sends request/command/query payloads (`ISender.Send(object)`); any other payload throws.

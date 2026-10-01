@@ -32,6 +32,14 @@ services.AddMessagingHost(
 `NBB.Messaging.Host` itself does not depend on any mediator library: subscriber discovery from mediator handlers and the dispatch middleware are provided by the adapter packages
 [`NBB.Messaging.Mediator`](../NBB.Messaging.Mediator#readme) (source generated [Mediator](https://github.com/martinothamar/Mediator)) and [`NBB.Messaging.MediatR`](../NBB.Messaging.MediatR#readme) ([MediatR](https://github.com/jbogard/MediatR)).
 
+The adapters discover the handlers registered in the service collection the messaging host is configured on. When they are registered in a separate container
+(e.g. one container per module in a modular monolith), select that collection first; the discovered types are added to the same subscriber group:
+```csharp
+.AddSubscriberServices(subscriberBuilder => subscriberBuilder
+    .FromServiceCollection(moduleServices)
+    .FromMediatorHandledEvents().AddAllClasses())
+```
+
 
 ## Host configuration
 

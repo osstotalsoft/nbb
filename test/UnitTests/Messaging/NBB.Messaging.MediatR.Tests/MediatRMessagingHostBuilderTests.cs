@@ -9,6 +9,7 @@ using NBB.Messaging.Abstractions;
 using NBB.Messaging.Host;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -100,6 +101,32 @@ namespace NBB.Messaging.MediatR.Tests
             config.Subscribers[0].MessageType.Should().Be(typeof(QueryMessage));
             config.Subscribers[0].Options.Should().Be(MessagingSubscriberOptions.Default);
             config.Subscribers[0].Pipeline.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Should_discover_handled_messages_from_the_selected_service_collection()
+        {
+            //Arrange
+            var hostServices = new ServiceCollection();
+            hostServices.AddSingleton<INotificationHandler<EventMessage>>(new EventHandler());
+            var moduleServices = new ServiceCollection();
+            moduleServices.AddSingleton<IRequestHandler<CommandMessage>>(new CommandHandler());
+
+            //Act
+            var builder = new MessagingHostConfigurationBuilder(Mock.Of<IServiceProvider>(), hostServices);
+            builder
+                // events from the host collection, commands from the module collection, in the same subscriber group
+                .AddSubscriberServices(cfg => cfg
+                    .FromMediatRHandledEvents().AddAllClasses()
+                    .FromServiceCollection(moduleServices)
+                    .FromMediatRHandledCommands().AddAllClasses())
+                .WithDefaultOptions()
+                .UsePipeline(_ => { });
+
+            var config = builder.Build();
+
+            //Assert
+            config.Subscribers.Select(s => s.MessageType).Should().BeEquivalentTo([typeof(EventMessage), typeof(CommandMessage)]);
         }
 
         public record CommandMessage : IRequest;

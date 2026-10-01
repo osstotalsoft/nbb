@@ -35,6 +35,22 @@ namespace NBB.Messaging.Mediator.Tests
         }
 
         [Fact]
+        public void Should_discover_handled_messages_from_the_selected_service_collection()
+        {
+            var hostServices = new ServiceCollection();
+            hostServices.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+            var moduleServices = new ServiceCollection();
+            moduleServices.AddSingleton(Mock.Of<global::Mediator.IRequestHandler<DoSomething, global::Mediator.Unit>>());
+
+            // events from the host collection, commands from the module collection, in the same subscriber group
+            SubscribedTypes(hostServices, s => s
+                    .FromMediatorHandledEvents().AddAllClasses()
+                    .FromServiceCollection(moduleServices)
+                    .FromMediatorHandledCommands())
+                .Should().BeEquivalentTo([typeof(SomethingHappened), typeof(DoSomething)]);
+        }
+
+        [Fact]
         public async Task Should_dispatch_messages_from_the_bus_to_mediator_handlers()
         {
             //Arrange
