@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Mediator;
 using NBB.ProjectR;
 using NBB.ProjectR.Mediator;
 using NBB.Core.DependencyInjection;
@@ -26,14 +27,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             foreach (var r in services.GetProjectorEventRegistrations())
             {
-                services.AddScoped(typeof(global::Mediator.INotificationHandler<>).MakeGenericType(r.EventType),
+                services.AddScoped(typeof(INotificationHandler<>).MakeGenericType(r.EventType),
                     typeof(ProjectorNotificationHandler<,,,>).MakeGenericType(r.EventType, r.ModelType, r.MessageType, r.IdentityType));
             }
 
             // the bridges depend on scoped services: a Singleton Mediator would resolve them from the root provider
             services
-                .RequireRegistration(typeof(global::Mediator.IMediator), "NBB.ProjectR.Mediator", MediatorRegistrationHint)
-                .RequireNonSingletonLifetime(typeof(global::Mediator.IMediator), "NBB.ProjectR.Mediator", MediatorRegistrationHint);
+                .RequireRegistration(typeof(IMediator), "NBB.ProjectR.Mediator", MediatorRegistrationHint)
+                .RequireNonSingletonLifetime(typeof(IMediator), "NBB.ProjectR.Mediator", MediatorRegistrationHint);
 
             return services;
         }

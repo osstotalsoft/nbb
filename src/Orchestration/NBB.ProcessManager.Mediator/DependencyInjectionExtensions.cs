@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using Mediator;
 using NBB.ProcessManager.Mediator;
 using NBB.ProcessManager.Runtime;
 using NBB.Core.DependencyInjection;
@@ -27,15 +28,15 @@ namespace Microsoft.Extensions.DependencyInjection
 
             foreach (var (definitionType, dataType, eventType) in services.GetProcessManagerEventRegistrations())
             {
-                services.AddScoped(typeof(global::Mediator.INotificationHandler<>).MakeGenericType(eventType),
+                services.AddScoped(typeof(INotificationHandler<>).MakeGenericType(eventType),
                     typeof(ProcessManagerNotificationHandler<,,>).MakeGenericType(definitionType, dataType, eventType));
             }
 
             services.AddMediatorEffects();
             // the bridges depend on scoped services: a Singleton Mediator would resolve them from the root provider
             services
-                .RequireRegistration(typeof(global::Mediator.IMediator), "NBB.ProcessManager.Mediator", MediatorRegistrationHint)
-                .RequireNonSingletonLifetime(typeof(global::Mediator.IMediator), "NBB.ProcessManager.Mediator", MediatorRegistrationHint);
+                .RequireRegistration(typeof(IMediator), "NBB.ProcessManager.Mediator", MediatorRegistrationHint)
+                .RequireNonSingletonLifetime(typeof(IMediator), "NBB.ProcessManager.Mediator", MediatorRegistrationHint);
 
             return services;
         }
