@@ -34,26 +34,14 @@ namespace NBB.Application.Mediator.Tests
             => _sut.Classify(mediatorContract).Should().Be(new MediatRContractKindClassifier().Classify(mediatRContract));
 
         [Fact]
-        public void Should_reject_registering_both_mediator_libraries()
-        {
-            var services = new ServiceCollection();
-            services.AddMediatorIntegration();
-
-            var act = () => services.AddMediatRIntegration();
-
-            act.Should().Throw<InvalidOperationException>().WithMessage("*single mediator library*");
-        }
-
-        [Fact]
-        public void AddMediatorIntegration_should_be_idempotent()
+        public void AddMediatorIntegration_should_register_the_classifier()
         {
             var services = new ServiceCollection();
 
-            services.AddMediatorIntegration();
             services.AddMediatorIntegration();
 
             using var sp = services.BuildServiceProvider();
-            sp.GetServices<IContractKindClassifier>().Should().ContainSingle().Which.Should().BeOfType<MediatorContractKindClassifier>();
+            sp.GetRequiredService<IContractKindClassifier>().Should().BeOfType<MediatorContractKindClassifier>();
         }
     }
 

@@ -17,7 +17,8 @@ services.AddMediatRIntegration();
 * `IEventPublisher` - `MediatREventPublisher`
 * `IContractKindClassifier` - `MediatRContractKindClassifier`: `IRequest` - `Command`, `IRequest<T>` - `Query`, `INotification` - `Event`, anything else - `Other`
 
-An application uses a single mediator library: registering the Mediator implementations (or another `IEventPublisher`) too throws.
+An application uses a single mediator library: do not call `AddMediatorIntegration()` too (the registrations made last win).
+To replace a port implementation, e.g. to publish nothing in-process, register your own after `AddMediatRIntegration()`.
 
 ## MediatREventPublisher
 `MediatREventPublisher` implements `IEventPublisher` (`NBB.Core.Abstractions`): it publishes the events that are MediatR `INotification`s, sequentially, to the MediatR notification handlers.

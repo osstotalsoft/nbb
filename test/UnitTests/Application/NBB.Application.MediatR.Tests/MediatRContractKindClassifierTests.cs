@@ -24,29 +24,30 @@ namespace NBB.Application.MediatR.Tests
             => _sut.Classify(contractType).Should().Be(expected);
 
         [Fact]
-        public void AddMediatRIntegration_should_register_the_publisher_and_the_classifier_idempotently()
+        public void AddMediatRIntegration_should_register_the_publisher_and_the_classifier()
         {
             var services = new ServiceCollection();
             services.AddSingleton(Mock.Of<IPublisher>());
 
             services.AddMediatRIntegration();
-            services.AddMediatRIntegration();
 
             using var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
-            scope.ServiceProvider.GetServices<IEventPublisher>().Should().ContainSingle().Which.Should().BeOfType<MediatREventPublisher>();
-            sp.GetServices<IContractKindClassifier>().Should().ContainSingle().Which.Should().BeOfType<MediatRContractKindClassifier>();
+            scope.ServiceProvider.GetRequiredService<IEventPublisher>().Should().BeOfType<MediatREventPublisher>();
+            sp.GetRequiredService<IContractKindClassifier>().Should().BeOfType<MediatRContractKindClassifier>();
         }
 
         [Fact]
-        public void AddMediatRIntegration_should_reject_another_event_publisher()
+        public void An_event_publisher_registered_after_AddMediatRIntegration_should_replace_it()
         {
             var services = new ServiceCollection();
-            services.AddSingleton(Mock.Of<IEventPublisher>());
+            var eventPublisher = Mock.Of<IEventPublisher>();
 
-            var act = () => services.AddMediatRIntegration();
+            services.AddMediatRIntegration();
+            services.AddSingleton(eventPublisher);
 
-            act.Should().Throw<InvalidOperationException>().WithMessage("*single mediator library*");
+            using var sp = services.BuildServiceProvider();
+            sp.GetRequiredService<IEventPublisher>().Should().BeSameAs(eventPublisher);
         }
 
         public record TestCommand : IRequest;

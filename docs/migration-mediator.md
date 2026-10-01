@@ -29,7 +29,7 @@ No longer depending on MediatR: `NBB.Messaging.Host`, `NBB.Messaging.MultiTenanc
    ```csharp
    services.AddMediatRIntegration(); // IEventPublisher + IContractKindClassifier
    ```
-   * `EventSourcedRepository<T>` now requires an `IEventPublisher` (resolving it fails otherwise). To publish nothing in-process, register your own `IEventPublisher` implementation instead.
+   * `EventSourcedRepository<T>` now requires an `IEventPublisher` (resolving it fails otherwise). To publish nothing in-process, register your own `IEventPublisher` implementation (after `AddMediatRIntegration()` when you call it: the last registration wins).
    * The NBB 4 topic resolution (`UseTopicResolutionBackwardCompatibility`) and the messaging `TenantMiddleware` require an `IContractKindClassifier`: without it the host fails at start (NBB 4 topics) or the `TenantMiddleware` cannot be activated.
 2. **Messaging host** - reference `NBB.Messaging.MediatR`. `FromMediatRHandled*()` and `UseMediatRMiddleware()` are unchanged.
 3. **Unit of work publishing** - `MediatorUowDecorator<>` is obsolete (removed in NBB 11). Replace it with:
@@ -114,7 +114,9 @@ Notes:
 Equivalent messages get the same NBB 4 topics with both adapters, so a service can move to Mediator independently of the others.
 
 ### Mixed fleets
-Each application uses a single mediator library (calling both `AddMediatorIntegration()` and `AddMediatRIntegration()` throws). When services on MediatR and services on
+Each application uses a single mediator library: call either `AddMediatorIntegration()` or `AddMediatRIntegration()`, not both.
+Calling both is not detected: the registrations made last win, so the other library's events are not published in-process
+and its contracts are not classified (`TenantMiddleware`, NBB 4 topics). When services on MediatR and services on
 Mediator share a contracts assembly, the contracts can implement both marker interfaces during the transition, e.g.
 `public record ContractValidated(...) : MediatR.INotification, Mediator.INotification;`.
 

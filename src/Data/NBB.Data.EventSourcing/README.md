@@ -51,7 +51,7 @@ An `IEventPublisher` registration is required (resolving the repository fails ot
 services.AddMediatorIntegration(); // NBB.Application.Mediator - publishes Mediator notifications
 services.AddMediatRIntegration();  // NBB.Application.MediatR - publishes MediatR notifications
 ```
-To publish nothing in-process, register your own `IEventPublisher` implementation.
+To publish nothing in-process, register your own `IEventPublisher` implementation (after `AddMediatorIntegration()` / `AddMediatRIntegration()` when you call it: the last registration wins).
 
 
 Stream identity
