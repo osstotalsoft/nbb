@@ -115,6 +115,16 @@ namespace NBB.Messaging.Host.Tests
             config.Subscribers[2].Pipeline.Should().NotBe(mockMiddlewareFunc);
         }
 
+        [Fact]
+        public void FromServiceCollection_should_reject_a_null_service_collection()
+        {
+            var selector = new TypeSourceSelector(new ServiceCollection());
+
+            var act = () => selector.FromServiceCollection(null);
+
+            act.Should().Throw<ArgumentNullException>().WithParameterName("services");
+        }
+
         public record CommandMessage;
 
         public record EventMessage;

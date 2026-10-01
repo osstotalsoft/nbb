@@ -14,24 +14,14 @@ namespace NBB.Application.MediatR.Effects
     {
         public class Send
         {
-            public class QuerySideEffect<TResponse> : ISideEffect<TResponse>, IAmHandledBy<QueryHandler<TResponse>>
+            public class QuerySideEffect<TResponse>(IRequest<TResponse> query) : ISideEffect<TResponse>, IAmHandledBy<QueryHandler<TResponse>>
             {
-                public IRequest<TResponse> Query { get; }
-
-                public QuerySideEffect(IRequest<TResponse> query)
-                {
-                    Query = query;
-                }
+                public IRequest<TResponse> Query { get; } = query;
             }
 
-            public class CommandSideEffect : ISideEffect<Unit>, IAmHandledBy<CommandHandler>
+            public class CommandSideEffect(IRequest query) : ISideEffect<Unit>, IAmHandledBy<CommandHandler>
             {
-                public IRequest Query { get; }
-
-                public CommandSideEffect(IRequest query)
-                {
-                    Query = query;
-                }
+                public IRequest Query { get; } = query;
             }
 
             public class QueryHandler<TResponse>(IMediator mediator) : ISideEffectHandler<QuerySideEffect<TResponse>, TResponse>
@@ -55,14 +45,9 @@ namespace NBB.Application.MediatR.Effects
 
         public class Publish
         {
-            public class SideEffect : ISideEffect
+            public class SideEffect(INotification notification) : ISideEffect
             {
-                public INotification Notification { get; }
-
-                public SideEffect(INotification notification)
-                {
-                    Notification = notification;
-                }
+                public INotification Notification { get; } = notification;
             }
 
 

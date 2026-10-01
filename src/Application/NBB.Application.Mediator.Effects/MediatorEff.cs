@@ -14,14 +14,9 @@ namespace NBB.Application.Mediator.Effects
     {
         public class Send
         {
-            public class RequestSideEffect<TResponse> : ISideEffect<TResponse>, IAmHandledBy<RequestHandler<TResponse>>
+            public class RequestSideEffect<TResponse>(IMessage request) : ISideEffect<TResponse>, IAmHandledBy<RequestHandler<TResponse>>
             {
-                public IMessage Request { get; }
-
-                public RequestSideEffect(IMessage request)
-                {
-                    Request = request;
-                }
+                public IMessage Request { get; } = request;
             }
 
             public class RequestHandler<TResponse>(ISender sender) : ISideEffectHandler<RequestSideEffect<TResponse>, TResponse>
@@ -40,14 +35,9 @@ namespace NBB.Application.Mediator.Effects
 
         public class Publish
         {
-            public class SideEffect : ISideEffect, IAmHandledBy<Handler>
+            public class SideEffect(INotification notification) : ISideEffect, IAmHandledBy<Handler>
             {
-                public INotification Notification { get; }
-
-                public SideEffect(INotification notification)
-                {
-                    Notification = notification;
-                }
+                public INotification Notification { get; } = notification;
             }
 
             public class Handler(IPublisher publisher) : ISideEffectHandler<SideEffect, Unit>

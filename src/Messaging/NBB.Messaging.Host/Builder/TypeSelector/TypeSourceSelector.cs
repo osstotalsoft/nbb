@@ -73,7 +73,11 @@ namespace NBB.Messaging.Host
         }
 
         public ITypeSourceSelector FromServiceCollection(IServiceCollection services)
-            => new TypeSourceSelector(services) { TypeSelectors = TypeSelectors, SelectedTopics = SelectedTopics };
+        {
+            ArgumentNullException.ThrowIfNull(services);
+
+            return new TypeSourceSelector(services) { TypeSelectors = TypeSelectors, SelectedTopics = SelectedTopics };
+        }
 
         IServiceCollection IServiceCollectionProvider.ServiceCollection
         {

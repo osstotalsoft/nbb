@@ -7,17 +7,8 @@ using System;
 
 namespace NBB.Messaging.BackwardCompatibility
 {
-    public class NBB4TopicRegistryDecorator : ITopicRegistry
+    public class NBB4TopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IContractKindClassifier contractKindClassifier) : ITopicRegistry
     {
-        private readonly ITopicRegistry innerTopicRegistry;
-        private readonly IContractKindClassifier contractKindClassifier;
-
-        public NBB4TopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IContractKindClassifier contractKindClassifier)
-        {
-            this.innerTopicRegistry = innerTopicRegistry;
-            this.contractKindClassifier = contractKindClassifier;
-        }
-
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
         {
             var topic = innerTopicRegistry.GetTopicForMessageType(messageType, false);

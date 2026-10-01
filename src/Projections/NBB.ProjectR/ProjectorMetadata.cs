@@ -35,19 +35,12 @@ namespace NBB.ProjectR
 
     public record ProjectorMetadata(Type ProjectorType, Type ModelType, Type MessageType, Type IdentityType, Type[] SubscriptionTypes, int SnapshotFrequency);
 
-    public class ProjectorMetadataAccessor
+    public class ProjectorMetadataAccessor(ProjectorMetadata[] metadata)
     {
-        private readonly ProjectorMetadata[] _metadata;
-
-        public ProjectorMetadataAccessor(ProjectorMetadata[] metadata)
-        {
-            this._metadata = metadata;
-        }
-
-        public System.Collections.Generic.IReadOnlyList<ProjectorMetadata> Metadata => _metadata;
+        public System.Collections.Generic.IReadOnlyList<ProjectorMetadata> Metadata => metadata;
 
         public ProjectorMetadata GetMetadataFor<TModel>()
-            => _metadata.FirstOrDefault(m => m.ModelType == typeof(TModel));
+            => metadata.FirstOrDefault(m => m.ModelType == typeof(TModel));
     }
 
     public static class ProjectorMetadataService
