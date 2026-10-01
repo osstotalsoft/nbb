@@ -12,12 +12,14 @@ namespace NBB.ProjectR.Tests
         public ServiceProvider BuildServiceProvider()
         {
             var services = new ServiceCollection();
-            services.AddProjectR(GetType().Assembly);
+            services
+                .AddProjectR(GetType().Assembly)
+                .AddProjectRMediatRHandlers();
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(GetType().Assembly));
             services
                 .AddEffects()
                 .AddMessagingEffects()
-                .AddMediatorEffects();
+                .AddMediatREffects();
             services.AddMessageBus().AddInProcessTransport();
             services.AddEventStore(b => b.UseNewtownsoftJson().UseInMemoryEventRepository());
             services.AddLogging();

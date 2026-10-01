@@ -31,7 +31,7 @@ public class PollingLoopPM : AbstractDefinition<PollingLoopPM.State>
             .SetState((_, state) => state.Data with { IsWorking = true, LoopsNr = state.Data.LoopsNr + 1 })
             .Then((_, state) =>
             {
-                var q1 = Mediator.Send(new GetClientQuery());
+                var q1 = MediatorEff.Send(new GetClientQuery());
                 return q1
                     .Then(client =>
                     {

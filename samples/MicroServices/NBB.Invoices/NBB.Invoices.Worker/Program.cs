@@ -1,18 +1,16 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Application.MediatR;
 using NBB.Core.Abstractions;
+using NBB.Data.Abstractions;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
-using NBB.Invoices.Application.CommandHandlers;
 using NBB.Invoices.Data;
 using NBB.Messaging.Host;
 using Serilog;
@@ -48,7 +46,9 @@ namespace NBB.Invoices.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateInvoiceCommandHandler>());
+                    services
+                        .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+                        .AddMediatorIntegration();
 
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();
@@ -63,15 +63,15 @@ namespace NBB.Invoices.Worker
                         hostBuilder => hostBuilder
                         .Configure(configBuilder => configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                                .FromMediatRHandledCommands().AddAllClasses()
-                                .FromMediatRHandledEvents().AddAllClasses()
+                                .FromMediatorHandledCommands().AddAllClasses()
+                                .FromMediatorHandledEvents().AddAllClasses()
                             )
                             .WithDefaultOptions()
                             .UsePipeline(pipelineBuilder => pipelineBuilder
                                 .UseCorrelationMiddleware()
                                 .UseExceptionHandlingMiddleware()
                                 .UseDefaultResiliencyMiddleware()
-                                .UseMediatRMiddleware()
+                                .UseMediatorMiddleware()
                             )
                         )
                     );
@@ -80,7 +80,7 @@ namespace NBB.Invoices.Worker
 
                     services
                         .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
-                        .Decorate(typeof(IUow<>), typeof(MediatorUowDecorator<>))
+                        .Decorate(typeof(IUow<>), typeof(EventPublishingUowDecorator<>))
                         .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
                 });
 

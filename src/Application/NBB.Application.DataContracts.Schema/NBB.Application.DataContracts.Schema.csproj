@@ -21,8 +21,4 @@
     <PackageReference Include="AutoFixture" Version="$(AutoFixturePackageVersion)" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -30,7 +30,7 @@ namespace NBB.ProcessManager.Definition.Builder
 
         public void Event<TEvent>(Action<EventCorrelationBuilder<TEvent, TData>> configureEventCorrelation)
         {
-            Preconditions.NotNull(configureEventCorrelation, nameof(configureEventCorrelation));
+            ArgumentNullException.ThrowIfNull(configureEventCorrelation);
 
             var configurator = new EventCorrelationBuilder<TEvent, TData>();
             configureEventCorrelation(configurator);

@@ -49,18 +49,5 @@ namespace NBB.Messaging.Host.Tests.MessagingPipeline
             //Assert
             Mock.Get(pipelineBuilderMock).Verify(x => x.Use(It.IsAny<Func<PipelineDelegate<MessagingContext>, PipelineDelegate<MessagingContext>>>()));
         }
-
-        [Fact]
-        public void Should_UseMediatRMiddleware()
-        {
-            //Arrange
-            var pipelineBuilderMock = Mock.Of<IPipelineBuilder<MessagingContext>>();
-
-            //Act
-            pipelineBuilderMock.UseMediatRMiddleware();
-
-            //Assert
-            Mock.Get(pipelineBuilderMock).Verify(x => x.Use(It.IsAny<Func<PipelineDelegate<MessagingContext>, PipelineDelegate<MessagingContext>>>()));
-        }
     }
 }

@@ -44,6 +44,8 @@ namespace NBB.ProjectR
             this._metadata = metadata;
         }
 
+        public System.Collections.Generic.IReadOnlyList<ProjectorMetadata> Metadata => _metadata;
+
         public ProjectorMetadata GetMetadataFor<TModel>()
             => _metadata.FirstOrDefault(m => m.ModelType == typeof(TModel));
     }

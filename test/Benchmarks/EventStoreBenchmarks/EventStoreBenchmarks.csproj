@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
     <ProjectReference Include="..\..\..\src\Data\NBB.Data.EventSourcing\NBB.Data.EventSourcing.csproj" />
     <ProjectReference Include="..\..\..\src\Domain\NBB.Domain\NBB.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\EventStore\NBB.EventStore.AdoNet.Migrations\NBB.EventStore.AdoNet.Migrations.csproj" />

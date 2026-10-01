@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using MediatR;
 using NBB.Todos.Data;
 using NBB.Todo.Worker.Application;
 using NBB.Messaging.Host;
@@ -73,8 +72,10 @@ namespace NBB.Todo.Worker
 
         private static void ConfigureServices(HostBuilderContext hostingContext, IServiceCollection services)
         {
-            // MediatR 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CreateTodoTaskHandler>());
+            // Mediator
+            services
+                .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+                .AddMediatorIntegration(); // the contract classifier is required by the TenantMiddleware
 
             // Data
             services.AddTodoDataAccess();
@@ -87,14 +88,14 @@ namespace NBB.Todo.Worker
                 hostBuilder => hostBuilder
                 .Configure(configBuilder => configBuilder
                         .AddSubscriberServices(selector => selector
-                            .FromMediatRHandledCommands().AddAllClasses())
+                            .FromMediatorHandledCommands().AddAllClasses())
                         .WithDefaultOptions()
                         .UsePipeline(builder => builder
                             .UseCorrelationMiddleware()
                             .UseTenantMiddleware()
                             .UseExceptionHandlingMiddleware()
                             .UseDefaultResiliencyMiddleware()
-                            .UseMediatRMiddleware())
+                            .UseMediatorMiddleware())
                     )
                 );
 

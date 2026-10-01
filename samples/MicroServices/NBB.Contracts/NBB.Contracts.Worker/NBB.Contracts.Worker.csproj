@@ -20,7 +20,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
@@ -41,6 +40,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="$(OpenTelemetryInstrumentationEFCorePackageVersion)" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationRuntimePackageVersion)" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.HttpListener" Version="$(OpenTelemetryExporterPrometheusHttpListenerPackageVersion)" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +56,8 @@
     <ProjectReference Include="..\NBB.Contracts.Application\NBB.Contracts.Application.csproj" />
     <ProjectReference Include="..\NBB.Contracts.ReadModel.Data\NBB.Contracts.ReadModel.Data.csproj" />
     <ProjectReference Include="..\NBB.Contracts.WriteModel.Data\NBB.Contracts.WriteModel.Data.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.Mediator\NBB.Application.Mediator.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Mediator\NBB.Messaging.Mediator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

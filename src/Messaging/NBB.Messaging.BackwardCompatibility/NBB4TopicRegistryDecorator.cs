@@ -1,19 +1,21 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using NBB.Core.Abstractions;
 using NBB.Messaging.Abstractions;
 using System;
-using MediatR;
 
 namespace NBB.Messaging.BackwardCompatibility
 {
     public class NBB4TopicRegistryDecorator : ITopicRegistry
     {
         private readonly ITopicRegistry innerTopicRegistry;
+        private readonly IContractKindClassifier contractKindClassifier;
 
-        public NBB4TopicRegistryDecorator(ITopicRegistry innerTopicRegistry)
+        public NBB4TopicRegistryDecorator(ITopicRegistry innerTopicRegistry, IContractKindClassifier contractKindClassifier)
         {
             this.innerTopicRegistry = innerTopicRegistry;
+            this.contractKindClassifier = contractKindClassifier;
         }
 
         public string GetTopicForMessageType(Type messageType, bool includePrefix = true)
@@ -23,18 +25,13 @@ namespace NBB.Messaging.BackwardCompatibility
             static string Prepend(string prefix, string str)
                 => str.StartsWith(prefix) ? str : $"{prefix}{str}";
 
-            if (typeof(IRequest).IsAssignableFrom(messageType))
+            // NBB 4 topics: queries and other types share the "ch.messages." prefix
+            topic = contractKindClassifier.Classify(messageType) switch
             {
-                topic = Prepend("ch.commands.", topic);
-            }
-            else if (typeof(INotification).IsAssignableFrom(messageType))
-            {
-                topic = Prepend("ch.events.", topic);
-            }
-            else
-            {
-                topic = Prepend("ch.messages.", topic);
-            }
+                ContractKind.Command => Prepend("ch.commands.", topic),
+                ContractKind.Event => Prepend("ch.events.", topic),
+                _ => Prepend("ch.messages.", topic)
+            };
             topic = (includePrefix ? GetTopicPrefix() : string.Empty) + topic;
             return topic;
         }

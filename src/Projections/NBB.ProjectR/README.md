@@ -55,7 +55,7 @@ When creating projections, one has to provide the following information:
 
                 (Message.ValidateContract msg, { IsValidated: false }) => (
                     model with { IsValidated = true, ValidatedByUserId = msg.UserId },
-                    Mediator.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
+                    MediatorEff.Send(new LoadUserById.Query(msg.UserId)).Then(x =>
                         Eff.OfMsg<Message>(new Message.SetUserName(msg.ContractId, x.UserName)))),
 
                 (Message.SetUserName msg, not null) => (
@@ -68,7 +68,7 @@ When creating projections, one has to provide the following information:
                 _ => (model, Eff.None<Message>())
             };
 
-        public (Guid Identity, Message Message) Subscribe(INotification @event) => @event switch
+        public (Guid Identity, Message Message) Subscribe(object @event) => @event switch
         {
             ContractCreated ev => (ev.ContractId, new Message.CreateContract(ev.ContractId, ev.Value)),
             ContractValidated ev => (ev.ContractId, new Message.ValidateContract(ev.ContractId, ev.UserId)),
@@ -91,12 +91,16 @@ When creating projections, one has to provide the following information:
 This library depends on:
    - NBB effect system
    - NBB EventStore
-   - MediatR
+
+The events are dispatched to the projectors in-process by an adapter package:
+[`NBB.ProjectR.Mediator`](../NBB.ProjectR.Mediator#readme) (`AddProjectRMediatorHandlers()`) or [`NBB.ProjectR.MediatR`](../NBB.ProjectR.MediatR#readme) (`AddProjectRMediatRHandlers()`).
 
 so you will need to register the dependent services, like so:
 ```csharp
-services.AddProjectR(GetType().Assembly);
-services.AddMediatR(GetType().Assembly);
+services.AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped);
+services
+    .AddProjectR(GetType().Assembly)
+    .AddProjectRMediatorHandlers();
 services
     .AddEffects()
     .AddMessagingEffects()

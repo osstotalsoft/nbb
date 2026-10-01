@@ -1,7 +1,6 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using NBB.Core.Effects;
 using NBB.ProcessManager.Definition.SideEffects;
 using NBB.ProcessManager.Runtime.Persistence;
@@ -17,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class DependencyInjectionExtensions
     {
-        public static void AddProcessManager(this IServiceCollection services, params Assembly[] assemblies)
+        public static IServiceCollection AddProcessManager(this IServiceCollection services, params Assembly[] assemblies)
         {
             services.AddProcessManagerDefinition(assemblies);
             services.AddScoped<ProcessExecutionCoordinator>();
@@ -26,9 +25,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTimeoutEffects();
             services.AddMessagingEffects();
             services.AddHttpEffects();
-            services.AddMediatorEffects();
-            services.AddScoped<INotificationHandler<TimeoutOccured>, TimeoutOccuredHandler>();
-            services.AddNotificationHandlers(typeof(ProcessManagerNotificationHandler<,,>));
+
+            return services;
         }
 
         private static void AddTimeoutEffects(this IServiceCollection services)

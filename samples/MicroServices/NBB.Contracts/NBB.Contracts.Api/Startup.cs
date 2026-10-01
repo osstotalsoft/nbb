@@ -62,6 +62,14 @@ namespace NBB.Contracts.Api
                 throw new Exception($"Messaging:Transport={transport} not supported");
             }
 
+            services
+                .AddMediator(options =>
+                {
+                    options.ServiceLifetime = ServiceLifetime.Scoped;
+                    options.GenerateTypesAsInternal = true; // NBB.Mono references this project and has its own generator
+                    options.Assemblies = [typeof(Startup)]; // this host only publishes to the bus: no in-process messages or handlers
+                })
+                .AddMediatorIntegration(); // contract classifier for the NBB 4 topic resolution
             services.AddContractsReadModelDataAccess();
 
             var assembly = Assembly.GetExecutingAssembly().GetName();

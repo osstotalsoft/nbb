@@ -1,8 +1,8 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.Logging;
+using NBB.Core.Abstractions;
 using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
@@ -20,15 +20,15 @@ namespace NBB.Data.EventSourcing
     {
         private readonly IEventStore _eventStore;
         private readonly ISnapshotStore _snapshotStore;
-        private readonly IMediator _mediator;
+        private readonly IEventPublisher _eventPublisher;
         private readonly EventSourcingOptions _eventSourcingOptions;
         private readonly ILogger<EventSourcedRepository<TAggregateRoot>> _logger;
 
-        public EventSourcedRepository(IEventStore eventStore, ISnapshotStore snapshotStore, IMediator mediator, EventSourcingOptions eventSourcingOptions, ILogger<EventSourcedRepository<TAggregateRoot>> logger)
+        public EventSourcedRepository(IEventStore eventStore, ISnapshotStore snapshotStore, IEventPublisher eventPublisher, EventSourcingOptions eventSourcingOptions, ILogger<EventSourcedRepository<TAggregateRoot>> logger)
         {
             _eventStore = eventStore;
             _snapshotStore = snapshotStore;
-            _mediator = mediator;
+            _eventPublisher = eventPublisher;
             _eventSourcingOptions = eventSourcingOptions;
             _logger = logger;
         }
@@ -103,10 +103,7 @@ namespace NBB.Data.EventSourcing
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            foreach (var @event in events.OfType<INotification>())
-            {
-                await _mediator.Publish(@event, cancellationToken);
-            }
+            await _eventPublisher.PublishAsync(events, cancellationToken);
 
             stopWatch.Stop();
             _logger.LogDebug("EventSourcedRepository.PublishEventsAsync for {AggregateType} took {ElapsedMilliseconds} ms.", typeof(TAggregateRoot).Name, stopWatch.ElapsedMilliseconds);

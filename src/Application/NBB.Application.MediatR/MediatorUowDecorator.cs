@@ -1,45 +1,20 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System;
 using MediatR;
 using NBB.Core.Abstractions;
+using NBB.Data.Abstractions;
 
 namespace NBB.Application.MediatR
 {
-    public class MediatorUowDecorator<TEntity> : IUow<TEntity>
+    [Obsolete("Use EventPublishingUowDecorator<TEntity> (NBB.Data.Abstractions) together with AddMediatRIntegration(). Will be removed in NBB 11.")]
+    public class MediatorUowDecorator<TEntity> : EventPublishingUowDecorator<TEntity>
         where TEntity : IEventedEntity
     {
-        private readonly IUow<TEntity> _inner;
-        private readonly IMediator _mediator;
-
         public MediatorUowDecorator(IUow<TEntity> inner, IMediator mediator)
+            : base(inner, new MediatREventPublisher(mediator))
         {
-            _inner = inner;
-            _mediator = mediator;
-        }
-
-        public IEnumerable<TEntity> GetChanges()
-        {
-            return _inner.GetChanges();
-        }
-
-        public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            var events = this.GetChanges().SelectMany(e => e.GetUncommittedChanges().ToList()).ToList();
-            await _inner.SaveChangesAsync(cancellationToken);
-            await OnAfterSave(events, cancellationToken);
-        }
-
-        private async Task OnAfterSave(List<object> events, CancellationToken cancellationToken = default)
-        {
-            foreach (var @event in events.OfType<INotification>())
-            {
-                await _mediator.Publish(@event, cancellationToken);
-            }
         }
     }
 }

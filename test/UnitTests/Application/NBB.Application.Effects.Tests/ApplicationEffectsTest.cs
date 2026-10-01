@@ -1,4 +1,4 @@
-// Copyright (c) TotalSoft.
+﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
 using System.Threading;
@@ -15,14 +15,14 @@ namespace NBB.Application.Effects.Tests
     public class ApplicationEffectsTest
     {
         [Fact]
-        public void AddMediatorEffects_should_register_MediatorSendQuery_SideEffectHandler()
+        public void AddMediatREffects_should_register_MediatorSendQuery_SideEffectHandler()
         {
             //Arrange
             var services = new ServiceCollection();
             services.AddSingleton(Mock.Of<IMediator>());
 
             //Act
-            services.AddMediatorEffects();
+            services.AddMediatREffects();
 
             //Assert
             using var container = services.BuildServiceProvider();
@@ -45,6 +45,34 @@ namespace NBB.Application.Effects.Tests
             //Assert
             mediator.Verify(x=> x.Send(query, It.IsAny<CancellationToken>()), Times.Once);
         }
+
+        [Fact]
+        public void MediatorEff_Send_should_build_a_query_side_effect()
+        {
+            var query = new TestQuery();
+
+            var effect = MediatorEff.Send(query);
+
+            effect.Should().NotBeNull();
+        }
+
+#pragma warning disable CS0618 // obsolete aliases kept for NBB 10 compatibility
+        [Fact]
+        public void Obsolete_AddMediatorEffects_should_still_register_the_handlers()
+        {
+            //Arrange
+            var services = new ServiceCollection();
+            services.AddSingleton(Mock.Of<IMediator>());
+
+            //Act
+            services.AddMediatorEffects();
+
+            //Assert
+            using var container = services.BuildServiceProvider();
+            container.GetService(typeof(MediatorEffects.Send.QueryHandler<TestQuery>)).Should().NotBeNull();
+            NBB.Application.MediatR.Effects.Mediator.Send(new TestQuery()).Should().NotBeNull();
+        }
+#pragma warning restore CS0618
 
     }
 

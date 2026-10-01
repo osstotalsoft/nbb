@@ -9,6 +9,8 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <!-- integration events handled only by the process manager bridges have no generated handler -->
+    <NoWarn>$(NoWarn);MSG0005</NoWarn>
     <DockerComposeProjectPath>..\..\MicroServices\docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>NBB_Mono_04f3de64-51a9-466b-a489-ed331aba59c8</UserSecretsId>
   </PropertyGroup>
@@ -18,11 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
     <PackageReference Include="Serilog.AspNetCore" Version="$(SerilogAspNetCorePackageVersion)" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +43,9 @@
     <ProjectReference Include="..\..\MicroServices\NBB.MicroServicesOrchestration\NBB.MicroServicesOrchestration.csproj" />
     <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Api\NBB.Payments.Api.csproj" />
     <ProjectReference Include="..\..\MicroServices\NBB.Payments\NBB.Payments.Application\NBB.Payments.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Application\NBB.Application.Mediator\NBB.Application.Mediator.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Mediator\NBB.Messaging.Mediator.csproj" />
+    <ProjectReference Include="..\..\..\src\Orchestration\NBB.ProcessManager.Mediator\NBB.ProcessManager.Mediator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -33,33 +34,19 @@ namespace NBB.Application.MediatR.Effects
                 }
             }
 
-            public class QueryHandler<TResponse> : ISideEffectHandler<QuerySideEffect<TResponse>, TResponse>
+            public class QueryHandler<TResponse>(IMediator mediator) : ISideEffectHandler<QuerySideEffect<TResponse>, TResponse>
             {
-                private readonly IMediator _mediator;
-
-                public QueryHandler(IMediator mediator)
-                {
-                    _mediator = mediator;
-                }
-
                 public Task<TResponse> Handle(QuerySideEffect<TResponse> sideEffect, CancellationToken cancellationToken = default)
                 {
-                    return _mediator.Send(sideEffect.Query, cancellationToken);
+                    return mediator.Send(sideEffect.Query, cancellationToken);
                 }
             }
 
-            public class CommandHandler : ISideEffectHandler<CommandSideEffect, Unit>
+            public class CommandHandler(IMediator mediator) : ISideEffectHandler<CommandSideEffect, Unit>
             {
-                private readonly IMediator _mediator;
-
-                public CommandHandler(IMediator mediator)
-                {
-                    _mediator = mediator;
-                }
-
                 public async Task<Unit> Handle(CommandSideEffect sideEffect, CancellationToken cancellationToken = default)
                 {
-                    await _mediator.Send(sideEffect.Query, cancellationToken);
+                    await mediator.Send(sideEffect.Query, cancellationToken);
 
                     return Unit.Value;
                 }
@@ -79,25 +66,18 @@ namespace NBB.Application.MediatR.Effects
             }
 
 
-            public class Handler : ISideEffectHandler<SideEffect, Unit>
+            public class Handler(IMediator mediator) : ISideEffectHandler<SideEffect, Unit>
             {
-                private readonly IMediator _mediator;
-
-                public Handler(IMediator mediator)
-                {
-                    _mediator = mediator;
-                }
-
                 public async Task<Unit> Handle(SideEffect sideEffect, CancellationToken cancellationToken = default)
                 {
-                    await _mediator.Publish(sideEffect.Notification, cancellationToken);
+                    await mediator.Publish(sideEffect.Notification, cancellationToken);
                     return Unit.Value;
                 }
             }
         }
     }
 
-    public static class Mediator
+    public static class MediatorEff
     {
         public static Effect<TResponse> Send<TResponse>(IRequest<TResponse> query) =>
             Effect.Of<MediatorEffects.Send.QuerySideEffect<TResponse>, TResponse>(
@@ -109,6 +89,15 @@ namespace NBB.Application.MediatR.Effects
 
         public static Effect<Unit> Publish(INotification notification) =>
             Effect.Of<MediatorEffects.Publish.SideEffect, Unit>(new MediatorEffects.Publish.SideEffect(notification));
+    }
 
+    [Obsolete("Use MediatorEff instead. Will be removed in NBB 11.")]
+    public static class Mediator
+    {
+        public static Effect<TResponse> Send<TResponse>(IRequest<TResponse> query) => MediatorEff.Send(query);
+
+        public static Effect<Unit> Send(IRequest cmd) => MediatorEff.Send(cmd);
+
+        public static Effect<Unit> Publish(INotification notification) => MediatorEff.Publish(notification);
     }
 }

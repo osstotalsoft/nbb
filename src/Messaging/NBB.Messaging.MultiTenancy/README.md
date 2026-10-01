@@ -31,3 +31,15 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     ...
 }
 ```
+
+### Contract classification
+Events (e.g. notifications) whose tenant cannot be identified, or whose tenant is not found or disabled, are skipped; any other message (commands, queries) requires a valid tenant.
+The middleware decides what an event is using the application's `IContractKindClassifier` (`NBB.Core.Abstractions`), registered by the mediator application adapter:
+
+```csharp
+services.AddMediatorIntegration(); // NBB.Application.Mediator
+// or
+services.AddMediatRIntegration();  // NBB.Application.MediatR
+```
+
+Without a classifier the middleware cannot be activated (the first message fails with a dependency injection error).

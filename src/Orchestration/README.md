@@ -7,6 +7,18 @@ dotnet add package NBB.ProcessManager.Definition
 dotnet add package NBB.ProcessManager.Runtime
 ```
 
+The runtime does not depend on a mediator library. Events are dispatched to the definitions in-process by an adapter package:
+* [`NBB.ProcessManager.Mediator`](./NBB.ProcessManager.Mediator#readme) - `services.AddProcessManagerMediatorHandlers()` (source generated [Mediator](https://github.com/martinothamar/Mediator))
+* [`NBB.ProcessManager.MediatR`](./NBB.ProcessManager.MediatR#readme) - `services.AddProcessManagerMediatRHandlers()` ([MediatR](https://github.com/jbogard/MediatR))
+
+```csharp
+services
+    .AddProcessManager(typeof(OrderProcessManager).Assembly)
+    .AddProcessManagerMediatorHandlers();
+```
+
+Timeout messages are published directly to the message bus.
+
 ## Creating a simple definition 
 First we have to define the data struct in this case `OrderState` which is a container that will be persisted, then you have to specify how 
 we correlate events that will come through your process manager, then you can buid using the api a flow of sending command and events or 

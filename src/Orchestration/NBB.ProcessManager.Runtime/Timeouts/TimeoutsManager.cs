@@ -1,8 +1,8 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.Logging;
+using NBB.Messaging.Abstractions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +14,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
     {
         private readonly ITimeoutsRepository _timeoutsRepository;
         private readonly ILogger<TimeoutsManager> _logger;
-        private readonly IMediator _mediator;
+        private readonly IServiceScopeFactory _scopeFactory;
         static readonly TimeSpan MaxNextRetrievalDelay = TimeSpan.FromMinutes(1);
         static readonly TimeSpan NextRetrievalPollSleep = TimeSpan.FromMilliseconds(1000);
         readonly Func<DateTime> _currentTimeProvider;
@@ -26,7 +26,7 @@ namespace NBB.ProcessManager.Runtime.Timeouts
         {
             _timeoutsRepository = timeoutsRepository;
             _logger = logger;
-            _mediator = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IMediator>();
+            _scopeFactory = scopeFactory;
             _currentTimeProvider = currentTimeProvider;
 
             var now = _currentTimeProvider();
@@ -71,7 +71,11 @@ namespace NBB.ProcessManager.Runtime.Timeouts
                     return;
                 }
 
-                await _mediator.Publish(new TimeoutOccured(timeoutData.ProcessManagerInstanceId, timeoutData.Message), cancellationToken);
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var busPublisher = scope.ServiceProvider.GetRequiredService<IMessageBusPublisher>();
+                    await busPublisher.PublishAsync(timeoutData.Message, cancellationToken);
+                }
 
                 if (_startSlice < timeoutData.DueDate)
                 {

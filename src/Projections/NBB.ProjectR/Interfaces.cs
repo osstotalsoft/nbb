@@ -3,7 +3,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using NBB.Core.Effects;
 
 namespace NBB.ProjectR
@@ -12,7 +11,7 @@ namespace NBB.ProjectR
     public interface IProjector<TModel, TMessage, TIdentity> : IProjectorMarker
     {
         (TModel Model, Effect<TMessage> Effect) Project(TMessage message, TModel model);
-        (TIdentity Identity, TMessage Message) Subscribe(INotification @event);
+        (TIdentity Identity, TMessage Message) Subscribe(object @event);
 
     }
 

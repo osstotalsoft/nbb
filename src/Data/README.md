@@ -41,6 +41,6 @@ This package aims to help you deal with data access when working with event sour
 It offers an `EventSourcedRepository` that:
 * reads/persists events from/into an `IEventStore`
 * manages snapshots using an `ISnapshotStore`
-* dispatches events using `MediatR`
+* publishes events in-process using an `IEventPublisher` (Mediator / MediatR adapters in `NBB.Application.Mediator` / `NBB.Application.MediatR`)
 
 For more details see [`NBB.Data.EventSourcing`](./NBB.Data.EventSourcing#readme)

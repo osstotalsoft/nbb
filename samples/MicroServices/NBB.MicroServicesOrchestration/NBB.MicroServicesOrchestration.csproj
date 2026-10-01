@@ -4,10 +4,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <UserSecretsId>NBB_Orchestration_a3e28d3a-7681-452a-9dbe-a52a9b6a0854</UserSecretsId>
+    <!-- integration events handled only by the process manager bridges have no generated handler -->
+    <NoWarn>$(NoWarn);MSG0005</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="$(MediatRPackageVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsPackagesVersion)" />
@@ -19,6 +20,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
     <PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
+    <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,8 @@
     <ProjectReference Include="..\NBB.Contracts\NBB.Contracts.PublishedLanguage\NBB.Contracts.PublishedLanguage.csproj" />
     <ProjectReference Include="..\NBB.Invoices\NBB.Invoices.PublishedLanguage\NBB.Invoices.PublishedLanguage.csproj" />
     <ProjectReference Include="..\NBB.Payments\NBB.Payments.PublishedLanguage\NBB.Payments.PublishedLanguage.csproj" />
+    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Mediator\NBB.Messaging.Mediator.csproj" />
+    <ProjectReference Include="..\..\..\src\Orchestration\NBB.ProcessManager.Mediator\NBB.ProcessManager.Mediator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

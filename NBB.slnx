@@ -13,6 +13,7 @@
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Contracts/">
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Api/NBB.Contracts.Api.csproj" />
+    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application.Commands/NBB.Contracts.Application.Commands.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application/NBB.Contracts.Application.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Domain/NBB.Contracts.Domain.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Migrations/NBB.Contracts.Migrations.csproj" />
@@ -40,6 +41,7 @@
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Payments/">
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Api/NBB.Payments.Api.csproj" />
+    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application.Commands/NBB.Payments.Application.Commands.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application/NBB.Payments.Application.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Data/NBB.Payments.Data.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Domain/NBB.Payments.Domain.csproj" />
@@ -95,7 +97,9 @@
     <File Path="src/Application/README.md" />
     <Project Path="src/Application/NBB.Application.DataContracts.Schema/NBB.Application.DataContracts.Schema.csproj" />
     <Project Path="src/Application/NBB.Application.DataContracts/NBB.Application.DataContracts.csproj" />
+    <Project Path="src/Application/NBB.Application.Mediator.Effects/NBB.Application.Mediator.Effects.csproj" />
     <Project Path="src/Application/NBB.Application.Mediator.FSharp/NBB.Application.Mediator.FSharp.fsproj" />
+    <Project Path="src/Application/NBB.Application.Mediator/NBB.Application.Mediator.csproj" />
     <Project Path="src/Application/NBB.Application.MediatR.Effects/NBB.Application.MediatR.Effects.csproj" />
     <Project Path="src/Application/NBB.Application.MediatR/NBB.Application.MediatR.csproj" />
   </Folder>
@@ -151,6 +155,8 @@
     <Project Path="src/Messaging/NBB.Messaging.Host/NBB.Messaging.Host.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.InProcessMessaging/NBB.Messaging.InProcessMessaging.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.JetStream/NBB.Messaging.JetStream.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Mediator/NBB.Messaging.Mediator.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.MediatR/NBB.Messaging.MediatR.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.MultiTenancy/NBB.Messaging.MultiTenancy.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.Nats/NBB.Messaging.Nats.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.Noop/NBB.Messaging.Noop.csproj" />
@@ -168,9 +174,13 @@
   <Folder Name="/src/Orchestration/">
     <File Path="src/Orchestration/README.md" />
     <Project Path="src/Orchestration/NBB.ProcessManager.Definition/NBB.ProcessManager.Definition.csproj" />
+    <Project Path="src/Orchestration/NBB.ProcessManager.Mediator/NBB.ProcessManager.Mediator.csproj" />
+    <Project Path="src/Orchestration/NBB.ProcessManager.MediatR/NBB.ProcessManager.MediatR.csproj" />
     <Project Path="src/Orchestration/NBB.ProcessManager.Runtime/NBB.ProcessManager.Runtime.csproj" />
   </Folder>
   <Folder Name="/src/Projections/">
+    <Project Path="src/Projections/NBB.ProjectR.Mediator/NBB.ProjectR.Mediator.csproj" />
+    <Project Path="src/Projections/NBB.ProjectR.MediatR/NBB.ProjectR.MediatR.csproj" />
     <Project Path="src/Projections/NBB.ProjectR/NBB.ProjectR.csproj" />
   </Folder>
   <Folder Name="/src/Tools/" />
@@ -193,9 +203,12 @@
   <Folder Name="/test/UnitTests/Application/">
     <Project Path="test/UnitTests/Application/NBB.Application.Effects.Tests/NBB.Application.Effects.Tests.csproj" />
     <Project Path="test/UnitTests/Application/NBB.Application.Mediator.FSharp.Tests/NBB.Application.Mediator.FSharp.Tests.fsproj" />
+    <Project Path="test/UnitTests/Application/NBB.Application.Mediator.Tests/NBB.Application.Mediator.Tests.csproj" />
+    <Project Path="test/UnitTests/Application/NBB.Application.MediatR.Tests/NBB.Application.MediatR.Tests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/Core/">
     <Project Path="test/UnitTests/Core/NBB.Core.Configuration.Tests/NBB.Core.Configuration.Tests.csproj" />
+    <Project Path="test/UnitTests/Core/NBB.Core.DependencyInjection.Tests/NBB.Core.DependencyInjection.Tests.csproj" />
     <Project Path="test/UnitTests/Core/NBB.Core.Effects.FSharp.Tests/NBB.Core.Effects.FSharp.Tests.fsproj" />
     <Project Path="test/UnitTests/Core/NBB.Core.Effects.Tests/NBB.Core.Effects.Tests.csproj" />
     <Project Path="test/UnitTests/Core/NBB.Core.Evented.FSharp.Tests/NBB.Core.Evented.FSharp.Tests.fsproj" />
@@ -203,6 +216,7 @@
     <Project Path="test/UnitTests/NBB.Core.FSharp.Tests/NBB.Core.FSharp.Tests.fsproj" />
   </Folder>
   <Folder Name="/test/UnitTests/Data/">
+    <Project Path="test/UnitTests/Data/NBB.Data.Abstractions.Tests/NBB.Data.Abstractions.Tests.csproj" />
     <Project Path="test/UnitTests/Data/NBB.Data.EntityFramework.MultiTenancy.Tests/NBB.Data.EntityFramework.MultiTenancy.Tests.csproj" />
     <Project Path="test/UnitTests/Data/NBB.Data.EntityFramework.Tests/NBB.Data.EntityFramework.Tests.csproj" />
     <Project Path="test/UnitTests/Data/NBB.Data.EventSourcing.Tests/NBB.Data.EventSourcing.Tests.csproj" />
@@ -224,6 +238,8 @@
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.Effects.Tests/NBB.Messaging.Effects.Tests.csproj" />
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.Host.Tests/NBB.Messaging.Host.Tests.csproj" />
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.InProcessMessaging.Tests/NBB.Messaging.InProcessMessaging.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.Mediator.Tests/NBB.Messaging.Mediator.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.MediatR.Tests/NBB.Messaging.MediatR.Tests.csproj" />
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.MultiTenancy.Tests/NBB.Messaging.MultiTenancy.Tests.csproj" />
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.Rusi.Tests/NBB.Messaging.Rusi.Tests.csproj" />
   </Folder>
@@ -234,9 +250,11 @@
     <Project Path="test/UnitTests/MultiTenancy/NBB.MultiTenancy.Identification.Tests/NBB.MultiTenancy.Identification.Tests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/Orchestration/">
+    <Project Path="test/UnitTests/Orchestration/NBB.ProcessManager.Mediator.Tests/NBB.ProcessManager.Mediator.Tests.csproj" />
     <Project Path="test/UnitTests/Orchestration/NBB.ProcessManager.Tests/NBB.ProcessManager.Tests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/Projections/">
+    <Project Path="test/UnitTests/Projections/NBB.ProjectR.Mediator.Tests/NBB.ProjectR.Mediator.Tests.csproj" />
     <Project Path="test/UnitTests/Projections/NBB.ProjectR.Tests/NBB.ProjectR.Tests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/Tools/">

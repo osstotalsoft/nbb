@@ -3,7 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
+using Mediator;
 using NBB.Contracts.Domain.ContractAggregate;
 using NBB.Messaging.Abstractions;
 
@@ -19,9 +19,9 @@ namespace NBB.Contracts.Application.DomainEventHandlers
             _messageBusPublisher = messageBusPublisher;
         }
 
-        public Task Handle(ContractValidated domainEvent, CancellationToken cancellationToken)
+        public async ValueTask Handle(ContractValidated domainEvent, CancellationToken cancellationToken)
         {
-            return _messageBusPublisher.PublishAsync(
+            await _messageBusPublisher.PublishAsync(
                 new PublishedLanguage.ContractValidated(domainEvent.ContractId, domainEvent.ClientId, domainEvent.Amount), cancellationToken);
         }
     }

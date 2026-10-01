@@ -46,14 +46,6 @@ namespace NBB.Messaging.Host
             => UseMiddleware<SchemaMessageValidatorMiddleware>(pipelineBuilder);
 
         /// <summary>
-        /// Adds to the pipeline a middleware that sends/publishes messages that are events, commands or queries to mediatR.
-        /// </summary>
-        /// <param name="pipelineBuilder">The pipeline builder.</param>
-        /// <returns>The pipeline builder for further configuring the pipeline. It is used used in the fluent configuration API.</returns>
-        public static IPipelineBuilder<MessagingContext> UseMediatRMiddleware(this IPipelineBuilder<MessagingContext> pipelineBuilder)
-            => UseMiddleware<MediatRMiddleware>(pipelineBuilder);
-
-        /// <summary>
         /// Adds to the pipeline a middleware that offers resiliency  policies for "out of order" and concurrency exceptions.
         /// </summary>
         /// <param name="pipelineBuilder">The pipeline builder.</param>

@@ -20,12 +20,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.MediatR\NBB.Application.MediatR.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\NBB.Invoices\NBB.Invoices.PublishedLanguage\NBB.Invoices.PublishedLanguage.csproj" />
     <ProjectReference Include="..\NBB.Payments.Data\NBB.Payments.Data.csproj" />
     <ProjectReference Include="..\NBB.Payments.Domain\NBB.Payments.Domain.csproj" />
     <ProjectReference Include="..\NBB.Payments.PublishedLanguage\NBB.Payments.PublishedLanguage.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mediator.Abstractions" Version="$(MediatorPackageVersion)" />
   </ItemGroup>
 
 </Project>

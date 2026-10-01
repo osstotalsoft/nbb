@@ -241,6 +241,7 @@ namespace TheBenchmarks
             services.AddLogging();
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+            services.AddMediatRIntegration();
 
             services.AddEventStore(es =>
             {

@@ -2,10 +2,11 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
-using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NBB.Core.Abstractions;
+using NBB.Data.Abstractions;
 using NBB.Data.EventSourcing.Infrastructure;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
@@ -107,7 +108,7 @@ namespace NBB.Data.EventSourcing.Tests
             //Arrange
             //var eventStoreMock = new Mock<IEventStore>();
             var eventStoreMock = new TestEventStore();
-            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock, Mock.Of<ISnapshotStore>(), Mock.Of<IMediator>(), new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock, Mock.Of<ISnapshotStore>(), Mock.Of<IEventPublisher>(), new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
             var testAggregate = new TestEventSourcedAggregateRoot(Guid.NewGuid(), 5, domainEvents);
@@ -125,7 +126,7 @@ namespace NBB.Data.EventSourcing.Tests
         {
             //Arrange
             var snapshotStore = Mock.Of<ISnapshotStore>();
-            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), new EventSourcingOptions { DefaultSnapshotVersionFrequency = 1 }, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IEventPublisher>(), new EventSourcingOptions { DefaultSnapshotVersionFrequency = 1 }, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
@@ -147,7 +148,7 @@ namespace NBB.Data.EventSourcing.Tests
             //Arrange
             var snapshotStore = Mock.Of<ISnapshotStore>();
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 2};
-            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IEventPublisher>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
@@ -169,7 +170,7 @@ namespace NBB.Data.EventSourcing.Tests
             //Arrange
             var snapshotStore = Mock.Of<ISnapshotStore>();
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 2};
-            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IEventPublisher>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
@@ -191,7 +192,7 @@ namespace NBB.Data.EventSourcing.Tests
             //Arrange
             var snapshotStore = Mock.Of<ISnapshotStore>();
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 10};
-            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IEventPublisher>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
@@ -213,7 +214,7 @@ namespace NBB.Data.EventSourcing.Tests
             //Arrange
             var snapshotStore = Mock.Of<ISnapshotStore>();
             var options = new EventSourcingOptions {DefaultSnapshotVersionFrequency = 10};
-            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IMediator>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestSnapshotAggregateRoot>(Mock.Of<IEventStore>(), snapshotStore, Mock.Of<IEventPublisher>(), options, Mock.Of<ILogger<EventSourcedRepository<TestSnapshotAggregateRoot>>>());
 
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
@@ -234,7 +235,7 @@ namespace NBB.Data.EventSourcing.Tests
         {
             //Arrange
             var eventStoreMock = new Mock<IEventStore>();
-            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), Mock.Of<IMediator>(), new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), Mock.Of<IEventPublisher>(), new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
             var domainEvent = Mock.Of<object>();
             var domainEvents = new List<object> { domainEvent };
             var testAggregate = new Mock<TestEventSourcedAggregateRoot>();
@@ -248,89 +249,109 @@ namespace NBB.Data.EventSourcing.Tests
         }
 
         [Fact]
-        public async Task Should_dispatch_events()
+        public async Task Should_publish_all_uncommitted_events_once_after_append()
         {
             //Arrange
+            var calls = new List<string>();
             var eventStoreMock = new Mock<IEventStore>();
-            //var wasCalled = false;
-            //var mediatorMock = new Mock<IMediator>();
-            //mediatorMock
-            //    .Setup(m => m.Publish(It.IsAny<TestDomainEvent>(), It.IsAny<CancellationToken>()))
-            //    .Callback(() =>
-            //    {
-            //        wasCalled = true;
-            //    });
-            //    .Returns(Task.CompletedTask);
+            eventStoreMock
+                .Setup(x => x.AppendEventsToStreamAsync(It.IsAny<string>(), It.IsAny<IEnumerable<object>>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
+                .Callback(() => calls.Add("append"))
+                .Returns(Task.CompletedTask);
+            var eventPublisherMock = new Mock<IEventPublisher>();
+            IEnumerable<object> publishedEvents = null;
+            eventPublisherMock
+                .Setup(x => x.PublishAsync(It.IsAny<IEnumerable<object>>(), It.IsAny<CancellationToken>()))
+                .Callback((IEnumerable<object> events, CancellationToken _) => { calls.Add("publish"); publishedEvents = events; })
+                .Returns(Task.CompletedTask);
 
-            //.ReturnsAsync(Task.CompletedTask); //<-- return Task to allow await to continue
-            //mediatorMock.Setup(x=> x.Publish())
-            var mediatorMock = new TestMediator();
-
-            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), mediatorMock, new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
+            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), eventPublisherMock.Object, new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
             var testAggregate = new Mock<TestEventSourcedAggregateRoot>();
             var domainEvent = new TestDomainEvent();
-            var domainEvents = new List<object> { domainEvent };
+            var otherEvent = new object();
+            var domainEvents = new List<object> { domainEvent, otherEvent };
             testAggregate.Setup(a => a.GetUncommittedChanges()).Returns(domainEvents);
+
             //Act
             await sut.SaveAsync(testAggregate.Object, CancellationToken.None);
 
             //Assert
-            //mediatorMock.Verify(m => m.Publish(domainEvent, It.IsAny<CancellationToken>()), Times.Once());
+            eventPublisherMock.Verify(x => x.PublishAsync(It.IsAny<IEnumerable<object>>(), It.IsAny<CancellationToken>()), Times.Once);
+            publishedEvents.Should().BeEquivalentTo(domainEvents, o => o.WithStrictOrdering());
+            calls.Should().Equal("append", "publish");
+        }
 
-            mediatorMock.PublishCallsCount.Should().Be(1);
+        [Fact]
+        public async Task Should_not_publish_events_when_append_fails()
+        {
+            //Arrange
+            var eventStoreMock = new Mock<IEventStore>();
+            eventStoreMock
+                .Setup(x => x.AppendEventsToStreamAsync(It.IsAny<string>(), It.IsAny<IEnumerable<object>>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new ConcurrencyException("concurrency"));
+            var eventPublisherMock = new Mock<IEventPublisher>();
 
+            var sut = new EventSourcedRepository<TestEventSourcedAggregateRoot>(eventStoreMock.Object, Mock.Of<ISnapshotStore>(), eventPublisherMock.Object, new EventSourcingOptions(), Mock.Of<ILogger<EventSourcedRepository<TestEventSourcedAggregateRoot>>>());
+            var testAggregate = new Mock<TestEventSourcedAggregateRoot>();
+            testAggregate.Setup(a => a.GetUncommittedChanges()).Returns(new List<object> { new TestDomainEvent() });
+
+            //Act
+            var act = () => sut.SaveAsync(testAggregate.Object, CancellationToken.None);
+
+            //Assert
+            await act.Should().ThrowAsync<ConcurrencyException>();
+            eventPublisherMock.Verify(x => x.PublishAsync(It.IsAny<IEnumerable<object>>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public void Should_fail_to_resolve_repository_when_no_event_publisher_is_registered()
+        {
+            //Arrange
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddSingleton(Mock.Of<IEventStore>());
+            services.AddSingleton(Mock.Of<ISnapshotStore>());
+            services.AddEventSourcingDataAccess();
+            services.AddEventSourcedRepository<TestEventSourcedAggregateRoot>();
+            using var sp = services.BuildServiceProvider();
+            using var scope = sp.CreateScope();
+
+            //Act
+            var act = () => scope.ServiceProvider.GetRequiredService<IEventSourcedRepository<TestEventSourcedAggregateRoot>>();
+
+            //Assert
+            act.Should().Throw<InvalidOperationException>().WithMessage("*IEventPublisher*");
+        }
+
+        [Fact]
+        public void Should_resolve_repository_with_a_custom_event_publisher()
+        {
+            //Arrange
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddSingleton(Mock.Of<IEventStore>());
+            services.AddSingleton(Mock.Of<ISnapshotStore>());
+            services.AddEventSourcingDataAccess();
+            services.AddEventSourcedRepository<TestEventSourcedAggregateRoot>();
+            services.AddSingleton(Mock.Of<IEventPublisher>());
+            using var sp = services.BuildServiceProvider();
+            using var scope = sp.CreateScope();
+
+            //Act
+            var repository = scope.ServiceProvider.GetRequiredService<IEventSourcedRepository<TestEventSourcedAggregateRoot>>();
+
+            //Assert
+            repository.Should().NotBeNull();
         }
     }
 
-    public class TestDomainEvent : object, INotification
+    public class TestDomainEvent
     {
         public DateTime CreationDate => DateTime.Now;
         
         public Guid EventId => Guid.Empty;
 
         public int SequenceNumber { get; set; }
-    }
-
-    public class TestMediator : IMediator
-    {
-        public int PublishCallsCount { get; private set; }
-
-        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Publish(object notification, CancellationToken cancellationToken = default)
-        {
-            this.PublishCallsCount++;
-            return Task.CompletedTask;
-        }
-
-        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification
-        {
-            this.PublishCallsCount++;
-            return Task.CompletedTask;
-        }
-
-        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<object> Send(object request, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class TestEventStore : IEventStore

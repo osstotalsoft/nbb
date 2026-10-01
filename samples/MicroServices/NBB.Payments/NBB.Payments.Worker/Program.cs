@@ -1,19 +1,17 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NBB.Application.MediatR;
 using NBB.Core.Abstractions;
+using NBB.Data.Abstractions;
 using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.Messaging.Host;
-using NBB.Payments.Application.CommandHandlers;
 using NBB.Payments.Data;
 using Serilog;
 using Serilog.Events;
@@ -48,7 +46,9 @@ namespace NBB.Payments.Worker
                 })
                 .ConfigureServices((hostingContext, services) =>
                 {
-                    services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<PayPayableCommandHandler>());
+                    services
+                        .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+                        .AddMediatorIntegration();
                     //services.AddKafkaMessaging();
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
 
@@ -65,21 +65,21 @@ namespace NBB.Payments.Worker
                         hostBuilder => hostBuilder
                         .Configure(configBuilder => configBuilder
                             .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                                .FromMediatRHandledCommands().AddAllClasses()
-                                .FromMediatRHandledEvents().AddAllClasses()
+                                .FromMediatorHandledCommands().AddAllClasses()
+                                .FromMediatorHandledEvents().AddAllClasses()
                             )
                             .WithDefaultOptions()
                             .UsePipeline(pipelineBuilder => pipelineBuilder
                                 .UseCorrelationMiddleware()
                                 .UseExceptionHandlingMiddleware()
                                 .UseDefaultResiliencyMiddleware()
-                                .UseMediatRMiddleware()
+                                .UseMediatorMiddleware()
                             )
                         ));
 
                     services
                         .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
-                        .Decorate(typeof(IUow<>), typeof(MediatorUowDecorator<>))
+                        .Decorate(typeof(IUow<>), typeof(EventPublishingUowDecorator<>))
                         .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
                 });
 

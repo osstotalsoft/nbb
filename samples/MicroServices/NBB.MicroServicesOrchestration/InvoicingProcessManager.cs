@@ -1,7 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using MediatR;
+using Mediator;
 using NBB.Contracts.PublishedLanguage;
 using NBB.Invoices.PublishedLanguage;
 using NBB.Payments.PublishedLanguage;
