@@ -1,0 +1,18 @@
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.5.4">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+    <UserSecretsId>185f963f-9c55-48b7-936b-2d0a2208df2d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NBB.Todo.Api\NBB.Todo.Api.csproj" />
+    <ProjectReference Include="..\NBB.Todo.Migrations\NBB.Todo.Migrations.csproj" />
+    <ProjectReference Include="..\NBB.Todo.Worker\NBB.Todo.Worker.csproj" />
+  </ItemGroup>
+
+</Project>

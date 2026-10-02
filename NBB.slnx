@@ -57,6 +57,8 @@
   <Folder Name="/samples/MultiTenancy/">
     <File Path="samples/MultiTenancy/MultiTenantTodoList.postman_collection.json" />
     <File Path="samples/MultiTenancy/README.md" />
+    <File Path="samples/MultiTenancy/aspire.config.json" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.AppHost/NBB.Todo.AppHost.csproj" />
     <Project Path="samples/MultiTenancy/NBB.Todo.Api/NBB.Todo.Api.csproj" />
     <Project Path="samples/MultiTenancy/NBB.Todo.Data/NBB.Todo.Data.csproj" />
     <Project Path="samples/MultiTenancy/NBB.Todo.Migrations/NBB.Todo.Migrations.csproj" />
