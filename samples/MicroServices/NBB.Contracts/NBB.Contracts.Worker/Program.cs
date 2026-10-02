@@ -17,13 +17,6 @@ using System;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation())
-    .WithMetrics(metrics => metrics
-        .AddMeter(ContractDomainMetrics.InstrumentationName)
-        .AddInstrumentation<ContractDomainMetrics>());
 
 builder.Services
     .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
@@ -74,6 +67,15 @@ builder.Services.AddMessagingHost(
         )
     )
 );
+
+// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation())
+    .WithMetrics(metrics => metrics
+        .AddMeter(ContractDomainMetrics.InstrumentationName)
+        .AddInstrumentation<ContractDomainMetrics>());
 
 var host = builder.Build();
 

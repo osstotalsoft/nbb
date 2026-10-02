@@ -15,10 +15,6 @@ using System;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contracts API", Version = "v1" }));
@@ -53,6 +49,12 @@ builder.Services
     })
     .AddMediatorIntegration(); // contract classifier for the NBB 4 topic resolution
 builder.Services.AddContractsReadModelDataAccess();
+
+// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation());
 
 var app = builder.Build();
 

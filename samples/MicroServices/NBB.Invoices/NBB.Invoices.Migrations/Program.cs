@@ -10,6 +10,7 @@ using System;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
+
 builder.Services.AddScoped<Migrator>();
 
 var host = builder.Build();

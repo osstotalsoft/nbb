@@ -11,6 +11,7 @@ using System;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
+
 builder.Services.AddTodoDataAccess();
 builder.Services.AddMultitenancy(builder.Configuration);
 builder.Services.AddScoped<Migrator>();

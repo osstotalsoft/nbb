@@ -12,10 +12,6 @@ using System.Reflection;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 // generated types are internal because NBB.Mono references this host and generates its own Mediator
 builder.Services.AddMediator(options =>
@@ -57,6 +53,12 @@ builder.Services.AddMessagingHost(
 builder.Services
     .AddProcessManager(Assembly.GetEntryAssembly())
     .AddProcessManagerMediatorHandlers();
+
+// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation());
 
 var host = builder.Build();
 

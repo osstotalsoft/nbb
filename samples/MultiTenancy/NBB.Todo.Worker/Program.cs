@@ -13,10 +13,6 @@ using OpenTelemetry.Trace;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 // Mediator
 builder.Services
@@ -50,6 +46,12 @@ builder.Services.AddMultitenancy(builder.Configuration)
     .AddMultiTenantMessaging()
     .AddDefaultMessagingTenantIdentification()
     .AddTenantRepository<ConfigurationTenantRepository>();
+
+// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation());
 
 var host = builder.Build();
 
