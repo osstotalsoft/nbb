@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/samples/">
     <File Path="samples/README.md" />
+    <Project Path="samples/NBB.Samples.ServiceDefaults/NBB.Samples.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/samples/MicroServices/">
     <File Path="samples/MicroServices/NBB Samples.postman_collection.json" />
