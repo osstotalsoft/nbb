@@ -1,20 +1,30 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NBB.Todo.Migrations;
+using NBB.Todos.Data;
 using System;
 
-namespace NBB.Todo.Migrations
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var invoicesMigrator = new TodoDatabaseMigrator();
+var builder = Host.CreateApplicationBuilder(args);
 
-            invoicesMigrator.EnsureDatabaseDeleted(args).Wait();
-            Console.WriteLine("Database deleted");
-            invoicesMigrator.MigrateDatabaseToLatestVersion(args).Wait();
-            Console.WriteLine("Database created");
-        }
-    }
+builder.AddServiceDefaults();
+builder.Services.AddTodoDataAccess();
+builder.Services.AddMultitenancy(builder.Configuration);
+builder.Services.AddScoped<Migrator>();
+
+var host = builder.Build();
+await host.StartAsync();
+try
+{
+    using var scope = host.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<Migrator>().RunAsync();
 }
+catch (Exception ex)
+{
+    host.Services.GetRequiredService<ILogger<Program>>().LogError(ex, "Database migration failed");
+    Environment.ExitCode = 1;
+}
+await host.StopAsync();

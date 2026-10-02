@@ -1,149 +1,56 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Serilog;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Todos.Data;
-using NBB.Todo.Worker.Application;
+using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host;
 using NBB.Messaging.MultiTenancy;
 using NBB.Messaging.OpenTelemetry;
 using NBB.MultiTenancy.Abstractions.Repositories;
-using NBB.Correlation.Serilog;
-using NBB.Tools.Serilog.Enrichers.TenantId;
-using Microsoft.Extensions.Configuration;
-using OpenTelemetry;
-using OpenTelemetry.Extensions.Propagators;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Resources;
-using System.Reflection;
+using NBB.Todos.Data;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Metrics;
-using NBB.Tools.Serilog.OpenTelemetryTracingSink;
-using Microsoft.Data.SqlClient;
-using System.Linq;
 
-namespace NBB.Todo.Worker
-{
-    public class Program
-    {
-        public static async Task<int> Main(string[] args)
-        {
-            try
-            {
-                var host = BuildConsoleHost(args);
+var builder = Host.CreateApplicationBuilder(args);
 
-                Log.Information("Starting NBB.Tasks.Worker");
+builder.AddServiceDefaults();
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation());
 
-                await host.RunAsync(CancellationToken.None);
+// Mediator
+builder.Services
+    .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+    .AddMediatorIntegration(); // the contract classifier is required by the TenantMiddleware
 
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Host terminated unexpectedly");
-                return 1;
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-        }
+// Data
+builder.Services.AddTodoDataAccess();
 
-        public static IHost BuildConsoleHost(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureServices(ConfigureServices)
-                .UseSerilog((context, services, logConfig) =>
-                {
-                    logConfig
-                        .ReadFrom.Configuration(context.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.With<CorrelationLogEventEnricher>()
-                        .Enrich.With(services.GetRequiredService<TenantEnricher>())
-                        .WriteTo.OpenTelemetryTracing()
-                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
-                })
-                .UseConsoleLifetime()
-                .Build();
+// Messaging
+builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration);
 
-        private static void ConfigureServices(HostBuilderContext hostingContext, IServiceCollection services)
-        {
-            // Mediator
-            services
-                .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
-                .AddMediatorIntegration(); // the contract classifier is required by the TenantMiddleware
+builder.Services.AddMessagingHost(
+    builder.Configuration,
+    hostBuilder => hostBuilder
+    .Configure(configBuilder => configBuilder
+            .AddSubscriberServices(selector => selector
+                .FromMediatorHandledCommands().AddAllClasses())
+            .WithDefaultOptions()
+            .UsePipeline(pipeline => pipeline
+                .UseCorrelationMiddleware()
+                .UseTenantMiddleware()
+                .UseExceptionHandlingMiddleware()
+                .UseDefaultResiliencyMiddleware()
+                .UseMediatorMiddleware())
+        )
+    );
 
-            // Data
-            services.AddTodoDataAccess();
+// Multitenancy
+builder.Services.AddMultitenancy(builder.Configuration)
+    .AddMultiTenantMessaging()
+    .AddDefaultMessagingTenantIdentification()
+    .AddTenantRepository<ConfigurationTenantRepository>();
 
-            // Messaging
-            services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+var host = builder.Build();
 
-            services.AddMessagingHost(
-                hostingContext.Configuration,
-                hostBuilder => hostBuilder
-                .Configure(configBuilder => configBuilder
-                        .AddSubscriberServices(selector => selector
-                            .FromMediatorHandledCommands().AddAllClasses())
-                        .WithDefaultOptions()
-                        .UsePipeline(builder => builder
-                            .UseCorrelationMiddleware()
-                            .UseTenantMiddleware()
-                            .UseExceptionHandlingMiddleware()
-                            .UseDefaultResiliencyMiddleware()
-                            .UseMediatorMiddleware())
-                    )
-                );
-
-            Log.Information("Messaging.Env=" + hostingContext.Configuration.GetSection("Messaging")["Env"]);
-
-            // Multitenancy
-            services.AddMultitenancy(hostingContext.Configuration)
-                .AddMultiTenantMessaging()
-                .AddDefaultMessagingTenantIdentification()
-                .AddTenantRepository<ConfigurationTenantRepository>();
-
-            services.AddSingleton<TenantEnricher>();
-
-
-            var assembly = Assembly.GetExecutingAssembly().GetName();
-            void configureResource(ResourceBuilder r) =>
-                r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
-
-
-            if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
-            {
-                Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
-
-                services.AddOpenTelemetry().WithTracing(builder => builder
-                        .ConfigureResource(configureResource)
-                        .SetSampler(new AlwaysOnSampler())
-                        .AddMessageBusInstrumentation()
-                        .AddEntityFrameworkCoreInstrumentation(options => {
-                            options.EnrichWithIDbCommand = (activity, command) =>
-                                activity.SetTag(
-                                    "db.statement.params",
-                                    string.Join(", ", command.Parameters.Cast<SqlParameter>().Select(p => $"{p.ParameterName} = {p.Value}")));                   
-                        })
-                        .AddOtlpExporter()
-                );
-                services.Configure<OtlpExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Otlp"));
-            }
-
-
-            if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
-            {
-                services.AddOpenTelemetry().WithMetrics(options =>
-                {
-                    options.ConfigureResource(configureResource)
-                        .AddRuntimeInstrumentation()
-                        .AddPrometheusHttpListener();
-                });
-            }
-        }
-    }
-}
+await host.RunAsync();

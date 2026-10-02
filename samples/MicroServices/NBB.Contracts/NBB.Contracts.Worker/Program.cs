@@ -7,142 +7,74 @@ using Microsoft.Extensions.Hosting;
 using NBB.Contracts.Application;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
-using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Messaging.Host;
 using NBB.Messaging.OpenTelemetry;
-using OpenTelemetry;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Extensions.Propagators;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Serilog;
 using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Reflection;
-using NBB.Tools.Serilog.OpenTelemetryTracingSink;
 
-namespace NBB.Contracts.Worker
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.AddServiceDefaults();
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation())
+    .WithMetrics(metrics => metrics
+        .AddMeter(ContractDomainMetrics.InstrumentationName)
+        .AddInstrumentation<ContractDomainMetrics>());
+
+builder.Services
+    .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+    .AddMediatorIntegration();
+
+var transport = builder.Configuration.GetValue("Messaging:Transport", "JetStream");
+if (transport.Equals("JetStream", StringComparison.InvariantCultureIgnoreCase))
 {
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = Host
-                .CreateDefaultBuilder(args)
-                .UseSerilog((context, services, logConfig) =>
-                {
-                    logConfig
-                        .ReadFrom.Configuration(context.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
-                        .WriteTo.OpenTelemetryTracing();
-                })
-                .ConfigureServices((hostingContext, services) =>
-                {
-                    services
-                        .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
-                        .AddMediatorIntegration();
-
-                    var transport = hostingContext.Configuration.GetValue("Messaging:Transport", "NATS");
-                    if (transport.Equals("NATS", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        services
-                            .AddMessageBus()
-                            .AddNatsTransport(hostingContext.Configuration)
-                            .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
-                    }
-                    else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        services
-                            .AddMessageBus()
-                            .AddRusiTransport(hostingContext.Configuration)
-                            .UseTopicResolutionBackwardCompatibility(hostingContext.Configuration);
-                    }
-                    else
-                    {
-                        throw new Exception($"Messaging:Transport={transport} not supported");
-                    }
-
-                    services.AddContractsWriteModelDataAccess();
-                    services.AddContractsReadModelDataAccess();
-
-
-                    services.AddEventStore(b =>
-                    {
-                        b.UseNewtownsoftJson(new SingleValueObjectConverter());
-                        b.UseAdoNetEventRepository(o => o.FromConfiguration());
-                    });
-
-                    services.AddMessagingHost(hostingContext.Configuration, hostBuilder => hostBuilder.UseStartup<MessagingHostStartup>());
-
-                    var assembly = Assembly.GetExecutingAssembly().GetName();
-                    void configureResource(ResourceBuilder r) =>
-                        r.AddService(assembly.Name, serviceVersion: assembly.Version?.ToString(), serviceInstanceId: Environment.MachineName);
-
-                    if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:TracingEnabled"))
-                    {
-                        Sdk.SetDefaultTextMapPropagator(new JaegerPropagator());
-
-                        services.AddOpenTelemetry().WithTracing(builder => builder
-                                .ConfigureResource(configureResource)
-                                .SetSampler(new AlwaysOnSampler())
-                                .AddMessageBusInstrumentation()
-                                .AddEntityFrameworkCoreInstrumentation()
-                                .AddOtlpExporter()
-                        );
-                        services.Configure<OtlpExporterOptions>(hostingContext.Configuration.GetSection("OpenTelemetry:Otlp"));
-                    }
-
-                    if (hostingContext.Configuration.GetValue<bool>("OpenTelemetry:MetricsEnabled"))
-                    {
-                        services.AddOpenTelemetry().WithMetrics(options =>
-                        {
-                            options.ConfigureResource(configureResource)
-                                .AddRuntimeInstrumentation()
-                                .AddPrometheusHttpListener();
-                            AddContractMetrics(options);
-                        });
-                    }
-                    else
-                    {
-                        services.TryAddSingleton<ContractDomainMetrics>();
-                    }
-                });
-
-            var host = builder.Build();
-
-            await host.RunAsync();
-        }
-
-        public static MeterProviderBuilder AddContractMetrics(MeterProviderBuilder builder)
-        {
-            builder.AddMeter(ContractDomainMetrics.InstrumentationName);
-            return builder.AddInstrumentation<ContractDomainMetrics>();
-        }
-    }
-
-    class MessagingHostStartup : IMessagingHostStartup
-    {
-        public Task Configure(IMessagingHostConfigurationBuilder hostConfigurationBuilder)
-        {
-            hostConfigurationBuilder
-                .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                    .FromMediatorHandledCommands().AddAllClasses())
-                .WithOptions(optionsBuilder => optionsBuilder
-                    .ConfigureTransport(transportOptions =>
-                        transportOptions with { MaxConcurrentMessages = 2 }))
-                .UsePipeline(pipelineBuilder => pipelineBuilder
-                    .UseCorrelationMiddleware()
-                    .UseExceptionHandlingMiddleware()
-                    .UseDefaultResiliencyMiddleware()
-                    .UseMediatorMiddleware()
-                );
-
-            return Task.CompletedTask;
-        }
-    }
+    builder.Services
+        .AddMessageBus()
+        .AddJetStreamTransport(builder.Configuration)
+        .UseTopicResolutionBackwardCompatibility(builder.Configuration);
 }
+else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
+{
+    builder.Services
+        .AddMessageBus()
+        .AddRusiTransport(builder.Configuration)
+        .UseTopicResolutionBackwardCompatibility(builder.Configuration);
+}
+else
+{
+    throw new Exception($"Messaging:Transport={transport} not supported");
+}
+
+builder.Services.AddContractsWriteModelDataAccess();
+builder.Services.AddContractsReadModelDataAccess();
+
+builder.Services.AddEventStore(es =>
+{
+    es.UseNewtownsoftJson(new SingleValueObjectConverter());
+    es.UseAdoNetEventRepository(o => o.FromConfiguration());
+});
+
+builder.Services.AddMessagingHost(
+    builder.Configuration,
+    hostBuilder => hostBuilder
+    .Configure(configBuilder => configBuilder
+        .AddSubscriberServices(subscriberBuilder => subscriberBuilder
+            .FromMediatorHandledCommands().AddAllClasses())
+        .WithOptions(optionsBuilder => optionsBuilder
+            .ConfigureTransport(transportOptions => transportOptions with { MaxConcurrentMessages = 2 }))
+        .UsePipeline(pipelineBuilder => pipelineBuilder
+            .UseCorrelationMiddleware()
+            .UseExceptionHandlingMiddleware()
+            .UseDefaultResiliencyMiddleware()
+            .UseMediatorMiddleware()
+        )
+    )
+);
+
+var host = builder.Build();
+
+await host.RunAsync();

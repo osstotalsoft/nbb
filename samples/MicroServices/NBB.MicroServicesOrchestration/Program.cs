@@ -1,91 +1,63 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.Events;
-using System.Threading.Tasks;
-using Serilog.Sinks.MSSqlServer;
-using NBB.Correlation.Serilog;
-using NBB.Messaging.Host;
-using System.Reflection;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NBB.Messaging.Host;
+using NBB.Messaging.OpenTelemetry;
+using OpenTelemetry.Trace;
+using System.Linq;
+using System.Reflection;
 
-namespace NBB.MicroServicesOrchestration
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.AddServiceDefaults();
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .AddMessageBusInstrumentation()
+        .AddSqlClientInstrumentation());
+
+// generated types are internal because NBB.Mono references this host and generates its own Mediator
+builder.Services.AddMediator(options =>
 {
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = Host
-                .CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, loggingBuilder) =>
-                {
-                    var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
+    options.ServiceLifetime = ServiceLifetime.Scoped;
+    options.GenerateTypesAsInternal = true;
+});
 
-                    Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Information()
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                        .Enrich.FromLogContext()
-                        .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
-                        .CreateLogger();
+builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration);
 
-                    loggingBuilder.AddSerilog(dispose: true);
-                    loggingBuilder.AddFilter("Microsoft", logLevel => logLevel >= LogLevel.Warning);
-                    loggingBuilder.AddConsole();
-                })
-                .ConfigureServices((hostingContext, services) =>
-                {
-                    // generated types are internal because NBB.Mono references this host and generates its own Mediator
-                    services.AddMediator(options =>
-                    {
-                        options.ServiceLifetime = ServiceLifetime.Scoped;
-                        options.GenerateTypesAsInternal = true;
-                    });
+builder.Services.AddEventStore(es =>
+{
+    es.UseNewtownsoftJson();
+    es.UseAdoNetEventRepository(o => o.FromConfiguration());
+});
 
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+var integrationMessageAssemblies = new[] {
+    typeof(NBB.Contracts.PublishedLanguage.ContractValidated).Assembly,
+    typeof(NBB.Invoices.PublishedLanguage.InvoiceCreated).Assembly,
+    typeof(NBB.Payments.PublishedLanguage.PayableCreated).Assembly,
+};
 
-                    services.AddEventStore(es =>
-                    {
-                        es.UseNewtownsoftJson();
-                        es.UseAdoNetEventRepository(o => o.FromConfiguration());
-                    });
+builder.Services.AddMessagingHost(
+    builder.Configuration,
+    hostBuilder => hostBuilder
+    .Configure(configBuilder => configBuilder
+        .AddSubscriberServices(subscriberBuilder => subscriberBuilder
+            .FromMediatorHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
+        )
+        .WithDefaultOptions()
+        .UsePipeline(pipelineBuilder => pipelineBuilder
+            .UseCorrelationMiddleware()
+            .UseExceptionHandlingMiddleware()
+            .UseDefaultResiliencyMiddleware()
+            .UseMediatorMiddleware()
+        )
+    ));
 
-                    var integrationMessageAssemblies = new[] {
-                        typeof(NBB.Contracts.PublishedLanguage.ContractValidated).Assembly,
-                        typeof(NBB.Invoices.PublishedLanguage.InvoiceCreated).Assembly,
-                        typeof(NBB.Payments.PublishedLanguage.PayableCreated).Assembly,
-                    };
+builder.Services
+    .AddProcessManager(Assembly.GetEntryAssembly())
+    .AddProcessManagerMediatorHandlers();
 
-                    services.AddMessagingHost(
-                        hostingContext.Configuration,
-                        hostBuilder => hostBuilder
-                        .Configure(configBuilder => configBuilder
-                            .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                                .FromMediatorHandledEvents().AddClassesWhere(t => integrationMessageAssemblies.Contains(t.Assembly))
-                            )
-                            .WithDefaultOptions()
-                            .UsePipeline(pipelineBuilder => pipelineBuilder
-                                .UseCorrelationMiddleware()
-                                .UseExceptionHandlingMiddleware()
-                                .UseDefaultResiliencyMiddleware()
-                                .UseMediatorMiddleware()
-                            )
-                        ));
+var host = builder.Build();
 
-                    services
-                        .AddProcessManager(Assembly.GetEntryAssembly())
-                        .AddProcessManagerMediatorHandlers();
-                });
-
-            var host = builder.UseConsoleLifetime().Build();
-
-            await host.RunAsync();
-        }
-    }
-}
+await host.RunAsync();
