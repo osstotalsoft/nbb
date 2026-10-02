@@ -1,0 +1,5 @@
+﻿{
+  "appHost": {
+    "path": "NBB.MicroServices.AppHost/NBB.MicroServices.AppHost.csproj"
+  }
+}

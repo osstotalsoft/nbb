@@ -10,6 +10,8 @@
   <Folder Name="/samples/MicroServices/">
     <File Path="samples/MicroServices/NBB Samples.postman_collection.json" />
     <File Path="samples/MicroServices/README.md" />
+    <File Path="samples/MicroServices/aspire.config.json" />
+    <Project Path="samples/MicroServices/NBB.MicroServices.AppHost/NBB.MicroServices.AppHost.csproj" />
     <Project Path="samples/MicroServices/NBB.MicroServicesOrchestration/NBB.MicroServicesOrchestration.csproj" />
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Contracts/">
