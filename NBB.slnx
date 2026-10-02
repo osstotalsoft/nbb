@@ -14,7 +14,6 @@
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Contracts/">
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Api/NBB.Contracts.Api.csproj" />
-    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application.Commands/NBB.Contracts.Application.Commands.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application/NBB.Contracts.Application.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Domain/NBB.Contracts.Domain.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Migrations/NBB.Contracts.Migrations.csproj" />
@@ -42,7 +41,6 @@
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Payments/">
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Api/NBB.Payments.Api.csproj" />
-    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application.Commands/NBB.Payments.Application.Commands.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application/NBB.Payments.Application.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Data/NBB.Payments.Data.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Domain/NBB.Payments.Domain.csproj" />
