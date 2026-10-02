@@ -14,8 +14,8 @@
 		<FsUnitPackageVersion>7.1.1</FsUnitPackageVersion>
 		<FluentAssertionsPackageVersion>8.8.0</FluentAssertionsPackageVersion>
 		<MicrosoftDataSqlClientPackageVersion>6.1.3</MicrosoftDataSqlClientPackageVersion>
-		<MicrosoftExtensionsPackagesVersion>10.0.1</MicrosoftExtensionsPackagesVersion>
-		<MicrosoftEntityFrameworkPackagesVersion>10.0.1</MicrosoftEntityFrameworkPackagesVersion>
+		<MicrosoftExtensionsPackagesVersion>10.0.12</MicrosoftExtensionsPackagesVersion>
+		<MicrosoftEntityFrameworkPackagesVersion>10.0.12</MicrosoftEntityFrameworkPackagesVersion>
 		<MicrosoftCSharpPackageVersion>4.7.0</MicrosoftCSharpPackageVersion>
 		<OpenTelemetryCorePackageVersion>1.14.0</OpenTelemetryCorePackageVersion>
 		<OpenTelemetryExtensionsHostingPackageVersion>1.14.0</OpenTelemetryExtensionsHostingPackageVersion>
@@ -33,8 +33,8 @@
 		<SerilogSinksConsole>6.1.1</SerilogSinksConsole>
 		<SerilogSinksMSSqlServerPackageVersion>9.0.2</SerilogSinksMSSqlServerPackageVersion>
 		<SerilogAspNetCorePackageVersion>10.0.0</SerilogAspNetCorePackageVersion>
-		<AutoMapperPackageVersion>14.0.0</AutoMapperPackageVersion>
 		<NJsonSchemaPackageVersion>11.5.2</NJsonSchemaPackageVersion>
+		<SwashbuckleAspNetCorePackageVersion>10.2.3</SwashbuckleAspNetCorePackageVersion>
 		<AutoFixturePackageVersion>4.18.1</AutoFixturePackageVersion>
 		<JaegerPackageVersion>1.0.3</JaegerPackageVersion>
 		<SystemIdentityModelTokensJwtPackageVersion>8.15.0</SystemIdentityModelTokensJwtPackageVersion>
