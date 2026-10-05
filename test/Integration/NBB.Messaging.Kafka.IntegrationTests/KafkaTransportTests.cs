@@ -6,7 +6,7 @@ namespace NBB.Messaging.Kafka.IntegrationTests
 {
     public class KafkaTransportTests
     {
-        //[Fact]
+        [Fact]
         public async Task Test_unsubscribe_with_dispose()
         {
             var sp = BuildServiceProvider();
@@ -15,7 +15,7 @@ namespace NBB.Messaging.Kafka.IntegrationTests
             sub.Dispose();
         }
 
-        //[Fact]
+        [Fact]
         public async Task Test_unsubscribe_with_cancel_and_dispose()
         {
             var sp = BuildServiceProvider();
@@ -26,18 +26,26 @@ namespace NBB.Messaging.Kafka.IntegrationTests
             sub.Dispose();
         }
 
-        //[Fact]
+        [Fact]
         public async Task Test_publish_then_subscribe_round_trip()
         {
             var sp = BuildServiceProvider();
             var msgBus = sp.GetRequiredService<IMessageBus>();
             var received = new TaskCompletionSource<bool>();
-            await msgBus.PublishAsync("MyTestMessage", MessagingPublisherOptions.Default with { TopicName = "MyTestTopic" });
-            var sub = await msgBus.SubscribeAsync(
+            var topic = "MyTestTopic-" + Guid.NewGuid();
+            await msgBus.PublishAsync(new TestPayload { Text = "MyTestMessage" }, MessagingPublisherOptions.Default with { TopicName = topic });
+            var sub = await msgBus.SubscribeAsync<TestPayload>(
                 _e => { received.TrySetResult(true); return Task.CompletedTask; },
-                MessagingSubscriberOptions.Default with { TopicName = "MyTestTopic", Transport = SubscriptionTransportOptions.StreamProcessor });
+                MessagingSubscriberOptions.Default with { TopicName = topic, Transport = SubscriptionTransportOptions.StreamProcessor with { DeliverNewMessagesOnly = false } });
             await received.Task.WaitAsync(TimeSpan.FromMilliseconds(5000));
+            // the TCS is completed from inside the transport poll task: yield so Dispose does not run on the poll thread
+            await Task.Yield();
             sub.Dispose();
+        }
+
+        private class TestPayload
+        {
+            public string Text;
         }
 
         private IServiceProvider BuildServiceProvider()
