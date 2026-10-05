@@ -13,7 +13,7 @@ builder.AddServiceDefaults();
 
 builder.Services.AddScoped<Migrator>();
 
-var host = builder.Build();
+using var host = builder.Build();
 await host.StartAsync();
 try
 {

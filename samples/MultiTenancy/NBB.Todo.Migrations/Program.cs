@@ -16,7 +16,7 @@ builder.Services.AddTodoDataAccess();
 builder.Services.AddMultitenancy(builder.Configuration);
 builder.Services.AddScoped<Migrator>();
 
-var host = builder.Build();
+using var host = builder.Build();
 await host.StartAsync();
 try
 {
