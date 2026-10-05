@@ -12,7 +12,7 @@ Each service is split into a Web API, a messaging worker and a migrations projec
 
 ## Running the samples with Aspire
 
-[`NBB.MicroServices.AppHost`](./NBB.MicroServices.AppHost) is an [Aspire](https://aspire.dev) AppHost that runs the Contracts, Invoices and Payments services and the orchestration process manager together, with the Aspire dashboard for logs, traces and metrics. `NBB.Invoices.FSharp` is not part of the AppHost.
+[`NBB.MicroServices.AppHost`](./NBB.MicroServices.AppHost) is an [Aspire](https://aspire.dev) AppHost that runs the Contracts, Invoices and Payments services and the orchestration process manager together, with the Aspire dashboard for logs, traces and metrics.
 
 ### Prerequisites
 * [.NET 10 SDK](https://dotnet.microsoft.com/download)
@@ -31,6 +31,9 @@ The AppHost takes two connection strings and passes them to the services:
   dotnet user-secrets set ConnectionStrings:sql "Server=YOUR_SERVER;User Id=YOUR_USER;Password=YOUR_PASSWORD;MultipleActiveResultSets=true;TrustServerCertificate=True" --project samples/MicroServices/NBB.MicroServices.AppHost
   ```
 * `ConnectionStrings:jetstream` - the NATS server URL, configured in [`appsettings.json`](./NBB.MicroServices.AppHost/appsettings.json) of the AppHost (override it in the AppHost user secrets if needed).
+
+### Choosing the Invoices implementation
+By default the AppHost runs the C# Invoices service. Set `Invoices:UseFSharp` to `true` in the AppHost [`appsettings.json`](./NBB.MicroServices.AppHost/appsettings.json) (or start it with the `Invoices__UseFSharp=true` environment variable) to run [`NBB.Invoices.FSharp`](./NBB.Invoices.FSharp#readme) instead. It is a drop-in replacement: same API, same messages and the same database, so the rest of the services and the end-to-end flow work unchanged.
 
 ### Running
 From the `samples/MicroServices` folder:

@@ -16,6 +16,8 @@
     <ProjectReference Include="..\NBB.Invoices\NBB.Invoices.Api\NBB.Invoices.Api.csproj" />
     <ProjectReference Include="..\NBB.Invoices\NBB.Invoices.Migrations\NBB.Invoices.Migrations.csproj" />
     <ProjectReference Include="..\NBB.Invoices\NBB.Invoices.Worker\NBB.Invoices.Worker.csproj" />
+    <ProjectReference Include="..\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Api\NBB.Invoices.FSharp.Api.fsproj" />
+    <ProjectReference Include="..\NBB.Invoices.FSharp\NBB.Invoices.FSharp.Worker\NBB.Invoices.FSharp.Worker.fsproj" />
     <ProjectReference Include="..\NBB.Payments\NBB.Payments.Api\NBB.Payments.Api.csproj" />
     <ProjectReference Include="..\NBB.Payments\NBB.Payments.Migrations\NBB.Payments.Migrations.csproj" />
     <ProjectReference Include="..\NBB.Payments\NBB.Payments.Worker\NBB.Payments.Worker.csproj" />

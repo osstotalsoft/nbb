@@ -1,6 +1,8 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Extensions.Configuration;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // External infrastructure: the SQL Server connection string comes from user secrets, the NATS JetStream server from appsettings
@@ -33,13 +35,25 @@ var invoicesMigrations = builder.AddProject<Projects.NBB_Invoices_Migrations>("i
     .WithReference(invoicesDb, connectionName: "DefaultConnection")
     .WithEnvironment("EventStore__NBB__ConnectionString", invoicesDb);
 
-builder.AddProject<Projects.NBB_Invoices_Api>("invoices-api")
+// Invoices:UseFSharp switches to the F# implementation (NBB.Invoices.FSharp), a drop-in replacement
+// that serves the same API and handles the same published language messages
+var useFSharpInvoices = builder.Configuration.GetValue<bool>("Invoices:UseFSharp");
+
+var invoicesApi = useFSharpInvoices
+    ? builder.AddProject<Projects.NBB_Invoices_FSharp_Api>("invoices-api")
+    : builder.AddProject<Projects.NBB_Invoices_Api>("invoices-api");
+
+invoicesApi
     .WithReference(invoicesDb, connectionName: "DefaultConnection")
     .WithJetStream(jetstream)
     .WithHttpHealthCheck("/health")
     .WaitForCompletion(invoicesMigrations);
 
-builder.AddProject<Projects.NBB_Invoices_Worker>("invoices-worker")
+var invoicesWorker = useFSharpInvoices
+    ? builder.AddProject<Projects.NBB_Invoices_FSharp_Worker>("invoices-worker")
+    : builder.AddProject<Projects.NBB_Invoices_Worker>("invoices-worker");
+
+invoicesWorker
     .WithReference(invoicesDb, connectionName: "DefaultConnection")
     .WithEnvironment("EventStore__NBB__ConnectionString", invoicesDb)
     .WithJetStream(jetstream)
