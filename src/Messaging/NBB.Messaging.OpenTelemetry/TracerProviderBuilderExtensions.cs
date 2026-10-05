@@ -21,11 +21,12 @@ namespace NBB.Messaging.OpenTelemetry
 
             builder
                 .AddSource(MessagingActivitySource.Current.Name)
-                .ConfigureServices(services =>
+                // the decorators are applied when the message bus is registered, so this can be called before AddMessageBus
+                .ConfigureServices(services => services.ConfigureMessageBusServices(messageBusServices =>
                 {
-                    services.Decorate<IMessageBusPublisher, OpenTelemetryPublisherDecorator>();
-                    services.Decorate<IMessageBusSubscriber, OpenTelemetrySubscriberDecorator>();
-                });
+                    messageBusServices.Decorate<IMessageBusPublisher, OpenTelemetryPublisherDecorator>();
+                    messageBusServices.Decorate<IMessageBusSubscriber, OpenTelemetrySubscriberDecorator>();
+                }));
 
             return builder;
         }
