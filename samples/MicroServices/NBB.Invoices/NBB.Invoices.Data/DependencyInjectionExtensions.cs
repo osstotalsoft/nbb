@@ -20,9 +20,7 @@ namespace NBB.Invoices.Data
             services.AddDbContext<InvoicesDbContext>(
                 (serviceProvider, options) =>
                 {
-                    var configuration = serviceProvider.GetService<IConfiguration>();
-                    var connectionString = configuration.GetConnectionString("DefaultConnection");
-                    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
+                    options.UseSqlite(":memory:");
                 });
 
             services.AddEventSourcingDataAccess()
@@ -39,9 +37,7 @@ namespace NBB.Invoices.Data
             services.AddDbContextPool<InvoicesDbContext>(
                 (serviceProvider, options) =>
                 {
-                    var configuration = serviceProvider.GetService<IConfiguration>();
-                    var connectionString = configuration.GetConnectionString("DefaultConnection");
-                    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
+                    options.UseSqlite(":memory:");
                 });
         }
 

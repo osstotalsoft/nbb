@@ -33,6 +33,7 @@
     <PackageReference Include="Serilog" Version="$(SerilogPackageVersion)" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="$(SerilogExtensionsLoggingPackageVersion)" />
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="$(SerilogSinksMSSqlServerPackageVersion)" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="$(SerilogSinksConsole)" />
     <PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
     <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
@@ -40,6 +41,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.Serilog\NBB.Correlation.Serilog.csproj" />
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.AdoNet\NBB.EventStore.AdoNet.csproj" />
+    <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore.InMemory\NBB.EventStore.InMemory.csproj" />
     <ProjectReference Include="..\..\..\..\src\EventStore\NBB.EventStore\NBB.EventStore.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />

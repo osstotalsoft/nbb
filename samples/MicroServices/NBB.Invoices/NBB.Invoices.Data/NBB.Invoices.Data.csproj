@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(MicrosoftEntityFrameworkPackagesVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(MicrosoftEntityFrameworkPackagesVersion)" />
     <PackageReference Include="Scrutor" Version="$(ScrutorPackageVersion)" />
   </ItemGroup>
 
