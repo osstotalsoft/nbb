@@ -108,6 +108,10 @@ public class KafkaMessagingTransport(IProducer<byte[], byte[]> producer, KafkaCo
                 }
             }
             catch (OperationCanceledException) { }
+            catch (Exception e)
+            {
+                OnError?.Invoke(e);
+            }
         });
 
         return new SubscriptionDisposable(() =>

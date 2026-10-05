@@ -193,7 +193,7 @@ namespace NBB.Messaging.Kafka.Tests
         }
 
         [Fact]
-        public void Test_add_kafka_transport_resolves_imessagingtransport()
+        public void Test_add_kafka_transport_di_wiring()
         {
             //Arrange
             var configuration = new ConfigurationBuilder()
@@ -205,11 +205,40 @@ namespace NBB.Messaging.Kafka.Tests
                 .Build();
 
             //Act
-            var services = new ServiceCollection().AddKafkaTransport(configuration);
-            var transport = services.BuildServiceProvider().GetRequiredService<IMessagingTransport>();
+            // resolve KafkaConsumerFactory only: its provider constructs KafkaConsumerFactoryImpl (no native
+            // ProducerBuilder.Build(); full IMessagingTransport resolution needs librdkafka, deferred to integration tests)
+            var factory = new ServiceCollection().AddKafkaTransport(configuration)
+                .BuildServiceProvider().GetRequiredService<KafkaConsumerFactory>();
 
             //Assert
-            transport.Should().NotBeNull();
+            factory.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Test_add_kafka_transport_missing_bootstrap_servers_fails_validation()
+        {
+            //Arrange
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["Messaging:Kafka:group_id"] = "g1",
+                })
+                .Build();
+
+            //Act
+            // options validation is lazy: it fires on .Value read, which Create does before any native call
+            var factory = new ServiceCollection().AddKafkaTransport(configuration)
+                .BuildServiceProvider().GetRequiredService<KafkaConsumerFactory>();
+            var failed = false;
+            try {
+                _ = factory.Create("topic", SubscriptionTransportOptions.Default);
+            }
+            catch (Exception) {
+                failed = true;
+            }
+
+            //Assert
+            failed.Should().BeTrue();
         }
     }
 }
