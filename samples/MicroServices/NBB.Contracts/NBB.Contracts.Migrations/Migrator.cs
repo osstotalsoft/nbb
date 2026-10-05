@@ -21,9 +21,11 @@ namespace NBB.Contracts.Migrations
 
             await using (var dbContext = new ContractsReadDbContext(options))
             {
-                await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+                var created = await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+                logger.LogInformation(created
+                    ? "Read model database created"
+                    : "Read model database already exists, schema left unchanged");
             }
-            logger.LogInformation("Read model database is up to date");
 
             await new AdoNetEventStoreDatabaseMigrator(configuration).CreateDatabaseObjectsAsync(cancellationToken);
             logger.LogInformation("EventStore objects are up to date");
