@@ -2,8 +2,11 @@
 // This source code is licensed under the MIT license.
 
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xunit;
 
 namespace NBB.Messaging.Abstractions.Tests
@@ -12,6 +15,12 @@ namespace NBB.Messaging.Abstractions.Tests
     {
         private class Marker
         {
+        }
+
+        private class PublisherDecorator : IMessageBusPublisher
+        {
+            public Task PublishAsync<T>(T message, MessagingPublisherOptions publisherOptions = null,
+                CancellationToken cancellationToken = default) => Task.CompletedTask;
         }
 
         private static int MarkerCount(IServiceCollection services) =>
@@ -75,6 +84,23 @@ namespace NBB.Messaging.Abstractions.Tests
 
             //Assert
             MarkerCount(services).Should().Be(1);
+        }
+
+        [Fact]
+        public void Should_keep_the_deferred_decoration_when_the_message_bus_is_added_again()
+        {
+            //Arrange
+            var services = new ServiceCollection();
+            services.ConfigureMessageBusServices(s =>
+                s.Replace(ServiceDescriptor.Singleton<IMessageBusPublisher, PublisherDecorator>()));
+            services.AddMessageBus();
+
+            //Act
+            services.AddMessageBus();
+
+            //Assert
+            services.BuildServiceProvider().GetRequiredService<IMessageBusPublisher>()
+                .Should().BeOfType<PublisherDecorator>();
         }
     }
 }

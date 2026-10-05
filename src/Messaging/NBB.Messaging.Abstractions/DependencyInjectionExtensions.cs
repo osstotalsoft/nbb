@@ -12,6 +12,13 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddMessageBus(this IServiceCollection services)
         {
+            // a second call would register undecorated publisher and subscriber services again
+            if (services.Any(d => d.ServiceType == typeof(MessageBusMarker)))
+            {
+                return services;
+            }
+
+            services.AddSingleton<MessageBusMarker>();
             services.AddSingleton<IMessageBusPublisher, MessageBusPublisher>();
             services.AddSingleton<IMessageBusSubscriber, MessageBusSubscriber>();
             services.AddSingleton<ITopicRegistry, DefaultTopicRegistry>();
@@ -31,6 +38,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// If the message bus is already registered the configuration is applied immediately,
         /// otherwise it is applied when <see cref="AddMessageBus"/> is called.
         /// If the message bus is never registered the configuration is not applied.
+        /// A configuration applied by <see cref="AddMessageBus"/> runs before the registrations that follow it,
+        /// so its decorators end up inside the decorators added after <see cref="AddMessageBus"/>.
         /// </summary>
         public static IServiceCollection ConfigureMessageBusServices(this IServiceCollection services, Action<IServiceCollection> configure)
         {
@@ -56,10 +65,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
             foreach (var descriptor in deferred)
             {
-                // applied once: a later AddMessageBus call does not apply them again
                 services.Remove(descriptor);
                 ((MessageBusServicesConfiguration)descriptor.ImplementationInstance).Configure(services);
             }
         }
+
+        private sealed class MessageBusMarker;
     }
 }
