@@ -50,7 +50,7 @@ namespace NBB.Invoices.Worker
                         .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
                         .AddMediatorIntegration();
 
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+                    services.AddMessageBus().AddKafkaTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();
                     services.AddEventStore(e =>
                     {
