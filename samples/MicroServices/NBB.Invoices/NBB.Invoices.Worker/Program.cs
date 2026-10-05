@@ -15,6 +15,7 @@ using NBB.Invoices.Data;
 using NBB.Messaging.Host;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,12 +29,16 @@ namespace NBB.Invoices.Worker
                 .CreateDefaultBuilder(args)
                 .ConfigureLogging((hostingContext, loggingBuilder) =>
                 {
+                    var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
+
                     Log.Logger = new LoggerConfiguration()
                         .MinimumLevel.Debug()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.Console()
+                        .WriteTo.MSSqlServer(connectionString,
+                            new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+                        //In-memory opt-in for local runs: replace the MSSqlServer sink with .WriteTo.Console()
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -52,7 +57,8 @@ namespace NBB.Invoices.Worker
                     services.AddEventStore(e =>
                     {
                         e.UseNewtownsoftJson(new SingleValueObjectConverter());
-                        e.UseInMemoryEventRepository();
+                        e.UseAdoNetEventRepository(o => o.FromConfiguration());
+                        //In-memory opt-in for local runs: e.UseInMemoryEventRepository();
                     });
 
                     services.AddMessagingHost(
