@@ -62,3 +62,21 @@ The consumer is subscribed synchronously inside `SubscribeAsync` (before the pol
 ## DI test deferral
 
 The unit tests (`NBB.Messaging.Kafka.Tests`) resolve only the `KafkaConsumerFactory` service from the DI graph, because building the producer/consumer via `ProducerBuilder.Build()` loads the native librdkafka library. Full `IMessagingTransport` resolution through `AddKafkaTransport` is deferred to the integration tests (`test/Integration/NBB.Messaging.Kafka.IntegrationTests`), which run against a live Kafka server and are excluded from CI.
+
+## Running the integration tests locally
+
+Verified procedure (Windows):
+
+1. **Kafka server**: any local server works; the Apache image listens on `9092` by default, matching the test `appsettings.json`:
+   ```
+   docker pull apache/kafka:latest
+   docker run -d --name nbb-kafka --publish 9092:9092 --publish 9093:9093 --env LISTEN_PORT=9092 --env EXTERNAL_HOST=localhost apache/kafka:latest
+   ```
+2. **librdkafka binaries**: `Confluent.Kafka` loads the native library via a `kafka-windows-x64-*` folder on `PATH`. Install once from the NuGet redist package (`librdkafka.redist`, version matching the pinned `Confluent.Kafka`): extract its `runtimes/win-x64/native` DLLs into `%LOCALAPPDATA%\librdkafka\kafka-windows-x64-v<version>\native` and prepend `%LOCALAPPDATA%\librdkafka` to `PATH` for the test run.
+3. **Enable the facts**: the integration test `[Fact]` attributes are commented out by convention (CI never runs `test/Integration`); uncomment them for a local run.
+4. **Run**:
+   ```
+   dotnet test test/Integration/NBB.Messaging.Kafka.IntegrationTests -c Debug
+   ```
+
+Test-design notes for the round-trip test: the message payload must be an object type (the Newtonsoft serdes deserializes envelope payloads as `JObject`, so scalar `String` payloads cannot round-trip); the topic must be unique per run (a stable consumer group persists committed offsets across runs, so a reused topic resumes past the new message); and `Dispose` must not run synchronously on the poll task's thread (completing a `TaskCompletionSource` from inside the handler resumes the awaiting test continuation on that thread, and `Dispose`'s join would deadlock it — `await Task.Yield()` before `Dispose` breaks the chain).
