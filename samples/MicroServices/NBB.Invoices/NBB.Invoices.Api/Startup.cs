@@ -26,7 +26,8 @@ namespace NBB.Invoices.Api
             services.AddMvc();
             services.AddSingleton(Configuration);
             //services.AddKafkaMessaging();
-            services.AddMessageBus().AddKafkaTransport(Configuration);
+            //Default transport is NATS. To opt in to Kafka, replace the line below with: services.AddMessageBus().AddKafkaTransport(Configuration);
+            services.AddMessageBus().AddNatsTransport(Configuration);
             services.AddInvoicesReadDataAccess();
         }
 

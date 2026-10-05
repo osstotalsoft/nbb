@@ -15,7 +15,6 @@ using NBB.Invoices.Data;
 using NBB.Messaging.Host;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,7 +46,8 @@ namespace NBB.Invoices.Worker
                         .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
                         .AddMediatorIntegration();
 
-                    services.AddMessageBus().AddKafkaTransport(hostingContext.Configuration);
+                    //Default transport is NATS. To opt in to Kafka, replace the line below with: services.AddMessageBus().AddKafkaTransport(hostingContext.Configuration);
+                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();
                     services.AddEventStore(e =>
                     {
