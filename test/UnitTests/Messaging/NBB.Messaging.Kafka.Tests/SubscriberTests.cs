@@ -269,6 +269,32 @@ namespace NBB.Messaging.Kafka.Tests
         }
 
         [Fact]
+        public async Task Test_subscribe_commit_fault_is_nonfatal()
+        {
+            // regression: a transient Commit throw must not end the poll task. Pre-fix the Commit fault reached
+            // the outer catch and killed the subscription (batch 2 never consumed). With the per-batch guard the
+            // single Commit fault is reported via OnError and polling continues, so both batches are handled+committed.
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(new byte[] { 1 }, 0)).Returns(Result(new byte[] { 2 }, 1)).Returns(Eof());
+            Mock.Get(consumer).SetupSequence(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()))
+                .Throws(new Exception("commit boom"));
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var transport = Transport(new MockedConsumerFactory(consumer));
+            var errored = 0;
+            transport.OnError += _ => errored++;
+            var subscription = await transport.SubscribeAsync("topic", handler,
+                new SubscriptionTransportOptions { MaxConcurrentMessages = 1, UseGroup = true });
+            await Task.Delay(100); // Rusi convention: let poll loop run
+            subscription.Dispose();
+
+            //Assert
+            errored.Should().Be(1); // the Commit fault is reported, poll loop kept running
+            Mock.Get(handler).Verify(h => h(It.IsAny<TransportReceiveContext>()), Times.Exactly(2));
+            Mock.Get(consumer).Verify(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()), Times.Exactly(2));
+        }
+
+        [Fact]
         public async Task Test_subscribe_already_cancelled_token_skips_consumption()
         {
             // finding 2: the caller token is observed by the poll loop

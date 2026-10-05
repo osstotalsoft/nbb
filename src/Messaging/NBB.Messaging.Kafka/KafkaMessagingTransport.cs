@@ -93,28 +93,42 @@ public class KafkaMessagingTransport(IProducer<byte[], byte[]> producer, KafkaCo
 
                     if (results.Count > 0)
                     {
-                        await Parallel.ForEachAsync(results,
-                            new ParallelOptions { MaxDegreeOfParallelism = maxConcurrentMessages, CancellationToken = cts.Token },
-                            async (result, _) =>
-                            {
-                                try
-                                {
-                                    await handler(new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(result.Message.Value)));
-                                }
-                                catch (Exception e)
-                                {
-                                    // Kafka has no per-message NACK: the offset still advances (unlike JetStream explicit-ack)
-                                    OnError?.Invoke(e);
-                                }
-                            });
-
-                        if (subscriberOptions.UseGroup)
+                        // handle+commit is its own guard: a transient Commit throw or unexpected ForEachAsync
+                        // fault is non-fatal (report and keep polling), unlike a fatal ConsumeException
+                        try
                         {
-                            var lastByPartition = new Dictionary<TopicPartition, ConsumeResult<byte[], byte[]>>();
-                            foreach (var r in results)
-                                lastByPartition[r.TopicPartition] = r;
-                            foreach (var last in lastByPartition.Values)
-                                consumer.Commit(last);
+                            await Parallel.ForEachAsync(results,
+                                new ParallelOptions { MaxDegreeOfParallelism = maxConcurrentMessages, CancellationToken = cts.Token },
+                                async (result, _) =>
+                                {
+                                    try
+                                    {
+                                        await handler(new TransportReceiveContext(new TransportReceivedData.EnvelopeBytes(result.Message.Value)));
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        // Kafka has no per-message NACK: the offset still advances (unlike JetStream explicit-ack)
+                                        OnError?.Invoke(e);
+                                    }
+                                });
+
+                            if (subscriberOptions.UseGroup)
+                            {
+                                var lastByPartition = new Dictionary<TopicPartition, ConsumeResult<byte[], byte[]>>();
+                                foreach (var r in results)
+                                    lastByPartition[r.TopicPartition] = r;
+                                foreach (var last in lastByPartition.Values)
+                                    consumer.Commit(last);
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // cancellation is not a batch fault: let it reach the outer handling and end the poll task
+                            throw;
+                        }
+                        catch (Exception e)
+                        {
+                            _ = Task.Run(() => OnError?.Invoke(e));
                         }
                     }
                 }
