@@ -198,6 +198,7 @@
   </Folder>
   <Folder Name="/test/Integration/">
     <Project Path="test/Integration/NBB.EventStore.IntegrationTests/NBB.EventStore.IntegrationTests.csproj" />
+    <Project Path="test/Integration/NBB.Messaging.Kafka.IntegrationTests/NBB.Messaging.Kafka.IntegrationTests.csproj" />
     <Project Path="test/Integration/NBB.Messaging.Rusi.IntegrationTests/NBB.Messaging.Rusi.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/" />
