@@ -5,10 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host;
 using NBB.Messaging.MultiTenancy;
-using NBB.Messaging.OpenTelemetry;
 using NBB.MultiTenancy.Abstractions.Repositories;
 using NBB.Todos.Data;
-using OpenTelemetry.Trace;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -46,12 +44,6 @@ builder.Services.AddMultitenancy(builder.Configuration)
     .AddMultiTenantMessaging()
     .AddDefaultMessagingTenantIdentification()
     .AddTenantRepository<ConfigurationTenantRepository>();
-
-// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 var host = builder.Build();
 

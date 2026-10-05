@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="$(OpenTelemetryInstrumentationSqlClientPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,7 +43,6 @@
     <ProjectReference Include="..\NBB.Payments.Data\NBB.Payments.Data.csproj" />
     <ProjectReference Include="..\NBB.Payments.PublishedLanguage\NBB.Payments.PublishedLanguage.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.JetStream\NBB.Messaging.JetStream.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
     <ProjectReference Include="..\..\..\NBB.Samples.ServiceDefaults\NBB.Samples.ServiceDefaults.csproj" />
   </ItemGroup>
 

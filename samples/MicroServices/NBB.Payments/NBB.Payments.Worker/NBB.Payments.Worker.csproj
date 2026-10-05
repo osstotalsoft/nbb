@@ -31,7 +31,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="$(OpenTelemetryInstrumentationSqlClientPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,7 +41,6 @@
     <ProjectReference Include="..\..\..\..\src\Application\NBB.Application.Mediator\NBB.Application.Mediator.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Mediator\NBB.Messaging.Mediator.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.JetStream\NBB.Messaging.JetStream.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
     <ProjectReference Include="..\..\..\NBB.Samples.ServiceDefaults\NBB.Samples.ServiceDefaults.csproj" />
   </ItemGroup>
 

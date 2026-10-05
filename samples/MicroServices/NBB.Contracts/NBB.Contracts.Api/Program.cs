@@ -8,8 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi;
 using NBB.Contracts.ReadModel.Data;
 using NBB.Correlation.AspNet;
-using NBB.Messaging.OpenTelemetry;
-using OpenTelemetry.Trace;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,12 +47,6 @@ builder.Services
     })
     .AddMediatorIntegration(); // contract classifier for the NBB 4 topic resolution
 builder.Services.AddContractsReadModelDataAccess();
-
-// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 var app = builder.Build();
 

@@ -5,10 +5,8 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open NBB.Core.Effects
 open NBB.Messaging.Host
-open NBB.Messaging.OpenTelemetry
 open NBB.Invoices.FSharp.Application
 open NBB.Invoices.FSharp.Data
-open OpenTelemetry.Trace
 
 [<EntryPoint>]
 let main args =
@@ -42,12 +40,6 @@ let main args =
                 |> ignore)
             |> ignore
     )
-    |> ignore
-
-    // Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
-    builder.Services
-        .AddOpenTelemetry()
-        .WithTracing(fun tracing -> tracing.AddMessageBusInstrumentation().AddSqlClientInstrumentation() |> ignore)
     |> ignore
 
     builder.Build().Run()

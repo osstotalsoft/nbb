@@ -4,8 +4,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NBB.Messaging.Host;
-using NBB.Messaging.OpenTelemetry;
-using OpenTelemetry.Trace;
 using System.Linq;
 using System.Reflection;
 
@@ -53,12 +51,6 @@ builder.Services.AddMessagingHost(
 builder.Services
     .AddProcessManager(Assembly.GetEntryAssembly())
     .AddProcessManagerMediatorHandlers();
-
-// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 var host = builder.Build();
 

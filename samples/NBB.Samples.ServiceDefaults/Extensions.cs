@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ServiceDiscovery;
+using NBB.Messaging.OpenTelemetry;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
@@ -73,7 +74,11 @@ public static class Extensions
                     )
                     // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
                     //.AddGrpcClientInstrumentation()
-                    .AddHttpClientInstrumentation();
+                    .AddHttpClientInstrumentation()
+                    // All the sample services use SQL Server (EF Core, the NBB event store or ADO.NET)
+                    .AddSqlClientInstrumentation()
+                    // NBB message bus publish/receive spans; a no-op for hosts without a message bus
+                    .AddMessageBusInstrumentation();
             });
 
         builder.AddOpenTelemetryExporters();

@@ -9,9 +9,7 @@ using NBB.Contracts.ReadModel.Data;
 using NBB.Contracts.WriteModel.Data;
 using NBB.Domain;
 using NBB.Messaging.Host;
-using NBB.Messaging.OpenTelemetry;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using System;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -68,11 +66,7 @@ builder.Services.AddMessagingHost(
     )
 );
 
-// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
 builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation())
     .WithMetrics(metrics => metrics
         .AddMeter(ContractDomainMetrics.InstrumentationName)
         .AddInstrumentation<ContractDomainMetrics>());

@@ -11,10 +11,8 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Giraffe
 open NBB.Correlation.AspNet
-open NBB.Messaging.OpenTelemetry
 open NBB.Invoices.FSharp.Application
 open NBB.Invoices.FSharp.Data
-open OpenTelemetry.Trace
 
 let webApp =
     choose [ subRouteCi "/api" (choose [ Handlers.Invoice.handler ]) ]
@@ -39,12 +37,6 @@ let main args =
     builder.Services
         .AddGiraffe()
         .AddSingleton<Json.ISerializer>(Json.Serializer(JsonSerializerOptions(JsonSerializerDefaults.Web)))
-    |> ignore
-
-    // Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
-    builder.Services
-        .AddOpenTelemetry()
-        .WithTracing(fun tracing -> tracing.AddMessageBusInstrumentation().AddSqlClientInstrumentation() |> ignore)
     |> ignore
 
     let app = builder.Build()

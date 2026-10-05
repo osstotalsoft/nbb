@@ -21,7 +21,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsPackagesVersion)" />      
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
     <PackageReference Include="Mediator.SourceGenerator" Version="$(MediatorPackageVersion)" PrivateAssets="all" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="$(OpenTelemetryInstrumentationSqlClientPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,7 +28,6 @@
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.Host\NBB.Messaging.Host.csproj" />
     <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.MultiTenancy\NBB.Messaging.MultiTenancy.csproj" />
-    <ProjectReference Include="..\..\..\src\Messaging\NBB.Messaging.OpenTelemetry\NBB.Messaging.OpenTelemetry.csproj" />
     <ProjectReference Include="..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Http\NBB.MultiTenancy.Identification.Http.csproj" />
     <ProjectReference Include="..\..\..\src\MultiTenancy\NBB.MultiTenancy.Identification.Messaging\NBB.MultiTenancy.Identification.Messaging.csproj" />
     <ProjectReference Include="..\NBB.Todo.Data\NBB.Todo.Data.csproj" />

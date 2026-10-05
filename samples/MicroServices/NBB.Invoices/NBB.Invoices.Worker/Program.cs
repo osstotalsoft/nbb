@@ -10,8 +10,6 @@ using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.Invoices.Data;
 using NBB.Messaging.Host;
-using NBB.Messaging.OpenTelemetry;
-using OpenTelemetry.Trace;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -51,12 +49,6 @@ builder.Services
     .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
     .Decorate(typeof(IUow<>), typeof(EventPublishingUowDecorator<>))
     .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
-
-// Registered after the message bus: the instrumentation decorates the bus publisher and subscriber
-builder.Services.AddOpenTelemetry()
-    .WithTracing(tracing => tracing
-        .AddMessageBusInstrumentation()
-        .AddSqlClientInstrumentation());
 
 var host = builder.Build();
 
