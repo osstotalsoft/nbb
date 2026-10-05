@@ -1,0 +1,215 @@
+// Copyright (c) TotalSoft.
+// This source code is licensed under the MIT license.
+
+using Confluent.Kafka;
+using FluentAssertions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Moq;
+using NBB.Messaging.Abstractions;
+using NBB.Messaging.Kafka;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
+
+namespace NBB.Messaging.Kafka.Tests
+{
+    internal class MockedConsumerFactory(IConsumer<byte[], byte[]> consumer) : KafkaConsumerFactory
+    {
+        public SubscriptionTransportOptions CapturedOptions { get; set; } = null;
+
+        public IConsumer<byte[], byte[]> Create(string topic, SubscriptionTransportOptions options)
+        {
+            CapturedOptions = options;
+            return consumer;
+        }
+    }
+
+    public class SubscriberTests
+    {
+        private static ConsumeResult<byte[], byte[]> Result(byte[] payload, long offset, int partition = 0) =>
+            new ConsumeResult<byte[], byte[]> { Topic = "topic", Partition = new Partition(partition), Offset = new Offset(offset),
+                Message = new Message<byte[], byte[]> { Value = payload } };
+
+        private static ConsumeResult<byte[], byte[]> Eof(int partition = 0) =>
+            new ConsumeResult<byte[], byte[]> { Topic = "topic", Partition = new Partition(partition), IsPartitionEOF = true };
+
+        private static KafkaMessagingTransport Transport(MockedConsumerFactory factory) =>
+            new(null, factory, new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+
+        [Fact]
+        public async Task TestSubscriber()
+        {
+            // happy path: 3 messages, handler gets EnvelopeBytes, commit per partition, dispose closes
+            var payloadBytes = new byte[] { 1, 2, 3 };
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(payloadBytes, 0)).Returns(Result(payloadBytes, 1)).Returns(Result(payloadBytes, 2))
+                .Returns(Eof());
+
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var transport = Transport(new MockedConsumerFactory(consumer));
+
+            //Act
+            var subscription = await transport.SubscribeAsync("topic", handler,
+                new SubscriptionTransportOptions { MaxConcurrentMessages = 3 });
+            await Task.Delay(100); // Rusi convention: let poll loop run
+            subscription.Dispose();
+
+            //Assert
+            Mock.Get(handler).Verify(h => h(It.Is<TransportReceiveContext>(m =>
+                ((TransportReceivedData.EnvelopeBytes)m.ReceivedData).Bytes == payloadBytes)), Times.Exactly(3));
+            Mock.Get(consumer).Verify(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()), Times.Once);
+            Mock.Get(consumer).Verify(c => c.Close(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_sanitizes_topic()
+        {
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            var subscription = await Transport(new MockedConsumerFactory(consumer))
+                .SubscribeAsync("spa ce/!", Mock.Of<Func<TransportReceiveContext, Task>>());
+            subscription.Dispose();
+            Mock.Get(consumer).Verify(c => c.Subscribe("spa_ce__"));
+        }
+
+        [Fact]
+        public async Task Test_subscribe_skips_partition_eof()
+        {
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Eof());
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var subscription = await Transport(new MockedConsumerFactory(consumer)).SubscribeAsync("topic", handler);
+            await Task.Delay(100);
+            subscription.Dispose();
+            Mock.Get(handler).Verify(h => h(It.IsAny<TransportReceiveContext>()), Times.Never);
+            Mock.Get(consumer).Verify(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_default_options_batch_size_one()
+        {
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Eof());
+            var factory = new MockedConsumerFactory(consumer);
+            var transport = new KafkaMessagingTransport(null, factory,
+                new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+
+            var subscription = await transport.SubscribeAsync("topic", Mock.Of<Func<TransportReceiveContext, Task>>());
+            await Task.Delay(100);
+            subscription.Dispose();
+
+            factory.CapturedOptions.Should().NotBeNull();
+            factory.CapturedOptions.MaxConcurrentMessages.Should().Be(1);
+            Mock.Get(consumer).Verify(c => c.Consume(It.IsAny<System.TimeSpan>()), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_dispose_closes_consumer()
+        {
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Eof());
+            var subscription = await Transport(new MockedConsumerFactory(consumer))
+                .SubscribeAsync("topic", Mock.Of<Func<TransportReceiveContext, Task>>());
+            subscription.Dispose();
+            Mock.Get(consumer).Verify(c => c.Close(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_commits_per_partition()
+        {
+            // results on partitions 0 and 1: Commit called twice, once per TopicPartition
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(new byte[] { 1 }, 0, 0)).Returns(Result(new byte[] { 2 }, 0, 1))
+                .Returns(Eof());
+            var subscription = await Transport(new MockedConsumerFactory(consumer))
+                .SubscribeAsync("topic", Mock.Of<Func<TransportReceiveContext, Task>>());
+            await Task.Delay(100);
+            subscription.Dispose();
+            Mock.Get(consumer).Verify(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public async Task Test_subscribe_nonfatal_consume_error_continues()
+        {
+            var payloadBytes = new byte[] { 7 };
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Throws(new ConsumeException(Eof(), new Error(ErrorCode.Local_InvalidArg, "non-fatal boom")))
+                .Returns(Result(payloadBytes, 0)).Returns(Eof());
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var transport = Transport(new MockedConsumerFactory(consumer));
+            var errored = 0;
+            transport.OnError += _ => errored++;
+            var subscription = await transport.SubscribeAsync("topic", handler);
+            await Task.Delay(100);
+            subscription.Dispose();
+            errored.Should().Be(1);
+            Mock.Get(handler).Verify(h => h(It.IsAny<TransportReceiveContext>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_fatal_consume_error_stops_loop()
+        {
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Throws(new ConsumeException(Eof(), new Error(ErrorCode.Local_Fatal, "fatal boom", true)));
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var transport = Transport(new MockedConsumerFactory(consumer));
+            var errored = 0;
+            transport.OnError += _ => errored++;
+            var subscription = await transport.SubscribeAsync("topic", handler);
+            await Task.Delay(100);
+            subscription.Dispose();
+            errored.Should().Be(1);
+            Mock.Get(handler).Verify(h => h(It.IsAny<TransportReceiveContext>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_handler_failure_reported()
+        {
+            // handler throws on first result -> OnError fires, loop continues, second result delivered
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(new byte[] { 1 }, 0)).Returns(Result(new byte[] { 2 }, 1))
+                .Returns(Eof());
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            Mock.Get(handler).SetupSequence(h => h(It.IsAny<TransportReceiveContext>()))
+                .Throws(new Exception("handler boom")).Returns(Task.CompletedTask);
+            var transport = Transport(new MockedConsumerFactory(consumer));
+            var errored = 0;
+            transport.OnError += _ => errored++;
+            var subscription = await transport.SubscribeAsync("topic", handler);
+            await Task.Delay(100);
+            subscription.Dispose();
+            errored.Should().Be(1);
+        }
+
+        [Fact]
+        public void Test_add_kafka_transport_resolves_imessagingtransport()
+        {
+            //Arrange
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    ["Messaging:Kafka:bootstrap_servers"] = "localhost:9092",
+                    ["Messaging:Kafka:group_id"] = "g1",
+                })
+                .Build();
+
+            //Act
+            var services = new ServiceCollection().AddKafkaTransport(configuration);
+            var transport = services.BuildServiceProvider().GetRequiredService<IMessagingTransport>();
+
+            //Assert
+            transport.Should().NotBeNull();
+        }
+    }
+}
