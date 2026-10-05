@@ -30,7 +30,7 @@ The transport requires a *Kafka* section inside the *Messaging* configuration se
 
 Settings:
 - **bootstrap_servers** - comma-separated list of `host:port` pairs of one or more Kafka servers. Required: the DI wiring fails validation with `missing bootstrap_servers` when it is empty.
-- **group_id** - base identifier of the Kafka consumer group used by subscriptions. Each subscription gets its own consumer group named `<group_id>__<sanitized topic>`, so subscriptions to different topics keep independent position state.
+- **group_id** - base identifier of the Kafka consumer group used by subscriptions. Each subscription gets its own consumer group named `<group_id>__<sanitized topic>` (stable per topic, so subscriptions to different topics keep independent position state). With `UseGroup = false` the group name gets an extra per-subscription nonce suffix (`<group_id>__<sanitized topic>__<uuid>`), so each subscription starts fresh and its offsets are never persisted.
 
 Note that topics are sanitized to the Kafka topic alphabet (`a-z A-Z 0-9 . - _`): any other character is replaced with `_`. The same sanitization is applied to the consumer-group name, so the same topic always maps to the same Kafka topic and consumer group.
 
@@ -41,12 +41,19 @@ The transport maps the generic `SubscriptionTransportOptions` to Kafka concepts 
 | SubscriptionTransportOptions | Kafka equivalent |
 |---|---|
 | **DeliverNewMessagesOnly** | `AutoOffsetReset` of the consumer, set by the consumer factory: `Latest` when the flag is set, `Earliest` when it is not. Only relevant on first consumption for a consumer group; afterwards the persisted group offsets decide where consumption starts. |
-| **MaxConcurrentMessages** | Batch size of the `Consume` collect-loop (up to N messages are pulled before invoking the handlers) plus the `MaxDegreeOfParallelism` of the `Parallel.ForEachAsync` that runs the handlers. |
+| **MaxConcurrentMessages** | Batch size of the `Consume` collect-loop (up to N messages are pulled before invoking the handlers) plus the `MaxDegreeOfParallelism` of the `Parallel.ForEachAsync` that runs the handlers. Clamped to at least 1. A partition EOF (or a null result) breaks the collect-loop early, so a batch can be smaller than the budget. |
+| **UseGroup** | With `true` (default) the subscription uses the stable `<group_id>__<topic>` consumer group and commits partition offsets after each batch, so position survives restarts. With `false` (`SubscriptionTransportOptions.RequestReply`) the consumer group gets a per-subscription nonce and no `Commit` is ever issued: ephemeral subscription semantics, nothing persists. |
 | **IsDurable** / **AckWait** | No Kafka equivalent. Kafka consumer-group offsets persist per `group_id` (per topic-partition), so subscription position survives restarts for a stable group name; there is no per-subscription durability switch nor an ack timeout with redelivery. |
 
 ## Handler-failure tradeoff
 
 Kafka has no per-message negative acknowledgement (unlike the JetStream NATS transports, where a failed handler leaves the message un-acked for redelivery). In this transport the batch commit still advances the partition offset past a message whose handler threw: the failure is reported to the `OnError` transport error handler and the message is *not* redelivered. If replaying failed messages matters, handle it at the application level (for example by re-publishing to a retry topic) rather than relying on the transport.
+
+Two delivery-guarantee notes:
+- **At-least-once within a batch**: the batch commit happens only after all handlers of the batch have run, so a crash between the handlers and the commit redelivers up to `MaxConcurrentMessages` already-handled messages.
+- **Shared group offsets**: with `UseGroup = true` there is one consumer group per topic, so two *live* subscriptions to the same topic share the group's offsets and each commit moves the other's position. Keep at most one live subscription per topic per `group_id` (a restart of a stopped subscription then overlaps with, and may skip past, messages consumed by the live one). Use `UseGroup = false` for concurrent ephemeral subscriptions.
+
+The consumer is subscribed synchronously inside `SubscribeAsync` (before the poll loop starts), so a message published right after `SubscribeAsync` returns is visible to the subscription even with `AutoOffsetReset.Latest`; the residual window is only the asynchronous assignment of the returned disposable.
 
 ## Native runtime requirement
 

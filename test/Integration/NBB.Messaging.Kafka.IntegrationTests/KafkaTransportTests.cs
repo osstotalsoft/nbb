@@ -26,6 +26,20 @@ namespace NBB.Messaging.Kafka.IntegrationTests
             sub.Dispose();
         }
 
+        //[Fact]
+        public async Task Test_publish_then_subscribe_round_trip()
+        {
+            var sp = BuildServiceProvider();
+            var msgBus = sp.GetRequiredService<IMessageBus>();
+            var received = new TaskCompletionSource<bool>();
+            await msgBus.PublishAsync("MyTestMessage", MessagingPublisherOptions.Default with { TopicName = "MyTestTopic" });
+            var sub = await msgBus.SubscribeAsync(
+                _e => { received.TrySetResult(true); return Task.CompletedTask; },
+                MessagingSubscriberOptions.Default with { TopicName = "MyTestTopic", Transport = SubscriptionTransportOptions.StreamProcessor });
+            await received.Task.WaitAsync(TimeSpan.FromMilliseconds(5000));
+            sub.Dispose();
+        }
+
         private IServiceProvider BuildServiceProvider()
         {
             var services = new ServiceCollection();

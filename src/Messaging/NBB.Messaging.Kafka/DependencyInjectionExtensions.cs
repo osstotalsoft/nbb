@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
 using NBB.Messaging.Kafka;
 using System;
-using System.Collections;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -21,7 +20,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddOptions<KafkaOptions>()
                 .Bind(configuration.GetSection("Messaging").GetSection("Kafka"))
                 .Validate(options => !string.IsNullOrEmpty(options.BootstrapServers),
-                    "missing bootstrap_servers");
+                    "missing bootstrap_servers")
+                .Validate(options => !string.IsNullOrEmpty(options.GroupId),
+                    "missing group_id");
 
             services.AddSingleton<IProducer<byte[], byte[]>>(sp =>
             {
@@ -40,8 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<KafkaMessagingTransport>(sp =>
                 new KafkaMessagingTransport(
                     sp.GetRequiredService<IProducer<byte[], byte[]>>(),
-                    sp.GetRequiredService<KafkaConsumerFactory>(),
-                    sp.GetRequiredService<IOptions<KafkaOptions>>()));
+                    sp.GetRequiredService<KafkaConsumerFactory>()));
 
             services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<KafkaMessagingTransport>());
             services.AddSingleton<IMessagingTransport>(sp => sp.GetRequiredService<KafkaMessagingTransport>());

@@ -24,15 +24,19 @@ internal class KafkaConsumerFactoryImpl(IOptions<KafkaOptions> kafkaOptions) : K
             new ConsumerConfig
             {
                 BootstrapServers = kafkaOptions.Value.BootstrapServers,
-                GroupId = KafkaMessagingTransport.SanitizeTopic(kafkaOptions.Value.GroupId + "__" + topic),
+                GroupId = GroupName(topic, options),
                 AutoOffsetReset = options.DeliverNewMessagesOnly ? AutoOffsetReset.Latest : AutoOffsetReset.Earliest,
                 EnableAutoCommit = false,
                 EnableAutoOffsetStore = false,
             }).Build();
+
+    internal string GroupName(string topic, SubscriptionTransportOptions options) =>
+        KafkaMessagingTransport.SanitizeTopic(
+            options.UseGroup ? $"{kafkaOptions.Value.GroupId}__{topic}"
+                             : $"{kafkaOptions.Value.GroupId}__{topic}__{Guid.NewGuid()}");
 }
 
-public class KafkaMessagingTransport(IProducer<byte[], byte[]> producer, KafkaConsumerFactory consumerFactory,
-    IOptions<KafkaOptions> kafkaOptions) : IMessagingTransport, ITransportMonitor
+public class KafkaMessagingTransport(IProducer<byte[], byte[]> producer, KafkaConsumerFactory consumerFactory) : IMessagingTransport, ITransportMonitor
 {
     public event TransportErrorHandler OnError;
 
@@ -54,28 +58,43 @@ public class KafkaMessagingTransport(IProducer<byte[], byte[]> producer, KafkaCo
     {
         var sanitizedTopic = SanitizeTopic(topic);
         var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
+        var maxConcurrentMessages = Math.Max(1, subscriberOptions.MaxConcurrentMessages);
         var consumer = consumerFactory.Create(sanitizedTopic, subscriberOptions);
+        // subscribe synchronously, before the poll loop starts: the consumer is positioned when SubscribeAsync returns
+        consumer.Subscribe(sanitizedTopic);
         var cts = new CancellationTokenSource();
+        //link the internal token to the caller token: caller cancellation cancels the poll loop and running handlers
+        if (cancellationToken.CanBeCanceled)
+            cancellationToken.Register(_ => cts.Cancel(), null);
 
         var t = Task.Run(async () =>
         {
             try
             {
-                consumer.Subscribe(sanitizedTopic);
-                while (!cts.IsCancellationRequested)
+                while (!cts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
                 {
+                    // collected outside the inner try: results already popped from the librdkafka buffer
+                    // must be handled and committed even when a later Consume in the same batch throws
+                    var results = new List<ConsumeResult<byte[], byte[]>>();
                     try
                     {
-                        var results = new List<ConsumeResult<byte[], byte[]>>();
-                        for (var i = 0; i < subscriberOptions.MaxConcurrentMessages; i++)
+                        for (var i = 0; i < maxConcurrentMessages && !cancellationToken.IsCancellationRequested; i++)
                         {
                             var result = consumer.Consume(TimeSpan.FromMilliseconds(100));
                             if (result is null || result.IsPartitionEOF) break;
                             results.Add(result);
                         }
+                    }
+                    catch (ConsumeException e)
+                    {
+                        _ = Task.Run(() => OnError?.Invoke(e));
+                        if (e.Error.IsFatal) break;
+                    }
 
+                    if (results.Count > 0)
+                    {
                         await Parallel.ForEachAsync(results,
-                            new ParallelOptions { MaxDegreeOfParallelism = subscriberOptions.MaxConcurrentMessages, CancellationToken = cts.Token },
+                            new ParallelOptions { MaxDegreeOfParallelism = maxConcurrentMessages, CancellationToken = cts.Token },
                             async (result, _) =>
                             {
                                 try
@@ -89,33 +108,29 @@ public class KafkaMessagingTransport(IProducer<byte[], byte[]> producer, KafkaCo
                                 }
                             });
 
-                        var lastByPartition = new Dictionary<TopicPartition, ConsumeResult<byte[], byte[]>>();
-                        foreach (var r in results)
-                            lastByPartition[r.TopicPartition] = r;
-                        foreach (var last in lastByPartition.Values)
-                            consumer.Commit(last);
-                    }
-                    catch (OperationCanceledException) { break; }
-                    catch (ConsumeException e)
-                    {
-                        OnError?.Invoke(e);
-                        if (e.Error.IsFatal) break;
-                    }
-                    catch (Exception e)
-                    {
-                        OnError?.Invoke(e);
+                        if (subscriberOptions.UseGroup)
+                        {
+                            var lastByPartition = new Dictionary<TopicPartition, ConsumeResult<byte[], byte[]>>();
+                            foreach (var r in results)
+                                lastByPartition[r.TopicPartition] = r;
+                            foreach (var last in lastByPartition.Values)
+                                consumer.Commit(last);
+                        }
                     }
                 }
             }
             catch (OperationCanceledException) { }
             catch (Exception e)
             {
-                OnError?.Invoke(e);
+                _ = Task.Run(() => OnError?.Invoke(e));
             }
         });
 
+        var closed = false;
         return new SubscriptionDisposable(() =>
         {
+            if (closed) return;
+            closed = true;
             cts.Cancel();
             t.Wait();
             consumer.Close();

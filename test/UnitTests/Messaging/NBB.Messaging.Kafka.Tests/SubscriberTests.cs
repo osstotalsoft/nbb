@@ -38,7 +38,7 @@ namespace NBB.Messaging.Kafka.Tests
             new ConsumeResult<byte[], byte[]> { Topic = "topic", Partition = new Partition(partition), IsPartitionEOF = true };
 
         private static KafkaMessagingTransport Transport(MockedConsumerFactory factory) =>
-            new(null, factory, new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+            new(null, factory);
 
         [Fact]
         public async Task TestSubscriber()
@@ -97,8 +97,7 @@ namespace NBB.Messaging.Kafka.Tests
             Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
                 .Returns(Eof());
             var factory = new MockedConsumerFactory(consumer);
-            var transport = new KafkaMessagingTransport(null, factory,
-                new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+            var transport = new KafkaMessagingTransport(null, factory);
 
             var subscription = await transport.SubscribeAsync("topic", Mock.Of<Func<TransportReceiveContext, Task>>());
             await Task.Delay(100);
@@ -239,6 +238,77 @@ namespace NBB.Messaging.Kafka.Tests
 
             //Assert
             failed.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Test_subscribe_mid_batch_consume_error_keeps_collected_results()
+        {
+            // finding 1: result1 is collected, then a non-fatal ConsumeException aborts the collect loop:
+            // result1 was already popped from the librdkafka buffer, so it must still be handled and committed
+            var payloadBytes = new byte[] { 5 };
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(payloadBytes, 0))
+                .Throws(new ConsumeException(Eof(), new Error(ErrorCode.Local_InvalidArg, "non-fatal boom")))
+                .Returns(Result(payloadBytes, 1)).Returns(Eof());
+            var handler = Mock.Of<Func<TransportReceiveContext, Task>>();
+            var transport = Transport(new MockedConsumerFactory(consumer));
+            var errored = 0;
+            transport.OnError += _ => errored++;
+
+            //Act
+            var subscription = await transport.SubscribeAsync("topic", handler,
+                new SubscriptionTransportOptions { MaxConcurrentMessages = 3 });
+            await Task.Delay(100); // Rusi convention: let poll loop run
+            subscription.Dispose();
+
+            //Assert
+            errored.Should().Be(1);
+            Mock.Get(handler).Verify(h => h(It.IsAny<TransportReceiveContext>()), Times.Exactly(2));
+            Mock.Get(consumer).Verify(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public async Task Test_subscribe_already_cancelled_token_skips_consumption()
+        {
+            // finding 2: the caller token is observed by the poll loop
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(new byte[] { 1 }, 0)).Returns(Eof());
+            var cancelled = new CancellationTokenSource();
+            cancelled.Cancel();
+            var subscription = await Transport(new MockedConsumerFactory(consumer))
+                .SubscribeAsync("topic", Mock.Of<Func<TransportReceiveContext, Task>>(),
+                    SubscriptionTransportOptions.Default, cancelled.Token);
+            subscription.Dispose();
+            Mock.Get(consumer).Verify(c => c.Consume(It.IsAny<System.TimeSpan>()), Times.Never);
+            Mock.Get(consumer).Verify(c => c.Close(), Times.Once);
+        }
+
+        [Fact]
+        public async Task Test_subscribe_request_reply_skips_commit()
+        {
+            // finding 3: UseGroup=false (RequestReply) => ephemeral group, Commit never called
+            var consumer = Mock.Of<IConsumer<byte[], byte[]>>();
+            Mock.Get(consumer).SetupSequence(c => c.Consume(It.IsAny<System.TimeSpan>()))
+                .Returns(Result(new byte[] { 1 }, 0)).Returns(Eof());
+            var subscription = await Transport(new MockedConsumerFactory(consumer))
+                .SubscribeAsync("topic", Mock.Of<Func<TransportReceiveContext, Task>>(), SubscriptionTransportOptions.RequestReply);
+            await Task.Delay(100);
+            subscription.Dispose();
+            Mock.Get(consumer).Verify(c => c.Commit(It.IsAny<ConsumeResult<byte[], byte[]>>()), Times.Never);
+        }
+
+        [Fact]
+        public void Test_consumer_group_name_nonce_when_use_group_false()
+        {
+            // finding 3: stable group name with UseGroup=true, unique nonce-suffixed name without
+            var factory = new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions { GroupId = "g1" }));
+            factory.GroupName("topic", SubscriptionTransportOptions.Default).Should().Be("g1__topic");
+            var ephemeral1 = factory.GroupName("topic", SubscriptionTransportOptions.RequestReply);
+            var ephemeral2 = factory.GroupName("topic", SubscriptionTransportOptions.RequestReply);
+            ephemeral1.Should().NotBe(ephemeral2);
+            ephemeral1.Should().StartWith("g1__topic__");
         }
     }
 }

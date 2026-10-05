@@ -37,8 +37,7 @@ namespace NBB.Messaging.Kafka.Tests
                 .Returns(() => Task.FromResult(new DeliveryResult<byte[], byte[]>()));
 
             var transport = new KafkaMessagingTransport(producer,
-                new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions())),
-                new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+                new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions())));
 
             var sendContext = new TransportSendContext(
                 PayloadBytesAccessor: () => (null, null),
@@ -67,8 +66,7 @@ namespace NBB.Messaging.Kafka.Tests
                 .Returns(() => Task.FromResult(new DeliveryResult<byte[], byte[]>()));
 
             var transport = new KafkaMessagingTransport(producer,
-                new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions())),
-                new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+                new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions())));
 
             var sendContext = new TransportSendContext(
                 PayloadBytesAccessor: () => (null, null),
@@ -94,8 +92,7 @@ namespace NBB.Messaging.Kafka.Tests
                 .Returns(() => Task.FromResult(new DeliveryResult<byte[], byte[]>()));
 
             var transport = new KafkaMessagingTransport(producer,
-                new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions())),
-                new OptionsWrapper<KafkaOptions>(new KafkaOptions()));
+                new KafkaConsumerFactoryImpl(new OptionsWrapper<KafkaOptions>(new KafkaOptions())));
 
             var sendContext = new TransportSendContext(
                 PayloadBytesAccessor: () => (null, null),
