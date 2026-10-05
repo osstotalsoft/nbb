@@ -11,7 +11,7 @@ namespace NBB.Messaging.Abstractions
     /// applied by <see cref="DependencyInjectionExtensions.AddMessageBus"/>.
     /// See <see cref="DependencyInjectionExtensions.ConfigureMessageBusServices"/>.
     /// </summary>
-    public sealed class MessageBusServicesConfiguration(Action<IServiceCollection> configure)
+    internal sealed class MessageBusServicesConfiguration(Action<IServiceCollection> configure)
     {
         internal Action<IServiceCollection> Configure { get; } = configure;
     }

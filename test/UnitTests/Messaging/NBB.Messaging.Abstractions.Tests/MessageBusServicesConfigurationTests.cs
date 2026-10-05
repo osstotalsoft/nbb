@@ -40,7 +40,6 @@ namespace NBB.Messaging.Abstractions.Tests
             //Assert
             countBeforeMessageBus.Should().Be(0);
             MarkerCount(services).Should().Be(1);
-            services.Should().NotContain(d => d.ServiceType == typeof(MessageBusServicesConfiguration));
         }
 
         [Fact]
@@ -55,7 +54,6 @@ namespace NBB.Messaging.Abstractions.Tests
 
             //Assert
             MarkerCount(services).Should().Be(1);
-            services.Should().NotContain(d => d.ServiceType == typeof(MessageBusServicesConfiguration));
         }
 
         [Fact]
