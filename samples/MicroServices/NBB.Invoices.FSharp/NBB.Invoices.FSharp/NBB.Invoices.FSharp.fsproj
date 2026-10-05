@@ -8,6 +8,8 @@
     <Compile Include="Domain\InvoiceAggregate.fs" />
     <Compile Include="Application\MessageBus.fs" />
     <Compile Include="Application\Invoice.fs" />
+    <Compile Include="Application\InvoiceQueries.fs" />
+    <Compile Include="Application\PublishedLanguage.fs" />
     <Compile Include="Application\Application.fs" />
     <Compile Include="Data\Invoice.fs" />
     <Compile Include="Data\DependencyInjection.fs" />
@@ -18,9 +20,12 @@
     <ProjectReference Include="..\..\..\..\src\Core\NBB.Core.Effects.FSharp\NBB.Core.Effects.FSharp.fsproj" />
     <ProjectReference Include="..\..\..\..\src\Core\NBB.Core.Evented.FSharp\NBB.Core.Evented.FSharp.fsproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Effects\NBB.Messaging.Effects.csproj" />
+    <ProjectReference Include="..\..\NBB.Invoices\NBB.Invoices.PublishedLanguage\NBB.Invoices.PublishedLanguage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="$(MicrosoftDataSqlClientPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftExtensionsPackagesVersion)" />
   </ItemGroup>
 

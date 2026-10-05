@@ -1,4 +1,4 @@
-// Copyright (c) TotalSoft.
+﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
 namespace NBB.Invoices.FSharp.Application
@@ -22,15 +22,6 @@ module Middlewares =
                 return result
             }
 
-    let publishMessage =
-        fun _ req ->
-            effect {
-                do! MessageBus.publish req
-                return Some()
-            }
-
-
-
 module WriteApplication =
     open Middlewares
 
@@ -40,13 +31,15 @@ module WriteApplication =
     let private commandPipeline =
         log
         << handlers [ CreateInvoice.handle |> upCast
-                      MarkInvoiceAsPayed.handle |> upCast ]
+                      MarkInvoiceAsPayed.handle |> upCast
+                      ProcessInvoice.handle |> upCast ]
 
     let private queryPipeline: QueryMiddleware = handlers []
 
     open EventMiddleware
 
-    let private eventPipeline : EventMiddleware = (*log << *)handlers []
+    let private eventPipeline: EventMiddleware =
+        handlers [ PublishedLanguage.publishIntegrationEvents |> EventHandler.upCast ]
 
 
     let addServices (services: IServiceCollection) =
@@ -56,17 +49,18 @@ module WriteApplication =
         services.AddMediator(commandPipeline, queryPipeline, eventPipeline)
 
 module ReadApplication =
-    open Middlewares
-
     open RequestMiddleware
+    open QueryHandler
 
-    let private commandPipeline = log << publishMessage
-    let private queryPipeline: QueryMiddleware = handlers []
+    let private commandPipeline: CommandMiddleware = handlers []
 
+    let private queryPipeline: QueryMiddleware =
+        handlers [ GetInvoices.handle |> upCast
+                   GetInvoice.handle |> upCast ]
 
     open EventMiddleware
 
-    let private eventPipeline : EventMiddleware = (*log << *)handlers []
+    let private eventPipeline: EventMiddleware = handlers []
 
 
     let addServices (services: IServiceCollection) =
