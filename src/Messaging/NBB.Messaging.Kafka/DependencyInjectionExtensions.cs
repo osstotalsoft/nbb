@@ -34,26 +34,13 @@ namespace Microsoft.Extensions.DependencyInjection
                     }).Build();
             });
 
-            services.AddSingleton<ConsumerFactory>(sp =>
-            {
-                var kafkaOptions = sp.GetRequiredService<IOptions<KafkaOptions>>();
-                return (string topic, SubscriptionTransportOptions options) =>
-                    new ConsumerBuilder<byte[], byte[]>(
-                        new ConsumerConfig
-                        {
-                            BootstrapServers = kafkaOptions.Value.BootstrapServers,
-                            GroupId = kafkaOptions.Value.GroupId + "__" + topic,
-                            AutoOffsetReset = options.DeliverNewMessagesOnly
-                                ? AutoOffsetReset.Latest : AutoOffsetReset.Earliest,
-                            EnableAutoCommit = false,
-                            EnableAutoOffsetStore = false,
-                        }).Build();
-            });
+            services.AddSingleton<KafkaConsumerFactory>(sp =>
+                new KafkaConsumerFactoryImpl(sp.GetRequiredService<IOptions<KafkaOptions>>()));
 
             services.AddSingleton<KafkaMessagingTransport>(sp =>
                 new KafkaMessagingTransport(
                     sp.GetRequiredService<IProducer<byte[], byte[]>>(),
-                    sp.GetRequiredService<ConsumerFactory>(),
+                    sp.GetRequiredService<KafkaConsumerFactory>(),
                     sp.GetRequiredService<IOptions<KafkaOptions>>()));
 
             services.AddSingleton<ITransportMonitor>(sp => sp.GetRequiredService<KafkaMessagingTransport>());

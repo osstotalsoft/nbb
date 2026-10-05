@@ -22,7 +22,8 @@
       "test\\UnitTests\\Messaging\\NBB.Messaging.Mediator.Tests\\NBB.Messaging.Mediator.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.MediatR.Tests\\NBB.Messaging.MediatR.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.MultiTenancy.Tests\\NBB.Messaging.MultiTenancy.Tests.csproj",
-      "test\\UnitTests\\Messaging\\NBB.Messaging.Rusi.Tests\\NBB.Messaging.Rusi.Tests.csproj"
+      "test\\UnitTests\\Messaging\\NBB.Messaging.Rusi.Tests\\NBB.Messaging.Rusi.Tests.csproj",
+      "test\\UnitTests\\Messaging\\NBB.Messaging.Kafka.Tests\\NBB.Messaging.Kafka.Tests.csproj"
     ]
   }
 }
