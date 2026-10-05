@@ -23,6 +23,7 @@ namespace NBB.Invoices.Data
                     var configuration = serviceProvider.GetService<IConfiguration>();
                     var connectionString = configuration.GetConnectionString("DefaultConnection");
                     options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
+                    //In-memory opt-in for local runs (needs native sqlite3.dll): options.UseSqlite(":memory:");
                 });
 
             services.AddEventSourcingDataAccess()
@@ -42,6 +43,7 @@ namespace NBB.Invoices.Data
                     var configuration = serviceProvider.GetService<IConfiguration>();
                     var connectionString = configuration.GetConnectionString("DefaultConnection");
                     options.UseSqlServer(connectionString, b => b.MigrationsAssembly("NBB.Invoices.Migrations"));
+                    //In-memory opt-in for local runs (needs native sqlite3.dll): options.UseSqlite(":memory:");
                 });
         }
 

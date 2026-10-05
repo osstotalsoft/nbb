@@ -38,6 +38,7 @@ namespace NBB.Invoices.Worker
                         .Enrich.With<CorrelationLogEventEnricher>()
                         .WriteTo.MSSqlServer(connectionString,
                             new MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true })
+                        //In-memory opt-in for local runs: replace the MSSqlServer sink with .WriteTo.Console()
                         .CreateLogger();
 
                     loggingBuilder.AddSerilog(dispose: true);
@@ -50,12 +51,14 @@ namespace NBB.Invoices.Worker
                         .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
                         .AddMediatorIntegration();
 
+                    //Default transport is NATS. To opt in to Kafka, replace the line below with: services.AddMessageBus().AddKafkaTransport(hostingContext.Configuration);
                     services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
                     services.AddInvoicesWriteDataAccess();
                     services.AddEventStore(e =>
                     {
                         e.UseNewtownsoftJson(new SingleValueObjectConverter());
                         e.UseAdoNetEventRepository(o => o.FromConfiguration());
+                        //In-memory opt-in for local runs: e.UseInMemoryEventRepository();
                     });
 
                     services.AddMessagingHost(

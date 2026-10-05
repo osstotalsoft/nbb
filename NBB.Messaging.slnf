@@ -7,6 +7,7 @@
       "src\\Messaging\\NBB.Messaging.Host\\NBB.Messaging.Host.csproj",
       "src\\Messaging\\NBB.Messaging.InProcessMessaging\\NBB.Messaging.InProcessMessaging.csproj",
       "src\\Messaging\\NBB.Messaging.JetStream\\NBB.Messaging.JetStream.csproj",
+      "src\\Messaging\\NBB.Messaging.Kafka\\NBB.Messaging.Kafka.csproj",
       "src\\Messaging\\NBB.Messaging.Mediator\\NBB.Messaging.Mediator.csproj",
       "src\\Messaging\\NBB.Messaging.MediatR\\NBB.Messaging.MediatR.csproj",
       "src\\Messaging\\NBB.Messaging.MultiTenancy\\NBB.Messaging.MultiTenancy.csproj",
@@ -21,7 +22,8 @@
       "test\\UnitTests\\Messaging\\NBB.Messaging.Mediator.Tests\\NBB.Messaging.Mediator.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.MediatR.Tests\\NBB.Messaging.MediatR.Tests.csproj",
       "test\\UnitTests\\Messaging\\NBB.Messaging.MultiTenancy.Tests\\NBB.Messaging.MultiTenancy.Tests.csproj",
-      "test\\UnitTests\\Messaging\\NBB.Messaging.Rusi.Tests\\NBB.Messaging.Rusi.Tests.csproj"
+      "test\\UnitTests\\Messaging\\NBB.Messaging.Rusi.Tests\\NBB.Messaging.Rusi.Tests.csproj",
+      "test\\UnitTests\\Messaging\\NBB.Messaging.Kafka.Tests\\NBB.Messaging.Kafka.Tests.csproj"
     ]
   }
 }

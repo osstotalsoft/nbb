@@ -155,6 +155,7 @@
     <Project Path="src/Messaging/NBB.Messaging.Host/NBB.Messaging.Host.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.InProcessMessaging/NBB.Messaging.InProcessMessaging.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.JetStream/NBB.Messaging.JetStream.csproj" />
+    <Project Path="src/Messaging/NBB.Messaging.Kafka/NBB.Messaging.Kafka.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.Mediator/NBB.Messaging.Mediator.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.MediatR/NBB.Messaging.MediatR.csproj" />
     <Project Path="src/Messaging/NBB.Messaging.MultiTenancy/NBB.Messaging.MultiTenancy.csproj" />
@@ -197,6 +198,7 @@
   </Folder>
   <Folder Name="/test/Integration/">
     <Project Path="test/Integration/NBB.EventStore.IntegrationTests/NBB.EventStore.IntegrationTests.csproj" />
+    <Project Path="test/Integration/NBB.Messaging.Kafka.IntegrationTests/NBB.Messaging.Kafka.IntegrationTests.csproj" />
     <Project Path="test/Integration/NBB.Messaging.Rusi.IntegrationTests/NBB.Messaging.Rusi.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/" />
@@ -242,6 +244,7 @@
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.MediatR.Tests/NBB.Messaging.MediatR.Tests.csproj" />
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.MultiTenancy.Tests/NBB.Messaging.MultiTenancy.Tests.csproj" />
     <Project Path="test/UnitTests/Messaging/NBB.Messaging.Rusi.Tests/NBB.Messaging.Rusi.Tests.csproj" />
+    <Project Path="test/UnitTests/Messaging/NBB.Messaging.Kafka.Tests/NBB.Messaging.Kafka.Tests.csproj" />
   </Folder>
   <Folder Name="/test/UnitTests/MultiTenancy/">
     <Project Path="test/UnitTests/MultiTenancy/NBB.MultiTenancy.Configuration.Tests/NBB.MultiTenancy.Abstractions.Tests.csproj" />
