@@ -1,70 +1,46 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-open System
-open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
-open NBB.Invoices.FSharp.Application
+open Microsoft.Extensions.Hosting
 open NBB.Core.Effects
 open NBB.Messaging.Host
-open Microsoft.Extensions.Logging
+open NBB.Invoices.FSharp.Application
 open NBB.Invoices.FSharp.Data
-open NBB.Application.Mediator.FSharp
 
 [<EntryPoint>]
-let main argv =
+let main args =
+    let builder = Host.CreateApplicationBuilder(args)
 
-    // Services configuration
-    let serviceConfig (context: HostBuilderContext) (services: IServiceCollection) =
-        services
-        |> WriteApplication.addServices
-        |> DataAccess.addServices
-        |> ignore
+    builder.AddServiceDefaults() |> ignore
 
-        services
-            .AddMessageBus()
-            .AddNatsTransport(context.Configuration)
-        |> ignore
+    builder.Services
+    |> WriteApplication.addServices
+    |> DataAccess.addServices builder.Configuration
+    |> ignore
 
-        services.AddMessagingHost
-            (context.Configuration,
-            fun hostBuilder ->
-                hostBuilder.Configure
-                    (fun configBuilder ->
-                        configBuilder
-                            .AddSubscriberServices(fun config ->
-                                config.AddTypes(typeof<CreateInvoice.Command>, typeof<MarkInvoiceAsPayed.Command>)
-                                |> ignore)
-                            .WithDefaultOptions()
-                            .UsePipeline(fun pipelineBuilder ->
-                                pipelineBuilder
-                                    .UseCorrelationMiddleware()
-                                    .UseExceptionHandlingMiddleware()
-                                    .UseDefaultResiliencyMiddleware()
-                                    .UseEffectMiddleware(fun m ->
-                                        m
-                                        |> Mediator.sendMessage
-                                        |> EffectExtensions.ToUnit)
-                                |> ignore)
+    builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration) |> ignore
+
+    // Subscribes to the NBB.Invoices published language commands, the same ones handled by the C# Invoices worker
+    builder.Services.AddMessagingHost(
+        builder.Configuration,
+        fun hostBuilder ->
+            hostBuilder.Configure(fun configBuilder ->
+                configBuilder
+                    .AddSubscriberServices(fun config -> config.AddTypes(Array.ofList PublishedLanguage.commandTypes) |> ignore)
+                    .WithDefaultOptions()
+                    .UsePipeline(fun pipelineBuilder ->
+                        pipelineBuilder
+                            .UseCorrelationMiddleware()
+                            .UseExceptionHandlingMiddleware()
+                            .UseDefaultResiliencyMiddleware()
+                            .UseEffectMiddleware(fun message ->
+                                message |> PublishedLanguage.handleMessage |> EffectExtensions.ToUnit)
                         |> ignore)
                 |> ignore)
-        |> ignore
+            |> ignore
+    )
+    |> ignore
 
-    // Logging configuration
-    let loggingConfig (context: HostBuilderContext) (loggingBuilder: ILoggingBuilder) =
-        loggingBuilder.AddConsole().AddDebug() |> ignore
-
-
-    let host =
-        Host
-            .CreateDefaultBuilder(argv)
-            .ConfigureServices(Action<HostBuilderContext, IServiceCollection> serviceConfig)
-            .ConfigureLogging(Action<HostBuilderContext, ILoggingBuilder> loggingConfig)
-            .UseConsoleLifetime()
-            .Build()
-
-    host.RunAsync()
-    |> Async.AwaitTask
-    |> Async.RunSynchronously
-
+    builder.Build().Run()
     0

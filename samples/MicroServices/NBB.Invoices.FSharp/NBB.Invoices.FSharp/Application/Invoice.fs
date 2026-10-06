@@ -12,20 +12,16 @@ open NBB.Application.Mediator.FSharp
 module CreateInvoice =
     type Command =
         { ClientId: Guid
-          ContractId: Guid
+          ContractId: Guid option
           Amount: decimal }
         interface ICommand
 
     let handle cmd =
         effect {
             let eventedInvoice =
-                InvoiceAggregate.create cmd.ClientId (Some cmd.ContractId) cmd.Amount
+                InvoiceAggregate.create cmd.ClientId cmd.ContractId cmd.Amount
 
-            do!
-                eventedInvoice
-                |> Evented.run
-                |> fst
-                |> InvoiceRepository.save
+            do! InvoiceRepository.save eventedInvoice
 
             do!
                 eventedInvoice
@@ -43,21 +39,34 @@ module MarkInvoiceAsPayed =
 
     let handle cmd =
         effect {
-            let! invoice = InvoiceRepository.getById cmd.InvoiceId
+            match! InvoiceRepository.getById cmd.InvoiceId with
+            | Some invoice ->
+                let eventedInvoice =
+                    InvoiceAggregate.markAsPayed cmd.PaymentId invoice
 
-            let eventedInvoice =
-                InvoiceAggregate.markAsPayed cmd.PaymentId invoice
+                do! InvoiceRepository.save eventedInvoice
 
-            do!
-                eventedInvoice
-                |> Evented.run
-                |> fst
-                |> InvoiceRepository.save
+                do!
+                    eventedInvoice
+                    |> Evented.exec
+                    |> Mediator.dispatchEvents
+            | None -> ()
 
-            do!
-                eventedInvoice
-                |> Evented.exec
-                |> Mediator.dispatchEvents
+            return Some()
+        }
+
+module ProcessInvoice =
+    type Command =
+        { InvoiceId: Guid }
+        interface ICommand
+
+    let handle cmd =
+        effect {
+            match! InvoiceRepository.getById cmd.InvoiceId with
+            | Some _ ->
+                // some computational heavy stuff
+                do! Effect.from (fun () -> Threading.Thread.Sleep 1000)
+            | None -> ()
 
             return Some()
         }

@@ -22,4 +22,16 @@ The configuration allows specifying:
 
 ```
 
+## Usage
 
+By default the migrator reads the configuration itself, from `appsettings.json`, environment variables and (in Development) user secrets:
+
+```csharp
+await new AdoNetEventStoreDatabaseMigrator().CreateDatabaseObjectsAsync();
+```
+
+To use the configuration of an existing host instead, for example one built with `Host.CreateApplicationBuilder`, pass its `IConfiguration`:
+
+```csharp
+await new AdoNetEventStoreDatabaseMigrator(builder.Configuration).CreateDatabaseObjectsAsync();
+```

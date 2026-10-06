@@ -1,23 +1,25 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NBB.Correlation.AspNet;
+using NBB.Payments.Data;
 
-namespace NBB.Payments.Api
-{
-    public static class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+builder.AddServiceDefaults();
+
+builder.Services.AddControllers();
+builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration);
+builder.Services.AddPaymentsReadDataAccess();
+
+var app = builder.Build();
+
+app.UseCorrelation();
+
+app.MapControllers();
+app.MapDefaultEndpoints();
+
+app.Run();

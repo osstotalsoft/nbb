@@ -18,7 +18,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Correlation\NBB.Correlation.AspNet\NBB.Correlation.AspNet.csproj" />
     <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Abstractions\NBB.Messaging.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.Nats\NBB.Messaging.Nats.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Messaging\NBB.Messaging.JetStream\NBB.Messaging.JetStream.csproj" />
+    <ProjectReference Include="..\..\..\NBB.Samples.ServiceDefaults\NBB.Samples.ServiceDefaults.csproj" />
     <ProjectReference Include="..\NBB.Invoices.FSharp\NBB.Invoices.FSharp.fsproj" />
   </ItemGroup>
 

@@ -5,15 +5,17 @@
   </Folder>
   <Folder Name="/samples/">
     <File Path="samples/README.md" />
+    <Project Path="samples/NBB.Samples.ServiceDefaults/NBB.Samples.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/samples/MicroServices/">
     <File Path="samples/MicroServices/NBB Samples.postman_collection.json" />
     <File Path="samples/MicroServices/README.md" />
+    <File Path="samples/MicroServices/aspire.config.json" />
+    <Project Path="samples/MicroServices/NBB.MicroServices.AppHost/NBB.MicroServices.AppHost.csproj" />
     <Project Path="samples/MicroServices/NBB.MicroServicesOrchestration/NBB.MicroServicesOrchestration.csproj" />
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Contracts/">
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Api/NBB.Contracts.Api.csproj" />
-    <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application.Commands/NBB.Contracts.Application.Commands.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Application/NBB.Contracts.Application.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Domain/NBB.Contracts.Domain.csproj" />
     <Project Path="samples/MicroServices/NBB.Contracts/NBB.Contracts.Migrations/NBB.Contracts.Migrations.csproj" />
@@ -41,7 +43,6 @@
   </Folder>
   <Folder Name="/samples/MicroServices/NBB.Payments/">
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Api/NBB.Payments.Api.csproj" />
-    <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application.Commands/NBB.Payments.Application.Commands.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Application/NBB.Payments.Application.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Data/NBB.Payments.Data.csproj" />
     <Project Path="samples/MicroServices/NBB.Payments/NBB.Payments.Domain/NBB.Payments.Domain.csproj" />
@@ -56,6 +57,8 @@
   <Folder Name="/samples/MultiTenancy/">
     <File Path="samples/MultiTenancy/MultiTenantTodoList.postman_collection.json" />
     <File Path="samples/MultiTenancy/README.md" />
+    <File Path="samples/MultiTenancy/aspire.config.json" />
+    <Project Path="samples/MultiTenancy/NBB.Todo.AppHost/NBB.Todo.AppHost.csproj" />
     <Project Path="samples/MultiTenancy/NBB.Todo.Api/NBB.Todo.Api.csproj" />
     <Project Path="samples/MultiTenancy/NBB.Todo.Data/NBB.Todo.Data.csproj" />
     <Project Path="samples/MultiTenancy/NBB.Todo.Migrations/NBB.Todo.Migrations.csproj" />

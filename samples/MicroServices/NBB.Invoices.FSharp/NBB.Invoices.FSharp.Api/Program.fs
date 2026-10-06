@@ -1,91 +1,56 @@
-// Copyright (c) TotalSoft.
+﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-namespace NBB.Invoices.FSharp.Api
+module NBB.Invoices.FSharp.Api.Program
 
 open System
-open Microsoft.AspNetCore.Hosting
-open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.Logging
+open System.Text.Json
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
-open NBB.Correlation.AspNet
+open Microsoft.Extensions.Hosting
+open Microsoft.Extensions.Logging
 open Giraffe
+open NBB.Correlation.AspNet
 open NBB.Invoices.FSharp.Application
 open NBB.Invoices.FSharp.Data
-open NBB.Messaging.Abstractions
-open NBB.Messaging.Nats
-open Microsoft.AspNetCore.Cors.Infrastructure
 
-module Program =
-    let webApp =
-        choose [
-            route "/" >=>  text "Hello"
-            subRoute "/api"
-                (choose [
-                    Handlers.Invoice.handler
-                    //Handlers.ElemDefinitions.handler
-                    //Handlers.Compilation.handler
-                ])
-            setStatusCode 404 >=> text "Not Found" ]
+let webApp =
+    choose [ subRouteCi "/api" (choose [ Handlers.Invoice.handler ]) ]
 
-    let errorHandler (ex : Exception) (logger : ILogger) =
-        logger.LogError(ex, "An unhandled exception has occurred while executing the request.")
-        clearResponse >=> setStatusCode 500 >=> text ex.Message
+let errorHandler (ex: Exception) (logger: ILogger) =
+    logger.LogError(ex, "An unhandled exception has occurred while executing the request.")
+    clearResponse >=> setStatusCode 500 >=> text ex.Message
 
-    // ---------------------------------
-    // Config and Main
-    // ---------------------------------
+[<EntryPoint>]
+let main args =
+    let builder = WebApplication.CreateBuilder(args)
 
-    let configureCors (builder : CorsPolicyBuilder) =
-        builder.WithOrigins("http://localhost:5000")
-               .AllowAnyMethod()
-               .AllowAnyHeader()
-               |> ignore
+    builder.AddServiceDefaults() |> ignore
 
-    let configureApp (app : IApplicationBuilder) =
-        let env = app.ApplicationServices.GetService<IWebHostEnvironment>()
-        (match env.IsDevelopment() with
-        | true  -> app.UseDeveloperExceptionPage()
-        | false -> app.UseGiraffeErrorHandler errorHandler)
-            .UseCors(configureCors)
-            .UseCorrelation()
-            .UseGiraffe(webApp)
+    builder.Services
+    |> ReadApplication.addServices
+    |> DataAccess.addServices builder.Configuration
+    |> ignore
 
-    let configureServices (context: WebHostBuilderContext) (services : IServiceCollection) =
-        services
-        |> ReadApplication.addServices
-        |> DataAccess.addServices
-        |> ignore
+    builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration) |> ignore
 
-        services
-            .AddMessageBus()
-            .AddNatsTransport(context.Configuration)
-        |> ignore
+    builder.Services
+        .AddGiraffe()
+        .AddSingleton<Json.ISerializer>(Json.Serializer(JsonSerializerOptions(JsonSerializerDefaults.Web)))
+    |> ignore
 
-        services
-            .AddCors()
-            .AddGiraffe()
-            //.AddSingleton<Giraffe.IJsonSerializer>(
-            //    NewtonsoftJsonSerializer(NewtonsoftJsonSerializer.DefaultSettings))
-        |> ignore
+    let app = builder.Build()
 
-    let configureLogging (builder : ILoggingBuilder) =
-        builder.AddFilter(_.Equals(LogLevel.Error))
-               .AddConsole()
-               .AddDebug() |> ignore
+    if app.Environment.IsDevelopment() then
+        app.UseDeveloperExceptionPage() |> ignore
+    else
+        app.UseGiraffeErrorHandler errorHandler |> ignore
 
+    app.UseCorrelation() |> ignore
+    app.MapDefaultEndpoints() |> ignore
 
-    [<EntryPoint>]
-    let main args =
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(
-                fun webHostBuilder ->
-                    webHostBuilder
-                        .Configure(configureApp)
-                        .ConfigureServices(configureServices)
-                        .ConfigureLogging(configureLogging)
-                        |> ignore)
-            .Build()
-            .Run()
-        0
+    // Requests not handled by Giraffe fall through to the endpoints above (the health checks)
+    app.UseGiraffe webApp
+
+    app.Run()
+    0

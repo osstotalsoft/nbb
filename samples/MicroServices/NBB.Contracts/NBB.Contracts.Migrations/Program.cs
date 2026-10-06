@@ -1,23 +1,28 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using NBB.EventStore.AdoNet.Migrations;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NBB.Contracts.Migrations;
 using System;
 
-namespace NBB.Contracts.Migrations
-{
-    class Program
-    {
-        private static void Main(string[] args)
-        {
-            var contractsMigrator = new ContractsReadDatabaseMigrator();
-            contractsMigrator.EnsureDatabaseDeleted(args).Wait();
-            Console.WriteLine("Database deleted");
-            contractsMigrator.MigrateDatabaseToLatestVersion(args).Wait();
-            Console.WriteLine("Database created");
+var builder = Host.CreateApplicationBuilder(args);
 
-            new AdoNetEventStoreDatabaseMigrator().ReCreateDatabaseObjects(args).Wait();
-            Console.WriteLine("EventStore objects re-created");
-        }
-    }
+builder.AddServiceDefaults();
+
+builder.Services.AddScoped<Migrator>();
+
+using var host = builder.Build();
+await host.StartAsync();
+try
+{
+    using var scope = host.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<Migrator>().RunAsync();
 }
+catch (Exception ex)
+{
+    host.Services.GetRequiredService<ILogger<Program>>().LogError(ex, "Database migration failed");
+    Environment.ExitCode = 1;
+}
+await host.StopAsync();

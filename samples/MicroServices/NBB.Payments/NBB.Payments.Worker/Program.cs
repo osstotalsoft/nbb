@@ -1,89 +1,55 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NBB.Core.Abstractions;
 using NBB.Data.Abstractions;
-using NBB.Correlation.Serilog;
 using NBB.Domain;
 using NBB.Domain.Abstractions;
 using NBB.EventStore.Abstractions;
 using NBB.Messaging.Host;
 using NBB.Payments.Data;
-using Serilog;
-using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace NBB.Payments.Worker
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.AddServiceDefaults();
+
+builder.Services
+    .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
+    .AddMediatorIntegration();
+
+builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration);
+builder.Services.AddPaymentsWriteDataAccess();
+builder.Services.AddEventStore(es =>
 {
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var builder = Host
-                .CreateDefaultBuilder(args)
-                .ConfigureLogging((hostingContext, loggingBuilder) =>
-                {
-                    var connectionString = hostingContext.Configuration.GetConnectionString("Logs");
+    es.UseNewtownsoftJson(new SingleValueObjectConverter());
+    es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
+});
 
-                    Log.Logger = new LoggerConfiguration()
-                        .MinimumLevel.Debug()
-                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                        .Enrich.FromLogContext()
-                        .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.MSSqlServer(connectionString,
-                            new MSSqlServerSinkOptions {TableName = "Logs", AutoCreateSqlTable = true})
-                        .CreateLogger();
+builder.Services.AddMessagingHost(
+    builder.Configuration,
+    hostBuilder => hostBuilder
+    .Configure(configBuilder => configBuilder
+        .AddSubscriberServices(subscriberBuilder => subscriberBuilder
+            .FromMediatorHandledCommands().AddAllClasses()
+            .FromMediatorHandledEvents().AddAllClasses()
+        )
+        .WithDefaultOptions()
+        .UsePipeline(pipelineBuilder => pipelineBuilder
+            .UseCorrelationMiddleware()
+            .UseExceptionHandlingMiddleware()
+            .UseDefaultResiliencyMiddleware()
+            .UseMediatorMiddleware()
+        )
+    )
+);
 
-                    loggingBuilder.AddSerilog(dispose: true);
-                    loggingBuilder.AddFilter("Microsoft", logLevel => logLevel >= LogLevel.Warning);
-                    loggingBuilder.AddConsole();
-                })
-                .ConfigureServices((hostingContext, services) =>
-                {
-                    services
-                        .AddMediator(options => options.ServiceLifetime = ServiceLifetime.Scoped)
-                        .AddMediatorIntegration();
-                    //services.AddKafkaMessaging();
-                    services.AddMessageBus().AddNatsTransport(hostingContext.Configuration);
+builder.Services
+    .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
+    .Decorate(typeof(IUow<>), typeof(EventPublishingUowDecorator<>))
+    .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
 
-                    services.AddPaymentsWriteDataAccess();
+var host = builder.Build();
 
-                    services.AddEventStore(es =>
-                    {
-                        es.UseNewtownsoftJson(new SingleValueObjectConverter());
-                        es.UseAdoNetEventRepository(opts => opts.FromConfiguration());
-                    });
-
-                    services.AddMessagingHost(
-                        hostingContext.Configuration,
-                        hostBuilder => hostBuilder
-                        .Configure(configBuilder => configBuilder
-                            .AddSubscriberServices(subscriberBuilder => subscriberBuilder
-                                .FromMediatorHandledCommands().AddAllClasses()
-                                .FromMediatorHandledEvents().AddAllClasses()
-                            )
-                            .WithDefaultOptions()
-                            .UsePipeline(pipelineBuilder => pipelineBuilder
-                                .UseCorrelationMiddleware()
-                                .UseExceptionHandlingMiddleware()
-                                .UseDefaultResiliencyMiddleware()
-                                .UseMediatorMiddleware()
-                            )
-                        ));
-
-                    services
-                        .Decorate(typeof(IUow<>), typeof(DomainUowDecorator<>))
-                        .Decorate(typeof(IUow<>), typeof(EventPublishingUowDecorator<>))
-                        .Decorate(typeof(IUow<>), typeof(EventStoreUowDecorator<>));
-                });
-
-            await builder.RunConsoleAsync(CancellationToken.None);
-        }
-    }
-}
+await host.RunAsync();

@@ -18,6 +18,28 @@ namespace NBB.EventStore.AdoNet.Migrations
         private readonly Internal.Scripts _scripts;
 
         public AdoNetEventStoreDatabaseMigrator(bool forceMultiTenant = false, bool isTestHost = false)
+            : this(BuildConfiguration(isTestHost ? Assembly.GetCallingAssembly() : Assembly.GetEntryAssembly()), forceMultiTenant)
+        {
+        }
+
+        public AdoNetEventStoreDatabaseMigrator(IConfiguration configuration, bool forceMultiTenant = false)
+        {
+            ArgumentNullException.ThrowIfNull(configuration);
+
+            _connectionString = configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
+            var tenancySection = configuration.GetSection("MultiTenancy");
+            var tenancyOptions = tenancySection.Get<TenancyHostingOptions>();
+            if ((tenancyOptions == null) && !forceMultiTenant)
+            {
+                _scripts = new Internal.Scripts();
+            }
+            else
+            {
+                _scripts = new Multitenancy.Internal.Scripts();
+            }
+        }
+
+        private static IConfiguration BuildConfiguration(Assembly userSecretsAssembly)
         {
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -29,21 +51,10 @@ namespace NBB.EventStore.AdoNet.Migrations
 
             if (isDevelopment)
             {
-                configurationBuilder.AddUserSecrets(isTestHost ? Assembly.GetCallingAssembly() : Assembly.GetEntryAssembly());
+                configurationBuilder.AddUserSecrets(userSecretsAssembly);
             }
 
-            var configuration = configurationBuilder.Build();
-            _connectionString = configuration.GetSection("EventStore").GetSection("NBB")["ConnectionString"];
-            var tenancySection = configuration.GetSection("MultiTenancy");
-            var tenancyOptions = tenancySection.Get<TenancyHostingOptions>();
-            if ((tenancyOptions == null) && !forceMultiTenant)
-            {
-                _scripts = new Internal.Scripts();
-            }
-            else
-            {
-                _scripts = new Multitenancy.Internal.Scripts();
-            }            
+            return configurationBuilder.Build();
         }
 
         public async Task ReCreateDatabaseObjects(string[] args, CancellationToken cancellationToken = default)

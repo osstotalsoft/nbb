@@ -1,35 +1,64 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NBB.Correlation.Serilog;
-using NBB.Tools.Serilog.OpenTelemetryTracingSink;
-using Serilog;
+using Microsoft.OpenApi;
+using NBB.Contracts.ReadModel.Data;
+using NBB.Correlation.AspNet;
+using System;
 
-namespace NBB.Contracts.Api
+var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
+
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Contracts API", Version = "v1" }));
+builder.Services.AddHttpContextAccessor();
+
+var transport = builder.Configuration.GetValue("Messaging:Transport", "JetStream");
+if (transport.Equals("JetStream", StringComparison.InvariantCultureIgnoreCase))
 {
-    public static class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseSerilog((context, services, logConfig) =>
-                {
-                    logConfig
-                        .ReadFrom.Configuration(context.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.With<CorrelationLogEventEnricher>()
-                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}")
-                        .WriteTo.OpenTelemetryTracing();
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+    builder.Services
+        .AddMessageBus()
+        .AddJetStreamTransport(builder.Configuration)
+        .UseTopicResolutionBackwardCompatibility(builder.Configuration);
 }
+else if (transport.Equals("Rusi", StringComparison.InvariantCultureIgnoreCase))
+{
+    builder.Services
+        .AddMessageBus()
+        .AddRusiTransport(builder.Configuration)
+        .UseTopicResolutionBackwardCompatibility(builder.Configuration);
+}
+else
+{
+    throw new Exception($"Messaging:Transport={transport} not supported");
+}
+
+builder.Services
+    .AddMediator(options =>
+    {
+        options.ServiceLifetime = ServiceLifetime.Scoped;
+        options.GenerateTypesAsInternal = true; // NBB.Mono references this project and has its own generator
+        options.Assemblies = [typeof(Program)]; // this host only publishes to the bus: no in-process messages or handlers
+    })
+    .AddMediatorIntegration(); // contract classifier for the NBB 4 topic resolution
+builder.Services.AddContractsReadModelDataAccess();
+
+var app = builder.Build();
+
+app.UseCorrelation();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Contracts API v1"));
+}
+
+app.MapControllers();
+app.MapDefaultEndpoints();
+
+app.Run();

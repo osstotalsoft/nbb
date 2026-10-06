@@ -1,41 +1,58 @@
-// Copyright (c) TotalSoft.
+﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Serilog;
-using NBB.Correlation.Serilog;
+using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NBB.Tools.Serilog.Enrichers.TenantId;
-using NBB.Tools.Serilog.OpenTelemetryTracingSink;
+using Microsoft.Extensions.Hosting;
+using NBB.Correlation.AspNet;
+using NBB.MultiTenancy.Abstractions.Repositories;
+using NBB.MultiTenancy.AspNet;
+using NBB.Todo.Api;
+using NBB.Todos.Data;
 
-namespace NBB.Todo.Api
+var builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
+
+builder.Services.AddControllers();
+builder.Services.AddMessageBus().AddJetStreamTransport(builder.Configuration);
+builder.Services.AddTodoDataAccess();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSwaggerGen(options =>
 {
-    public class Program
+    if (builder.Configuration.IsMultiTenant())
     {
-        public static void Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
-            Log.Information("Starting NBB.Todo.Api");
-
-            host.Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseSerilog((context, services, logConfig) =>
-                {
-                    logConfig
-                        .ReadFrom.Configuration(context.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.With<CorrelationLogEventEnricher>()
-                        .Enrich.With(services.GetRequiredService<TenantEnricher>())
-                        .WriteTo.OpenTelemetryTracing()
-                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {TenantCode:u}] {Message:lj}{NewLine}{Exception}");
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        options.OperationFilter<SwaggerTenantHeaderFilter>();
     }
-}
+});
+
+builder.Services.AddMultitenancy(builder.Configuration)
+    .AddDefaultHttpTenantIdentification()
+    .AddMultiTenantMessaging()
+    .AddTenantRepository<ConfigurationTenantRepository>();
+
+builder.Services.AddProblemDetails(options => ProblemDetailsConfiguration.Configure(options));
+
+var app = builder.Build();
+
+app.UseRouting();
+
+app.UseAuthorization();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCorrelation();
+app.UseWhen(
+    ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api")),
+    appBuilder => appBuilder.UseTenantMiddleware());
+
+app.UseProblemDetails();
+
+app.MapControllers();
+app.MapDefaultEndpoints();
+
+app.Run();

@@ -55,9 +55,13 @@ module InvoiceRepository =
     open InvoiceAggregate
 
     type SideEffect<'a> =
-        | GetById of InvoiceId: Guid * Continuation: (Invoice -> 'a)
-        | Save of Invoice: Invoice * Continuation: (unit -> 'a)
+        | GetById of InvoiceId: Guid * Continuation: (Invoice option -> 'a)
+        | Save of Invoice: Invoice * EventCount: int * Continuation: (unit -> 'a)
         interface ISideEffect<'a>
 
     let getById invoiceId = Effect.Of(GetById(invoiceId, id))
-    let save invoice = Effect.Of(Save(invoice, id))
+
+    /// Saves an evented invoice; the stored version advances by the number of events, like EventedAggregateRoot
+    let save (eventedInvoice: Evented<Invoice, InvoiceEvent>) =
+        let invoice, events = Evented.run eventedInvoice
+        Effect.Of(Save(invoice, List.length events, id))
