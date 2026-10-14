@@ -4,6 +4,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using NBB.Core.Configuration;
 using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
@@ -12,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
-using static NBB.MultiTenancy.Abstractions.Configuration.TenantConfigurationExtensions;
 
 namespace NBB.MultiTenancy.Abstractions.Tests
 {
@@ -527,7 +527,129 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
 
             // Assert
-            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part Database is not provided!");
+            act.Should().Throw<ConnectionStringConfigurationException>().WithMessage("Connection string part Database is not provided!");
+        }
+
+        private const string MbfsTenantId = "68a448a2-e7d8-4875-8127-f18668217eb6";
+        private const string BcrTenantId = "ef8d5362-9969-4e02-8794-0d1af56816f6";
+        private const string IdentityClientId = "3f2c1a9e-6b7d-4e8f-9a0b-1c2d3e4f5a6b";
+
+        [Fact]
+        public void load_connectionString_workload_identity_ignores_default_credentials()
+        {
+            // Arrange
+            var tenantConfig = GetTenantConfiguration(GetIdentityConfigJson("Active Directory Workload Identity"), MbfsTenantId, "MBFS");
+
+            // Act
+            var connectionString = tenantConfig.GetConnectionString("Leasing_Database");
+
+            // Assert
+            connectionString.Should().Be($"Server=server1;Database=db1;User Id={IdentityClientId};Authentication=Active Directory Workload Identity;MultipleActiveResultSets=true");
+        }
+
+        [Fact]
+        public void load_connectionString_workload_identity_missing_identity_client_id()
+        {
+            // Arrange
+            var myConfiguration = @"{
+                      ""MultiTenancy"": {
+                        ""Defaults"": {
+                          ""ConnectionStrings"": {
+                            ""Leasing_Database"": {
+                              ""UserName"": ""web"",
+                              ""Password"": ""pass""
+                            }
+                          }
+                        },
+                        ""Tenants"": {
+                          ""MBFS"": {
+                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
+                            ""ConnectionStrings"": {
+                              ""Leasing_Database"": {
+                                ""Server"": ""server1"",
+                                ""Database"": ""db1"",
+                                ""Authentication"": ""Active Directory Workload Identity""
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }";
+            var tenantConfig = GetTenantConfiguration(myConfiguration, MbfsTenantId, "MBFS");
+
+            // Act
+            Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
+
+            // Assert
+            act.Should().Throw<ConnectionStringConfigurationException>().WithMessage("Connection string part IdentityClientId is not provided!");
+        }
+
+        [Fact]
+        public void load_connectionString_workload_identity_only_for_one_tenant()
+        {
+            // Arrange
+            var configJson = GetIdentityConfigJson("Active Directory Workload Identity");
+
+            // Act (the tenant context is ambient, so resolve one tenant at a time)
+            var mbfsConnectionString = GetTenantConfiguration(configJson, MbfsTenantId, "MBFS").GetConnectionString("Leasing_Database");
+            var bcrConnectionString = GetTenantConfiguration(configJson, BcrTenantId, "BCR").GetConnectionString("Leasing_Database");
+
+            // Assert
+            mbfsConnectionString.Should().Be($"Server=server1;Database=db1;User Id={IdentityClientId};Authentication=Active Directory Workload Identity;MultipleActiveResultSets=true");
+            bcrConnectionString.Should().Be("Server=server2;Database=db2;User Id=web;Password=pass;");
+        }
+
+        // MBFS overrides Authentication and IdentityClientId; UserName/Password come from Defaults; BCR keeps the legacy configuration
+        private static string GetIdentityConfigJson(string authentication) => @"{
+                      ""MultiTenancy"": {
+                        ""Defaults"": {
+                          ""ConnectionStrings"": {
+                            ""Leasing_Database"": {
+                              ""UserName"": ""web"",
+                              ""Password"": ""pass""
+                            }
+                          }
+                        },
+                        ""Tenants"": {
+                          ""MBFS"": {
+                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
+                            ""ConnectionStrings"": {
+                              ""Leasing_Database"": {
+                                ""Server"": ""server1"",
+                                ""Database"": ""db1"",
+                                ""OtherParams"": ""MultipleActiveResultSets=true"",
+                                ""Authentication"": """ + authentication + @""",
+                                ""IdentityClientId"": """ + IdentityClientId + @"""
+                              }
+                            }
+                          },
+                          ""BCR"": {
+                            ""TenantId"": ""ef8d5362-9969-4e02-8794-0d1af56816f6"",
+                            ""ConnectionStrings"": {
+                              ""Leasing_Database"": {
+                                ""Server"": ""server2"",
+                                ""Database"": ""db2""
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }";
+
+        private static TenantConfiguration GetTenantConfiguration(string json, string tenantId, string tenantCode)
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonStream(new MemoryStream(Encoding.UTF8.GetBytes(json)))
+                .Build();
+
+            var tca = new TenantContextAccessor
+            {
+                TenantContext = new TenantContext(new Tenant(Guid.Parse(tenantId), tenantCode))
+            };
+
+            return new TenantConfiguration(configuration,
+                new OptionsWrapper<TenancyHostingOptions>(new TenancyHostingOptions()
+                    { TenancyType = TenancyType.MultiTenant }), tca);
         }
     }
 }

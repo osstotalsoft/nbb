@@ -1,4 +1,4 @@
-# NBB.MultiTenancy.Abstractions
+﻿# NBB.MultiTenancy.Abstractions
 
 This package provides some abstractions for multi-tenant projects like
 * `Tenant` - data structure that stores tenant information (eg. id, name, code)
@@ -29,8 +29,7 @@ The `GetConnectionString` extension:
 public static string GetConnectionString(this ITenantConfiguration config, string name)
 ```
 
-reads connection string configuration from:
-  - separate connection info segments:
+resolves the `ConnectionStrings:{name}` entry from the current tenant configuration (tenant values merged with `MultiTenancy:Defaults`), either from separate connection info segments or from a standalone string:
   ```json
      "ConnectionStrings": {
         "MyDatabase": {
@@ -41,11 +40,31 @@ reads connection string configuration from:
           "OtherParams": "MultipleActiveResultSets=true"
         }
   ```
-  - or standalone string:
+
+It delegates to `IConfiguration.ResolveConnectionString` from [NBB.Core.Configuration](../../Core/NBB.Core.Configuration/README.md#connection-strings), which documents the supported segments, including identity-based authentication (`Authentication`, `IdentityClientId`). For passwordless modes such as `Active Directory Workload Identity`, `UserName` and `Password` are ignored, even when merged from `MultiTenancy:Defaults`, so a tenant can switch to a managed identity while the shared SQL login stays in the defaults:
   ```json
-     "ConnectionStrings": {
-        "MyDatabase": "Server=myserver,3342;Database=mydb;User Id=myuser;Password=mypass;MultipleActiveResultSets=true"
+     "MultiTenancy": {
+        "Defaults": {
+          "ConnectionStrings": {
+            "MyDatabase": { "UserName": "myuser", "Password": "mypass" }
+          }
+        },
+        "Tenants": {
+          "TenantA": {
+            "ConnectionStrings": {
+              "MyDatabase": {
+                "Server": "myserver.database.windows.net",
+                "Database": "tenant_a",
+                "Authentication": "Active Directory Workload Identity",
+                "IdentityClientId": "00000000-0000-0000-0000-000000000000"
+              }
+            }
+          }
+        }
+     }
   ```
+
+A missing mandatory segment throws `NBB.Core.Configuration.ConnectionStringConfigurationException`. The former `TenantConnectionStringBuilderException` is obsolete and no longer thrown.
 
 The `GetValue<T>` extension reads values or complex objects from configuration:
 ```csharp
