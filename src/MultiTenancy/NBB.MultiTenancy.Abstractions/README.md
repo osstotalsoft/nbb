@@ -47,6 +47,26 @@ reads connection string configuration from:
         "MyDatabase": "Server=myserver,3342;Database=mydb;User Id=myuser;Password=mypass;MultipleActiveResultSets=true"
   ```
 
+The segmented form also accepts two optional keys for identity-based authentication:
+  - `Authentication` - the SqlClient authentication mode. When it is missing or empty, the connection string is built exactly as above.
+  - `IdentityClientId` - the client id of the managed identity, used as `User Id` for passwordless modes.
+
+For the passwordless modes `Active Directory Workload Identity`, `Active Directory Managed Identity`, `Active Directory MSI` and `Active Directory Default` (matched case-insensitively and ignoring spaces, e.g. `ActiveDirectoryWorkloadIdentity`), `Server`, `Database` and `IdentityClientId` are mandatory, while `UserName` and `Password` are ignored (even when merged from `MultiTenancy:Defaults`):
+  ```json
+     "ConnectionStrings": {
+        "MyDatabase": {
+          "Server": "myserver.database.windows.net",
+          "Database": "mydb",
+          "Authentication": "Active Directory Workload Identity",
+          "IdentityClientId": "00000000-0000-0000-0000-000000000000",
+          "OtherParams": "MultipleActiveResultSets=true"
+        }
+  ```
+  results in `Server=myserver.database.windows.net;Database=mydb;User Id=00000000-0000-0000-0000-000000000000;Authentication=Active Directory Workload Identity;MultipleActiveResultSets=true`
+
+Any other `Authentication` value (e.g. `Active Directory Service Principal`) requires `UserName` and `Password` and is appended to the connection string:
+`Server=...;Database=...;User Id=myuser;Password=mypass;Authentication=Active Directory Service Principal;...`
+
 The `GetValue<T>` extension reads values or complex objects from configuration:
 ```csharp
 /// <summary>
