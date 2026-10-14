@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace NBB.MultiTenancy.Abstractions.Configuration;
@@ -43,94 +42,18 @@ public static class TenantConfigurationExtensions
     /// <param name="config"></param>
     /// <param name="name"></param>
     /// <returns></returns>
+    /// <exception cref="NBB.Core.Configuration.ConnectionStringConfigurationException">A mandatory connection info segment is missing.</exception>
     public static string GetConnectionString(this ITenantConfiguration config, string name)
-    {
-        var connStrBuilder = config.GetValue<TenantConnectionStringBuilder>($"ConnectionStrings:{name}");
-        if (connStrBuilder != null)
-        {
-            return connStrBuilder.Build();
-        }
-
-        return config.GetValue<string>($"ConnectionStrings:{name}");
-    }
+        => ((IConfiguration)config).ResolveConnectionString(name);
 
     /// <summary>
     /// Exception thrown when connection string builder is not properly configured
     /// </summary>
+    [Obsolete("No longer thrown; catch NBB.Core.Configuration.ConnectionStringConfigurationException instead.")]
     public class TenantConnectionStringBuilderException : Exception
     {
         public TenantConnectionStringBuilderException(string message) : base(message)
         {
-        }
-    }
-
-    private class TenantConnectionStringBuilder
-    {
-        // Authentication modes that use an identity instead of a password (compared ignoring case and spaces)
-        private static readonly HashSet<string> PasswordlessAuthenticationModes = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "ActiveDirectoryWorkloadIdentity",
-            "ActiveDirectoryManagedIdentity",
-            "ActiveDirectoryMSI",
-            "ActiveDirectoryDefault"
-        };
-
-        public string Server { get; set; }
-        public string Database { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string OtherParams { get; set; }
-        public string Authentication { get; set; }
-        public string IdentityClientId { get; set; }
-
-        public string Build()
-        {
-            if (string.IsNullOrWhiteSpace(Authentication))
-            {
-                Validate();
-
-                return $"Server={Server};Database={Database};User Id={UserName};Password={Password};{OtherParams}";
-            }
-
-            if (IsPasswordlessAuthentication())
-            {
-                ValidatePasswordless();
-
-                return $"Server={Server};Database={Database};User Id={IdentityClientId};Authentication={Authentication};{OtherParams}";
-            }
-
-            Validate();
-
-            return $"Server={Server};Database={Database};User Id={UserName};Password={Password};Authentication={Authentication};{OtherParams}";
-        }
-
-        private bool IsPasswordlessAuthentication()
-        {
-            var normalized = string.Concat(Authentication.Where(c => !char.IsWhiteSpace(c)));
-            return PasswordlessAuthenticationModes.Contains(normalized);
-        }
-
-        private static void CheckMandatoryField(string fieldValue, string fieldName)
-        {
-            if (string.IsNullOrWhiteSpace(fieldValue))
-            {
-                throw new TenantConnectionStringBuilderException($"Connection string part {fieldName} is not provided!");
-            }
-        }
-
-        private void Validate()
-        {
-            CheckMandatoryField(Server, nameof(Server));
-            CheckMandatoryField(Database, nameof(Database));
-            CheckMandatoryField(UserName, nameof(UserName));
-            CheckMandatoryField(Password, nameof(Password));
-        }
-
-        private void ValidatePasswordless()
-        {
-            CheckMandatoryField(Server, nameof(Server));
-            CheckMandatoryField(Database, nameof(Database));
-            CheckMandatoryField(IdentityClientId, nameof(IdentityClientId));
         }
     }
 }

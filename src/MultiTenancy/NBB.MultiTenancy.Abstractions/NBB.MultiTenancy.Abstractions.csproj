@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\NBB.Core.Configuration\NBB.Core.Configuration.csproj" />
     <ProjectReference Include="..\..\Core\NBB.Core.DependencyInjection\NBB.Core.DependencyInjection.csproj" />
   </ItemGroup>
 

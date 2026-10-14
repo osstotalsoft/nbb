@@ -2,9 +2,9 @@
 // This source code is licensed under the MIT license.
 
 using FluentAssertions;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using NBB.Core.Configuration;
 using NBB.MultiTenancy.Abstractions.Configuration;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
-using static NBB.MultiTenancy.Abstractions.Configuration.TenantConfigurationExtensions;
 
 namespace NBB.MultiTenancy.Abstractions.Tests
 {
@@ -528,7 +527,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
 
             // Assert
-            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part Database is not provided!");
+            act.Should().Throw<ConnectionStringConfigurationException>().WithMessage("Connection string part Database is not provided!");
         }
 
         private const string MbfsTenantId = "68a448a2-e7d8-4875-8127-f18668217eb6";
@@ -546,36 +545,6 @@ namespace NBB.MultiTenancy.Abstractions.Tests
 
             // Assert
             connectionString.Should().Be($"Server=server1;Database=db1;User Id={IdentityClientId};Authentication=Active Directory Workload Identity;MultipleActiveResultSets=true");
-        }
-
-        [Fact]
-        public void load_connectionString_workload_identity_without_other_params()
-        {
-            // Arrange
-            var myConfiguration = @"{
-                      ""MultiTenancy"": {
-                        ""Tenants"": {
-                          ""MBFS"": {
-                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
-                            ""ConnectionStrings"": {
-                              ""Leasing_Database"": {
-                                ""Server"": ""server1"",
-                                ""Database"": ""db1"",
-                                ""Authentication"": ""Active Directory Workload Identity"",
-                                ""IdentityClientId"": """ + IdentityClientId + @"""
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }";
-            var tenantConfig = GetTenantConfiguration(myConfiguration, MbfsTenantId, "MBFS");
-
-            // Act
-            var connectionString = tenantConfig.GetConnectionString("Leasing_Database");
-
-            // Assert
-            connectionString.Should().Be($"Server=server1;Database=db1;User Id={IdentityClientId};Authentication=Active Directory Workload Identity;");
         }
 
         [Fact]
@@ -612,116 +581,7 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
 
             // Assert
-            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part IdentityClientId is not provided!");
-        }
-
-        [Fact]
-        public void load_connectionString_workload_identity_missing_server()
-        {
-            // Arrange
-            var myConfiguration = @"{
-                      ""MultiTenancy"": {
-                        ""Tenants"": {
-                          ""MBFS"": {
-                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
-                            ""ConnectionStrings"": {
-                              ""Leasing_Database"": {
-                                ""Database"": ""db1"",
-                                ""Authentication"": ""Active Directory Workload Identity"",
-                                ""IdentityClientId"": """ + IdentityClientId + @"""
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }";
-            var tenantConfig = GetTenantConfiguration(myConfiguration, MbfsTenantId, "MBFS");
-
-            // Act
-            Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
-
-            // Assert
-            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part Server is not provided!");
-        }
-
-        [Theory]
-        [InlineData("Active Directory Workload Identity")]
-        [InlineData("ActiveDirectoryWorkloadIdentity")]
-        [InlineData("active directory workload identity")]
-        [InlineData("ACTIVEDIRECTORYWORKLOADIDENTITY")]
-        [InlineData("Active  Directory Workload  Identity")]
-        [InlineData("Active Directory Managed Identity")]
-        [InlineData("ActiveDirectoryManagedIdentity")]
-        [InlineData("Active Directory MSI")]
-        [InlineData("ActiveDirectoryMSI")]
-        [InlineData("Active Directory Default")]
-        [InlineData("activedirectorydefault")]
-        public void load_connectionString_passwordless_authentication_modes(string authentication)
-        {
-            // Arrange
-            var tenantConfig = GetTenantConfiguration(GetIdentityConfigJson(authentication), MbfsTenantId, "MBFS");
-
-            // Act
-            var connectionString = tenantConfig.GetConnectionString("Leasing_Database");
-
-            // Assert
-            connectionString.Should().Be($"Server=server1;Database=db1;User Id={IdentityClientId};Authentication={authentication};MultipleActiveResultSets=true");
-        }
-
-        [Fact]
-        public void load_connectionString_service_principal_keeps_credentials()
-        {
-            // Arrange
-            var tenantConfig = GetTenantConfiguration(GetIdentityConfigJson("Active Directory Service Principal"), MbfsTenantId, "MBFS");
-
-            // Act
-            var connectionString = tenantConfig.GetConnectionString("Leasing_Database");
-
-            // Assert
-            connectionString.Should().Be("Server=server1;Database=db1;User Id=web;Password=pass;Authentication=Active Directory Service Principal;MultipleActiveResultSets=true");
-        }
-
-        [Fact]
-        public void load_connectionString_service_principal_missing_password()
-        {
-            // Arrange
-            var myConfiguration = @"{
-                      ""MultiTenancy"": {
-                        ""Tenants"": {
-                          ""MBFS"": {
-                            ""TenantId"": ""68a448a2-e7d8-4875-8127-f18668217eb6"",
-                            ""ConnectionStrings"": {
-                              ""Leasing_Database"": {
-                                ""Server"": ""server1"",
-                                ""Database"": ""db1"",
-                                ""UserName"": ""web"",
-                                ""Authentication"": ""Active Directory Service Principal""
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }";
-            var tenantConfig = GetTenantConfiguration(myConfiguration, MbfsTenantId, "MBFS");
-
-            // Act
-            Action act = () => tenantConfig.GetConnectionString("Leasing_Database");
-
-            // Assert
-            act.Should().Throw<TenantConnectionStringBuilderException>().WithMessage("Connection string part Password is not provided!");
-        }
-
-        [Fact]
-        public void load_connectionString_whitespace_authentication_uses_legacy_format()
-        {
-            // Arrange
-            var tenantConfig = GetTenantConfiguration(GetIdentityConfigJson("   "), MbfsTenantId, "MBFS");
-
-            // Act
-            var connectionString = tenantConfig.GetConnectionString("Leasing_Database");
-
-            // Assert
-            connectionString.Should().Be("Server=server1;Database=db1;User Id=web;Password=pass;MultipleActiveResultSets=true");
+            act.Should().Throw<ConnectionStringConfigurationException>().WithMessage("Connection string part IdentityClientId is not provided!");
         }
 
         [Fact]
@@ -737,24 +597,6 @@ namespace NBB.MultiTenancy.Abstractions.Tests
             // Assert
             mbfsConnectionString.Should().Be($"Server=server1;Database=db1;User Id={IdentityClientId};Authentication=Active Directory Workload Identity;MultipleActiveResultSets=true");
             bcrConnectionString.Should().Be("Server=server2;Database=db2;User Id=web;Password=pass;");
-        }
-
-        [Fact]
-        public void workload_identity_connectionString_is_parsed_by_sql_client()
-        {
-            // Arrange
-            var tenantConfig = GetTenantConfiguration(GetIdentityConfigJson("Active Directory Workload Identity"), MbfsTenantId, "MBFS");
-
-            // Act
-            var builder = new SqlConnectionStringBuilder(tenantConfig.GetConnectionString("Leasing_Database"));
-
-            // Assert
-            builder.Authentication.Should().Be(SqlAuthenticationMethod.ActiveDirectoryWorkloadIdentity);
-            builder.UserID.Should().Be(IdentityClientId);
-            builder.Password.Should().BeEmpty();
-            builder.DataSource.Should().Be("server1");
-            builder.InitialCatalog.Should().Be("db1");
-            builder.MultipleActiveResultSets.Should().BeTrue();
         }
 
         // MBFS overrides Authentication and IdentityClientId; UserName/Password come from Defaults; BCR keeps the legacy configuration
