@@ -37,18 +37,20 @@ public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions,
 
         var cc = new ConsumerConfig();
         var consumerName = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
-        if (subscriberOptions.IsDurable)
+        if (subscriberOptions.IsDurable && subscriberOptions.UseGroup)
         {
-            if (!subscriberOptions.UseGroup)
-                logger.LogWarning(
-                    "UseGroup = false is ignored for the durable subscription to {Topic}: subscribers with client id {ClientId} share consumer {ConsumerName} and compete for messages. Use IsDurable = false to deliver every message to every subscriber",
-                    topic, natsOptions.Value.ClientId, consumerName);
-
             cc.Name = consumerName;
             cc.DurableName = consumerName;
         }
         else
         {
+            // A durable consumer is shared by every subscriber with the same client id, so it cannot fan out.
+            // Without a group the subscription is made ephemeral instead, and durability is dropped.
+            if (subscriberOptions.IsDurable)
+                logger.LogWarning(
+                    "IsDurable = true is ignored for the subscription to {Topic} because UseGroup = false: each subscriber gets its own ephemeral consumer and receives every message, but messages published while it is not running are not delivered to it",
+                    topic);
+
             // Ephemeral consumer, removed by the server once nobody pulls from it.
             // It must still be named, otherwise the create subject is built from the filter subject and the server rejects it.
             // Without a group every subscriber gets its own consumer, so each one receives every message (fan-out).
