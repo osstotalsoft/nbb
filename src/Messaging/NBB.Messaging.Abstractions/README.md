@@ -116,7 +116,7 @@ var subscription = await _messageBus.SubscribeAsync<TMessage>(HandleMsg, Messagi
   - **DynamicDeserializationScannedAssemblies** - the assemblies to scan in case UseDynamicDeserialization is used
 - **Transport** - options for the messaging transport
   - **IsDurable** (default true) - Specifies if a durable subscription should be made
-  - **UseGroup** (default true) - Specifies if a consumer group should be used
+  - **UseGroup** (default true) - Specifies if a consumer group should be used. With JetStream it applies to non-durable subscriptions: grouped subscribers share one ephemeral consumer and compete for messages, ungrouped subscribers each get their own and every one receives every message (fan-out). Durable subscriptions are always grouped.
   - **MaxConcurrentMessages** (default 1) - Specifies the maximum number of messages that can be handled concurrently
   - **DeliverNewMessagesOnly** (default true) -  If set, only new messages are delivered. Otherwise all available messages are delivered even if published before the subscription.
   - **AckWait** (default 5000) - Timeout before message redelivery (in milliseconds)

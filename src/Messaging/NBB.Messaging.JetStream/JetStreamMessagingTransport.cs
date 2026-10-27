@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NATS.Client.Core;
 using NATS.Client.JetStream;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream;
 
-public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsConnectionPool connectionPool) : IMessagingTransport, ITransportMonitor
+public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsConnectionPool connectionPool, ILogger<JetStreamMessagingTransport> logger) : IMessagingTransport, ITransportMonitor
 {
     public event TransportErrorHandler OnError;
 
@@ -35,11 +36,23 @@ public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions,
         var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
 
         var cc = new ConsumerConfig();
+        var consumerName = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
         if (subscriberOptions.IsDurable)
         {
-            var clientId = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
-            cc.Name = clientId;
-            cc.DurableName = clientId;
+            if (!subscriberOptions.UseGroup)
+                logger.LogWarning(
+                    "UseGroup = false is ignored for the durable subscription to {Topic}: subscribers with client id {ClientId} share consumer {ConsumerName} and compete for messages. Use IsDurable = false to deliver every message to every subscriber",
+                    topic, natsOptions.Value.ClientId, consumerName);
+
+            cc.Name = consumerName;
+            cc.DurableName = consumerName;
+        }
+        else
+        {
+            // Ephemeral consumer, removed by the server once nobody pulls from it.
+            // It must still be named, otherwise the create subject is built from the filter subject and the server rejects it.
+            // Without a group every subscriber gets its own consumer, so each one receives every message (fan-out).
+            cc.Name = subscriberOptions.UseGroup ? consumerName : consumerName + "__" + Guid.NewGuid().ToString("N");
         }
 
         if (subscriberOptions.DeliverNewMessagesOnly)
