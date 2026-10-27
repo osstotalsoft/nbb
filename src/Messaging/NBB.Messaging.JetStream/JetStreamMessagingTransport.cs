@@ -37,24 +37,25 @@ public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions,
 
         var cc = new ConsumerConfig();
         var consumerName = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
-        if (subscriberOptions.IsDurable && subscriberOptions.UseGroup)
+        // Consumers without a DurableName are ephemeral: the server removes them once nobody pulls from them.
+        // They must still be named, otherwise the create subject is built from the filter subject and the server rejects it.
+        if (subscriberOptions.UseGroup)
         {
+            // Subscribers with the same client id share one consumer, so each message goes to only one of them.
             cc.Name = consumerName;
-            cc.DurableName = consumerName;
+            if (subscriberOptions.IsDurable)
+                cc.DurableName = consumerName;
         }
         else
         {
-            // A durable consumer is shared by every subscriber with the same client id, so it cannot fan out.
-            // Without a group the subscription is made ephemeral instead, and durability is dropped.
+            // Every subscriber gets its own ephemeral consumer, so each one receives every message (fan-out).
+            // A durable consumer would be shared by every subscriber with the same client id, so durability is dropped.
             if (subscriberOptions.IsDurable)
                 logger.LogWarning(
                     "IsDurable = true is ignored for the subscription to {Topic} because UseGroup = false: each subscriber gets its own ephemeral consumer and receives every message, but messages published while it is not running are not delivered to it",
                     topic);
 
-            // Ephemeral consumer, removed by the server once nobody pulls from it.
-            // It must still be named, otherwise the create subject is built from the filter subject and the server rejects it.
-            // Without a group every subscriber gets its own consumer, so each one receives every message (fan-out).
-            cc.Name = subscriberOptions.UseGroup ? consumerName : consumerName + "__" + Guid.NewGuid().ToString("N");
+            cc.Name = consumerName + "__" + Guid.NewGuid().ToString("N");
         }
 
         if (subscriberOptions.DeliverNewMessagesOnly)
