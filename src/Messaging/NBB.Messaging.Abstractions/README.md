@@ -125,6 +125,7 @@ Predefined combinations of transport options:
 - **SubscriptionTransportOptions.StreamProcessor** - Stream processor transport options (with durable subscription, within consumer group, )
 - **SubscriptionTransportOptions.RequestReply** - Request/Reply transport options (lightweight, non-durable, without consumer group)
 - **SubscriptionTransportOptions.PubSub** - Publisher/Subscriber transport options (lightweight, non-durable)
+- **SubscriptionTransportOptions.Broadcast** - Broadcast transport options (lightweight, non-durable, without consumer group): every subscriber, e.g. every replica of a service, receives every message. Use it for per-instance state such as in-memory caches or SSE connections.
 
 **Note**: If the message type is not known and we don't use *DynamicDeserialization*, the message payload will be deserialized into an *ExpandoObject*
 

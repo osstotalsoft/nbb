@@ -49,5 +49,12 @@ namespace NBB.Messaging.Abstractions
 
         public static SubscriptionTransportOptions PubSub => new()
             {IsDurable = false};
+
+        /// <summary>
+        /// Broadcast transport options (non-durable, without consumer group): every subscriber, e.g. every replica of a service,
+        /// receives every message. Messages published while a subscriber is not running are not delivered to it.
+        /// </summary>
+        public static SubscriptionTransportOptions Broadcast => new()
+            {IsDurable = false, UseGroup = false};
     }
 }
