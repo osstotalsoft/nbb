@@ -42,10 +42,11 @@ namespace NBB.Messaging.Abstractions
             {DeliverNewMessagesOnly = false};
 
         /// <summary>
-        /// Request/Reply transport options (non-durable
+        /// Request/Reply transport options (non-durable, without consumer group): used to wait for the reply to a request,
+        /// e.g. by <see cref="MessageBus.WhenMessage{TMessage}"/>. Every subscriber receives every message.
         /// </summary>
-        [System.Obsolete("Use Broadcast, which has the same options. RequestReply will be removed in the next major version.")]
-        public static SubscriptionTransportOptions RequestReply => Broadcast;
+        public static SubscriptionTransportOptions RequestReply => new()
+            {IsDurable = false, UseGroup = false};
 
         public static SubscriptionTransportOptions PubSub => new()
             {IsDurable = false};

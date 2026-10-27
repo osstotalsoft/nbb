@@ -11,7 +11,7 @@ namespace NBB.Messaging.Rusi.IntegrationTests
         {
             var sp = BuildServiceProvider();
             var msgBus = sp.GetRequiredService<IMessageBus>();
-            var sub = await msgBus.SubscribeAsync(_e => Task.CompletedTask, MessagingSubscriberOptions.Default with { TopicName = "MyTestTopic", Transport = SubscriptionTransportOptions.Broadcast });
+            var sub = await msgBus.SubscribeAsync(_e => Task.CompletedTask, MessagingSubscriberOptions.Default with { TopicName = "MyTestTopic", Transport = SubscriptionTransportOptions.RequestReply });
             sub.Dispose();
         }
 
@@ -21,7 +21,7 @@ namespace NBB.Messaging.Rusi.IntegrationTests
             var sp = BuildServiceProvider();
             var msgBus = sp.GetRequiredService<IMessageBus>();
             var cts = new CancellationTokenSource();
-            var sub = await msgBus.SubscribeAsync(_e => Task.CompletedTask, MessagingSubscriberOptions.Default with { TopicName = "MyTestTopic", Transport = SubscriptionTransportOptions.Broadcast }, cts.Token);
+            var sub = await msgBus.SubscribeAsync(_e => Task.CompletedTask, MessagingSubscriberOptions.Default with { TopicName = "MyTestTopic", Transport = SubscriptionTransportOptions.RequestReply }, cts.Token);
             cts.Cancel();
             sub.Dispose();
         }
