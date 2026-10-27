@@ -123,7 +123,7 @@ var subscription = await _messageBus.SubscribeAsync<TMessage>(HandleMsg, Messagi
 
 Predefined combinations of transport options:
 - **SubscriptionTransportOptions.StreamProcessor** - Stream processor transport options (with durable subscription, within consumer group, )
-- **SubscriptionTransportOptions.RequestReply** - Request/Reply transport options (lightweight, non-durable, without consumer group): used to wait for the reply to a request, e.g. by `IMessageBus.WhenMessage`. It is the counterpart of rocket-toolkit's `RPC` mode.
+- **SubscriptionTransportOptions.RequestReply** - Request/Reply transport options (lightweight, non-durable, without consumer group): used to wait for the reply to a request, e.g. by `IMessageBus.WhenMessage`.
 - **SubscriptionTransportOptions.PubSub** - Publisher/Subscriber transport options (lightweight, non-durable)
 - **SubscriptionTransportOptions.Broadcast** - Broadcast transport options (lightweight, non-durable, without consumer group): every subscriber, e.g. every replica of a service, receives every message. Use it for per-instance state such as in-memory caches or SSE connections. It has the same transport options as `RequestReply`, named for application subscriptions that fan out; it is the counterpart of rocket-toolkit's `BROADCAST` mode.
 
