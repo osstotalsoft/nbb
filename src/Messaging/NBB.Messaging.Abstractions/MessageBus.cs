@@ -49,7 +49,7 @@ namespace NBB.Messaging.Abstractions
             }
 
             using var subscription = await SubscribeAsync<TMessage>(HandleMessage,
-                new MessagingSubscriberOptions { Transport = SubscriptionTransportOptions.RequestReply },
+                new MessagingSubscriberOptions { Transport = SubscriptionTransportOptions.Broadcast },
                 tokenSource.Token);
 
             if (millisecondsTimeout > 0)

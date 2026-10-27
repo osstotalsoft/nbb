@@ -44,8 +44,8 @@ namespace NBB.Messaging.Abstractions
         /// <summary>
         /// Request/Reply transport options (non-durable
         /// </summary>
-        public static SubscriptionTransportOptions RequestReply => new()
-            {IsDurable = false, UseGroup = false};
+        [System.Obsolete("Use Broadcast, which has the same options. RequestReply will be removed in the next major version.")]
+        public static SubscriptionTransportOptions RequestReply => Broadcast;
 
         public static SubscriptionTransportOptions PubSub => new()
             {IsDurable = false};
