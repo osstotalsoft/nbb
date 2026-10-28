@@ -1,6 +1,7 @@
 ﻿// Copyright (c) TotalSoft.
 // This source code is licensed under the MIT license.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NATS.Client.Core;
 using NATS.Client.JetStream;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace NBB.Messaging.JetStream;
 
-public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsConnectionPool connectionPool) : IMessagingTransport, ITransportMonitor
+public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions, INatsConnectionPool connectionPool, ILogger<JetStreamMessagingTransport> logger) : IMessagingTransport, ITransportMonitor
 {
     public event TransportErrorHandler OnError;
 
@@ -35,11 +36,26 @@ public class JetStreamMessagingTransport(IOptions<JetStreamOptions> natsOptions,
         var subscriberOptions = options ?? SubscriptionTransportOptions.Default;
 
         var cc = new ConsumerConfig();
-        if (subscriberOptions.IsDurable)
+        var consumerName = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
+        // Consumers without a DurableName are ephemeral: the server removes them once nobody pulls from them.
+        // They must still be named, otherwise the create subject is built from the filter subject and the server rejects it.
+        if (subscriberOptions.UseGroup)
         {
-            var clientId = (natsOptions.Value.ClientId + "__" + topic).Replace(".", "_");
-            cc.Name = clientId;
-            cc.DurableName = clientId;
+            // Subscribers with the same client id share one consumer, so each message goes to only one of them.
+            cc.Name = consumerName;
+            if (subscriberOptions.IsDurable)
+                cc.DurableName = consumerName;
+        }
+        else
+        {
+            // Every subscriber gets its own ephemeral consumer, so each one receives every message (fan-out).
+            // A durable consumer would be shared by every subscriber with the same client id, so durability is dropped.
+            if (subscriberOptions.IsDurable)
+                logger.LogWarning(
+                    "IsDurable = true is ignored for the subscription to {Topic} because UseGroup = false: each subscriber gets its own ephemeral consumer and receives every message, but messages published while it is not running are not delivered to it",
+                    topic);
+
+            cc.Name = consumerName + "__" + Guid.NewGuid().ToString("N");
         }
 
         if (subscriberOptions.DeliverNewMessagesOnly)

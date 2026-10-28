@@ -116,15 +116,16 @@ var subscription = await _messageBus.SubscribeAsync<TMessage>(HandleMsg, Messagi
   - **DynamicDeserializationScannedAssemblies** - the assemblies to scan in case UseDynamicDeserialization is used
 - **Transport** - options for the messaging transport
   - **IsDurable** (default true) - Specifies if a durable subscription should be made
-  - **UseGroup** (default true) - Specifies if a consumer group should be used
+  - **UseGroup** (default true) - Specifies if a consumer group should be used. With JetStream, grouped subscribers share one consumer and compete for messages, while ungrouped subscribers each get their own ephemeral consumer and every one receives every message (fan-out). A JetStream durable consumer cannot fan out, so an ungrouped subscription is always ephemeral: `IsDurable = true` is ignored (with a warning) and messages published while a subscriber is not running are not delivered to it.
   - **MaxConcurrentMessages** (default 1) - Specifies the maximum number of messages that can be handled concurrently
   - **DeliverNewMessagesOnly** (default true) -  If set, only new messages are delivered. Otherwise all available messages are delivered even if published before the subscription.
   - **AckWait** (default 5000) - Timeout before message redelivery (in milliseconds)
 
 Predefined combinations of transport options:
 - **SubscriptionTransportOptions.StreamProcessor** - Stream processor transport options (with durable subscription, within consumer group, )
-- **SubscriptionTransportOptions.RequestReply** - Request/Reply transport options (lightweight, non-durable, without consumer group)
+- **SubscriptionTransportOptions.RequestReply** - Request/Reply transport options (lightweight, non-durable, without consumer group): used to wait for the reply to a request, e.g. by `IMessageBus.WhenMessage`.
 - **SubscriptionTransportOptions.PubSub** - Publisher/Subscriber transport options (lightweight, non-durable)
+- **SubscriptionTransportOptions.Broadcast** - Broadcast transport options (lightweight, non-durable, without consumer group): every subscriber, e.g. every replica of a service, receives every message. Use it for per-instance state such as in-memory caches or SSE connections. It has the same transport options as `RequestReply`, named for application subscriptions that fan out.
 
 **Note**: If the message type is not known and we don't use *DynamicDeserialization*, the message payload will be deserialized into an *ExpandoObject*
 
