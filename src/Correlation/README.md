@@ -24,6 +24,6 @@ There is a dedicated messaging header **nbb-correlationID** interpreted by:
 * [`messaging host`](../Messaging/NBB.Messaging.Host#readme) - there is a built-in [`correlation middleware `](../Messaging/NBB.Messaging.Host#built-in-correlation-middleware) that reads the messaging header and sets the current correlation ID
 
 ### Open Telemetry integration
-A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans. 
+A tag named **nbb.correlation_id** is added to the messaging publisher and subscriber spans, and to the current ASP.NET request span by the `UseCorrelation` middleware. The tag name is available as `CorrelationTracingTags.CorrelationId`.
 
 For details see [`NBB.Messaging.OpenTelemetry`](./../Messaging/NBB.Messaging.OpenTelemetry#readme)

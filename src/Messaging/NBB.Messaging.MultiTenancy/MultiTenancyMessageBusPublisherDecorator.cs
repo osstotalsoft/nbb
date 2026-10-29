@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using NBB.Messaging.Abstractions;
+using NBB.MultiTenancy.Abstractions;
 using NBB.MultiTenancy.Abstractions.Context;
 using NBB.MultiTenancy.Abstractions.Options;
 
@@ -43,7 +44,7 @@ namespace NBB.Messaging.MultiTenancy
 
             void NewCustomizer(MessagingEnvelope outgoingEnvelope)
             {
-                Activity.Current?.SetTag(TracingTags.TenantId, tenantId);
+                Activity.Current?.SetTag(TenantTracingTags.TenantId, tenantId);
 
                 outgoingEnvelope.SetHeader(MessagingHeaders.TenantId, tenantId.ToString());
                 options.EnvelopeCustomizer?.Invoke(outgoingEnvelope);

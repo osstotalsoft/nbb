@@ -7,6 +7,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using NBB.Correlation;
 using CorrelationManager = NBB.Correlation.CorrelationManager;
 
 // ReSharper disable once CheckNamespace
@@ -22,7 +23,7 @@ namespace NBB.Messaging.Host
         {
             using (CorrelationManager.NewCorrelationId(context.MessagingEnvelope.GetCorrelationId()))
             {
-                Activity.Current?.SetTag(TracingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString());
+                Activity.Current?.SetTag(CorrelationTracingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString());
 
                 await next();
             }

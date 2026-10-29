@@ -11,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
 using NBB.Core.Abstractions;
+using NBB.Correlation;
+using CorrelationManager = NBB.Correlation.CorrelationManager;
 
 namespace NBB.Messaging.OpenTelemetry.Publisher
 {
@@ -52,7 +54,7 @@ namespace NBB.Messaging.OpenTelemetry.Publisher
             using var activity = activitySource.StartActivity(operationName, ActivityKind.Producer);
 
             activity?.SetTag(TraceSemanticConventions.AttributeMessagingDestination, formattedTopicName);
-            activity?.SetTag(TracingTags.CorrelationId, Correlation.CorrelationManager.GetCorrelationId()?.ToString());
+            activity?.SetTag(CorrelationTracingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString());
 
             try
             {
