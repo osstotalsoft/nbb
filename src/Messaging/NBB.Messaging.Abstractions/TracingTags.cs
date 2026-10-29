@@ -12,8 +12,6 @@ namespace NBB.Messaging.Abstractions
     public static class TracingTags
     {
         public const string ComponentMessaging = "NBB.Messaging";
-        public const string CorrelationId = "nbb.correlation_id";
-        public const string TenantId = "nbb.tenant_id";
         public const string MessagingEnvelopeHeaderSpanTagPrefix = "messaging_header.";
     }
 }

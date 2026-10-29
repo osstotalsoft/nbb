@@ -65,7 +65,8 @@ namespace NBB.Messaging.MultiTenancy
 
             tenantContextAccessor.TenantContext = new TenantContext(tenant);
 
-            Activity.Current?.SetTag(TracingTags.TenantId, tenant.TenantId);
+            Activity.Current?.SetTag(TenantTracingTags.TenantId, tenant.TenantId);
+            Activity.Current?.SetTag(TenantTracingTags.TenantCode, tenant.Code);
 
             using (logger.BeginScope(new TenantLogScope(tenantContextAccessor.TenantContext)))
             {

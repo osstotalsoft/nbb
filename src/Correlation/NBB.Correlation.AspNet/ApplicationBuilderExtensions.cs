@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Primitives;
 using System;
+using System.Diagnostics;
 
 namespace NBB.Correlation.AspNet
 {
@@ -27,6 +28,8 @@ namespace NBB.Correlation.AspNet
 
                 using (CorrelationManager.NewCorrelationId(correlationId))
                 {
+                    Activity.Current?.SetTag(CorrelationTracingTags.CorrelationId, CorrelationManager.GetCorrelationId()?.ToString());
+
                     return inner();
                 }
 

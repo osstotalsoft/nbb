@@ -2,6 +2,7 @@
 // This source code is licensed under the MIT license.
 
 using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using NBB.MultiTenancy.Abstractions.Context;
 using System.Threading.Tasks;
@@ -37,6 +38,9 @@ namespace NBB.MultiTenancy.AspNet
             var tenant = await tenantRepository.Get(tenantId, context.RequestAborted);
 
             tenantContextAccessor.TenantContext = new TenantContext(tenant);
+
+            Activity.Current?.SetTag(TenantTracingTags.TenantId, tenant.TenantId);
+            Activity.Current?.SetTag(TenantTracingTags.TenantCode, tenant.Code);
 
             using (logger.BeginScope(new TenantLogScope(tenantContextAccessor.TenantContext)))
             {
